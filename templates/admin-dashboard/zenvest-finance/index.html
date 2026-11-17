@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenvest — Personal Finance, Cards &amp; Cashflow Analytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            znavy: {
+              DEFAULT: '#1D3F91',
+              dark: '#163172',
+              soft: '#EEF2FB',
+            },
+            ztea: {
+              DEFAULT: '#14B8A6',
+              mint: '#2DD4BF',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-outer: #E8ECF4;
+      --bg-shell: #F6F8FB;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F8FAFC;
+      --ink-main: #0F172A;
+      --ink-sec: #475569;
+      --ink-muted: #64748B;
+      --border-soft: #EAEEF5;
+      --shadow-card: 0 10px 28px -8px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(15, 23, 42, 0.02);
+    }
+
+    html[data-theme="dark"] {
+      --bg-outer: #070B14;
+      --bg-shell: #0D1322;
+      --bg-surface: #131B2E;
+      --bg-subtle: #19233A;
+      --ink-main: #F8FAFC;
+      --ink-sec: #CBD5E1;
+      --ink-muted: #94A3B8;
+      --border-soft: #222F49;
+      --shadow-card: 0 14px 34px -8px rgba(0, 0, 0, 0.45);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-outer);
+      color: var(--ink-main);
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-frame {
+      background: var(--bg-shell);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 28px 70px -18px rgba(15, 23, 42, 0.14);
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .zen-surface {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-card);
+      transition: background 0.25s ease, border-color 0.25s ease, transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .zen-kpi:hover {
+      transform: translateY(-2px);
+      border-color: rgba(29, 63, 145, 0.25);
+    }
+
+    .zen-subtle {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-soft);
+      transition: all 0.2s ease;
+    }
+    .zen-subtle:hover {
+      border-color: rgba(29, 63, 145, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .text-main { color: var(--ink-main); }
+    .text-sec  { color: var(--ink-sec); }
+    .text-mut  { color: var(--ink-muted); }
+    .border-zen { border-color: var(--border-soft); }
+
+    /* Collapsible Sidebar */
+    #zenSidebar {
+      width: 256px;
+      transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.sidebar-collapsed #zenSidebar {
+      width: 82px;
+    }
+    body.sidebar-collapsed .nav-text,
+    body.sidebar-collapsed .pro-promo-card,
+    body.sidebar-collapsed .others-heading,
+    body.sidebar-collapsed .dark-switch-pill {
+      display: none;
+    }
+    body.sidebar-collapsed .sidebar-nav-btn {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* Ocean Navy-to-Teal Bank Card + 3D Tilt */
+    .ocean-bank-card {
+      background:
+        radial-gradient(circle at 92% 18%, rgba(45, 212, 191, 0.42) 0%, transparent 48%),
+        radial-gradient(circle at 15% 88%, rgba(20, 184, 166, 0.52) 0%, transparent 55%),
+        linear-gradient(135deg, #1D3F91 0%, #19588F 52%, #139A94 100%);
+      box-shadow:
+        0 18px 34px -10px rgba(20, 140, 145, 0.38),
+        0 8px 0 -2px rgba(45, 212, 191, 0.25);
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out, box-shadow 0.25s ease;
+    }
+
+    /* Animated Bar Rise & Curve Draw */
+    @keyframes barGrow {
+      from { transform: scaleY(0.08); opacity: 0.25; }
+      to   { transform: scaleY(1); opacity: 1; }
+    }
+    .bar-anim {
+      transform-origin: bottom;
+      animation: barGrow 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes lineDraw {
+      from { stroke-dashoffset: 800; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .line-anim {
+      stroke-dasharray: 800;
+      animation: lineDraw 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-5 lg:p-6">
+
+  <!-- OUTER ROUNDED APP SHELL -->
+  <div class="max-w-[1500px] mx-auto app-frame rounded-[28px] overflow-hidden flex min-h-[880px]">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         LEFT SIDEBAR
+    ══════════════════════════════════════════════════════════════════ -->
+    <aside id="zenSidebar" class="zen-surface border-r border-zen flex-shrink-0 flex flex-col justify-between select-none">
+      <div>
+        <!-- Brand Header -->
+        <div class="h-[74px] px-5 flex items-center justify-between border-b border-zen">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="h-9 w-9 rounded-xl bg-znavy text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-znavy/25">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                <polyline points="16 7 22 7 22 13"></polyline>
+              </svg>
+            </div>
+            <span class="nav-text font-display text-lg font-extrabold tracking-tight text-main truncate">Zenvest</span>
+          </div>
+
+          <button onclick="toggleSidebar()" title="Collapse / Expand Sidebar" class="h-8 w-8 rounded-lg hover:bg-slate-100/70 flex items-center justify-center text-mut hover:text-main transition cursor-pointer">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Primary Navigation -->
+        <nav class="p-3.5 space-y-1">
+          <button data-zen="Dashboard" onclick="selectNav(this, 'Dashboard')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-znavy/10 text-znavy font-semibold text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span class="nav-text">Dashboard</span>
+          </button>
+
+          <button data-zen="Accounts" onclick="selectNav(this, 'Accounts')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sec hover:bg-slate-500/10 font-medium text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="nav-text">Accounts</span>
+          </button>
+
+          <button data-zen="Transactions" onclick="selectNav(this, 'Transactions')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sec hover:bg-slate-500/10 font-medium text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+            <span class="nav-text">Transactions</span>
+          </button>
+
+          <button data-zen="Payments" onclick="selectNav(this, 'Payments')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sec hover:bg-slate-500/10 font-medium text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span class="nav-text">Payments</span>
+          </button>
+
+          <button data-zen="Analytics" onclick="selectNav(this, 'Analytics')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sec hover:bg-slate-500/10 font-medium text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span class="nav-text">Analytics</span>
+          </button>
+
+          <button data-zen="Investments" onclick="selectNav(this, 'Investments')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sec hover:bg-slate-500/10 font-medium text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span class="nav-text">Investments</span>
+          </button>
+
+          <button data-zen="Beneficiaries" onclick="selectNav(this, 'Beneficiaries')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sec hover:bg-slate-500/10 font-medium text-sm transition cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+            <span class="nav-text">Beneficiaries</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Promo + Dark Mode Switch + Settings -->
+      <div class="p-4 space-y-4">
+        <!-- Upgrade to Pro Card -->
+        <div class="pro-promo-card zen-subtle rounded-2xl p-5 text-center">
+          <h4 class="font-display text-base font-extrabold text-main">Upgrade to Pro</h4>
+          <p class="text-xs text-mut mt-1.5 leading-relaxed">
+            Upgrade to Enterprise &amp; enjoy exclusive zero-FX perks!
+          </p>
+          <button onclick="showToast('Zenvest Pro Trial Activated (30 Days Free)')" class="mt-4 w-full rounded-xl bg-znavy hover:bg-znavy-dark text-white text-xs font-bold py-2.5 px-4 shadow-md shadow-znavy/20 transition cursor-pointer">
+            Upgrade Plan
+          </button>
+        </div>
+
+        <div class="space-y-1 pt-1">
+          <p class="others-heading px-3 text-xs font-bold uppercase tracking-wider text-mut mb-1.5">Others</p>
+
+          <!-- Working Dark Mode Switch -->
+          <div onclick="toggleTheme()" class="sidebar-nav-btn flex items-center justify-between px-3 py-2 rounded-xl text-sec hover:bg-slate-500/10 text-sm font-medium cursor-pointer">
+            <div class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-14.93 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              <span class="nav-text">Dark Mode</span>
+            </div>
+            <div id="darkTrack" class="dark-switch-pill relative w-10 h-5 rounded-full bg-slate-200 transition-colors">
+              <span id="darkThumb" class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"></span>
+            </div>
+          </div>
+
+          <button data-zen="Settings" onclick="selectNav(this, 'Settings')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sec hover:bg-slate-500/10 text-sm font-medium cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span class="nav-text">Settings</span>
+          </button>
+
+          <button data-zen="Support" onclick="selectNav(this, 'Support')" class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sec hover:bg-slate-500/10 text-sm font-medium cursor-pointer">
+            <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+            <span class="nav-text">Support</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         MAIN WORKSPACE
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Top Header -->
+      <header class="zen-surface h-[74px] px-6 lg:px-8 border-b border-zen flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <h1 id="pageHeading" class="font-display text-xl sm:text-[22px] font-bold text-main">Dashboard</h1>
+          <span class="hidden md:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 text-xs font-semibold text-emerald-600">
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Live Sync
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="relative hidden sm:block">
+            <svg class="w-4 h-4 text-mut absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <input
+              id="txSearchInput"
+              oninput="renderTransactions()"
+              type="text"
+              placeholder="Search transactions, users..."
+              class="zen-subtle rounded-xl pl-10 pr-4 py-2 w-64 lg:w-72 text-sm text-main placeholder:text-mut focus:outline-none focus:border-znavy"
+            />
+          </div>
+
+          <button onclick="showToast('2 new payout notifications')" class="zen-subtle relative h-10 w-10 rounded-xl flex items-center justify-center text-sec cursor-pointer">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span class="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500"></span>
+          </button>
+
+          <button onclick="showToast('Multi-currency: USD ($)') " class="zen-subtle h-10 w-10 rounded-xl flex items-center justify-center text-sec cursor-pointer">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </button>
+
+          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-znavy to-ztea text-white font-display text-sm font-bold flex items-center justify-center shadow-sm">
+            DL
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Grid -->
+      <main class="p-6 lg:p-7 space-y-6 flex-1 overflow-y-auto">
+
+        <div id="defaultDashboardView" class="space-y-6">
+        <!-- ROW 1: 5 SOFT PILLOWY KPI CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+          <div class="zen-surface zen-kpi rounded-2xl p-5 flex items-center gap-3.5">
+            <div class="h-11 w-11 rounded-xl bg-indigo-500/10 text-znavy flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-mut">Total Balance</p>
+              <p id="kpiTotalBalance" class="font-display text-xl font-extrabold text-main mt-0.5">$24,850.75</p>
+            </div>
+          </div>
+
+          <div class="zen-surface zen-kpi rounded-2xl p-5 flex items-center gap-3.5">
+            <div class="h-11 w-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-mut">Monthly Income</p>
+              <p id="kpiIncome" class="font-display text-xl font-extrabold text-main mt-0.5">$8,450</p>
+            </div>
+          </div>
+
+          <div class="zen-surface zen-kpi rounded-2xl p-5 flex items-center gap-3.5">
+            <div class="h-11 w-11 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 9.5h20"/></svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-mut">Monthly Expenses</p>
+              <p id="kpiExpense" class="font-display text-xl font-extrabold text-main mt-0.5">$5,920</p>
+            </div>
+          </div>
+
+          <div class="zen-surface zen-kpi rounded-2xl p-5 flex items-center gap-3.5">
+            <div class="h-11 w-11 rounded-xl bg-teal-500/10 text-teal-600 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2z"/></svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-mut">Savings</p>
+              <p class="font-display text-xl font-extrabold text-main mt-0.5">$2,530</p>
+            </div>
+          </div>
+
+          <div class="zen-surface zen-kpi rounded-2xl p-5 flex items-center gap-3.5">
+            <div class="h-11 w-11 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-mut">Pending Payments</p>
+              <p class="font-display text-xl font-extrabold text-main mt-0.5">$1,200</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2 & 3: MAIN 12-COLUMN ASYMMETRIC SPLIT (8 COLS LEFT + 4 COLS RIGHT) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+          <!-- LEFT 8 COLUMNS: ANALYTICS BAR CHART + RECENT TRANSACTIONS TABLE -->
+          <div class="xl:col-span-8 space-y-6">
+
+            <!-- Analytics & Financial Insights (12-Month Slim Dual-Bar + Kinetic Trend Glider) -->
+            <div class="zen-surface rounded-2xl p-6">
+              <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+                <div>
+                  <h2 class="font-display text-lg font-bold text-main">Analytics &amp; Financial Insights</h2>
+                  <p id="chartHoverReadout" class="text-xs text-mut mt-0.5">
+                    Hover any month to compare Income vs Expense &amp; Net Cashflow
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-5">
+                  <div class="flex items-center gap-4 text-xs font-semibold text-sec">
+                    <span class="flex items-center gap-2">
+                      <span class="h-3 w-3 rounded-sm bg-znavy"></span> Income
+                    </span>
+                    <span class="flex items-center gap-2">
+                      <span class="h-3 w-3 rounded-sm bg-ztea"></span> Expense
+                    </span>
+                  </div>
+
+                  <select
+                    id="periodSelect"
+                    onchange="renderDualBarChart()"
+                    class="zen-subtle rounded-xl px-3.5 py-2 text-xs font-semibold text-main cursor-pointer focus:outline-none"
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">2025 Comparison</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- 12-Month Dual Slim Pill Bar SVG Chart -->
+              <div class="relative">
+                <svg id="insightsSvg" viewBox="0 0 760 250" class="w-full h-60 overflow-visible"></svg>
+              </div>
+            </div>
+
+            <!-- Recent Transactions Table -->
+            <div class="zen-surface rounded-2xl p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                <h2 class="font-display text-lg font-bold text-main">Recent Transactions</h2>
+
+                <div class="flex items-center gap-2.5">
+                  <button onclick="showToast('Filtered: Current Billing Cycle')" class="zen-subtle inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-sec cursor-pointer">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    This Month
+                  </button>
+
+                  <select
+                    id="statusFilter"
+                    onchange="renderTransactions()"
+                    class="zen-subtle rounded-xl px-3.5 py-2 text-xs font-semibold text-sec cursor-pointer focus:outline-none"
+                  >
+                    <option value="all">Filter: All Status</option>
+                    <option value="Success">Success</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Failed">Failed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-zen text-xs font-semibold text-mut">
+                      <th class="py-3.5 px-3">Date <span class="opacity-60">⇅</span></th>
+                      <th class="py-3.5 px-3">Description <span class="opacity-60">⇅</span></th>
+                      <th class="py-3.5 px-3">Category <span class="opacity-60">⇅</span></th>
+                      <th class="py-3.5 px-3">Amount <span class="opacity-60">⇅</span></th>
+                      <th class="py-3.5 px-3">Status <span class="opacity-60">⇅</span></th>
+                      <th class="py-3.5 px-2 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="txTableBody" class="divide-y divide-slate-200/50 text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT 4 COLUMNS: MY CARDS + QUICK TRANSFER (3x2) + REPORTS & DOWNLOADS -->
+          <div class="xl:col-span-4 space-y-6">
+
+            <!-- Right Card 1: My Cards & Account -->
+            <div class="zen-surface rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="font-display text-base font-bold text-main">My Cards &amp; Account</h2>
+                <button onclick="cycleActiveCard()" title="Switch active card" class="h-8 w-8 rounded-lg hover:bg-slate-500/10 flex items-center justify-center text-mut cursor-pointer">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+                </button>
+              </div>
+
+              <!-- 3D Tilt Ocean Navy-to-Teal Card -->
+              <div
+                id="tiltBankCard"
+                onmousemove="handleCardTilt(event)"
+                onmouseleave="resetCardTilt()"
+                class="ocean-bank-card rounded-2xl p-6 text-white relative overflow-hidden cursor-pointer select-none"
+              >
+                <!-- Decorative Translucent Wave Arc -->
+                <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-25" viewBox="0 0 340 190" preserveAspectRatio="none">
+                  <path d="M -20 140 Q 90 60, 210 125 T 360 90 L 360 200 L -20 200 Z" fill="#2DD4BF" />
+                  <circle cx="295" cy="30" r="75" fill="#FFFFFF" fill-opacity="0.12" />
+                </svg>
+
+                <div class="relative z-10 flex items-center justify-between">
+                  <span class="text-xs font-medium text-sky-100/90">Current Balance</span>
+                  <span id="cardStatusBadge" class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-white">
+                    Active
+                  </span>
+                </div>
+
+                <p id="cardBalanceVal" class="relative z-10 font-display text-3xl font-extrabold tracking-tight mt-2">
+                  $6,450.30
+                </p>
+
+                <div class="relative z-10 mt-9 flex items-center justify-between text-xs font-mono tracking-wider text-sky-50/95">
+                  <span id="cardNumberVal">1234  5467  5676  2356</span>
+                  <span id="cardExpVal">05/31</span>
+                </div>
+              </div>
+
+              <button
+                onclick="cycleActiveCard()"
+                class="mt-5 w-full zen-subtle rounded-xl py-3 px-4 text-xs font-bold text-znavy flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add / Switch Card
+              </button>
+            </div>
+
+            <!-- Right Card 2: Quick Transfer (3x2 Soft Action Grid) -->
+            <div class="zen-surface rounded-2xl p-6">
+              <h2 class="font-display text-base font-bold text-main mb-4">Quick Transfer</h2>
+
+              <div class="grid grid-cols-3 gap-3">
+                <button onclick="openTransferModal()" class="zen-subtle rounded-2xl p-3.5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                  <span class="h-10 w-10 rounded-xl bg-znavy/10 text-znavy flex items-center justify-center">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg>
+                  </span>
+                  <span class="text-xs font-semibold text-main leading-tight">Send Money</span>
+                </button>
+
+                <button onclick="showToast('Payment Request Link Copied!')" class="zen-subtle rounded-2xl p-3.5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                  <span class="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                  <span class="text-xs font-semibold text-main leading-tight">Request Pay</span>
+                </button>
+
+                <button onclick="quickPayUtility()" class="zen-subtle rounded-2xl p-3.5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                  <span class="h-10 w-10 rounded-xl bg-teal-500/10 text-teal-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  </span>
+                  <span class="text-xs font-semibold text-main leading-tight">Pay Bills</span>
+                </button>
+
+                <button onclick="showToast('14 Verified Beneficiaries Active')" class="zen-subtle rounded-2xl p-3.5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                  <span class="h-10 w-10 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  </span>
+                  <span class="text-xs font-semibold text-main leading-tight">Beneficiary</span>
+                </button>
+
+                <button onclick="showToast('4 Active Recurring Subscriptions ($84.96/mo)')" class="zen-subtle rounded-2xl p-3.5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                  <span class="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                  </span>
+                  <span class="text-xs font-semibold text-main leading-tight">Subscription</span>
+                </button>
+
+                <button onclick="topUpBalance()" class="zen-subtle rounded-2xl p-3.5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                  <span class="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </span>
+                  <span class="text-xs font-semibold text-main leading-tight">Add Balance</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Card 3: Reports & Downloads -->
+            <div class="zen-surface rounded-2xl p-6">
+              <h2 class="font-display text-base font-bold text-main mb-4">Reports &amp; Downloads</h2>
+
+              <div class="space-y-3">
+                <div onclick="showToast('Downloading December_2025_Statement.pdf...')" class="zen-subtle rounded-2xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span class="h-10 w-10 rounded-xl bg-rose-500 text-white font-mono text-xs font-bold flex items-center justify-center flex-shrink-0 shadow-sm">
+                      PDF
+                    </span>
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold text-main truncate">December 2025 Statement</p>
+                      <p class="text-xs text-mut mt-0.5">Generated on Jan 01, 2026</p>
+                    </div>
+                  </div>
+                  <span class="h-8 w-8 rounded-lg hover:bg-slate-500/10 flex items-center justify-center text-sec flex-shrink-0">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                </div>
+
+                <div onclick="exportCsvTransactions()" class="zen-subtle rounded-2xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span class="h-10 w-10 rounded-xl bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center flex-shrink-0 shadow-sm">
+                      CSV
+                    </span>
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold text-main truncate">Transaction Export (CSV)</p>
+                      <p class="text-xs text-mut mt-0.5">Last 90 Days · Instant Download</p>
+                    </div>
+                  </div>
+                  <span class="h-8 w-8 rounded-lg hover:bg-slate-500/10 flex items-center justify-center text-sec flex-shrink-0">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        </div>
+
+        <!-- SUB-PAGE VIEW CONTAINER -->
+        <div id="tabSubpageView" class="hidden space-y-6"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Send Money Modal -->
+  <div id="sendModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/45 backdrop-blur-sm p-4">
+    <div class="zen-surface rounded-3xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display text-lg font-bold text-main">Instant Send Money</h3>
+        <button onclick="closeTransferModal()" class="h-8 w-8 rounded-lg hover:bg-slate-500/10 flex items-center justify-center text-mut cursor-pointer">✕</button>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-sec mb-1.5">Recipient / Description</label>
+        <input id="sendRecipient" type="text" value="Olivia Martin · Design Retainer" class="zen-subtle w-full rounded-xl px-4 py-2.5 text-sm text-main focus:outline-none" />
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-sec mb-1.5">Amount (USD)</label>
+        <input id="sendAmount" type="number" value="320" class="zen-subtle w-full rounded-xl px-4 py-2.5 text-sm font-mono text-main focus:outline-none" />
+      </div>
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button onclick="closeTransferModal()" class="zen-subtle rounded-xl px-4 py-2.5 text-xs font-semibold text-sec cursor-pointer">Cancel</button>
+        <button onclick="submitInstantSend()" class="rounded-xl bg-znavy hover:bg-znavy-dark text-white px-5 py-2.5 text-xs font-bold shadow-md cursor-pointer">Confirm Transfer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="zenToast" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="rounded-2xl bg-znavy text-white px-5 py-3.5 shadow-2xl flex items-center gap-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-ztea-mint"></span>
+      <span id="zenToastMsg" class="text-sm font-semibold">Saved</span>
+    </div>
+  </div>
+
+  <script>
+    const CHART_DATASETS = {
+      monthly: {
+        months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        income:  [40, 32, 25, 30, 34, 29, 26, 29, 27, 35, 30, 37],
+        expense: [20, 20, 20, 13, 20, 20, 15, 15, 20, 20, 15, 20],
+      },
+      quarterly: {
+        months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        income:  [34, 29, 31, 35, 38, 33, 31, 36, 34, 39, 37, 40],
+        expense: [18, 17, 19, 16, 18, 17, 16, 18, 17, 19, 16, 18],
+      }
+    };
+
+    const CARDS = [
+      { balance: '$6,450.30', number: '1234  5467  5676  2356', exp: '05/31', status: 'Active' },
+      { balance: '$12,920.00', number: '4928  8810  3042  7719', exp: '11/29', status: 'Savings Vault' },
+      { balance: '$5,480.45', number: '5290  1140  9920  4410', exp: '08/30', status: 'Virtual FX' },
+    ];
+    let cardIdx = 0;
+    let totalBalance = 24850.75;
+
+    let transactions = [
+      { date: 'Jan 08, 2026', desc: 'Amazon Purchase', cat: 'Shopping', amount: -120.50, status: 'Pending' },
+      { date: 'Jan 07, 2026', desc: 'Salary Credit', cat: 'Income', amount: 3500.00, status: 'Success' },
+      { date: 'Jan 06, 2026', desc: 'Electricity Bill', cat: 'Utilities', amount: -85.00, status: 'Pending' },
+      { date: 'Jan 05, 2026', desc: 'Netflix Subscription', cat: 'Entertainment', amount: -15.99, status: 'Success' },
+      { date: 'Jan 04, 2026', desc: 'Bank Transfer', cat: 'Transfer', amount: -500.00, status: 'Failed' },
+      { date: 'Jan 03, 2026', desc: 'Dividend Credit', cat: 'Investments', amount: 420.00, status: 'Success' },
+    ];
+
+    function renderDualBarChart() {
+      const period = document.getElementById('periodSelect').value;
+      const d = CHART_DATASETS[period];
+      const svg = document.getElementById('insightsSvg');
+      const W = 760, H = 250, topPad = 18, botPad = 34, leftPad = 46;
+      const plotH = H - topPad - botPad;
+      const stepX = (W - leftPad - 12) / 12;
+
+      let html = '';
+      // Y-axis labels & horizontal dashed gridlines
+      [0, 10, 20, 30, 40].forEach(val => {
+        const y = topPad + plotH - (val / 42) * plotH;
+        html += `<line x1="${leftPad}" y1="${y}" x2="${W - 12}" y2="${y}" stroke="rgba(148,163,184,0.2)" stroke-dasharray="4 4" />`;
+        html += `<text x="${leftPad - 12}" y="${y + 4}" text-anchor="end" fill="#64748B" font-size="12" font-weight="500">${val}k</text>`;
+      });
+
+      // Net Savings smooth spline path + gliding particle
+      const netPts = d.months.map((_, i) => {
+        const cx = leftPad + i * stepX + stepX * 0.45;
+        const net = d.income[i] - d.expense[i];
+        const cy = topPad + plotH - (net / 42) * plotH;
+        return `${i === 0 ? 'M' : 'L'} ${cx.toFixed(1)} ${cy.toFixed(1)}`;
+      }).join(' ');
+
+      d.months.forEach((m, i) => {
+        const groupX = leftPad + i * stepX + 14;
+        const incH = (d.income[i] / 42) * plotH;
+        const expH = (d.expense[i] / 42) * plotH;
+        const incY = topPad + plotH - incH;
+        const expY = topPad + plotH - expH;
+
+        html += `
+          <g class="cursor-pointer" onmouseenter="inspectMonth('${m}', ${d.income[i]}, ${d.expense[i]})">
+            <rect x="${groupX - 6}" y="${topPad}" width="34" height="${plotH}" fill="transparent" />
+            <rect x="${groupX}" y="${incY}" width="7.5" height="${incH}" rx="3.75" fill="#1D3F91" class="bar-anim" style="animation-delay:${i * 30}ms" />
+            <rect x="${groupX + 12}" y="${expY}" width="7.5" height="${expH}" rx="3.75" fill="#14B8A6" class="bar-anim" style="animation-delay:${i * 30 + 60}ms" />
+            <text x="${groupX + 9.5}" y="${H - 8}" text-anchor="middle" fill="#64748B" font-size="12" font-weight="500">${m}</text>
+          </g>
+        `;
+      });
+
+      // Subtle Net Cashflow kinetic line + gliding teal orb
+      html += `
+        <path d="${netPts}" fill="none" stroke="#14B8A6" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="5 4" class="line-anim" />
+        <circle r="4" fill="#14B8A6">
+          <animateMotion dur="5.5s" repeatCount="indefinite" path="${netPts}" />
+        </circle>
+      `;
+
+      svg.innerHTML = html;
+    }
+
+    function inspectMonth(m, inc, exp) {
+      const net = inc - exp;
+      document.getElementById('chartHoverReadout').innerHTML =
+        `<strong>${m} 2026</strong>: Income <strong class="text-znavy">$${inc},000</strong> · Expense <strong class="text-teal-600">$${exp},000</strong> · Net Saved <strong>+$${net},000</strong>`;
+    }
+
+    function renderTransactions() {
+      const q = document.getElementById('txSearchInput').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const tbody = document.getElementById('txTableBody');
+
+      const filtered = transactions.filter(tx => {
+        const matchQ = !q || tx.desc.toLowerCase().includes(q) || tx.cat.toLowerCase().includes(q);
+        const matchS = status === 'all' || tx.status === status;
+        return matchQ && matchS;
+      });
+
+      tbody.innerHTML = filtered.map(tx => {
+        const amtStr = tx.amount >= 0
+          ? `<span class="font-mono font-bold text-emerald-600">+ $${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>`
+          : `<span class="font-mono font-semibold text-main">- $${Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>`;
+
+        let pill = '';
+        if (tx.status === 'Success') {
+          pill = `<span class="inline-block rounded-lg bg-emerald-500/15 text-emerald-600 px-3 py-1 text-xs font-semibold">Success</span>`;
+        } else if (tx.status === 'Pending') {
+          pill = `<span class="inline-block rounded-lg bg-amber-500/15 text-amber-600 px-3 py-1 text-xs font-semibold">Pending</span>`;
+        } else {
+          pill = `<span class="inline-block rounded-lg bg-rose-500/15 text-rose-600 px-3 py-1 text-xs font-semibold">Failed</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-500/5 transition">
+            <td class="py-3.5 px-3 text-sec whitespace-nowrap">${tx.date}</td>
+            <td class="py-3.5 px-3 font-semibold text-main">${tx.desc}</td>
+            <td class="py-3.5 px-3 text-sec">${tx.cat}</td>
+            <td class="py-3.5 px-3 whitespace-nowrap">${amtStr}</td>
+            <td class="py-3.5 px-3">${pill}</td>
+            <td class="py-3.5 px-2 text-right">
+              <button onclick="showToast('Receipt opened for ${tx.desc}')" class="h-8 w-8 rounded-lg hover:bg-slate-500/10 inline-flex items-center justify-center text-mut cursor-pointer">⋮</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleSidebar() {
+      document.body.classList.toggle('sidebar-collapsed');
+    }
+
+    const ZEN_SUBPAGES = {
+      Accounts: {
+        subtitle: 'Connected checking accounts, high-yield mint vaults and virtual FX debit cards',
+        cta: 'Link External Bank',
+        kpis: [
+          { lbl: 'Combined Liquidity', val: '$24,850.75', sub: '+4.8% vs Last Month', tone: 'text-emerald-600' },
+          { lbl: 'Primary Checking', val: '$6,450.30', sub: 'Account ••2356 Active', tone: 'text-znavy' },
+          { lbl: 'High-Yield Vault', val: '$12,920.00', sub: '4.85% APY Compounding', tone: 'text-teal-600' },
+          { lbl: 'Virtual Multi-FX', val: '$5,480.45', sub: 'USD · EUR · GBP Zero-FX', tone: 'text-znavy' }
+        ],
+        chartTitle: 'Balance Distribution Across Accounts ($k)',
+        bars: [
+          { lbl: 'Vault', v: 92, txt: '$12.9k', c: '#1D3F91' },
+          { lbl: 'Checking', v: 54, txt: '$6.4k', c: '#14B8A6' },
+          { lbl: 'FX Card', v: 46, txt: '$5.5k', c: '#1D3F91' },
+          { lbl: 'Reserve', v: 30, txt: '$3.2k', c: '#14B8A6' },
+          { lbl: 'Rewards', v: 18, txt: '$0.8k', c: '#1D3F91' }
+        ],
+        tableTitle: 'Active Bank Accounts & Cards',
+        cols: ['Account / Vault', 'Number', 'APY / Perk', 'Balance', 'Action'],
+        rows: [
+          ['Zenvest Everyday Checking', '•• 2356', '1.5% Cashback', '$6,450.30', 'Statement'],
+          ['Mint High-Yield Savings Vault', '•• 7719', '4.85% APY', '$12,920.00', 'Top Up'],
+          ['Travel Zero-FX Virtual Card', '•• 4410', '0% FX Markup', '$5,480.45', 'Freeze / Pin'],
+          ['Emergency Goal Bucket', '•• 9012', 'Auto-Roundups', '$3,200.00', 'Adjust Goal'],
+          ['Joint Household Treasury', '•• 6184', '2 Co-Holders', '$4,150.00', 'Inspect']
+        ]
+      },
+      Transactions: {
+        subtitle: 'Full searchable ledger, merchant cashback tags and instant receipt exports',
+        cta: 'Export CSV Ledger',
+        ctaFn: 'exportCsvTransactions()',
+        kpis: [
+          { lbl: '30-Day Inflow', val: '+$8,450.00', sub: 'Salary + Dividends', tone: 'text-emerald-600' },
+          { lbl: '30-Day Outflow', val: '-$5,920.00', sub: '42 Cleared Items', tone: 'text-znavy' },
+          { lbl: 'Cashback Earned', val: '+$94.60', sub: 'Auto-Credited to Vault', tone: 'text-teal-600' },
+          { lbl: 'Pending Holds', val: '$205.50', sub: '2 Card Authorizations', tone: 'text-amber-600' }
+        ],
+        chartTitle: 'Weekly Spending Velocity ($)',
+        bars: [
+          { lbl: 'Wk 1', v: 64, txt: '$1.4k', c: '#1D3F91' },
+          { lbl: 'Wk 2', v: 52, txt: '$1.1k', c: '#14B8A6' },
+          { lbl: 'Wk 3', v: 78, txt: '$1.8k', c: '#1D3F91' },
+          { lbl: 'Wk 4', v: 48, txt: '$1.0k', c: '#14B8A6' },
+          { lbl: 'MTD', v: 42, txt: '$0.6k', c: '#1D3F91' }
+        ],
+        tableTitle: 'Categorized Transaction History',
+        cols: ['Date', 'Merchant / Note', 'Category', 'Amount', 'Receipt'],
+        rows: [
+          ['Jan 08, 2026', 'Whole Foods Market', 'Groceries', '-$142.80', 'View PDF'],
+          ['Jan 07, 2026', 'Direct Deposit · Payroll', 'Income', '+$3,500.00', 'Verified'],
+          ['Jan 06, 2026', 'City Power & Light', 'Utilities', '-$85.00', 'View PDF'],
+          ['Jan 05, 2026', 'Delta Air Lines', 'Travel FX', '-$418.00', 'View PDF'],
+          ['Jan 03, 2026', 'Vanguard Quarterly Div', 'Investments', '+$420.00', 'Verified']
+        ]
+      },
+      Payments: {
+        subtitle: 'Scheduled bill-pay calendar, recurring subscriptions and instant P2P transfers',
+        cta: 'Send Instant Money',
+        ctaFn: 'openTransferModal()',
+        kpis: [
+          { lbl: 'Upcoming Bills (14d)', val: '$1,200.00', sub: '3 Auto-Pay Scheduled', tone: 'text-znavy' },
+          { lbl: 'Active Subscriptions', val: '$84.96 / mo', sub: '4 Verified Merchants', tone: 'text-teal-600' },
+          { lbl: 'On-Time Streak', val: '28 Months', sub: 'Zero Late Fees', tone: 'text-emerald-600' },
+          { lbl: 'Daily Transfer Limit', val: '$10,000', sub: 'FedNow + RTP Instant', tone: 'text-znavy' }
+        ],
+        chartTitle: 'Monthly Scheduled Outflows ($)',
+        bars: [
+          { lbl: 'Rent', v: 88, txt: '$1,850', c: '#1D3F91' },
+          { lbl: 'Utils', v: 34, txt: '$210', c: '#14B8A6' },
+          { lbl: 'Fiber', v: 24, txt: '$79', c: '#1D3F91' },
+          { lbl: 'Subs', v: 26, txt: '$85', c: '#14B8A6' },
+          { lbl: 'Insure', v: 42, txt: '$290', c: '#1D3F91' }
+        ],
+        tableTitle: 'Upcoming Bills & Recurring Transfers',
+        cols: ['Biller / Payee', 'Due Date', 'Cadence', 'Amount', 'Quick Action'],
+        rows: [
+          ['Skyline Metro Residence', 'Jan 15, 2026', 'Monthly ACH', '$1,850.00', 'Pay Early'],
+          ['ConEd Smart Grid Electric', 'Jan 18, 2026', 'Auto-Pay', '$85.00', 'Pay Now'],
+          ['Sonic Gigabit Fiber', 'Jan 21, 2026', 'Virtual Card', '$79.00', 'Manage'],
+          ['Figma & Cloud Creative', 'Jan 24, 2026', 'Subscription', '$32.00', 'Pause Sub'],
+          ['Equinox Wellness Club', 'Jan 28, 2026', 'Monthly Card', '$195.00', 'Manage']
+        ]
+      },
+      Analytics: {
+        subtitle: 'Deep cashflow breakdown, monthly savings rate trajectory and 50/30/20 budget health',
+        cta: 'Download Cashflow PDF',
+        kpis: [
+          { lbl: 'Net Savings Rate', val: '29.9%', sub: '+4.9% Above Target', tone: 'text-emerald-600' },
+          { lbl: 'Avg. Monthly Surplus', val: '+$2,530', sub: 'Auto-Swept to Vault', tone: 'text-teal-600' },
+          { lbl: 'Discretionary Share', val: '22.4%', sub: 'Under 30% Cap', tone: 'text-znavy' },
+          { lbl: 'Annualized Net Saved', val: '$30,360', sub: 'On Pace for $32k', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'Spending Share by Budget Category (%)',
+        bars: [
+          { lbl: 'Housing', v: 78, txt: '34%', c: '#1D3F91' },
+          { lbl: 'Dining', v: 42, txt: '14%', c: '#14B8A6' },
+          { lbl: 'Travel', v: 36, txt: '11%', c: '#1D3F91' },
+          { lbl: 'Bills', v: 38, txt: '12%', c: '#14B8A6' },
+          { lbl: 'Saved', v: 72, txt: '30%', c: '#14B8A6' }
+        ],
+        tableTitle: 'Monthly Budget Guardrails vs Actual',
+        cols: ['Category', 'Monthly Budget', 'Actual Spend', 'Variance', 'Alert'],
+        rows: [
+          ['Housing & Utilities', '$2,200.00', '$2,060.00', '$140 Under', 'Healthy'],
+          ['Groceries & Dining', '$950.00', '$842.50', '$107 Under', 'Healthy'],
+          ['Travel & Transit', '$650.00', '$618.00', '$32 Under', 'On Budget'],
+          ['Shopping & Lifestyle', '$700.00', '$745.00', '$45 Over', 'Trim Cap'],
+          ['Vault Savings Sweep', '$2,200.00', '$2,530.00', '+$330 Beat', 'Optimal']
+        ]
+      },
+      Investments: {
+        subtitle: 'Automated wealth buckets, S&P 500 index ETFs, 5.1% Treasury T-Bills and dividend DRIP',
+        cta: 'Invest $500 Spare Cash',
+        kpis: [
+          { lbl: 'Investment Portfolio', val: '$48,920.00', sub: '+16.4% Trailing 1Y', tone: 'text-emerald-600' },
+          { lbl: 'Monthly Auto-Invest', val: '$1,250.00', sub: 'Every 1st & 15th', tone: 'text-znavy' },
+          { lbl: 'Projected Dividends', val: '$1,480 / yr', sub: '3.02% Blended Yield', tone: 'text-teal-600' },
+          { lbl: 'Expense Ratio', val: '0.04%', sub: 'Zero Advisory Fee', tone: 'text-znavy' }
+        ],
+        chartTitle: '5-Quarter Wealth Growth ($k)',
+        bars: [
+          { lbl: 'Q1 25', v: 52, txt: '$36k', c: '#1D3F91' },
+          { lbl: 'Q2 25', v: 62, txt: '$39k', c: '#14B8A6' },
+          { lbl: 'Q3 25', v: 71, txt: '$42k', c: '#1D3F91' },
+          { lbl: 'Q4 25', v: 82, txt: '$46k', c: '#14B8A6' },
+          { lbl: 'Q1 26', v: 92, txt: '$49k', c: '#1D3F91' }
+        ],
+        tableTitle: 'Core ETF & Treasury Holdings',
+        cols: ['Holding', 'Allocation', 'Yield', 'Market Value', 'Trade'],
+        rows: [
+          ['VTI · Total US Stock ETF', '45%', '1.42%', '$22,014.00', 'Buy More'],
+          ['SGOV · 0-3M US Treasury', '25%', '5.12%', '$12,230.00', 'Buy More'],
+          ['SCHD · US Dividend Equity', '15%', '3.48%', '$7,338.00', 'DRIP On'],
+          ['VXUS · Global Ex-US ETF', '10%', '2.95%', '$4,892.00', 'Rebalance'],
+          ['IBIT · Spot Bitcoin Sleeve', '5%', 'N/A', '$2,446.00', 'Inspect']
+        ]
+      },
+      Beneficiaries: {
+        subtitle: 'Verified domestic & international recipients, instant IBAN/ACH directory and split bills',
+        cta: 'Send to Beneficiary',
+        ctaFn: 'openTransferModal()',
+        kpis: [
+          { lbl: 'Verified Recipients', val: '14 Contacts', sub: '2FA Whitelisted', tone: 'text-znavy' },
+          { lbl: 'Instant P2P Transfers', val: '$0.00 Fee', sub: 'Zenvest-to-Zenvest', tone: 'text-teal-600' },
+          { lbl: 'Intl. Corridors', val: '38 Countries', sub: 'Mid-Market FX Rate', tone: 'text-emerald-600' },
+          { lbl: '30D Sent Volume', val: '$2,460.00', sub: '6 Instant Transfers', tone: 'text-znavy' }
+        ],
+        chartTitle: 'Top Transfer Corridors ($)',
+        bars: [
+          { lbl: 'USD ACH', v: 88, txt: '$1,420', c: '#1D3F91' },
+          { lbl: 'EUR SEPA', v: 58, txt: '$640', c: '#14B8A6' },
+          { lbl: 'GBP Faster', v: 38, txt: '$280', c: '#1D3F91' },
+          { lbl: 'CAD EFT', v: 26, txt: '$120', c: '#14B8A6' },
+          { lbl: 'Split Bill', v: 44, txt: '$310', c: '#1D3F91' }
+        ],
+        tableTitle: 'Trusted Beneficiary Directory',
+        cols: ['Recipient Name', 'Bank / Rail', 'Currency', 'Last Sent', 'Send'],
+        rows: [
+          ['Olivia Martin · Design', 'Chase RTP ••4810', 'USD ($)', '$320.00', 'Quick Send'],
+          ['Lucas Meyer · Berlin', 'N26 SEPA ••8921', 'EUR (€)', '$540.00', 'Quick Send'],
+          ['Hannah Chen · Family', 'Zenvest Instant', 'USD ($)', '$250.00', 'Quick Send'],
+          ['Marcus Vance · CPA', 'Mercury ACH ••1104', 'USD ($)', '$450.00', 'Quick Send'],
+          ['Sofia Rossi · Milan', 'Revolut IBAN ••3319', 'EUR (€)', '$180.00', 'Quick Send']
+        ]
+      },
+      Settings: {
+        subtitle: 'Card spending limits, biometric passkeys, automated savings roundups and notifications',
+        cta: 'Sync Preferences',
+        isSettings: true,
+        kpis: [
+          { lbl: 'Security Posture', val: 'Passkey + 2FA', sub: 'Hardware Protected', tone: 'text-emerald-600' },
+          { lbl: 'Daily Card Cap', val: '$3,500.00', sub: 'Instant App Override', tone: 'text-znavy' },
+          { lbl: 'Spare-Change Roundup', val: '2x Multiplier', sub: '+$148 Saved MTD', tone: 'text-teal-600' },
+          { lbl: 'FDIC Pass-Through', val: '$250,000', sub: 'Partner Bank Insured', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'Monthly Roundup & Cashback Boost ($)',
+        bars: [
+          { lbl: 'Sep', v: 48, txt: '$94', c: '#1D3F91' },
+          { lbl: 'Oct', v: 58, txt: '$112', c: '#14B8A6' },
+          { lbl: 'Nov', v: 70, txt: '$134', c: '#1D3F91' },
+          { lbl: 'Dec', v: 82, txt: '$156', c: '#14B8A6' },
+          { lbl: 'Jan', v: 76, txt: '$148', c: '#1D3F91' }
+        ]
+      },
+      Support: {
+        subtitle: '24/7 human concierge desk, zero-liability card dispute resolution and security center',
+        cta: 'Start Priority Chat',
+        kpis: [
+          { lbl: 'Concierge Wait Time', val: '< 45 Secs', sub: '24/7 Live Specialist', tone: 'text-emerald-600' },
+          { lbl: 'Zero-Liability Shield', val: '100% Covered', sub: 'Visa Infinite Tier', tone: 'text-znavy' },
+          { lbl: 'Open Disputes', val: '0 Active', sub: 'All Claims Settled', tone: 'text-teal-600' },
+          { lbl: 'System Status', val: '99.99% Up', sub: 'ACH · Cards · FX Live', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'Support Desk First-Reply Speed (Sec)',
+        bars: [
+          { lbl: 'Card Lock', v: 22, txt: '8s', c: '#14B8A6' },
+          { lbl: 'Live Chat', v: 44, txt: '38s', c: '#1D3F91' },
+          { lbl: 'Wire Help', v: 54, txt: '52s', c: '#14B8A6' },
+          { lbl: 'FX Travel', v: 36, txt: '29s', c: '#1D3F91' },
+          { lbl: 'Tax Docs', v: 48, txt: '44s', c: '#14B8A6' }
+        ],
+        tableTitle: 'Self-Service & Priority Concierge Actions',
+        cols: ['Help Topic', 'Team', 'Resolution Time', 'Status', 'Action'],
+        rows: [
+          ['Temporary Travel Notice (Zero-FX)', 'Card Security', 'Instant Toggle', 'Ready', 'Activate'],
+          ['Download Signed Bank Balance Letter', 'Verification', 'Instant PDF', 'Ready', 'Generate'],
+          ['Dispute Unrecognized Merchant Charge', 'Fraud Shield', 'Provisional Credit', 'Protected', 'Start Claim'],
+          ['Increase Same-Day Wire Limit ($50k)', 'Private Desk', '< 10 Minutes', 'Available', 'Request'],
+          ['Export Full FY2025 Tax & Interest Pack', 'Tax Reporting', '1099-INT Ready', 'Available', 'Download']
+        ]
+      }
+    };
+
+    function renderZenSubpage(title) {
+      const cfg = ZEN_SUBPAGES[title];
+      if (!cfg) return;
+      const box = document.getElementById('tabSubpageView');
+
+      const barsSvg = cfg.bars.map((b, i) => {
+        const x = 36 + i * 72;
+        const h = Math.round((b.v / 100) * 124);
+        const y = 156 - h;
+        return `
+          <g class="cursor-pointer" onclick="showToast('${cfg.chartTitle} — ${b.lbl}: ${b.txt}')">
+            <rect x="${x}" y="28" width="40" height="128" rx="10" fill="rgba(148,163,184,0.14)"/>
+            <rect x="${x}" y="${y}" width="40" height="${h}" rx="10" fill="${b.c}" class="bar-anim"/>
+            <text x="${x + 20}" y="${y - 7}" text-anchor="middle" fill="#64748B" font-size="12" font-weight="700">${b.txt}</text>
+            <text x="${x + 20}" y="178" text-anchor="middle" fill="#64748B" font-size="12" font-weight="500">${b.lbl}</text>
+          </g>
+        `;
+      }).join('');
+
+      const rightCard = cfg.isSettings
+        ? `
+          <div class="zen-surface rounded-2xl p-6 lg:col-span-7 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-base font-bold text-main">Card Guardrails &amp; Smart Savings</h3>
+              <span class="rounded-full bg-teal-500/15 text-teal-600 px-3 py-1 text-xs font-bold">Synced</span>
+            </div>
+            <div class="divide-y border-zen text-xs sm:text-sm">
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-semibold text-main">2x Spare-Change Vault Roundups</p>
+                  <p class="text-xs text-mut mt-0.5">Automatically sweep card purchase roundups into 4.85% APY Mint Vault</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated 2x Spare-Change Vault Roundups')" class="h-4 w-4 accent-[#1D3F91] cursor-pointer"/>
+              </label>
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-semibold text-main">Location-Based Card Fraud Shield</p>
+                  <p class="text-xs text-mut mt-0.5">Match physical card swipes against mobile GPS country automatically</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated Location-Based Card Fraud Shield')" class="h-4 w-4 accent-[#1D3F91] cursor-pointer"/>
+              </label>
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-semibold text-main">Instant Push Alerts Over $25.00</p>
+                  <p class="text-xs text-mut mt-0.5">Real-time spend notifications for cards, ACH debits and FX conversions</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated Real-Time Spend Alert Threshold')" class="h-4 w-4 accent-[#1D3F91] cursor-pointer"/>
+              </label>
+            </div>
+            <div class="flex items-center justify-between pt-2">
+              <button onclick="toggleTheme()" class="zen-subtle rounded-xl px-4 py-2.5 text-xs font-bold text-sec cursor-pointer">Toggle Light / Dark Theme</button>
+              <button onclick="showToast('Zenvest Account & Card Settings Saved')" class="rounded-xl bg-znavy hover:bg-znavy-dark text-white px-5 py-2.5 text-xs font-bold shadow-md cursor-pointer">Save Settings</button>
+            </div>
+          </div>
+        `
+        : `
+          <div class="zen-surface rounded-2xl p-6 lg:col-span-7 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-display text-base font-bold text-main">${cfg.tableTitle}</h3>
+              <span class="rounded-lg bg-teal-500/15 text-teal-600 px-2.5 py-1 text-xs font-semibold">Live Sync</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-zen text-xs font-semibold text-mut">
+                    <th class="py-2.5 px-3">${cfg.cols[0]}</th>
+                    <th class="py-2.5 px-3">${cfg.cols[1]}</th>
+                    <th class="py-2.5 px-3">${cfg.cols[2]}</th>
+                    <th class="py-2.5 px-3">${cfg.cols[3]}</th>
+                    <th class="py-2.5 px-3 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200/40 text-xs sm:text-sm">
+                  ${cfg.rows.map((r) => `
+                    <tr class="hover:bg-slate-500/5 transition">
+                      <td class="py-3 px-3 font-semibold text-main">${r[0]}</td>
+                      <td class="py-3 px-3 text-sec">${r[1]}</td>
+                      <td class="py-3 px-3 text-sec">${r[2]}</td>
+                      <td class="py-3 px-3 font-mono font-bold text-main">${r[3]}</td>
+                      <td class="py-3 px-3 text-right">
+                        <button onclick="${r[4] === 'Quick Send' ? 'openTransferModal()' : `showToast('${r[4]} · ${r[0]}')`}" class="zen-subtle rounded-lg px-3 py-1.5 text-xs font-bold text-znavy cursor-pointer">${r[4]}</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+      const ctaCall = cfg.ctaFn ? cfg.ctaFn : `showToast('${cfg.cta} initiated')`;
+
+      box.innerHTML = `
+        <div class="zen-surface rounded-2xl p-5 sm:px-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <button onclick="returnToZenOverview()" class="zen-subtle rounded-xl px-3.5 py-1.5 text-xs font-bold text-main inline-flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+                <span>← Overview</span>
+              </button>
+              <h2 class="font-display text-xl font-extrabold text-main tracking-tight">${title}</h2>
+            </div>
+            <p class="text-xs sm:text-sm text-mut mt-1.5">${cfg.subtitle}</p>
+          </div>
+          <button onclick="${ctaCall}" class="rounded-xl bg-znavy hover:bg-znavy-dark text-white px-4 py-2.5 text-xs font-bold shadow-md shadow-znavy/20 transition cursor-pointer">
+            ${cfg.cta}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          ${cfg.kpis.map((k) => `
+            <div class="zen-surface zen-kpi rounded-2xl p-5 flex flex-col justify-between">
+              <p class="text-xs font-medium text-mut">${k.lbl}</p>
+              <p class="font-display text-2xl font-extrabold text-main mt-1.5">${k.val}</p>
+              <p class="text-xs font-semibold ${k.tone} mt-1.5">${k.sub}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div class="zen-surface rounded-2xl p-6 lg:col-span-5 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-main">${cfg.chartTitle}</h3>
+              <span class="text-xs font-bold text-teal-600">2026 Live</span>
+            </div>
+            <svg viewBox="0 0 410 190" class="w-full h-48 overflow-visible">
+              <line x1="24" y1="156" x2="394" y2="156" stroke="rgba(148,163,184,0.25)" stroke-width="1"/>
+              ${barsSvg}
+            </svg>
+          </div>
+          ${rightCard}
+        </div>
+      `;
+    }
+
+    function returnToZenOverview() {
+      const dashBtn = document.querySelector('.sidebar-nav-btn[data-zen="Dashboard"]');
+      selectNav(dashBtn, 'Dashboard');
+    }
+
+    function selectNav(btn, title) {
+      document.querySelectorAll('.sidebar-nav-btn[data-zen]').forEach(el => {
+        el.classList.remove('bg-znavy/10', 'text-znavy', 'font-semibold');
+        el.classList.add('text-sec', 'font-medium');
+      });
+      if (btn) {
+        btn.classList.add('bg-znavy/10', 'text-znavy', 'font-semibold');
+        btn.classList.remove('text-sec', 'font-medium');
+      }
+      document.getElementById('pageHeading').textContent = title;
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+      if (!title || title === 'Dashboard') {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+        showToast('Switched to Dashboard Overview');
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderZenSubpage(title);
+        showToast('Opened ' + title);
+      }
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      const next = isDark ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      const track = document.getElementById('darkTrack');
+      const thumb = document.getElementById('darkThumb');
+      if (next === 'dark') {
+        track.classList.remove('bg-slate-200');
+        track.classList.add('bg-znavy');
+        thumb.style.transform = 'translateX(20px)';
+      } else {
+        track.classList.add('bg-slate-200');
+        track.classList.remove('bg-znavy');
+        thumb.style.transform = 'translateX(0px)';
+      }
+    }
+
+    function cycleActiveCard() {
+      cardIdx = (cardIdx + 1) % CARDS.length;
+      const c = CARDS[cardIdx];
+      document.getElementById('cardBalanceVal').textContent = c.balance;
+      document.getElementById('cardNumberVal').textContent = c.number;
+      document.getElementById('cardExpVal').textContent = c.exp;
+      document.getElementById('cardStatusBadge').textContent = c.status;
+      showToast('Switched to ' + c.status + ' Card');
+    }
+
+    function handleCardTilt(e) {
+      const el = document.getElementById('tiltBankCard');
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      el.style.transform = `perspective(800px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
+    }
+    function resetCardTilt() {
+      document.getElementById('tiltBankCard').style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg)';
+    }
+
+    function openTransferModal() {
+      const m = document.getElementById('sendModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeTransferModal() {
+      const m = document.getElementById('sendModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function submitInstantSend() {
+      const rec = document.getElementById('sendRecipient').value.trim() || 'Instant Transfer';
+      const amt = parseFloat(document.getElementById('sendAmount').value) || 100;
+      totalBalance -= amt;
+      document.getElementById('kpiTotalBalance').textContent = '$' + totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      transactions.unshift({ date: 'Just now', desc: rec, cat: 'Transfer', amount: -amt, status: 'Success' });
+      renderTransactions();
+      closeTransferModal();
+      showToast(`Sent $${amt.toFixed(2)} to ${rec}`);
+    }
+
+    function topUpBalance() {
+      totalBalance += 1000;
+      document.getElementById('kpiTotalBalance').textContent = '$' + totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      transactions.unshift({ date: 'Just now', desc: 'Instant Vault Top-Up', cat: 'Deposit', amount: 1000.00, status: 'Success' });
+      renderTransactions();
+      showToast('Added +$1,000.00 to Total Balance');
+    }
+
+    function quickPayUtility() {
+      transactions[2].status = 'Success';
+      renderTransactions();
+      showToast('Electricity Bill ($85.00) Paid Successfully!');
+    }
+
+    function exportCsvTransactions() {
+      showToast('Exported 6 transactions to Zenvest_Export.csv');
+    }
+
+    let tTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('zenToast');
+      document.getElementById('zenToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      el.classList.add('opacity-100', 'translate-y-0');
+      if (tTimer) clearTimeout(tTimer);
+      tTimer = setTimeout(() => {
+        el.classList.remove('opacity-100', 'translate-y-0');
+        el.classList.add('opacity-0', 'translate-y-3');
+      }, 2300);
+    }
+
+    renderDualBarChart();
+    renderTransactions();
+  </script>
+</body>
+</html>

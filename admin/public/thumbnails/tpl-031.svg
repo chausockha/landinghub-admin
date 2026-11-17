@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="bg31" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050716"/>
+      <stop offset="50%" stop-color="#090d24"/>
+      <stop offset="100%" stop-color="#050611"/>
+    </linearGradient>
+    <radialGradient id="orbCyan" cx="0.28" cy="0.24" r="0.42">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbPink" cx="0.76" cy="0.62" r="0.45">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="neonRim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#818cf8" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#f472b6" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="waveStroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="38%" stop-color="#f43f5e"/>
+      <stop offset="68%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="waveArea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.26"/>
+      <stop offset="55%" stop-color="#ec4899" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#090d24" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="riskArc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="50%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <filter id="glow31" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Space Canvas -->
+  <rect width="800" height="450" fill="url(#bg31)"/>
+  <rect width="800" height="450" fill="url(#orbCyan)"/>
+  <rect width="800" height="450" fill="url(#orbPink)"/>
+
+  <!-- Top Header Bar (Badge-safe left zone x < 430, y < 95 has zero text) -->
+  <rect x="24" y="18" width="752" height="38" rx="12" fill="#0b1029" fill-opacity="0.82" stroke="#312e81" stroke-width="1"/>
+  <circle cx="48" cy="37" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-dasharray="40 16"/>
+  <rect x="250" y="26" width="165" height="22" rx="8" fill="#111838" stroke="#3730a3" stroke-width="1"/>
+  <!-- Right Header Controls (x >= 445, safe from badges) -->
+  <rect x="530" y="25" width="152" height="24" rx="10" fill="#11193c" stroke="url(#neonRim)" stroke-width="1.2"/>
+  <circle cx="545" cy="37" r="5" fill="#6366f1"/>
+  <text x="556" y="41" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Ethereum Mainnet</text>
+  <circle cx="706" cy="37" r="11" fill="#11193c" stroke="#4338ca" stroke-width="1"/>
+  <circle cx="710" cy="32" r="2.5" fill="#f43f5e"/>
+  <circle cx="738" cy="37" r="11" fill="#1e1b4b" stroke="#22d3ee" stroke-width="1"/>
+
+  <!-- Left Floating Icon Dock -->
+  <rect x="24" y="70" width="38" height="246" rx="12" fill="#0b1029" fill-opacity="0.88" stroke="#312e81" stroke-width="1.2"/>
+  <rect x="29" y="77" width="28" height="28" rx="8" fill="#164e63" fill-opacity="0.55" stroke="#22d3ee" stroke-width="1"/>
+  <circle cx="43" cy="91" r="4.5" fill="#22d3ee"/>
+  <circle cx="43" cy="126" r="4" fill="#64748b"/>
+  <rect x="37" y="156" width="3.5" height="10" rx="1" fill="#38bdf8"/>
+  <rect x="42" y="152" width="3.5" height="14" rx="1" fill="#818cf8"/>
+  <rect x="47" y="158" width="3.5" height="8" rx="1" fill="#c084fc"/>
+  <rect x="37" y="189" width="12" height="9" rx="2" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="43" cy="228" r="4.5" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="43" cy="261" r="5" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="43" cy="294" r="4.5" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Row 1: 4 Neon Glass KPI Cards (All text positioned at y >= 98 to remain 100% badge-safe) -->
+  <!-- KPI 1: Portfolio Value -->
+  <rect x="74" y="70" width="154" height="72" rx="14" fill="#0d1330" fill-opacity="0.88" stroke="url(#neonRim)" stroke-width="1.4"/>
+  <text x="88" y="99" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8">PORTFOLIO VALUE</text>
+  <text x="88" y="125" fill="#f8fafc" font-family="Space Grotesk, Inter, sans-serif" font-size="20" font-weight="700">$128,450.25</text>
+
+  <!-- KPI 2: 24H PnL -->
+  <rect x="238" y="70" width="132" height="72" rx="14" fill="#0d1330" fill-opacity="0.88" stroke="url(#neonRim)" stroke-width="1.4"/>
+  <text x="252" y="99" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8">24H PNL</text>
+  <text x="252" y="123" fill="#34d399" font-family="Space Grotesk, Inter, sans-serif" font-size="19" font-weight="700">+2.87%</text>
+  <path d="M298 132 Q324 130 352 114" fill="none" stroke="#34d399" stroke-width="2.2" filter="url(#glow31)"/>
+
+  <!-- KPI 3: Asset Allocation -->
+  <rect x="380" y="70" width="154" height="72" rx="14" fill="#0d1330" fill-opacity="0.88" stroke="url(#neonRim)" stroke-width="1.4"/>
+  <text x="394" y="99" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8">ASSET ALLOCATION</text>
+  <text x="394" y="119" fill="#f8fafc" font-family="Inter, sans-serif" font-size="12" font-weight="700">BTC 45% / 50%</text>
+  <text x="410" y="134" fill="#94a3b8" font-family="Inter, sans-serif" font-size="10">ETH / USDT 25%</text>
+
+  <!-- KPI 4: Risk Level Gauge (x >= 544, completely clear of left badge) -->
+  <rect x="544" y="70" width="232" height="72" rx="14" fill="#0d1330" fill-opacity="0.88" stroke="url(#neonRim)" stroke-width="1.4"/>
+  <text x="558" y="92" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8">RISK LEVEL</text>
+  <text x="558" y="118" fill="#f8fafc" font-family="Space Grotesk, Inter, sans-serif" font-size="17" font-weight="700">Moderate</text>
+  <path d="M668 128 A 36 36 0 0 1 740 128" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M668 128 A 36 36 0 0 1 732 106" fill="none" stroke="url(#riskArc)" stroke-width="8" stroke-linecap="round" filter="url(#glow31)"/>
+  <text x="704" y="127" text-anchor="middle" fill="#ffffff" font-family="Space Grotesk, Inter, sans-serif" font-size="15" font-weight="700">63</text>
+
+  <!-- Main Center Panel: BTC / USD Neon Waveform -->
+  <rect x="74" y="154" width="496" height="176" rx="16" fill="#0b1029" fill-opacity="0.9" stroke="url(#neonRim)" stroke-width="1.5"/>
+  <text x="92" y="177" fill="#f8fafc" font-family="Space Grotesk, Inter, sans-serif" font-size="13.5" font-weight="700">BTC / USD</text>
+  <text x="322" y="177" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="10.5">High: $34,200   Low: $31,850   Volume: 1.25M</text>
+
+  <!-- Grid lines -->
+  <line x1="90" y1="205" x2="554" y2="205" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="90" y1="238" x2="554" y2="238" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="90" y1="271" x2="554" y2="271" stroke="#1e293b" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- Volume Needles -->
+  <g stroke="#38bdf8" stroke-opacity="0.32" stroke-width="2">
+    <line x1="105" y1="296" x2="105" y2="282"/><line x1="125" y1="296" x2="125" y2="276"/>
+    <line x1="145" y1="296" x2="145" y2="285"/><line x1="165" y1="296" x2="165" y2="278"/>
+    <line x1="185" y1="296" x2="185" y2="286"/><line x1="205" y1="296" x2="205" y2="272"/>
+    <line x1="225" y1="296" x2="225" y2="268"/><line x1="245" y1="296" x2="245" y2="280"/>
+    <line x1="265" y1="296" x2="265" y2="284"/><line x1="285" y1="296" x2="285" y2="277"/>
+    <line x1="305" y1="296" x2="305" y2="274"/><line x1="325" y1="296" x2="325" y2="262"/>
+    <line x1="345" y1="296" x2="345" y2="270"/><line x1="365" y1="296" x2="365" y2="265"/>
+    <line x1="385" y1="296" x2="385" y2="279"/><line x1="405" y1="296" x2="405" y2="273"/>
+    <line x1="425" y1="296" x2="425" y2="281"/><line x1="445" y1="296" x2="445" y2="264"/>
+    <line x1="465" y1="296" x2="465" y2="258"/><line x1="485" y1="296" x2="485" y2="270"/>
+    <line x1="505" y1="296" x2="505" y2="276"/><line x1="525" y1="296" x2="525" y2="263"/>
+    <line x1="545" y1="296" x2="545" y2="268"/>
+  </g>
+
+  <!-- Glowing Waveform Area & Line -->
+  <path d="M90 245 L112 238 L130 248 L150 242 L172 254 L195 250 L218 272 L240 258 L265 264 L292 256 L316 232 L342 214 L366 222 L392 216 L418 225 L445 204 L470 194 L496 208 L522 214 L552 196 L552 296 L90 296 Z" fill="url(#waveArea)"/>
+  <path d="M90 245 L112 238 L130 248 L150 242 L172 254 L195 250 L218 272 L240 258 L265 264 L292 256 L316 232 L342 214 L366 222 L392 216 L418 225 L445 204 L470 194 L496 208 L522 214 L552 196" fill="none" stroke="url(#waveStroke)" stroke-width="2.8" stroke-linejoin="round" filter="url(#glow31)"/>
+  <circle cx="552" cy="196" r="4" fill="#ffffff" stroke="#22d3ee" stroke-width="2"/>
+
+  <!-- Timeframe Pills -->
+  <rect x="242" y="304" width="34" height="18" rx="6" fill="#4f46e5"/>
+  <text x="208" y="316" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">1H</text>
+  <text x="259" y="316" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">1D</text>
+  <text x="298" y="316" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">1W</text>
+  <text x="338" y="316" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">1M</text>
+  <text x="378" y="316" fill="#94a3b8" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">1Y</text>
+
+  <!-- Right Column Panel 1: Watchlist -->
+  <rect x="582" y="154" width="194" height="94" rx="14" fill="#0d1330" fill-opacity="0.9" stroke="url(#neonRim)" stroke-width="1.3"/>
+  <text x="596" y="173" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="10" font-weight="700" letter-spacing="0.7">WATCHLIST</text>
+  <circle cx="602" cy="191" r="5.5" fill="#f59e0b"/>
+  <text x="613" y="194" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10.5" font-weight="600">Bitcoin</text>
+  <text x="762" y="194" text-anchor="end" fill="#34d399" font-family="Inter, sans-serif" font-size="10" font-weight="700">$32,760 +1.35%</text>
+  <circle cx="602" cy="212" r="5.5" fill="#6366f1"/>
+  <text x="613" y="215" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10.5" font-weight="600">Ethereum</text>
+  <text x="762" y="215" text-anchor="end" fill="#34d399" font-family="Inter, sans-serif" font-size="10" font-weight="700">$2,450 +0.75%</text>
+  <circle cx="602" cy="233" r="5.5" fill="#14b8a6"/>
+  <text x="613" y="236" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10.5" font-weight="600">Solana</text>
+  <text x="762" y="236" text-anchor="end" fill="#fb7185" font-family="Inter, sans-serif" font-size="10" font-weight="700">$125.30 -0.35%</text>
+
+  <!-- Right Column Panel 2: Instant Trade -->
+  <rect x="582" y="256" width="194" height="84" rx="14" fill="#0d1330" fill-opacity="0.9" stroke="url(#neonRim)" stroke-width="1.3"/>
+  <text x="596" y="274" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="10" font-weight="700" letter-spacing="0.7">INSTANT TRADE</text>
+  <rect x="596" y="281" width="80" height="20" rx="6" fill="#0e7490" fill-opacity="0.45" stroke="#22d3ee" stroke-width="1.2"/>
+  <text x="636" y="295" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="10" font-weight="700">BUY</text>
+  <rect x="682" y="281" width="80" height="20" rx="6" fill="#111838" stroke="#334155" stroke-width="1"/>
+  <text x="722" y="295" text-anchor="middle" fill="#94a3b8" font-family="Inter, sans-serif" font-size="10" font-weight="700">SELL</text>
+  <rect x="596" y="310" width="166" height="22" rx="7" fill="#312e81" stroke="#818cf8" stroke-width="1"/>
+  <text x="679" y="325" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Place Order · 0.5 BTC</text>
+
+  <!-- Bottom Row: My Holdings, Recent Transactions, Latest News -->
+  <rect x="74" y="342" width="322" height="90" rx="14" fill="#0d1330" fill-opacity="0.9" stroke="url(#neonRim)" stroke-width="1.3"/>
+  <text x="90" y="361" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="10" font-weight="700" letter-spacing="0.7">MY HOLDINGS</text>
+  <text x="90" y="383" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10.5" font-weight="600">Bitcoin · 1.25 BTC</text>
+  <text x="380" y="383" text-anchor="end" fill="#34d399" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">$32,760.45  +2.15%</text>
+  <text x="90" y="403" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10.5" font-weight="600">Ethereum · 5.80 ETH</text>
+  <text x="380" y="403" text-anchor="end" fill="#34d399" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">$2,450.80  +0.82%</text>
+  <text x="90" y="422" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10.5" font-weight="600">USDC · 12,000 USDC</text>
+  <text x="380" y="422" text-anchor="end" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">$1.00   0.00%</text>
+
+  <rect x="406" y="342" width="164" height="90" rx="14" fill="#0d1330" fill-opacity="0.9" stroke="url(#neonRim)" stroke-width="1.3"/>
+  <text x="420" y="361" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.6">RECENT TRANSACTIONS</text>
+  <text x="420" y="383" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="10">Bought 0.5 BTC</text>
+  <text x="556" y="383" text-anchor="end" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10" font-weight="700">$16,375</text>
+  <text x="420" y="403" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="10">Sold 2.0 ETH</text>
+  <text x="556" y="403" text-anchor="end" fill="#f8fafc" font-family="Inter, sans-serif" font-size="10" font-weight="700">$4,800</text>
+  <text x="420" y="422" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="10">Received USDC</text>
+  <text x="556" y="422" text-anchor="end" fill="#34d399" font-family="Inter, sans-serif" font-size="10" font-weight="700">$5,000</text>
+
+  <rect x="582" y="348" width="194" height="84" rx="14" fill="#0d1330" fill-opacity="0.9" stroke="url(#neonRim)" stroke-width="1.3"/>
+  <text x="596" y="366" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.6">LATEST NEWS</text>
+  <text x="596" y="385" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="9.5">• Crypto Market Surges Highs</text>
+  <text x="596" y="403" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="9.5">• SEC Reviews New ETF Filings</text>
+  <text x="596" y="421" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="9.5">• Web3 Adoption in Asia Grows</text>
+</svg>

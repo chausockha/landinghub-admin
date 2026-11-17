@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYNAPSE CORE — Autonomous AI GPU Cluster & LLM Router Multi-Panel Cockpit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Space Grotesk', 'Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            obsidian: {
+              950: '#060911',
+              900: '#0C1220',
+              800: '#111A2E'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+    }
+    body {
+      background-color: #060911;
+      color: #E2E8F0;
+      font-family: 'Inter', sans-serif;
+      background-image:
+        radial-gradient(circle at 18% 0%, rgba(6, 182, 212, 0.10), transparent 36%),
+        radial-gradient(circle at 82% 8%, rgba(99, 102, 241, 0.12), transparent 38%);
+    }
+    .dock-panel {
+      background: #0C1220;
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+    }
+    @keyframes neuralDraw {
+      from {
+        stroke-dashoffset: 900;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    .neural-draw-line {
+      stroke-dasharray: 900;
+      stroke-dashoffset: 900;
+      animation: neuralDraw 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .gauge-ring {
+      transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .bar-fluid {
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .pod-item-active {
+      background: rgba(6, 182, 212, 0.12);
+      border-color: rgba(6, 182, 212, 0.55);
+      box-shadow: 0 0 18px rgba(6, 182, 212, 0.14);
+    }
+    .telemetry-paused animateMotion {
+      display: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
+
+  <!-- FLOATING TELEMETRY TOOLTIP -->
+  <div id="neuralTooltip" class="pointer-events-none fixed z-50 hidden rounded-xl border border-cyan-400/50 bg-obsidian-950/95 px-3.5 py-2.5 text-slate-100 shadow-2xl backdrop-blur-md">
+    <div id="nTipTitle" class="font-mono text-xs font-semibold uppercase tracking-wider text-cyan-400">Shard Node</div>
+    <div id="nTipVal" class="mt-0.5 font-mono text-sm font-bold text-white">0 tok/s</div>
+    <div id="nTipSub" class="mt-0.5 text-xs text-emerald-400">KV Cache Healthy</div>
+  </div>
+
+  <!-- FLOATING KERNEL TOAST -->
+  <div id="neuralToast" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 rounded-xl border border-cyan-400/50 bg-obsidian-900/95 px-4 py-3 font-mono text-xs text-cyan-200 shadow-2xl backdrop-blur-md">
+    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+    <span id="neuralToastText">Kernel operation dispatched.</span>
+  </div>
+
+  <!-- COMPACT COCKPIT STATUS RIBBON + COCKPIT MODE TABS -->
+  <header class="sticky top-0 z-40 border-b border-sky-400/20 bg-obsidian-900/95 backdrop-blur-md">
+    <div class="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-3 px-4 py-2.5 lg:px-6">
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-400/50 bg-cyan-500/10 text-cyan-400">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/><path stroke-linecap="round" d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="font-display text-base font-bold tracking-wider text-white">SYNAPSE CORE</span>
+            <span class="rounded border border-cyan-500/50 bg-cyan-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-cyan-300">KERNEL 9.4-QUANTUM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Global Telemetry Strip -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="hidden items-center gap-5 rounded-lg border border-sky-400/20 bg-obsidian-950 px-3.5 py-1.5 font-mono text-xs md:flex">
+          <span class="text-slate-400">THROUGHPUT <strong id="hdrTokSec" class="text-cyan-400">14,820 tok/s</strong></span>
+          <span class="text-slate-600">|</span>
+          <span class="text-slate-400">MEDIAN TTFT <strong id="hdrTtft" class="text-emerald-400">18ms</strong></span>
+          <span class="text-slate-600">|</span>
+          <span class="text-slate-400">ACTIVE REPLICAS <strong id="hdrReplicas" class="text-indigo-400">64 Shards</strong></span>
+        </div>
+
+        <button id="neuralPulseBtn" type="button" class="flex items-center gap-2 rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-3 py-1.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-500/20">
+          <span id="neuralDot" class="h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span id="neuralPulseText">Telemetry Stream: LIVE</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Top Cockpit Mode Tabs -->
+    <div class="border-t border-sky-400/15 bg-obsidian-950/90 px-4 py-1.5 lg:px-6">
+      <nav class="mx-auto flex max-w-[1720px] items-center gap-1.5 overflow-x-auto" aria-label="Cockpit Mode Navigation">
+        <button type="button" data-cockpit-tab="overview" class="cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-cyan-400/50 bg-cyan-500/15 px-3.5 py-1.5 font-mono text-xs font-semibold text-cyan-300 transition">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Multi-Dock Overview</span>
+        </button>
+        <button type="button" data-cockpit-tab="shards" class="cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3.5 py-1.5 font-mono text-xs font-medium text-slate-400 transition hover:border-sky-400/25 hover:bg-obsidian-800 hover:text-white">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3m6-3v3M9 20v3m6-3v3M20 9h3m-3 6h3M1 9h3m-3 6h3"/></svg>
+          <span>GPU Tensor Shards</span>
+        </button>
+        <button type="button" data-cockpit-tab="router" class="cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3.5 py-1.5 font-mono text-xs font-medium text-slate-400 transition hover:border-sky-400/25 hover:bg-obsidian-800 hover:text-white">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 12h14"/></svg>
+          <span>LLM Weight Router</span>
+        </button>
+        <button type="button" data-cockpit-tab="rag" class="cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3.5 py-1.5 font-mono text-xs font-medium text-slate-400 transition hover:border-sky-400/25 hover:bg-obsidian-800 hover:text-white">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+          <span>Vector HNSW RAG</span>
+        </button>
+        <button type="button" data-cockpit-tab="guardrails" class="cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3.5 py-1.5 font-mono text-xs font-medium text-slate-400 transition hover:border-sky-400/25 hover:bg-obsidian-800 hover:text-white">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Kernel Guardrails</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- TRUE 3-COLUMN / 4-DOCK MULTI-PANEL COCKPIT LAYOUT + SUBPAGE CONTAINER -->
+  <main class="mx-auto max-w-[1720px] p-3 lg:p-4">
+    <div id="defaultDashboardView" class="grid grid-cols-1 gap-3 lg:min-h-[calc(100vh-102px)] lg:grid-cols-12">
+
+    <!-- DOCK 1: LEFT PANEL (lg:col-span-3) — Cluster Node & Model Topology Tree -->
+    <section class="dock-panel flex flex-col justify-between rounded-xl p-4 lg:col-span-3">
+      <div>
+        <div class="flex items-center justify-between border-b border-sky-400/20 pb-3">
+          <div>
+            <h2 class="font-display text-sm font-bold uppercase tracking-wider text-cyan-300">DOCK 01 // GPU POD TOPOLOGY</h2>
+            <p class="mt-0.5 text-xs text-slate-400">Select cluster fabric to inspect tensor routing</p>
+          </div>
+          <span class="font-mono text-xs text-emerald-400">NVLink 5.0</span>
+        </div>
+
+        <!-- Interactive GPU Pod Selector -->
+        <div id="podTreeList" class="mt-3.5 space-y-2.5">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Model Weights Router Status -->
+        <div class="mt-5 border-t border-sky-400/20 pt-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-xs font-bold uppercase tracking-wider text-indigo-300">Loaded Model Weights</h3>
+            <span class="font-mono text-xs text-slate-400">FP8 Quantized</span>
+          </div>
+
+          <div class="mt-3 space-y-2.5">
+            <div class="rounded-lg border border-sky-400/20 bg-obsidian-950/80 p-3">
+              <div class="flex items-center justify-between text-sm">
+                <span class="font-mono font-semibold text-white">Claude-Opus-Router</span>
+                <span class="rounded bg-emerald-500/20 px-2 py-0.5 font-mono text-xs text-emerald-400">ACTIVE</span>
+              </div>
+              <div class="mt-1.5 flex items-center justify-between text-xs text-slate-400">
+                <span>Traffic Share: 46%</span>
+                <span class="font-mono text-cyan-300">VRAM 612 GB</span>
+              </div>
+            </div>
+
+            <div class="rounded-lg border border-sky-400/20 bg-obsidian-950/80 p-3">
+              <div class="flex items-center justify-between text-sm">
+                <span class="font-mono font-semibold text-white">Gemini-2.5-Flash</span>
+                <span class="rounded bg-cyan-500/20 px-2 py-0.5 font-mono text-xs text-cyan-300">LOW-LATENCY</span>
+              </div>
+              <div class="mt-1.5 flex items-center justify-between text-xs text-slate-400">
+                <span>Traffic Share: 34%</span>
+                <span class="font-mono text-cyan-300">VRAM 284 GB</span>
+              </div>
+            </div>
+
+            <div class="rounded-lg border border-sky-400/20 bg-obsidian-950/80 p-3">
+              <div class="flex items-center justify-between text-sm">
+                <span class="font-mono font-semibold text-white">Llama-4-405B</span>
+                <span class="rounded bg-indigo-500/20 px-2 py-0.5 font-mono text-xs text-indigo-300">SHARDED x8</span>
+              </div>
+              <div class="mt-1.5 flex items-center justify-between text-xs text-slate-400">
+                <span>Traffic Share: 20%</span>
+                <span class="font-mono text-cyan-300">VRAM 840 GB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- InfiniBand Fabric Footer -->
+      <div class="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-mono font-semibold text-emerald-400">RDMA FABRIC LOSSLESS</span>
+          <span class="font-mono text-slate-300">3.2 Tbps/node</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER STACK (lg:col-span-6): DOCK 2 (UPPER TOPOLOGY & WAVEFORM) + DOCK 3 (LOWER TRACE WATERFALL) -->
+    <div class="flex flex-col gap-3 lg:col-span-6">
+
+      <!-- DOCK 2: CENTER UPPER PANEL — Neural Routing Topology SVG + Live Token/s Oscillating Waveform -->
+      <section class="dock-panel rounded-xl p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-400/20 pb-3">
+          <div>
+            <h2 class="font-display text-sm font-bold uppercase tracking-wider text-cyan-300">DOCK 02 // NEURAL ROUTING TOPOLOGY & TOKEN WAVEFORM</h2>
+            <p id="activeClusterSubtitle" class="mt-0.5 text-xs text-slate-400">Pod: us-east-b200-pod1 · Autonomous Speculative Decoding Enabled</p>
+          </div>
+          <div class="flex items-center gap-3 font-mono text-xs">
+            <span class="rounded border border-cyan-500/50 bg-cyan-500/10 px-2.5 py-1 text-cyan-300"><strong id="centerTokMetric">14,820</strong> tok/s</span>
+            <span class="rounded border border-emerald-500/50 bg-emerald-500/10 px-2.5 py-1 text-emerald-300">TTFT <strong id="centerTtftMetric">18ms</strong></span>
+          </div>
+        </div>
+
+        <!-- Interactive Node-Link Neural Routing Diagram -->
+        <div class="mt-3 overflow-x-auto rounded-lg border border-sky-400/10 bg-obsidian-950/90 p-2">
+          <svg class="h-52 min-w-[600px] w-full" viewBox="0 0 740 205">
+            <defs>
+              <linearGradient id="cyanIndigoLink" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#06B6D4"/>
+                <stop offset="50%" stop-color="#6366F1"/>
+                <stop offset="100%" stop-color="#10B981"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Background Subtle Grid -->
+            <g stroke="rgba(56,189,248,0.06)" stroke-width="1">
+              <line x1="0" y1="50" x2="740" y2="50"/>
+              <line x1="0" y1="102" x2="740" y2="102"/>
+              <line x1="0" y1="154" x2="740" y2="154"/>
+            </g>
+
+            <!-- Neural Routing Synaptic Paths -->
+            <path id="synPath1" class="neural-draw-line" d="M 118,102 C 165,102 185,102 232,102" fill="none" stroke="#06B6D4" stroke-width="2.2"/>
+            <path id="synPathTop" class="neural-draw-line" d="M 348,102 C 395,102 405,40 455,40 C 515,40 555,102 605,102" fill="none" stroke="url(#cyanIndigoLink)" stroke-width="2"/>
+            <path id="synPathMid" class="neural-draw-line" d="M 348,102 L 605,102" fill="none" stroke="url(#cyanIndigoLink)" stroke-width="2.2"/>
+            <path id="synPathBot" class="neural-draw-line" d="M 348,102 C 395,102 405,164 455,164 C 515,164 555,102 605,102" fill="none" stroke="url(#cyanIndigoLink)" stroke-width="2"/>
+
+            <!-- Glowing Photons (<animateMotion>) -->
+            <circle r="4.5" fill="#06B6D4">
+              <animateMotion dur="1.8s" repeatCount="indefinite" path="M 118,102 C 165,102 185,102 232,102"/>
+            </circle>
+            <circle r="4.5" fill="#06B6D4">
+              <animateMotion dur="2.4s" repeatCount="indefinite" path="M 348,102 C 395,102 405,40 455,40 C 515,40 555,102 605,102"/>
+            </circle>
+            <circle r="5" fill="#6366F1">
+              <animateMotion dur="1.9s" begin="0.5s" repeatCount="indefinite" path="M 348,102 L 605,102"/>
+            </circle>
+            <circle r="4.5" fill="#10B981">
+              <animateMotion dur="2.7s" begin="0.9s" repeatCount="indefinite" path="M 348,102 C 395,102 405,164 455,164 C 515,164 555,102 605,102"/>
+            </circle>
+
+            <!-- Node 1: Ingress Gateway -->
+            <g class="neural-node cursor-pointer" data-title="Ingress gRPC Gateway" data-val="14,820 tok/s" data-sub="TLS 1.3 Zero-Copy Envoy">
+              <rect x="16" y="78" width="102" height="48" rx="8" fill="#0C1220" stroke="#06B6D4" stroke-width="1.6"/>
+              <text x="67" y="99" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#E2E8F0">Ingress GW</text>
+              <text x="67" y="116" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#06B6D4">0.8ms</text>
+            </g>
+
+            <!-- Node 2: Semantic Cache -->
+            <g class="neural-node cursor-pointer" data-title="Semantic KV Cache" data-val="68.4% Hit Ratio" data-sub="Saves $1,420/hr GPU Compute">
+              <rect x="232" y="78" width="116" height="48" rx="8" fill="#0C1220" stroke="#6366F1" stroke-width="1.6"/>
+              <text x="290" y="99" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#E2E8F0">Semantic KV</text>
+              <text x="290" y="116" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#818CF8">68% Hit</text>
+            </g>
+
+            <!-- 3 LLM Shards -->
+            <g class="neural-node cursor-pointer" data-title="LLM Shard-01 (Opus)" data-val="6,410 tok/s" data-sub="FP8 Tensor Core 93% Util">
+              <rect x="430" y="18" width="110" height="42" rx="8" fill="#0C1220" stroke="#06B6D4" stroke-width="1.5"/>
+              <text x="485" y="43" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="600" fill="#67E8F9">LLM Shard-01</text>
+            </g>
+            <g class="neural-node cursor-pointer" data-title="LLM Shard-02 (Gemini)" data-val="5,280 tok/s" data-sub="Flash Attention-3 Active">
+              <rect x="430" y="81" width="110" height="42" rx="8" fill="#0C1220" stroke="#6366F1" stroke-width="1.5"/>
+              <text x="485" y="106" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="600" fill="#A5B4FC">LLM Shard-02</text>
+            </g>
+            <g class="neural-node cursor-pointer" data-title="LLM Shard-03 (Llama-4)" data-val="3,130 tok/s" data-sub="8-Way Tensor Parallel">
+              <rect x="430" y="144" width="110" height="42" rx="8" fill="#0C1220" stroke="#10B981" stroke-width="1.5"/>
+              <text x="485" y="169" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="600" fill="#6EE7B7">LLM Shard-03</text>
+            </g>
+
+            <!-- Final Node: Vector RAG -->
+            <g class="neural-node cursor-pointer" data-title="HNSW Vector RAG Engine" data-val="4.1B Embeddings" data-sub="p99 Recall Latency: 4.2ms">
+              <rect x="605" y="78" width="118" height="48" rx="8" fill="#0C1220" stroke="#10B981" stroke-width="1.8"/>
+              <text x="664" y="99" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#E2E8F0">Vector RAG</text>
+              <text x="664" y="116" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#34D399">4.2ms p99</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Real-Time Oscillating SVG Token/sec Waveform -->
+        <div class="mt-3 rounded-lg border border-sky-400/10 bg-obsidian-950/80 p-3">
+          <div class="mb-1.5 flex items-center justify-between text-xs">
+            <span class="font-mono uppercase tracking-wider text-slate-400">Real-Time Token Stream Waveform (60s Rolling)</span>
+            <span class="font-mono text-cyan-400">Peak: 16,400 tok/s</span>
+          </div>
+          <svg class="h-20 w-full" viewBox="0 0 680 74" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.32"/>
+                <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path id="waveformArea" d="M 0,48 Q 42,20 85,38 T 170,28 T 255,42 T 340,22 T 425,35 T 510,18 T 595,30 T 680,20 L 680,74 L 0,74 Z" fill="url(#waveGrad)"/>
+            <path id="waveformLine" class="neural-draw-line" d="M 0,48 Q 42,20 85,38 T 170,28 T 255,42 T 340,22 T 425,35 T 510,18 T 595,30 T 680,20" fill="none" stroke="#06B6D4" stroke-width="2.4"/>
+          </svg>
+        </div>
+      </section>
+
+      <!-- DOCK 3: CENTER LOWER PANEL — Live Inference Trace Waterfall -->
+      <section class="dock-panel flex-1 rounded-xl p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-400/20 pb-3">
+          <div>
+            <h2 class="font-display text-sm font-bold uppercase tracking-wider text-indigo-300">DOCK 03 // LIVE INFERENCE TRACE WATERFALL</h2>
+            <p class="mt-0.5 text-xs text-slate-400">End-to-end request span breakdown (Total Turnaround: <strong id="traceTotalMs" class="font-mono text-emerald-400">36ms</strong>)</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" data-trace="fast" class="trace-btn rounded border border-cyan-400/50 bg-cyan-500/20 px-2.5 py-1 font-mono text-xs font-semibold text-cyan-300">req_9f82a (36ms)</button>
+            <button type="button" data-trace="rag" class="trace-btn rounded border border-sky-400/20 bg-obsidian-950 px-2.5 py-1 font-mono text-xs text-slate-400 hover:text-white">req_4c19e (58ms)</button>
+          </div>
+        </div>
+
+        <div id="traceBarsWrapper" class="mt-4 space-y-3">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- DOCK 4: RIGHT PANEL (lg:col-span-3) — Radial GPU Telemetry Gauges & Live Command Console -->
+    <section class="dock-panel flex flex-col justify-between rounded-xl p-4 lg:col-span-3">
+      <div>
+        <div class="flex items-center justify-between border-b border-sky-400/20 pb-3">
+          <div>
+            <h2 class="font-display text-sm font-bold uppercase tracking-wider text-emerald-300">DOCK 04 // TELEMETRY & OPS</h2>
+            <p class="mt-0.5 text-xs text-slate-400">Radial SXM compute & live router console</p>
+          </div>
+          <span class="font-mono text-xs text-cyan-400">CUDA 13.1</span>
+        </div>
+
+        <!-- Dual SVG Radial Gauges -->
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <!-- Gauge 1: GPU Compute -->
+          <div class="flex flex-col items-center rounded-xl border border-sky-400/20 bg-obsidian-950/90 p-3">
+            <svg class="h-28 w-28" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(56,189,248,0.12)" stroke-width="9"/>
+              <circle id="gpuGaugeRing" class="gauge-ring" cx="60" cy="60" r="46" fill="none" stroke="#06B6D4" stroke-width="9"
+                      stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="25" transform="rotate(-90 60 60)"/>
+              <text id="gpuGaugeText" x="60" y="58" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" fill="#FFFFFF">91.4%</text>
+              <text x="60" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#94A3B8">Compute</text>
+            </svg>
+            <span class="mt-1 font-mono text-xs text-cyan-300">Tensor Core SM</span>
+          </div>
+
+          <!-- Gauge 2: KV Memory -->
+          <div class="flex flex-col items-center rounded-xl border border-sky-400/20 bg-obsidian-950/90 p-3">
+            <svg class="h-28 w-28" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(99,102,241,0.14)" stroke-width="9"/>
+              <circle id="kvGaugeRing" class="gauge-ring" cx="60" cy="60" r="46" fill="none" stroke="#6366F1" stroke-width="9"
+                      stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="74" transform="rotate(-90 60 60)"/>
+              <text id="kvGaugeText" x="60" y="58" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" fill="#FFFFFF">74.2%</text>
+              <text x="60" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#94A3B8">KV HBM3e</text>
+            </svg>
+            <span class="mt-1 font-mono text-xs text-indigo-300">PagedAttention</span>
+          </div>
+        </div>
+
+        <!-- Interactive Cluster Controls -->
+        <div class="mt-4 space-y-2.5">
+          <button id="rerouteBtn" type="button" class="flex w-full items-center justify-between rounded-xl border border-cyan-500/50 bg-cyan-500/10 px-3.5 py-2.5 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-500/20">
+            <span>Reroute Traffic (Auto-Balance)</span>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </button>
+
+          <button id="scaleReplicaBtn" type="button" class="flex w-full items-center justify-between rounded-xl border border-indigo-500/50 bg-indigo-500/10 px-3.5 py-2.5 text-sm font-semibold text-indigo-300 transition hover:bg-indigo-500/20">
+            <span>Scale Tensor Replicas (+8)</span>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Streaming Monospace Log Feed -->
+      <div class="mt-4 flex flex-col rounded-xl border border-sky-400/20 bg-obsidian-950 p-3">
+        <div class="mb-2 flex items-center justify-between border-b border-slate-800 pb-1.5">
+          <span class="font-mono text-xs font-semibold text-emerald-400">SYNAPSE://KERNEL-STDOUT</span>
+          <span class="font-mono text-xs text-slate-500">tail -f</span>
+        </div>
+        <div id="consoleLogFeed" class="h-48 space-y-1.5 overflow-y-auto font-mono text-xs leading-relaxed text-slate-300">
+          <!-- Live log entries -->
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <!-- DEDICATED COCKPIT SUB-PAGE VIEW -->
+    <div id="tabSubpageView" class="hidden space-y-4 py-1"></div>
+  </main>
+
+  <script>
+    (function () {
+      const pods = [
+        { id: 'us-east-b200-pod1', arch: 'NVIDIA B200 NVL72', temp: 64, vram: 82, tok: 14820, ttft: 18, gpuPct: 91.4, kvPct: 74.2 },
+        { id: 'eu-central-h100-pod4', arch: 'NVIDIA H100 SXM5', temp: 59, vram: 71, tok: 11240, ttft: 21, gpuPct: 84.6, kvPct: 68.5 },
+        { id: 'ap-tokyo-tpu-v5', arch: 'Cloud TPU v5p Pod', temp: 55, vram: 64, tok: 16390, ttft: 15, gpuPct: 88.2, kvPct: 61.8 }
+      ];
+
+      const traceSets = {
+        fast: {
+          total: '36ms',
+          spans: [
+            { name: 'Prompt Guardrail', startPct: 0, widthPct: 8, ms: '2ms', color: 'bg-cyan-400', desc: 'Zero-trust PII & injection filter' },
+            { name: 'Vector Embed', startPct: 8, widthPct: 17, ms: '6ms', color: 'bg-indigo-400', desc: '1536-d dense query projection' },
+            { name: 'KV-Cache Hit', startPct: 25, widthPct: 12, ms: '4ms', color: 'bg-emerald-400', desc: 'Prefix block reuse on HBM3e' },
+            { name: 'Decode Stream', startPct: 37, widthPct: 63, ms: '24ms', color: 'bg-cyan-500', desc: 'Speculative 4-token draft verify' }
+          ]
+        },
+        rag: {
+          total: '58ms',
+          spans: [
+            { name: 'Prompt Guardrail', startPct: 0, widthPct: 6, ms: '3ms', color: 'bg-cyan-400', desc: 'Policy classification pass' },
+            { name: 'Vector Embed', startPct: 6, widthPct: 20, ms: '11ms', color: 'bg-indigo-400', desc: 'Hybrid BM25 + dense reranker' },
+            { name: 'KV-Cache Hit', startPct: 26, widthPct: 14, ms: '8ms', color: 'bg-emerald-400', desc: 'Cross-shard context fetch' },
+            { name: 'Decode Stream', startPct: 40, widthPct: 60, ms: '36ms', color: 'bg-cyan-500', desc: 'FP8 tensor parallel stream' }
+          ]
+        }
+      };
+
+      let activePodId = pods[0].id;
+      let activeTrace = 'fast';
+      let replicas = 64;
+      let streamLive = true;
+      let wavePhase = 0;
+
+      const circumference = 289;
+
+      function setGauges(gpuPct, kvPct) {
+        const gpuOffset = circumference - (gpuPct / 100) * circumference;
+        const kvOffset = circumference - (kvPct / 100) * circumference;
+        document.getElementById('gpuGaugeRing').style.strokeDashoffset = gpuOffset.toFixed(1);
+        document.getElementById('kvGaugeRing').style.strokeDashoffset = kvOffset.toFixed(1);
+        document.getElementById('gpuGaugeText').textContent = gpuPct.toFixed(1) + '%';
+        document.getElementById('kvGaugeText').textContent = kvPct.toFixed(1) + '%';
+      }
+
+      function renderPods() {
+        const container = document.getElementById('podTreeList');
+        container.innerHTML = pods.map(p => {
+          const isAct = p.id === activePodId;
+          return `
+            <button type="button" data-pod="${p.id}" class="w-full rounded-xl border p-3 text-left transition ${isAct ? 'pod-item-active' : 'border-sky-400/20 bg-obsidian-950/80 hover:border-sky-400/50'}">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-sm font-bold text-white">${p.id}</span>
+                <span class="font-mono text-xs text-emerald-400">${p.temp}C</span>
+              </div>
+              <div class="mt-0.5 text-xs text-slate-400">${p.arch}</div>
+              <div class="mt-2.5">
+                <div class="mb-1 flex justify-between font-mono text-xs text-slate-400">
+                  <span>VRAM Allocation</span>
+                  <span class="text-cyan-300">${p.vram}%</span>
+                </div>
+                <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+                  <div class="bar-fluid h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500" style="width: ${p.vram}%"></div>
+                </div>
+              </div>
+            </button>
+          `;
+        }).join('');
+
+        container.querySelectorAll('[data-pod]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            activePodId = btn.getAttribute('data-pod');
+            const pod = pods.find(x => x.id === activePodId);
+            renderPods();
+            document.getElementById('activeClusterSubtitle').textContent = `Pod: ${pod.id} · ${pod.arch}`;
+            document.getElementById('hdrTokSec').textContent = pod.tok.toLocaleString() + ' tok/s';
+            document.getElementById('centerTokMetric').textContent = pod.tok.toLocaleString();
+            document.getElementById('hdrTtft').textContent = pod.ttft + 'ms';
+            document.getElementById('centerTtftMetric').textContent = pod.ttft + 'ms';
+            setGauges(pod.gpuPct, pod.kvPct);
+            appendLog(`Switched telemetry focus to ${pod.id} (${pod.arch})`);
+          });
+        });
+      }
+
+      function renderTraceWaterfall() {
+        const t = traceSets[activeTrace];
+        document.getElementById('traceTotalMs').textContent = t.total;
+        const wrap = document.getElementById('traceBarsWrapper');
+        wrap.innerHTML = t.spans.map(s => `
+          <div class="rounded-lg border border-sky-400/10 bg-obsidian-950/80 p-2.5">
+            <div class="mb-1.5 flex items-center justify-between text-sm">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-semibold text-white">${s.name}</span>
+                <span class="hidden text-xs text-slate-400 sm:inline">— ${s.desc}</span>
+              </div>
+              <span class="font-mono text-xs font-bold text-cyan-300">${s.ms}</span>
+            </div>
+            <div class="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-900">
+              <div class="bar-fluid absolute top-0 h-full rounded-full ${s.color}" style="left: ${s.startPct}%; width: ${s.widthPct}%"></div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function appendLog(msg, tone = 'text-cyan-300') {
+        const feed = document.getElementById('consoleLogFeed');
+        const now = new Date();
+        const ts = now.toTimeString().slice(0, 8);
+        const div = document.createElement('div');
+        div.innerHTML = `<span class="text-slate-500">[${ts}]</span> <span class="${tone}">${msg}</span>`;
+        feed.prepend(div);
+        while (feed.children.length > 18) {
+          feed.removeChild(feed.lastChild);
+        }
+      }
+
+      // Trace buttons
+      document.querySelectorAll('.trace-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.trace-btn').forEach(b => {
+            b.className = 'trace-btn rounded border border-sky-400/20 bg-obsidian-950 px-2.5 py-1 font-mono text-xs text-slate-400 hover:text-white';
+          });
+          btn.className = 'trace-btn rounded border border-cyan-400/50 bg-cyan-500/20 px-2.5 py-1 font-mono text-xs font-semibold text-cyan-300';
+          activeTrace = btn.getAttribute('data-trace');
+          renderTraceWaterfall();
+        });
+      });
+
+      // Ops Buttons
+      document.getElementById('rerouteBtn').addEventListener('click', () => {
+        const pod = pods.find(p => p.id === activePodId);
+        pod.gpuPct = Math.max(68, +(pod.gpuPct - 5.4).toFixed(1));
+        pod.ttft = Math.max(12, pod.ttft - 2);
+        setGauges(pod.gpuPct, pod.kvPct);
+        document.getElementById('hdrTtft').textContent = pod.ttft + 'ms';
+        document.getElementById('centerTtftMetric').textContent = pod.ttft + 'ms';
+        appendLog(`Router rebalanced shard weights on ${pod.id}; TTFT improved to ${pod.ttft}ms`, 'text-emerald-400');
+      });
+
+      document.getElementById('scaleReplicaBtn').addEventListener('click', () => {
+        replicas += 8;
+        document.getElementById('hdrReplicas').textContent = replicas + ' Shards';
+        const pod = pods.find(p => p.id === activePodId);
+        pod.kvPct = Math.max(48, +(pod.kvPct - 4.1).toFixed(1));
+        setGauges(pod.gpuPct, pod.kvPct);
+        appendLog(`Provisioned +8 FP8 tensor replicas (Total: ${replicas} Shards)`, 'text-indigo-300');
+      });
+
+      // Tooltip on SVG Nodes
+      const tooltip = document.getElementById('neuralTooltip');
+      document.querySelectorAll('.neural-node').forEach(node => {
+        node.addEventListener('mouseenter', () => {
+          document.getElementById('nTipTitle').textContent = node.getAttribute('data-title');
+          document.getElementById('nTipVal').textContent = node.getAttribute('data-val');
+          document.getElementById('nTipSub').textContent = node.getAttribute('data-sub');
+          tooltip.classList.remove('hidden');
+        });
+        node.addEventListener('mousemove', (e) => {
+          tooltip.style.left = (e.clientX + 14) + 'px';
+          tooltip.style.top = (e.clientY - 28) + 'px';
+        });
+        node.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+      });
+
+      // Live Telemetry Toggle
+      document.getElementById('neuralPulseBtn').addEventListener('click', () => {
+        streamLive = !streamLive;
+        document.getElementById('neuralPulseText').textContent = streamLive ? 'Telemetry Stream: LIVE' : 'Telemetry Stream: PAUSED';
+        document.getElementById('neuralDot').className = streamLive ? 'h-2 w-2 rounded-full bg-emerald-400' : 'h-2 w-2 rounded-full bg-slate-500';
+        document.body.classList.toggle('telemetry-paused', !streamLive);
+      });
+
+      // Oscillating Waveform & Live Ticker
+      setInterval(() => {
+        if (!streamLive) return;
+        wavePhase += 0.65;
+        const pts = [];
+        for (let i = 0; i <= 8; i++) {
+          const x = i * 85;
+          const y = Math.round(34 + Math.sin(wavePhase + i * 0.9) * 14 + (Math.random() * 6 - 3));
+          pts.push({ x, y });
+        }
+        let d = `M ${pts[0].x},${pts[0].y}`;
+        for (let i = 1; i < pts.length; i++) {
+          const midX = (pts[i - 1].x + pts[i].x) / 2;
+          const midY = (pts[i - 1].y + pts[i].y) / 2;
+          d += ` Q ${pts[i - 1].x},${pts[i - 1].y} ${midX},${midY}`;
+        }
+        d += ` L 680,${pts[8].y}`;
+        document.getElementById('waveformLine').setAttribute('d', d);
+        document.getElementById('waveformArea').setAttribute('d', d + ' L 680,74 L 0,74 Z');
+
+        const pod = pods.find(p => p.id === activePodId);
+        const jitterTok = pod.tok + Math.floor(Math.random() * 320 - 150);
+        document.getElementById('hdrTokSec').textContent = jitterTok.toLocaleString() + ' tok/s';
+        document.getElementById('centerTokMetric').textContent = jitterTok.toLocaleString();
+
+        const sampleLogs = [
+          `KV-cache block #4821 evicted zero tokens (hit=69.1%)`,
+          `Speculative draft accepted 4/4 tokens on LLM Shard-01`,
+          `RDMA all-reduce sync completed in 0.41ms across NVLink`,
+          `Vector HNSW shard queried 4.1B embeddings in 3.9ms`
+        ];
+        appendLog(sampleLogs[Math.floor(Math.random() * sampleLogs.length)], 'text-slate-300');
+      }, 2200);
+
+      function showNeuralToast(msg) {
+        const t = document.getElementById('neuralToast');
+        document.getElementById('neuralToastText').textContent = msg;
+        t.classList.remove('hidden');
+        t.classList.add('flex');
+        clearTimeout(window.__neuralToastTimer);
+        window.__neuralToastTimer = setTimeout(() => {
+          t.classList.add('hidden');
+          t.classList.remove('flex');
+        }, 3100);
+      }
+
+      const cockpitSubpages = {
+        shards: {
+          code: 'MODE // NVLINK 5.0 TENSOR FABRIC',
+          title: 'GPU Tensor Shards & HBM3e Memory Telemetry',
+          subtitle: 'Per-node SXM5/NVL72 thermal envelopes, PagedAttention KV block compaction, and RDMA all-reduce health.',
+          kpis: [
+            { label: 'Active Tensor Shards', val: '64 Nodes', delta: '100% Online', tone: 'cyan', sub: '8-way Tensor Parallelism' },
+            { label: 'Aggregate HBM3e Pool', val: '5.12 TB', delta: '74.2% Allocated', tone: 'indigo', sub: 'Zero OOM evictions 30d' },
+            { label: 'NVLink Bisection BW', val: '3.2 Tbps', delta: '0.41ms All-Reduce', tone: 'emerald', sub: 'RDMA RoCEv2 Lossless' },
+            { label: 'Mean SXM Junction Temp', val: '61.4 C', delta: 'Liquid Cooled', tone: 'cyan', sub: 'Throttle ceiling: 85 C' }
+          ],
+          visualTitle: 'Cluster Tensor Core Utilization & Thermal Headroom',
+          visualSub: 'Real-time FP8 compute saturation across regional GPU pods',
+          curve: 'M 12,88 C 75,64 135,76 205,44 C 275,28 330,36 388,20',
+          bars: [
+            { name: 'us-east-b200-pod1 (NVL72 Rack)', pct: 91, val: '91.4% SM · 64C Liquid', color: 'from-cyan-400 to-indigo-500' },
+            { name: 'ap-tokyo-tpu-v5 (v5p Torus)', pct: 88, val: '88.2% MXU · 55C Optimal', color: 'from-emerald-400 to-cyan-500' },
+            { name: 'eu-central-h100-pod4 (SXM5)', pct: 85, val: '84.6% SM · 59C Nominal', color: 'from-indigo-400 to-cyan-400' },
+            { name: 'us-west-h200-burst (Spot Pool)', pct: 62, val: '62.0% SM · Warm Standby', color: 'from-sky-400 to-emerald-400' }
+          ],
+          tableTitle: 'Hardware Shard Allocations & Kernel Operations',
+          actionCol: 'Shard Op',
+          rows: [
+            { id: 'SHD-00..15', col1: 'B200 Tensor Ring Alpha', col2: 'Claude-Opus-Router (FP8)', col3: '612 GB / 640 GB', status: 'OPTIMAL', done: 'COMPACTED', btn: 'Compact KV', toast: 'Compacted fragmented PagedAttention KV blocks on SHD-00..15 (+48 GB freed).' },
+            { id: 'SHD-16..31', col1: 'B200 Speculative Draft Pool', col2: 'Gemini-2.5-Flash', col3: '284 GB / 512 GB', status: 'LOW-LATENCY', done: 'PINNED L2', btn: 'Pin Weights', toast: 'Pinned speculative draft weights in L2 SRAM cache on SHD-16..31.' },
+            { id: 'SHD-32..47', col1: 'H100 EU Sovereign Ring', col2: 'Llama-4-405B (x8 TP)', col3: '840 GB / 960 GB', status: 'SHARDED', done: 'REBALANCED', btn: 'Rebalance TP', toast: 'Rebalanced 8-way tensor parallel communication ring on EU H100 pod.' },
+            { id: 'SHD-48..55', col1: 'TPU v5p Multimodal Encoder', col2: 'Vision-ViT + Audio', col3: '310 GB / 512 GB', status: 'STREAMING', done: 'CALIBRATED', btn: 'Calibrate FP8', toast: 'Recalibrated FP8 activation scaling factors with zero perplexity drift.' },
+            { id: 'SHD-56..63', col1: 'Hot-Spare Failover Octet', col2: 'Warm Pre-Loaded Checkpoints', col3: '128 GB / 640 GB', status: 'STANDBY', done: 'PROMOTED', btn: 'Test Failover', toast: 'Zero-drop 14ms shard failover drill completed on SHD-56..63.' }
+          ]
+        },
+        router: {
+          code: 'MODE // SEMANTIC MODEL ROUTER',
+          title: 'Autonomous LLM Weight Router & Speculative Decoding',
+          subtitle: 'Complexity-aware prompt classification routing queries across frontier, flash, and open-weight checkpoints.',
+          kpis: [
+            { label: 'Semantic Router Latency', val: '1.2ms', delta: 'BERT-Tiny Gate', tone: 'emerald', sub: 'Zero TTFT overhead' },
+            { label: 'Speculative Accept Rate', val: '86.4%', delta: '3.4x Speedup', tone: 'cyan', sub: '4-token Medusa draft head' },
+            { label: 'Compute Cost Reduction', val: '-41.8%', delta: '$1,420/hr Saved', tone: 'emerald', sub: 'vs static frontier routing' },
+            { label: 'Fallback SLA Uptime', val: '99.995%', delta: 'Zero 5xx Drops', tone: 'indigo', sub: 'Multi-region circuit breaker' }
+          ],
+          visualTitle: 'Traffic Split & Speculative Draft Acceptance',
+          visualSub: 'Live inference distribution by model tier and latency SLA',
+          curve: 'M 12,92 C 80,74 145,58 212,48 C 280,38 335,24 388,16',
+          bars: [
+            { name: 'Claude-Opus-Router (Complex Reasoning)', pct: 46, val: '46% Share · 22ms TTFT', color: 'from-cyan-400 to-indigo-500' },
+            { name: 'Gemini-2.5-Flash (Sub-20ms Realtime)', pct: 34, val: '34% Share · 14ms TTFT', color: 'from-emerald-400 to-cyan-400' },
+            { name: 'Llama-4-405B (Batch Code & Synthesis)', pct: 20, val: '20% Share · 19ms TTFT', color: 'from-indigo-400 to-sky-400' },
+            { name: 'Semantic Prefix KV-Cache Direct Hit', pct: 68, val: '68.4% Cache Hit · 4ms', color: 'from-emerald-400 to-teal-500' }
+          ],
+          tableTitle: 'Model Routing Rules & Dynamic Weight Gates',
+          actionCol: 'Router Control',
+          rows: [
+            { id: 'RT-01', col1: 'Multi-Step Code & Architecture', col2: 'Claude-Opus-Router', col3: 'Temp 0.2 · Top-P 0.95', status: 'PRIMARY', done: 'LOCKED SLA', btn: 'Tune Gate', toast: 'Updated complexity threshold to 0.72 for Claude-Opus-Router.' },
+            { id: 'RT-02', col1: 'Low-Latency UI & Voice Agents', col2: 'Gemini-2.5-Flash', col3: 'TTFT Cap < 18ms', status: 'FAST-LANE', done: 'BOOSTED +15%', btn: 'Prioritize', toast: 'Allocated priority QoS queue for sub-18ms voice streaming.' },
+            { id: 'RT-03', col1: 'Bulk JSON Extraction & ETL', col2: 'Llama-4-405B FP8', col3: 'Structured Grammar', status: 'BATCHED', done: 'GRAMMAR ON', btn: 'Enforce Schema', toast: 'Strict CFG JSON schema decoding enforced on RT-03.' },
+            { id: 'RT-04', col1: 'Semantic Prefix Cache Matcher', col2: 'HBM3e RadixTree', col3: 'Cosine >= 0.96', status: '68.4% HIT', done: 'FLUSHED STALE', btn: 'Prune Cold', toast: 'Pruned cold KV radix branches older than 6h (+99.2% freshness).' },
+            { id: 'RT-05', col1: 'Cross-Region Overflow Circuit', col2: 'us-east -> ap-tokyo', col3: 'Trigger @ 94% GPU', status: 'ARMED', done: 'VERIFIED 11ms', btn: 'Dry-Run', toast: 'Cross-region overflow dry-run verified at 11ms tunnel overhead.' }
+          ]
+        },
+        rag: {
+          code: 'MODE // HNSW VECTOR ENGINE',
+          title: 'Distributed Vector HNSW RAG & Hybrid Reranker',
+          subtitle: '4.1B dense FP16 embeddings indexed in NVMe/DRAM tiers with reciprocal rank fusion and cross-encoder scoring.',
+          kpis: [
+            { label: 'Indexed Vector Corpus', val: '4.12B', delta: '1536-d Dense', tone: 'emerald', sub: '128 distributed shards' },
+            { label: 'p99 Recall Latency', val: '4.2ms', delta: '99.1% Recall@10', tone: 'cyan', sub: 'efSearch=128 tuned' },
+            { label: 'Hybrid Reranker Lift', val: '+18.4%', delta: 'NDCG@5 Score', tone: 'indigo', sub: 'BM25 + BGE Cross-Encoder' },
+            { label: 'Live Ingestion Stream', val: '28.5k/s', delta: 'Zero Index Lock', tone: 'emerald', sub: 'CDC Kafka -> HNSW delta' }
+          ],
+          visualTitle: 'Index Memory Residency & Recall Accuracy',
+          visualSub: 'Query latency and recall fidelity across vector namespaces',
+          curve: 'M 12,86 C 76,78 142,54 208,46 C 276,34 334,26 388,18',
+          bars: [
+            { name: 'ns_codebase_ast (1.4B Vectors)', pct: 95, val: '3.6ms p99 · 99.4% Recall', color: 'from-cyan-400 to-emerald-400' },
+            { name: 'ns_enterprise_docs (1.8B Vectors)', pct: 89, val: '4.4ms p99 · ACL Filtered', color: 'from-indigo-400 to-cyan-400' },
+            { name: 'ns_telemetry_logs (620M Vectors)', pct: 78, val: '2.9ms p99 · Rolling 90d', color: 'from-emerald-400 to-teal-400' },
+            { name: 'ns_multimodal_frames (300M Vectors)', pct: 71, val: '5.1ms p99 · CLIP-ViT', color: 'from-sky-400 to-indigo-400' }
+          ],
+          tableTitle: 'Active HNSW Vector Namespaces & Index Maintenance',
+          actionCol: 'Index Op',
+          rows: [
+            { id: 'VEC-01', col1: 'ns_codebase_ast', col2: '1.40B · M=32 ef=128', col3: '3.6ms p99', status: 'SYNCED', done: 'RE-INDEXED', btn: 'Merge Delta', toast: 'Merged incremental WAL segments into ns_codebase_ast HNSW graph.' },
+            { id: 'VEC-02', col1: 'ns_enterprise_docs', col2: '1.80B · RBAC Enforced', col3: '4.4ms p99', status: 'SYNCED', done: 'ACL VERIFIED', btn: 'Audit RBAC', toast: 'Zero-trust document ACL bitmask verified across 1.8B embeddings.' },
+            { id: 'VEC-03', col1: 'ns_telemetry_logs', col2: '620M · Product Quant.', col3: '2.9ms p99', status: 'COMPACT', done: 'PQ8 TUNED', btn: 'Optimize PQ', toast: 'Product quantization codebook refreshed for ns_telemetry_logs.' },
+            { id: 'VEC-04', col1: 'ns_multimodal_frames', col2: '300M · 1024-d ViT', col3: '5.1ms p99', status: 'WARM', done: 'PREFETCHED', btn: 'Warm DRAM', toast: 'Prefetched hot centroid graph layers into pinned host DRAM.' },
+            { id: 'VEC-05', col1: 'Cross-Encoder Rerank Pool', col2: '4x TensorRT Engines', col3: '2.1ms Pass', status: 'ACTIVE', done: 'SCALED x6', btn: 'Scale TRT', toast: 'Scaled TensorRT reranker pool to 6 concurrent execution streams.' }
+          ]
+        },
+        guardrails: {
+          code: 'MODE // ZERO-TRUST SAFETY KERNEL',
+          title: 'Kernel Guardrails, PII Redaction & Rate Enclaves',
+          subtitle: 'Inline sub-2ms prompt injection shields, deterministic PII tokenization, and tenant token-bucket quotas.',
+          kpis: [
+            { label: 'Guardrail Filter Latency', val: '1.9ms', delta: 'Inline ONNX', tone: 'emerald', sub: 'Runs parallel to embed' },
+            { label: 'Injection Attempts Blocked', val: '1,428', delta: '100% Contained', tone: 'cyan', sub: 'Last 24h adversarial probes' },
+            { label: 'Zero-Trust PII Redactions', val: '48.2k', delta: '0 Leaks Logged', tone: 'emerald', sub: 'SSN · Keys · JWT · HIPAA' },
+            { label: 'Tenant Quota Compliance', val: '99.98%', delta: 'Fair-Share DRR', tone: 'indigo', sub: 'Deficit Round Robin active' }
+          ],
+          visualTitle: 'Defense-in-Depth Inspection Coverage',
+          visualSub: 'Real-time pass/intercept telemetry across ingress and egress gates',
+          curve: 'M 12,84 C 78,76 146,62 214,48 C 280,36 336,28 388,20',
+          bars: [
+            { name: 'Prompt Jailbreak & Indirect Injection Classifier', pct: 99, val: '99.94% Precision · 1.1ms', color: 'from-emerald-400 to-cyan-400' },
+            { name: 'Deterministic Secret / API Key Scanner', pct: 100, val: '100% Redaction · 0.3ms', color: 'from-cyan-400 to-indigo-500' },
+            { name: 'Hallucination Citation Grounding Check', pct: 94, val: '94.2% Entailment · 2.4ms', color: 'from-indigo-400 to-emerald-400' },
+            { name: 'mTLS 1.3 Hardware Enclave Attestation', pct: 100, val: 'FIPS 140-3 Verified', color: 'from-sky-400 to-cyan-300' }
+          ],
+          tableTitle: 'Active Security Policies & Enclave Controls',
+          actionCol: 'Policy Action',
+          rows: [
+            { id: 'SEC-01', col1: 'Indirect RAG Prompt Injection Shield', col2: 'Ingress + Retrieved Chunks', col3: 'Strict Quarantine', status: 'ENFORCED', done: 'RULES UPDATED', btn: 'Sync Signatures', toast: 'Synced latest adversarial jailbreak signatures across all ingress nodes.' },
+            { id: 'SEC-02', col1: 'Secret, Bearer Token & PII Vaulting', col2: 'Bi-Directional Stream', col3: 'AES-GCM Vault', status: 'ENFORCED', done: 'KEY ROTATED', btn: 'Rotate DEK', toast: 'Rotated ephemeral Data Encryption Keys across enclave workers.' },
+            { id: 'SEC-03', col1: 'RAG Entailment & Citation Verifier', col2: 'Egress Token Stream', col3: 'Min Score 0.88', status: 'ACTIVE', done: 'STRICT 0.92', btn: 'Tighten Floor', toast: 'Raised citation entailment floor to 0.92 for enterprise tenants.' },
+            { id: 'SEC-04', col1: 'Tenant Burst Token-Bucket Limiter', col2: '240k tok/min Cap', col3: 'Zero Noisy-Neighbor', status: 'BALANCED', done: 'QUOTA SYNCED', btn: 'Re-Sync Redis', toast: 'Synchronized distributed token-bucket counters across cluster.' },
+            { id: 'SEC-05', col1: 'Immutable Audit Trail Exporter', col2: 'WORM S3 + SIEM', col3: 'SHA-256 Chained', status: 'STREAMING', done: 'CHECKPOINTED', btn: 'Verify Hash', toast: 'Merkle hash chain verified intact across 14.2M inference events.' }
+          ]
+        }
+      };
+
+      function renderCockpitSubpage(tabKey) {
+        const cfg = cockpitSubpages[tabKey];
+        const subEl = document.getElementById('tabSubpageView');
+        if (!cfg || !subEl) return;
+
+        const toneCls = {
+          cyan: 'border-cyan-500/50 bg-cyan-500/10 text-cyan-300',
+          indigo: 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300',
+          emerald: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300'
+        };
+
+        subEl.innerHTML = `
+          <!-- Cockpit Sub-page Header -->
+          <section class="dock-panel rounded-xl p-5">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <span class="rounded border border-cyan-500/50 bg-cyan-500/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-cyan-300">${cfg.code}</span>
+                  <span class="font-mono text-xs text-emerald-400">POD: ${activePodId}</span>
+                </div>
+                <h1 class="mt-2 font-display text-2xl font-bold tracking-tight text-white">${cfg.title}</h1>
+                <p class="mt-1 text-sm text-slate-400">${cfg.subtitle}</p>
+              </div>
+              <button type="button" id="cockpitBackBtn" class="inline-flex items-center gap-2 rounded-xl border border-cyan-400/50 bg-cyan-500/10 px-4 py-2.5 font-mono text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg>
+                <span>&larr; Overview</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 4 Dark Cockpit KPI Cards -->
+          <section class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            ${cfg.kpis.map(k => `
+              <article class="dock-panel rounded-xl p-4">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="font-mono text-xs uppercase tracking-wider text-slate-400">${k.label}</span>
+                  <span class="rounded border px-2 py-0.5 font-mono text-xs font-semibold ${toneCls[k.tone] || toneCls.cyan}">${k.delta}</span>
+                </div>
+                <div class="mt-2.5 font-mono text-2xl font-bold text-white">${k.val}</div>
+                <div class="mt-1.5 text-xs text-slate-400">${k.sub}</div>
+              </article>
+            `).join('')}
+          </section>
+
+          <!-- Telemetry Visual + 5-Row Interactive Control Matrix -->
+          <section class="grid grid-cols-1 gap-3 lg:grid-cols-12">
+            <div class="dock-panel rounded-xl p-5 lg:col-span-5">
+              <h2 class="font-display text-sm font-bold uppercase tracking-wider text-cyan-300">${cfg.visualTitle}</h2>
+              <p class="mt-0.5 text-xs text-slate-400">${cfg.visualSub}</p>
+
+              <div class="mt-4 rounded-lg border border-sky-400/15 bg-obsidian-950/90 p-3.5">
+                <div class="mb-2 flex items-center justify-between font-mono text-xs">
+                  <span class="text-slate-400">60S KERNEL TELEMETRY</span>
+                  <span class="text-emerald-400">ZERO PACKET LOSS</span>
+                </div>
+                <svg class="h-28 w-full overflow-visible" viewBox="0 0 400 110">
+                  <line x1="12" y1="24" x2="388" y2="24" stroke="rgba(56,189,248,0.12)" stroke-dasharray="4 4"/>
+                  <line x1="12" y1="62" x2="388" y2="62" stroke="rgba(56,189,248,0.12)" stroke-dasharray="4 4"/>
+                  <line x1="12" y1="100" x2="388" y2="100" stroke="rgba(56,189,248,0.22)"/>
+                  <path class="neural-draw-line" d="${cfg.curve}" fill="none" stroke="#06B6D4" stroke-width="2.6" stroke-linecap="round"/>
+                  <circle r="4.5" fill="#10B981">
+                    <animateMotion dur="2.8s" repeatCount="indefinite" path="${cfg.curve}"/>
+                  </circle>
+                </svg>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                ${cfg.bars.map(b => `
+                  <div>
+                    <div class="mb-1 flex items-center justify-between font-mono text-xs">
+                      <span class="text-slate-200">${b.name}</span>
+                      <span class="text-cyan-300">${b.val}</span>
+                    </div>
+                    <div class="h-2 w-full overflow-hidden rounded-full bg-slate-900">
+                      <div class="bar-fluid h-full rounded-full bg-gradient-to-r ${b.color}" style="width: ${b.pct}%"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="dock-panel rounded-xl p-5 lg:col-span-7">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-400/20 pb-3">
+                <div>
+                  <h2 class="font-display text-sm font-bold uppercase tracking-wider text-indigo-300">${cfg.tableTitle}</h2>
+                  <p class="mt-0.5 text-xs text-slate-400">Direct kernel RPC execution with live stdout audit logging</p>
+                </div>
+                <span class="rounded border border-emerald-500/50 bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-300">RPC READY</span>
+              </div>
+
+              <div class="mt-4 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead class="border-b border-sky-400/20 font-mono text-xs uppercase text-slate-400">
+                    <tr>
+                      <th class="px-3 py-2.5">Target / ID</th>
+                      <th class="px-3 py-2.5">Configuration</th>
+                      <th class="px-3 py-2.5">Telemetry</th>
+                      <th class="px-3 py-2.5">State</th>
+                      <th class="px-3 py-2.5 text-right">${cfg.actionCol}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-sky-400/10 font-mono text-xs">
+                    ${cfg.rows.map((r, idx) => `
+                      <tr class="hover:bg-obsidian-950/75 transition">
+                        <td class="px-3 py-3">
+                          <div class="font-sans text-sm font-semibold text-white">${r.col1}</div>
+                          <div class="text-cyan-400">${r.id}</div>
+                        </td>
+                        <td class="px-3 py-3 text-slate-300">${r.col2}</td>
+                        <td class="px-3 py-3 text-cyan-200">${r.col3}</td>
+                        <td class="px-3 py-3">
+                          <span id="neuralSubState-${idx}" class="rounded border border-sky-400/25 bg-obsidian-950 px-2 py-0.5 text-xs text-slate-300">${r.status}</span>
+                        </td>
+                        <td class="px-3 py-3 text-right">
+                          <button type="button" data-neural-row="${idx}" class="neural-sub-btn rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/25">
+                            ${r.btn}
+                          </button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        `;
+
+        document.getElementById('cockpitBackBtn').addEventListener('click', () => switchCockpitTab('overview'));
+        subEl.querySelectorAll('.neural-sub-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = parseInt(btn.getAttribute('data-neural-row'), 10);
+            const r = cfg.rows[idx];
+            const stateEl = document.getElementById('neuralSubState-' + idx);
+            if (r && stateEl) {
+              stateEl.textContent = r.done;
+              stateEl.className = 'rounded border border-emerald-500/50 bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300';
+              btn.textContent = 'ACK OK';
+              btn.className = 'neural-sub-btn rounded-lg border border-emerald-500/50 bg-emerald-500/15 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-300';
+              appendLog(r.toast, 'text-emerald-400');
+              showNeuralToast(r.toast);
+            }
+          });
+        });
+      }
+
+      function switchCockpitTab(tabKey) {
+        document.querySelectorAll('.cockpit-tab-btn').forEach(b => {
+          const act = b.getAttribute('data-cockpit-tab') === tabKey;
+          b.className = act
+            ? 'cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-cyan-400/50 bg-cyan-500/15 px-3.5 py-1.5 font-mono text-xs font-semibold text-cyan-300 transition'
+            : 'cockpit-tab-btn flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3.5 py-1.5 font-mono text-xs font-medium text-slate-400 transition hover:border-sky-400/25 hover:bg-obsidian-800 hover:text-white';
+        });
+
+        const defView = document.getElementById('defaultDashboardView');
+        const subView = document.getElementById('tabSubpageView');
+        if (tabKey === 'overview' || !cockpitSubpages[tabKey]) {
+          subView.classList.add('hidden');
+          defView.classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          defView.classList.add('hidden');
+          subView.classList.remove('hidden');
+          renderCockpitSubpage(tabKey);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      document.querySelectorAll('.cockpit-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchCockpitTab(btn.getAttribute('data-cockpit-tab')));
+      });
+
+      renderPods();
+      renderTraceWaterfall();
+      appendLog('SYNAPSE CORE kernel initialized · 64 tensor shards online', 'text-emerald-400');
+      appendLog('Connected to us-east-b200-pod1 NVLink fabric', 'text-cyan-300');
+    })();
+  </script>
+</body>
+</html>

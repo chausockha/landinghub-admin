@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSEOPS — Cloud Revenue, AI Usage &amp; Infrastructure Telemetry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: '#07090F',
+            surface: '#0E121D',
+            surfaceElevated: '#131929',
+            carbonBlue: '#3B82F6',
+            pulseViolet: '#8B5CF6',
+            pulseEmerald: '#10B981',
+            pulseAmber: '#F59E0B',
+            pulseRose: '#F43F5E',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      background-color: #07090F;
+      color: #F8FAFC;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .bento-card {
+      background: linear-gradient(180deg, rgba(19, 25, 41, 0.72) 0%, rgba(14, 18, 29, 0.92) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .bento-card:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+    .glass-topbar {
+      background: rgba(7, 9, 15, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .glass-sidebar {
+      background: #0E121D;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .bg-grid-glow {
+      background-image:
+        radial-gradient(circle at 18% 0%, rgba(59, 130, 246, 0.11), transparent 36%),
+        radial-gradient(circle at 85% 8%, rgba(139, 92, 246, 0.09), transparent 34%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #07090F;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    /* Sidebar collapse */
+    aside.sidebar-collapsed {
+      width: 4.75rem;
+    }
+    aside.sidebar-collapsed .sidebar-label,
+    aside.sidebar-collapsed .sidebar-badge,
+    aside.sidebar-collapsed .sidebar-footer-detail,
+    aside.sidebar-collapsed .sidebar-section-heading {
+      display: none;
+    }
+    aside.sidebar-collapsed .nav-item-btn {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.65); opacity: 0; }
+    }
+    .status-ping {
+      animation: pulseDot 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .gauge-arc {
+      transition: stroke-dashoffset 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-obsidian text-slate-100 selection:bg-carbonBlue/30 selection:text-white">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 z-40 hidden bg-black/70 backdrop-blur-sm lg:hidden" onclick="toggleMobileSidebar(false)"></div>
+
+  <div class="flex min-h-screen w-full">
+    <!-- LEFT COLLAPSIBLE NAVIGATION SIDEBAR -->
+    <aside id="appSidebar" class="glass-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col justify-between transition-all duration-200 ease-out lg:static lg:translate-x-0 shrink-0">
+      <!-- Brand Header -->
+      <div>
+        <div class="flex h-16 items-center justify-between border-b border-white/[0.08] px-4">
+          <a href="#overview" onclick="event.preventDefault(); switchPulseSection('Overview')" class="flex items-center gap-3 overflow-hidden">
+            <div class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-carbonBlue via-indigo-500 to-pulseViolet shadow-lg shadow-carbonBlue/25">
+              <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12h4l3-8 4 16 3-8h4" />
+              </svg>
+            </div>
+            <div class="sidebar-label flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-extrabold tracking-wider text-white">PULSEOPS</span>
+                <span class="rounded bg-carbonBlue/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-carbonBlue border border-carbonBlue/30">v4.12</span>
+              </div>
+              <span class="text-[12.5px] font-medium text-slate-400">Cloud &amp; AI Telemetry</span>
+            </div>
+          </a>
+          <button id="collapseSidebarBtn" onclick="toggleDesktopSidebar()" title="Collapse sidebar" class="hidden rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.06] hover:text-white lg:inline-flex">
+            <svg id="collapseIcon" class="h-4 w-4 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <path d="M9 3v18M15 9l-3 3 3 3" />
+            </svg>
+          </button>
+          <button onclick="toggleMobileSidebar(false)" class="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.06] hover:text-white lg:hidden" aria-label="Close navigation">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Primary Navigation -->
+        <div class="px-3 py-4">
+          <p class="sidebar-section-heading mb-2 px-2.5 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Observability</p>
+          <nav id="sidebarNav" class="space-y-1" aria-label="Main Navigation">
+            <button data-nav="Overview" class="nav-item-btn group flex w-full items-center justify-between rounded-xl bg-carbonBlue/15 px-3 py-2.5 text-left text-xs font-semibold text-white ring-1 ring-inset ring-carbonBlue/30 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-carbonBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                  <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                  <rect x="3" y="16" width="7" height="5" rx="1.5" />
+                </svg>
+                <span class="sidebar-label">Overview</span>
+              </span>
+              <span class="sidebar-badge h-1.5 w-1.5 rounded-full bg-carbonBlue"></span>
+            </button>
+
+            <button data-nav="Realtime Telemetry" class="nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-slate-400 group-hover:text-pulseViolet transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+                <span class="sidebar-label">Realtime Telemetry</span>
+              </span>
+              <span class="sidebar-badge rounded-full bg-pulseEmerald/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-pulseEmerald">LIVE</span>
+            </button>
+
+            <button data-nav="Revenue & MRR" class="nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-slate-400 group-hover:text-carbonBlue transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                <span class="sidebar-label">Revenue &amp; MRR</span>
+              </span>
+            </button>
+
+            <button data-nav="Edge Nodes" class="nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-slate-400 group-hover:text-pulseEmerald transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+                <span class="sidebar-label">Edge Nodes</span>
+              </span>
+              <span class="sidebar-badge font-mono text-xs text-slate-500">42</span>
+            </button>
+
+            <button data-nav="Error Traces" class="nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-slate-400 group-hover:text-pulseRose transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                <span class="sidebar-label">Error Traces</span>
+              </span>
+              <span class="sidebar-badge rounded-md bg-pulseRose/15 px-1.5 py-0.5 font-mono text-xs font-bold text-pulseRose border border-pulseRose/30">3</span>
+            </button>
+
+            <p class="sidebar-section-heading mt-5 mb-2 pt-3 border-t border-white/[0.06] px-2.5 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Operations</p>
+
+            <button data-nav="Alerts" class="nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-slate-400 group-hover:text-pulseAmber transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span class="sidebar-label">Alerts</span>
+              </span>
+              <span class="sidebar-badge rounded-md bg-pulseAmber/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-pulseAmber">1</span>
+            </button>
+
+            <button data-nav="Settings" class="nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition">
+              <span class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0 text-slate-400 group-hover:text-slate-200 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                <span class="sidebar-label">Settings</span>
+              </span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Bottom Cluster Card & Profile -->
+      <div class="border-t border-white/[0.08] p-3 space-y-3">
+        <div class="sidebar-footer-detail rounded-xl bg-white/[0.03] border border-white/[0.07] p-3">
+          <div class="flex items-center justify-between text-[12.5px]">
+            <span class="font-semibold text-slate-300">GPU Mesh Cluster</span>
+            <span class="font-mono text-pulseEmerald">128/128 Up</span>
+          </div>
+          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+            <div class="h-full w-[87%] rounded-full bg-gradient-to-r from-carbonBlue to-pulseViolet"></div>
+          </div>
+          <div class="mt-2 flex items-center justify-between font-mono text-xs text-slate-400 tabular-nums">
+            <span>H100-SXM5</span>
+            <span>4.12M tok/s</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 px-1.5 py-1">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-slate-700 to-slate-600 text-xs font-bold text-white ring-1 ring-white/20">
+            AK
+          </div>
+          <div class="sidebar-footer-detail min-w-0 flex-1">
+            <p class="truncate text-xs font-semibold text-white">Aria Kovacs</p>
+            <p class="truncate font-mono text-xs text-slate-400">Principal SRE</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="bg-grid-glow flex min-w-0 flex-1 flex-col">
+      <!-- STICKY GLASS TOPBAR -->
+      <header class="glass-topbar sticky top-0 z-30 flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <!-- Left: Hamburger + Active Breadcrumb + Operational Pill -->
+        <div class="flex items-center gap-3 min-w-0">
+          <button onclick="toggleMobileSidebar(true)" class="rounded-lg border border-white/10 bg-white/[0.04] p-2 text-slate-300 hover:bg-white/[0.08] lg:hidden" aria-label="Open menu">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <div class="flex items-center gap-2 text-xs sm:text-sm">
+            <span class="hidden text-slate-500 sm:inline">prod-global</span>
+            <svg class="hidden h-3.5 w-3.5 text-slate-600 sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <h1 id="activeSectionTitle" class="truncate font-bold tracking-tight text-white">Executive Telemetry</h1>
+          </div>
+
+          <div class="hidden md:inline-flex items-center gap-2 rounded-full border border-pulseEmerald/25 bg-pulseEmerald/10 px-2.5 py-1 text-[12.5px] font-medium text-pulseEmerald">
+            <span class="relative flex h-2 w-2">
+              <span class="status-ping absolute inline-flex h-full w-full rounded-full bg-pulseEmerald"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-pulseEmerald"></span>
+            </span>
+            <span class="font-mono tabular-nums">99.998% Operational</span>
+          </div>
+        </div>
+
+        <!-- Right: Command Search + Timeframe Selector + Actions -->
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <!-- Command Search Button -->
+          <button onclick="openCommandModal()" class="group flex items-center gap-2.5 rounded-xl border border-white/[0.09] bg-white/[0.03] px-3 py-1.5 text-xs text-slate-400 hover:border-white/20 hover:bg-white/[0.06] hover:text-slate-200 transition">
+            <svg class="h-3.5 w-3.5 text-slate-400 group-hover:text-carbonBlue transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <span class="hidden xl:inline pr-4">Search traces, nodes, MRR...</span>
+            <span class="hidden sm:inline-flex items-center gap-1 rounded border border-white/10 bg-white/[0.05] px-1.5 py-0.5 font-mono text-xs font-semibold text-slate-300">
+              <svg class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
+              </svg>
+              K
+            </span>
+          </button>
+
+          <!-- Interactive Timeframe Selector -->
+          <div id="timeframeSelector" class="inline-flex items-center rounded-xl border border-white/[0.08] bg-[#0B0F19] p-1" role="tablist" aria-label="Timeframe">
+            <button data-tf="24H" class="tf-btn rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-semibold text-slate-400 hover:text-white transition">24H</button>
+            <button data-tf="7D" class="tf-btn rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-semibold text-slate-400 hover:text-white transition">7D</button>
+            <button data-tf="30D" class="tf-btn rounded-lg bg-carbonBlue text-white shadow-sm shadow-carbonBlue/30 px-2.5 py-1 font-mono text-[12.5px] font-semibold transition">30D</button>
+            <button data-tf="90D" class="tf-btn rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-semibold text-slate-400 hover:text-white transition">90D</button>
+          </div>
+
+          <!-- Export Snapshot -->
+          <button onclick="triggerSnapshotExport()" class="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-carbonBlue/40 hover:bg-carbonBlue/10 transition">
+            <svg class="h-3.5 w-3.5 text-carbonBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>Export</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN BENTO CONTENT -->
+      <main class="mx-auto w-full max-w-[1600px] flex-1 space-y-6 p-4 sm:p-6 lg:p-8">
+
+        <div id="defaultDashboardView" class="space-y-6">
+        <!-- 1. TOP KPI BENTO ROW (4 CARDS WITH INLINE SVG SPARKLINES) -->
+        <section aria-label="Key Performance Metrics" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <!-- KPI 1: Net MRR -->
+          <article class="bento-card rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-carbonBlue/15 text-carbonBlue">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <line x1="12" y1="1" x2="12" y2="23" />
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                  </span>
+                  <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Net Cloud MRR</p>
+                </div>
+                <p id="kpiMrrVal" class="mt-3 font-mono text-2xl font-bold tracking-tight text-white sm:text-[28px] tabular-nums">$482,910</p>
+              </div>
+              <span id="kpiMrrDelta" class="inline-flex items-center gap-1 rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2 py-0.5 font-mono text-[12.5px] font-semibold text-pulseEmerald tabular-nums">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10" /></svg>
+                +18.4%
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between gap-3">
+              <div class="text-[12.5px] text-slate-400">
+                <span class="font-mono text-slate-300" id="kpiMrrSub">+$75,120</span> net expansion
+              </div>
+              <svg class="h-10 w-28 overflow-visible" viewBox="0 0 120 38" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sparkBlue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.38" />
+                    <stop offset="100%" stop-color="#3B82F6" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path id="sparkMrrArea" d="M0 32 L18 29 L36 26 L54 27 L72 19 L90 14 L108 9 L120 4 L120 38 L0 38 Z" fill="url(#sparkBlue)" />
+                <path id="sparkMrrLine" d="M0 32 L18 29 L36 26 L54 27 L72 19 L90 14 L108 9 L120 4" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 2: Active API Requests/min -->
+          <article class="bento-card rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-pulseViolet/15 text-pulseViolet">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                  </span>
+                  <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Active API Req / Min</p>
+                </div>
+                <p id="kpiReqVal" class="mt-3 font-mono text-2xl font-bold tracking-tight text-white sm:text-[28px] tabular-nums">1.42M</p>
+              </div>
+              <span id="kpiReqDelta" class="inline-flex items-center gap-1 rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2 py-0.5 font-mono text-[12.5px] font-semibold text-pulseEmerald tabular-nums">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10" /></svg>
+                +9.2%
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between gap-3">
+              <div class="text-[12.5px] text-slate-400">
+                Peak <span class="font-mono text-slate-300" id="kpiReqSub">1.89M rpm</span>
+              </div>
+              <svg class="h-10 w-28 overflow-visible" viewBox="0 0 120 38" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sparkViolet" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.38" />
+                    <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path id="sparkReqArea" d="M0 30 L18 24 L36 28 L54 18 L72 21 L90 12 L108 13 L120 6 L120 38 L0 38 Z" fill="url(#sparkViolet)" />
+                <path id="sparkReqLine" d="M0 30 L18 24 L36 28 L54 18 L72 21 L90 12 L108 13 L120 6" stroke="#8B5CF6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 3: P95 Global Latency -->
+          <article class="bento-card rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-pulseEmerald/15 text-pulseEmerald">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </span>
+                  <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">P95 Global Latency</p>
+                </div>
+                <p id="kpiLatVal" class="mt-3 font-mono text-2xl font-bold tracking-tight text-white sm:text-[28px] tabular-nums">28.4ms</p>
+              </div>
+              <span id="kpiLatDelta" class="inline-flex items-center gap-1 rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2 py-0.5 font-mono text-[12.5px] font-semibold text-pulseEmerald tabular-nums">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 7l10 10M17 7v10H7" /></svg>
+                -6.1ms
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between gap-3">
+              <div class="text-[12.5px] text-slate-400">
+                P50 median <span class="font-mono text-slate-300" id="kpiLatSub">11.8ms</span>
+              </div>
+              <svg class="h-10 w-28 overflow-visible" viewBox="0 0 120 38" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sparkEmerald" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981" stop-opacity="0.38" />
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path id="sparkLatArea" d="M0 9 L18 14 L36 12 L54 19 L72 22 L90 26 L108 29 L120 31 L120 38 L0 38 Z" fill="url(#sparkEmerald)" />
+                <path id="sparkLatLine" d="M0 9 L18 14 L36 12 L54 19 L72 22 L90 26 L108 29 L120 31" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 4: Net Dollar Retention -->
+          <article class="bento-card rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-pulseAmber/15 text-pulseAmber">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </span>
+                  <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Net Dollar Retention</p>
+                </div>
+                <p id="kpiNdrVal" class="mt-3 font-mono text-2xl font-bold tracking-tight text-white sm:text-[28px] tabular-nums">134.8%</p>
+              </div>
+              <span id="kpiNdrDelta" class="inline-flex items-center gap-1 rounded-full border border-carbonBlue/30 bg-carbonBlue/15 px-2 py-0.5 font-mono text-[12.5px] font-semibold text-carbonBlue tabular-nums">
+                +4.2 pts
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between gap-3">
+              <div class="text-[12.5px] text-slate-400">
+                Enterprise <span class="font-mono text-slate-300" id="kpiNdrSub">418 seats</span>
+              </div>
+              <svg class="h-10 w-28 overflow-visible" viewBox="0 0 120 38" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sparkAmber" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.35" />
+                    <stop offset="100%" stop-color="#F59E0B" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path id="sparkNdrArea" d="M0 28 L18 27 L36 23 L54 21 L72 17 L90 15 L108 10 L120 7 L120 38 L0 38 Z" fill="url(#sparkAmber)" />
+                <path id="sparkNdrLine" d="M0 28 L18 27 L36 23 L54 21 L72 17 L90 15 L108 10 L120 7" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <!-- 2. MAIN BENTO CHARTS ROW (8 COLS MULTI-SERIES SVG AREA CHART + 4 COLS RADIAL GPU GAUGE) -->
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <!-- Left 8 Cols: Multi-Series Revenue vs Compute Cost Area & Line Chart -->
+          <div class="bento-card flex flex-col justify-between rounded-2xl p-5 sm:p-6 lg:col-span-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-base font-bold text-white">Cloud &amp; Token Revenue vs GPU Compute Cost</h2>
+                  <span id="chartRangeBadge" class="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-xs font-semibold text-slate-300">30D COHORT</span>
+                </div>
+                <p class="mt-1 text-xs text-slate-400">Real-time gross usage billing compared against dedicated H100/B200 cluster expenditure</p>
+              </div>
+
+              <!-- Interactive Series Checkboxes -->
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="inline-flex cursor-pointer select-none items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-carbonBlue/40 transition">
+                  <input type="checkbox" id="toggleRevenueSeries" checked class="sr-only peer" onchange="renderMainChart()" />
+                  <span class="h-2.5 w-2.5 rounded-sm bg-carbonBlue ring-2 ring-carbonBlue/30 opacity-30 peer-checked:opacity-100 transition"></span>
+                  <span>Gross Revenue</span>
+                </label>
+
+                <label class="inline-flex cursor-pointer select-none items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-pulseViolet/40 transition">
+                  <input type="checkbox" id="toggleCostSeries" checked class="sr-only peer" onchange="renderMainChart()" />
+                  <span class="h-2.5 w-2.5 rounded-sm bg-pulseViolet ring-2 ring-pulseViolet/30 opacity-30 peer-checked:opacity-100 transition"></span>
+                  <span>Compute Cost</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Inline Metric Strip -->
+            <div class="mt-5 grid grid-cols-3 gap-3 rounded-xl border border-white/[0.06] bg-obsidian/60 p-3.5">
+              <div>
+                <span class="text-[12.5px] text-slate-400">Period Gross Revenue</span>
+                <p id="summaryGrossRev" class="mt-0.5 font-mono text-sm sm:text-base font-bold text-white tabular-nums">$5,294,800</p>
+              </div>
+              <div class="border-l border-white/[0.07] pl-3">
+                <span class="text-[12.5px] text-slate-400">GPU &amp; Egress Cost</span>
+                <p id="summaryComputeCost" class="mt-0.5 font-mono text-sm sm:text-base font-bold text-pulseViolet tabular-nums">$1,412,300</p>
+              </div>
+              <div class="border-l border-white/[0.07] pl-3">
+                <span class="text-[12.5px] text-slate-400">Gross AI Margin</span>
+                <p id="summaryGrossMargin" class="mt-0.5 font-mono text-sm sm:text-base font-bold text-pulseEmerald tabular-nums">73.3%</p>
+              </div>
+            </div>
+
+            <!-- Interactive SVG Chart Container -->
+            <div class="relative mt-5 w-full pt-2">
+              <!-- Floating Tooltip -->
+              <div id="chartTooltip" class="pointer-events-none absolute top-0 left-0 z-20 hidden min-w-[195px] rounded-xl border border-white/15 bg-[#0B0F1B]/95 p-3 shadow-2xl backdrop-blur-md">
+                <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
+                  <span id="ttPeriod" class="font-mono text-[12.5px] font-bold text-white">Oct 2026</span>
+                  <span id="ttMargin" class="rounded bg-pulseEmerald/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-pulseEmerald">74.2% GM</span>
+                </div>
+                <div class="space-y-1.5 font-mono text-xs tabular-nums">
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 text-slate-400"><span class="h-2 w-2 rounded-full bg-carbonBlue"></span>Revenue</span>
+                    <span id="ttRev" class="font-semibold text-white">$482.9k</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 text-slate-400"><span class="h-2 w-2 rounded-full bg-pulseViolet"></span>Compute</span>
+                    <span id="ttCost" class="font-semibold text-slate-200">$124.6k</span>
+                  </div>
+                </div>
+              </div>
+
+              <svg id="revenueComputeSvg" class="h-64 sm:h-72 w-full overflow-visible select-none" viewBox="0 0 760 260" aria-label="Multi-Series Revenue vs Compute Cost Chart">
+                <!-- Populated dynamically via JS -->
+              </svg>
+            </div>
+          </div>
+
+          <!-- Right 4 Cols: System Health & GPU Cluster Radial SVG Gauge + 4 Regional Cluster Bars -->
+          <div class="bento-card flex flex-col justify-between rounded-2xl p-5 sm:p-6 lg:col-span-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <h2 class="text-base font-bold text-white">GPU Cluster Telemetry</h2>
+                <p class="mt-0.5 text-xs text-slate-400">Tensor core saturation &amp; regional load</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 rounded-lg border border-pulseEmerald/25 bg-pulseEmerald/10 px-2 py-1 font-mono text-xs font-semibold text-pulseEmerald">
+                OPTIMAL
+              </span>
+            </div>
+
+            <!-- Radial SVG Gauge -->
+            <div class="my-4 flex flex-col items-center justify-center">
+              <div class="relative flex h-44 w-44 items-center justify-center">
+                <svg class="h-full w-full -rotate-90" viewBox="0 0 180 180" aria-label="GPU Utilization Radial Gauge">
+                  <defs>
+                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#3B82F6" />
+                      <stop offset="55%" stop-color="#8B5CF6" />
+                      <stop offset="100%" stop-color="#10B981" />
+                    </linearGradient>
+                  </defs>
+                  <!-- Track -->
+                  <circle cx="90" cy="90" r="70" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="13" stroke-dasharray="330 440" stroke-dashoffset="-55" stroke-linecap="round" />
+                  <!-- Active Value Arc -->
+                  <circle id="gpuGaugeArc" class="gauge-arc" cx="90" cy="90" r="70" fill="none" stroke="url(#gaugeGrad)" stroke-width="13" stroke-dasharray="288.4 440" stroke-dashoffset="-55" stroke-linecap="round" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Utilization</span>
+                  <span id="gpuUtilValue" class="mt-0.5 font-mono text-3xl font-extrabold text-white tabular-nums">87.4%</span>
+                  <span id="gpuVramNote" class="mt-1 font-mono text-[12.5px] text-slate-400 tabular-nums">8.9 TB / 10.2 TB</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 Regional Cluster Bars -->
+            <div id="regionalClusterList" class="space-y-3.5 border-t border-white/[0.08] pt-4">
+              <!-- Populated dynamically via JS for interactive timeframe responsiveness -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. SECONDARY VISUAL DATA BENTO ROW (5 COLS FUNNEL + 7 COLS LIVE TRANSACTION STREAM TABLE) -->
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <!-- Left 5 Cols: Traffic & Conversion Funnel Breakdown -->
+          <div class="bento-card flex flex-col justify-between rounded-2xl p-5 sm:p-6 lg:col-span-5">
+            <div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-white">Pipeline &amp; Token Monetization Funnel</h2>
+                  <p class="mt-0.5 text-xs text-slate-400">Ingress request to enterprise billable settlement</p>
+                </div>
+                <span class="rounded-lg border border-carbonBlue/30 bg-carbonBlue/10 px-2.5 py-1 font-mono text-xs font-bold text-carbonBlue tabular-nums">
+                  38.4% Net CVR
+                </span>
+              </div>
+
+              <div class="mt-6 space-y-4">
+                <!-- Stage 1 -->
+                <div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-semibold text-slate-200">1. Global Edge Ingress</span>
+                    <div class="flex items-center gap-2 font-mono tabular-nums">
+                      <span class="text-slate-300">42,840,000</span>
+                      <span class="w-12 text-right font-bold text-carbonBlue">100.0%</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 flex h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06] p-0.5">
+                    <div class="h-full w-full rounded-full bg-gradient-to-r from-carbonBlue to-indigo-400"></div>
+                  </div>
+                </div>
+
+                <!-- Stage 2 -->
+                <div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-semibold text-slate-200">2. Auth &amp; Rate-Limit Cleared</span>
+                    <div class="flex items-center gap-2 font-mono tabular-nums">
+                      <span class="text-slate-300">39,584,160</span>
+                      <span class="w-12 text-right font-bold text-indigo-400">92.4%</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 flex h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06] p-0.5">
+                    <div class="h-full w-[92.4%] rounded-full bg-gradient-to-r from-indigo-500 to-pulseViolet"></div>
+                  </div>
+                </div>
+
+                <!-- Stage 3 -->
+                <div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-semibold text-slate-200">3. GPU Inference Dispatched</span>
+                    <div class="flex items-center gap-2 font-mono tabular-nums">
+                      <span class="text-slate-300">31,744,440</span>
+                      <span class="w-12 text-right font-bold text-pulseViolet">74.1%</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 flex h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06] p-0.5">
+                    <div class="h-full w-[74.1%] rounded-full bg-pulseViolet"></div>
+                  </div>
+                </div>
+
+                <!-- Stage 4 -->
+                <div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-semibold text-slate-200">4. Billable Token Commit</span>
+                    <div class="flex items-center gap-2 font-mono tabular-nums">
+                      <span class="text-slate-300">23,904,720</span>
+                      <span class="w-12 text-right font-bold text-pulseEmerald">55.8%</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 flex h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06] p-0.5">
+                    <div class="h-full w-[55.8%] rounded-full bg-gradient-to-r from-pulseViolet to-pulseEmerald"></div>
+                  </div>
+                </div>
+
+                <!-- Stage 5 -->
+                <div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-semibold text-slate-200">5. Enterprise Committed Tier</span>
+                    <div class="flex items-center gap-2 font-mono tabular-nums">
+                      <span class="text-slate-300">16,450,560</span>
+                      <span class="w-12 text-right font-bold text-pulseEmerald">38.4%</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 flex h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06] p-0.5">
+                    <div class="h-full w-[38.4%] rounded-full bg-pulseEmerald"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Segmented Traffic Channel Mix -->
+            <div class="mt-6 rounded-xl border border-white/[0.07] bg-obsidian/60 p-4">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-300">
+                <span>Ingress SDK Protocol Split</span>
+                <span class="font-mono text-[12.5px] text-slate-400">gRPC / REST / WS</span>
+              </div>
+              <div class="mt-2.5 flex h-2.5 w-full overflow-hidden rounded-full gap-1">
+                <div class="h-full w-[54%] rounded-l-full bg-carbonBlue" title="gRPC Stream 54%"></div>
+                <div class="h-full w-[31%] bg-pulseViolet" title="REST v2 31%"></div>
+                <div class="h-full w-[15%] rounded-r-full bg-pulseEmerald" title="WebSockets 15%"></div>
+              </div>
+              <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 font-mono text-[12.5px] text-slate-400 tabular-nums">
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-carbonBlue"></span>gRPC 54%</span>
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-pulseViolet"></span>REST 31%</span>
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-pulseEmerald"></span>Realtime WS 15%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 7 Cols: Live Event & Transaction Stream Table -->
+          <div class="bento-card flex flex-col rounded-2xl p-5 sm:p-6 lg:col-span-7">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h2 class="text-base font-bold text-white">Live Event &amp; Billing Stream</h2>
+                  <button id="streamToggleBtn" onclick="toggleLiveStream()" class="inline-flex items-center gap-1.5 rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseEmerald hover:bg-pulseEmerald/20 transition">
+                    <span id="streamDot" class="h-1.5 w-1.5 rounded-full bg-pulseEmerald"></span>
+                    <span id="streamLabel">STREAMING</span>
+                  </button>
+                </div>
+                <p class="mt-0.5 text-xs text-slate-400">Real-time tenant API settlements, token metering, and edge trace status</p>
+              </div>
+
+              <!-- Search Input -->
+              <div class="relative w-full sm:w-60">
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input id="streamSearchInput" oninput="renderTransactionTable()" type="text" placeholder="Filter trace, tenant, region..." class="w-full rounded-xl border border-white/10 bg-obsidian/80 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-carbonBlue focus:outline-none focus:ring-1 focus:ring-carbonBlue" />
+              </div>
+            </div>
+
+            <!-- Status Filter Pills + Simulate Action -->
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.07] pb-3.5">
+              <div id="statusFilterTabs" class="flex flex-wrap items-center gap-1.5">
+                <button data-status="All" class="status-pill rounded-lg bg-white/10 px-2.5 py-1 text-xs font-semibold text-white transition">All</button>
+                <button data-status="Succeeded" class="status-pill rounded-lg px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-white transition">Succeeded</button>
+                <button data-status="Warning" class="status-pill rounded-lg px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-white transition">Warning</button>
+                <button data-status="Failed" class="status-pill rounded-lg px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-white transition">Failed</button>
+              </div>
+
+              <button onclick="injectSimulatedEvent()" class="inline-flex items-center gap-1.5 rounded-lg border border-carbonBlue/30 bg-carbonBlue/10 px-2.5 py-1 font-mono text-[12.5px] font-semibold text-carbonBlue hover:bg-carbonBlue/20 transition">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" /></svg>
+                Emit Event
+              </button>
+            </div>
+
+            <!-- Table -->
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full min-w-[600px] text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-white/[0.06] text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                    <th class="py-2.5 pr-3">Trace / Time</th>
+                    <th class="py-2.5 px-3">Tenant &amp; Endpoint</th>
+                    <th class="py-2.5 px-3">Latency</th>
+                    <th class="py-2.5 px-3 text-right">Metered</th>
+                    <th class="py-2.5 pl-3 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="streamTableBody" class="divide-y divide-white/[0.05] text-xs">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        </div>
+
+        <div id="tabSubpageView" class="hidden space-y-6"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- COMMAND PALETTE MODAL (CMD+K) -->
+  <div id="commandModal" class="fixed inset-0 z-50 hidden items-start justify-center bg-black/75 p-4 pt-20 backdrop-blur-sm" onclick="if(event.target===this)closeCommandModal()">
+    <div class="w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-[#0E121D] shadow-2xl">
+      <div class="flex items-center gap-3 border-b border-white/10 px-4 py-3.5">
+        <svg class="h-4 w-4 text-carbonBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input id="commandInput" oninput="filterCommands()" type="text" placeholder="Jump to cluster, timeframe, or action..." class="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none" />
+        <button onclick="closeCommandModal()" class="rounded border border-white/10 px-1.5 py-0.5 font-mono text-xs text-slate-400 hover:text-white">ESC</button>
+      </div>
+      <div id="commandList" class="max-h-72 overflow-y-auto p-2 space-y-1 text-xs">
+        <button onclick="selectTimeframe('24H');closeCommandModal()" class="cmd-item flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-slate-200 hover:bg-carbonBlue/15">
+          <span>Switch Telemetry Window to Last 24 Hours</span>
+          <span class="font-mono text-xs text-carbonBlue">24H</span>
+        </button>
+        <button onclick="selectTimeframe('90D');closeCommandModal()" class="cmd-item flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-slate-200 hover:bg-carbonBlue/15">
+          <span>Switch Telemetry Window to 90-Day Quarterly View</span>
+          <span class="font-mono text-xs text-carbonBlue">90D</span>
+        </button>
+        <button onclick="setStatusFilter('Failed');closeCommandModal()" class="cmd-item flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-slate-200 hover:bg-pulseRose/15">
+          <span>Isolate Failed Error Traces in Billing Stream</span>
+          <span class="font-mono text-xs text-pulseRose">FILTER</span>
+        </button>
+        <button onclick="injectSimulatedEvent();closeCommandModal()" class="cmd-item flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-slate-200 hover:bg-pulseEmerald/15">
+          <span>Emit Live Synthetic Telemetry Trace</span>
+          <span class="font-mono text-xs text-pulseEmerald">ACTION</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACE INSPECTOR DRAWER / MODAL -->
+  <div id="traceModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm" onclick="if(event.target===this)closeTraceModal()">
+    <div class="w-full max-w-md rounded-2xl border border-white/15 bg-[#0E121D] p-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div>
+          <span class="font-mono text-[12.5px] uppercase tracking-wider text-carbonBlue">Trace Telemetry Payload</span>
+          <h3 id="modalTraceId" class="mt-0.5 font-mono text-base font-bold text-white">trc_99481a</h3>
+        </div>
+        <button onclick="closeTraceModal()" class="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div id="modalTraceDetails" class="mt-4 space-y-2.5 font-mono text-xs text-slate-300"></div>
+      <div class="mt-5 flex justify-end">
+        <button onclick="closeTraceModal()" class="rounded-xl bg-carbonBlue px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastBanner" class="pointer-events-none fixed bottom-5 right-5 z-50 flex translate-y-6 items-center gap-2.5 rounded-xl border border-white/15 bg-[#111726]/95 px-4 py-3 text-xs font-medium text-white opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200">
+    <svg class="h-4 w-4 text-pulseEmerald shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+    <span id="toastText">Telemetry updated</span>
+  </div>
+
+  <script>
+    // --- DATASET BY TIMEFRAME ---
+    const telemetryByTimeframe = {
+      '24H': {
+        badge: '24H REALTIME',
+        kpis: {
+          mrr: '$16,490', mrrDelta: '+12.1%', mrrSub: '+$1,840 today',
+          req: '1.58M', reqDelta: '+14.6%', reqSub: '2.04M rpm',
+          lat: '24.9ms', latDelta: '-3.8ms', latSub: '10.4ms',
+          ndr: '135.2%', ndrDelta: '+0.8 pts', ndrSub: '422 seats'
+        },
+        sparks: {
+          mrr: [31, 29, 25, 22, 18, 15, 9, 5],
+          req: [28, 19, 23, 14, 17, 9, 11, 4],
+          lat: [12, 15, 14, 21, 24, 27, 29, 32],
+          ndr: [26, 24, 23, 19, 17, 13, 11, 8]
+        },
+        summary: { rev: '$194,200', cost: '$49,810', margin: '74.4%' },
+        labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+        revenue: [12.4, 11.8, 13.1, 14.6, 15.9, 17.2, 18.4, 17.8, 19.1, 20.4, 19.8, 21.6],
+        cost:    [3.6,  3.4,  3.7,  4.0,  4.3,  4.5,  4.8,  4.7,  4.9,  5.1,  5.0,  5.3],
+        unit: 'k',
+        gpuUtil: 91.2,
+        vram: '9.3 TB / 10.2 TB',
+        regions: [
+          { id: 'us-east-1', load: 94, lat: '18.1ms', color: '#3B82F6' },
+          { id: 'eu-central-1', load: 86, lat: '24.6ms', color: '#8B5CF6' },
+          { id: 'ap-northeast-1', load: 79, lat: '32.0ms', color: '#10B981' },
+          { id: 'us-west-2', load: 88, lat: '20.4ms', color: '#F59E0B' }
+        ]
+      },
+      '7D': {
+        badge: '7D ROLLING',
+        kpis: {
+          mrr: '$118,420', mrrDelta: '+15.8%', mrrSub: '+$16,200 wk',
+          req: '1.49M', reqDelta: '+11.0%', reqSub: '1.95M rpm',
+          lat: '26.7ms', latDelta: '-4.9ms', latSub: '11.1ms',
+          ndr: '134.9%', ndrDelta: '+2.1 pts', ndrSub: '420 seats'
+        },
+        sparks: {
+          mrr: [33, 30, 28, 23, 20, 14, 11, 6],
+          req: [29, 25, 22, 20, 15, 14, 10, 7],
+          lat: [10, 12, 16, 18, 21, 25, 28, 30],
+          ndr: [28, 26, 24, 21, 18, 16, 12, 9]
+        },
+        summary: { rev: '$1,284,600', cost: '$338,900', margin: '73.6%' },
+        labels: ['Mon AM', 'Mon PM', 'Tue AM', 'Tue PM', 'Wed AM', 'Wed PM', 'Thu AM', 'Thu PM', 'Fri AM', 'Fri PM', 'Sat', 'Sun'],
+        revenue: [92, 96, 101, 104, 108, 112, 109, 115, 119, 124, 118, 128],
+        cost:    [26, 27, 28,  29,  29,  30,  29,  31,  31,  32,  30,  33],
+        unit: 'k',
+        gpuUtil: 89.0,
+        vram: '9.1 TB / 10.2 TB',
+        regions: [
+          { id: 'us-east-1', load: 91, lat: '19.4ms', color: '#3B82F6' },
+          { id: 'eu-central-1', load: 83, lat: '26.2ms', color: '#8B5CF6' },
+          { id: 'ap-northeast-1', load: 76, lat: '34.1ms', color: '#10B981' },
+          { id: 'us-west-2', load: 85, lat: '21.8ms', color: '#F59E0B' }
+        ]
+      },
+      '30D': {
+        badge: '30D COHORT',
+        kpis: {
+          mrr: '$482,910', mrrDelta: '+18.4%', mrrSub: '+$75,120',
+          req: '1.42M', reqDelta: '+9.2%', reqSub: '1.89M rpm',
+          lat: '28.4ms', latDelta: '-6.1ms', latSub: '11.8ms',
+          ndr: '134.8%', ndrDelta: '+4.2 pts', ndrSub: '418 seats'
+        },
+        sparks: {
+          mrr: [32, 29, 26, 27, 19, 14, 9, 4],
+          req: [30, 24, 28, 18, 21, 12, 13, 6],
+          lat: [9, 14, 12, 19, 22, 26, 29, 31],
+          ndr: [28, 27, 23, 21, 17, 15, 10, 7]
+        },
+        summary: { rev: '$5,294,800', cost: '$1,412,300', margin: '73.3%' },
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        revenue: [310, 328, 352, 369, 394, 418, 436, 459, 478, 504, 532, 568],
+        cost:    [94,  98,  102, 105, 110, 114, 118, 121, 124, 129, 134, 141],
+        unit: 'k',
+        gpuUtil: 87.4,
+        vram: '8.9 TB / 10.2 TB',
+        regions: [
+          { id: 'us-east-1', load: 92, lat: '19.8ms', color: '#3B82F6' },
+          { id: 'eu-central-1', load: 84, lat: '27.4ms', color: '#8B5CF6' },
+          { id: 'ap-northeast-1', load: 74, lat: '35.2ms', color: '#10B981' },
+          { id: 'us-west-2', load: 81, lat: '22.9ms', color: '#F59E0B' }
+        ]
+      },
+      '90D': {
+        badge: '90D QUARTER',
+        kpis: {
+          mrr: '$1,412,600', mrrDelta: '+31.2%', mrrSub: '+$336,400 qtr',
+          req: '1.36M', reqDelta: '+22.4%', reqSub: '1.89M rpm',
+          lat: '29.6ms', latDelta: '-9.4ms', latSub: '12.3ms',
+          ndr: '136.4%', ndrDelta: '+6.8 pts', ndrSub: '418 seats'
+        },
+        sparks: {
+          mrr: [35, 32, 28, 24, 20, 15, 10, 4],
+          req: [33, 29, 25, 22, 18, 15, 10, 5],
+          lat: [7, 11, 15, 18, 22, 25, 29, 32],
+          ndr: [31, 28, 25, 22, 18, 14, 9, 5]
+        },
+        summary: { rev: '$14,890,400', cost: '$3,892,100', margin: '73.9%' },
+        labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+        revenue: [940, 985, 1030, 1080, 1140, 1195, 1230, 1290, 1345, 1410, 1475, 1560],
+        cost:    [265, 274, 282,  291,  304,  312,  320,  331,  342,  356,  369,  384],
+        unit: 'k',
+        gpuUtil: 84.8,
+        vram: '8.6 TB / 10.2 TB',
+        regions: [
+          { id: 'us-east-1', load: 89, lat: '20.5ms', color: '#3B82F6' },
+          { id: 'eu-central-1', load: 81, lat: '28.1ms', color: '#8B5CF6' },
+          { id: 'ap-northeast-1', load: 72, lat: '36.4ms', color: '#10B981' },
+          { id: 'us-west-2', load: 78, lat: '23.7ms', color: '#F59E0B' }
+        ]
+      }
+    };
+
+    let currentTimeframe = '30D';
+    let currentStatusFilter = 'All';
+    let liveStreamActive = true;
+
+    const streamTransactions = [
+      { id: 'trc_94f10e', time: '14:02:48.21', tenant: 'Anthropic Enterprise Mesh', endpoint: 'POST /v2/inference/stream', region: 'us-east-1', latency: '19.4ms', amount: '$428.50', tokens: '14.2M tok', status: 'Succeeded' },
+      { id: 'trc_94f09c', time: '14:02:45.09', tenant: 'Linear Workspace AI', endpoint: 'POST /v2/embeddings/batch', region: 'us-west-2', latency: '14.8ms', amount: '$96.20', tokens: '6.4M tok', status: 'Succeeded' },
+      { id: 'trc_94f08b', time: '14:02:41.74', tenant: 'Vanguard Quant Core', endpoint: 'POST /v2/rerank/hybrid', region: 'eu-central-1', latency: '148.2ms', amount: '$312.00', tokens: '9.8M tok', status: 'Warning' },
+      { id: 'trc_94f07a', time: '14:02:38.12', tenant: 'Vercel Edge Functions', endpoint: 'POST /v2/inference/stream', region: 'us-east-1', latency: '21.1ms', amount: '$615.80', tokens: '20.5M tok', status: 'Succeeded' },
+      { id: 'trc_94f06d', time: '14:02:32.55', tenant: 'Kovai Robotics Cloud', endpoint: 'POST /v2/vision/tensor', region: 'ap-northeast-1', latency: '502.4ms', amount: '$0.00', tokens: 'Timeout', status: 'Failed' },
+      { id: 'trc_94f05e', time: '14:02:27.80', tenant: 'Ramp Expense Intelligence', endpoint: 'POST /v2/ocr/extract', region: 'us-east-1', latency: '26.3ms', amount: '$184.40', tokens: '7.1M tok', status: 'Succeeded' },
+      { id: 'trc_94f04f', time: '14:02:19.04', tenant: 'Mercor Talent Graph', endpoint: 'POST /v2/embeddings/batch', region: 'eu-central-1', latency: '119.7ms', amount: '$74.90', tokens: '4.9M tok', status: 'Warning' }
+    ];
+
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastText').textContent = msg;
+      banner.classList.remove('opacity-0', 'translate-y-6');
+      banner.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        banner.classList.add('opacity-0', 'translate-y-6');
+        banner.classList.remove('opacity-100', 'translate-y-0');
+      }, 2400);
+    }
+
+    // Sidebar controls
+    function toggleDesktopSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      const icon = document.getElementById('collapseIcon');
+      sidebar.classList.toggle('sidebar-collapsed');
+      icon.classList.toggle('rotate-180');
+    }
+
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('mobileBackdrop');
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    const pulseSubpages = {
+      'Realtime Telemetry': {
+        tag: 'OTEL GRPC STREAM · 100HZ',
+        subtitle: 'Sub-second token generation velocity, KV-cache hit telemetry, and live OpenTelemetry span ingestion across 128 H100 GPUs.',
+        ctaLabel: 'Sample 100% Traces',
+        ctaToast: 'Enabled 100% head-based span sampling for 15m diagnostic window',
+        kpis: [
+          { label: 'Token Throughput', val: '4.12M tok/s', badge: '+14.2%', tone: 'emerald', sub: 'H100-SXM5 FP8 kernels' },
+          { label: 'KV-Cache Hit Rate', val: '94.6%', badge: '+3.1%', tone: 'blue', sub: 'Prefix-tree radix routing' },
+          { label: 'Ingest Span Rate', val: '284k / sec', badge: '0 Dropped', tone: 'violet', sub: 'Rust ClickHouse writer' },
+          { label: 'TTFT P95 Latency', val: '19.2ms', badge: '-4.4ms', tone: 'emerald', sub: 'Time-to-first-token global' }
+        ],
+        chartTitle: 'Live Inference Pipeline Throughput & Queue Depth',
+        chartSub: 'Real-time saturation across gateway ingress, tokenizer workers, and tensor cores',
+        bars: [
+          { label: 'Envoy Edge Envoy TLS + Auth Mesh', pct: 68, meta: '1.58M rpm · 2.1ms Overhead', color: '#3B82F6' },
+          { label: 'vLLM Continuous Batching Scheduler', pct: 87, meta: '87.4% Tensor Saturation', color: '#8B5CF6' },
+          { label: 'Radix KV-Cache Shared NVLink Pool', pct: 94, meta: '94.6% Hit · 8.9 TB Active', color: '#10B981' },
+          { label: 'OpenTelemetry Span Collector Ring', pct: 61, meta: '284k spans/s · 0.0% Backpressure', color: '#F59E0B' }
+        ],
+        svgPts: '12,124 92,108 172,114 252,86 332,74 412,56 488,40',
+        svgColor: '#10B981',
+        tableTitle: 'Active Microservice Telemetry Streams',
+        cols: ['Service Mesh', 'Protocol & Region', 'P95 Latency', 'Throughput', 'Control'],
+        rows: [
+          { c1: 'inference-gateway-v2', c2: 'gRPC · us-east-1', c3: '18.1ms', c4: '640k rpm', action: 'Flush Ring', done: 'Flushed' },
+          { c1: 'embeddings-batch-pool', c2: 'HTTP/3 · us-west-2', c3: '14.6ms', c4: '410k rpm', action: 'Flush Ring', done: 'Flushed' },
+          { c1: 'hybrid-rerank- workers', c2: 'gRPC · eu-central-1', c3: '27.4ms', c4: '215k rpm', action: 'Flush Ring', done: 'Flushed' },
+          { c1: 'vision-tensor-decode', c2: 'gRPC · ap-northeast-1', c3: '34.8ms', c4: '118k rpm', action: 'Flush Ring', done: 'Flushed' },
+          { c1: 'billing-meter-ledger', c2: 'Kafka · multi-region', c3: '6.4ms', c4: '99.999% Ack', action: 'Verify Lag', done: '0ms Lag' }
+        ]
+      },
+      'Revenue & MRR': {
+        tag: 'USAGE METERING & ENTERPRISE ARR',
+        subtitle: 'Real-time token consumption billing, committed enterprise seat expansion, and gross margin after H100 compute cost.',
+        ctaLabel: 'Run Stripe Metering Sync',
+        ctaToast: 'Synchronized $482,910 metered usage ledger with Stripe Billing & NetSuite',
+        kpis: [
+          { label: 'Annualized Run-Rate', val: '$5.79M', badge: '+18.4% MoM', tone: 'blue', sub: '$482,910 Net Cloud MRR' },
+          { label: 'Gross AI Margin', val: '73.3%', badge: '+210 bps', tone: 'emerald', sub: 'Net of GPU & egress cost' },
+          { label: 'Net Dollar Retention', val: '134.8%', badge: 'Top Decile', tone: 'violet', sub: 'Zero enterprise logo churn' },
+          { label: 'Unbilled Usage Accrual', val: '$68,420', badge: 'Cycle Day 16', tone: 'amber', sub: 'Auto-invoiced T+0 month-end' }
+        ],
+        chartTitle: 'Revenue Mix by Monetization Tier',
+        chartSub: 'Contribution across enterprise committed contracts, pay-as-you-go tokens, and dedicated pods',
+        bars: [
+          { label: 'Enterprise Committed Annual Reserve', pct: 84, meta: '$298,400 MRR · 61.8% Share', color: '#3B82F6' },
+          { label: 'Dedicated Single-Tenant H100 Clusters', pct: 66, meta: '$118,200 MRR · 24.5% Share', color: '#8B5CF6' },
+          { label: 'Self-Serve Pay-As-You-Go Token API', pct: 48, meta: '$66,310 MRR · 13.7% Share', color: '#10B981' },
+          { label: 'Fine-Tuning & Custom Checkpoint Storage', pct: 34, meta: '+29.4% MoM Expansion', color: '#F59E0B' }
+        ],
+        svgPts: '12,130 92,118 172,102 252,88 332,70 412,52 488,36',
+        svgColor: '#3B82F6',
+        tableTitle: 'Top Enterprise Metered Billing Tenants',
+        cols: ['Enterprise Tenant', 'Contract Tier', '30d Token Vol', 'Monthly Bill', 'Invoice'],
+        rows: [
+          { c1: 'Anthropic Enterprise Mesh', c2: 'Dedicated 32x H100', c3: '4.82B tokens', c4: '$84,500', action: 'Preview Bill', done: 'Verified' },
+          { c1: 'Vercel Edge Functions', c2: 'Committed Scale', c3: '3.19B tokens', c4: '$62,400', action: 'Preview Bill', done: 'Verified' },
+          { c1: 'Databricks Mosaic Grid', c2: 'Committed Scale', c3: '2.74B tokens', c4: '$54,800', action: 'Preview Bill', done: 'Verified' },
+          { c1: 'Cursor IDE Cloud', c2: 'Low-Latency FIM', c3: '2.41B tokens', c4: '$48,900', action: 'Preview Bill', done: 'Verified' },
+          { c1: 'Ramp Expense AI', c2: 'Enterprise OCR', c3: '1.65B tokens', c4: '$31,200', action: 'Preview Bill', done: 'Verified' }
+        ]
+      },
+      'Edge Nodes': {
+        tag: '42 GLOBAL ANYCAST POPS',
+        subtitle: 'BGP Anycast ingress routing, regional GPU cluster health, and cross-continental NVLink/RDMA replication.',
+        ctaLabel: 'Run Global BGP Healthcheck',
+        ctaToast: 'Verified 42/42 Anycast edge PoPs healthy; global median RTT 11.8ms',
+        kpis: [
+          { label: 'Active Edge PoPs', val: '42 / 42', badge: '100% Online', tone: 'emerald', sub: 'AMER, EMEA, APAC, LATAM' },
+          { label: 'Global P50 RTT', val: '11.8ms', badge: '-1.9ms', tone: 'blue', sub: 'Smart GeoDNS + Anycast' },
+          { label: 'GPU Node Uptime', val: '128 / 128', badge: 'ECC Clean', tone: 'violet', sub: 'Zero XID hardware faults' },
+          { label: 'Inter-Region Egress', val: '48.2 Gbps', badge: 'Private Fiber', tone: 'amber', sub: '99.4% cache-local served' }
+        ],
+        chartTitle: 'Regional Cluster Compute Load & Thermal Headroom',
+        chartSub: 'Live tensor core utilization across primary multi-zone GPU availability regions',
+        bars: [
+          { label: 'us-east-1 (Ashburn · 48x H100-SXM5)', pct: 92, meta: '92% Load · 19.8ms P95 · 64°C', color: '#3B82F6' },
+          { label: 'eu-central-1 (Frankfurt · 32x H100-SXM5)', pct: 84, meta: '84% Load · 27.4ms P95 · 61°C', color: '#8B5CF6' },
+          { label: 'us-west-2 (Oregon · 32x H100-SXM5)', pct: 81, meta: '81% Load · 22.9ms P95 · 60°C', color: '#F59E0B' },
+          { label: 'ap-northeast-1 (Tokyo · 16x H100-SXM5)', pct: 74, meta: '74% Load · 35.2ms P95 · 58°C', color: '#10B981' }
+        ],
+        svgPts: '12,118 92,110 172,106 252,92 332,84 412,76 488,68',
+        svgColor: '#8B5CF6',
+        tableTitle: 'Global Edge PoP & GPU Node Directory',
+        cols: ['Node Cluster ID', 'Metro Location', 'GPU Topology', 'P95 RTT', 'Traffic Routing'],
+        rows: [
+          { c1: 'pop-iad-gpu-01', c2: 'Ashburn, VA (us-east-1)', c3: '48x H100 · InfiniBand', c4: '19.8ms', action: 'Rebalance', done: 'Balanced' },
+          { c1: 'pop-fra-gpu-02', c2: 'Frankfurt, DE (eu-central-1)', c3: '32x H100 · InfiniBand', c4: '27.4ms', action: 'Rebalance', done: 'Balanced' },
+          { c1: 'pop-pdx-gpu-03', c2: 'Portland, OR (us-west-2)', c3: '32x H100 · InfiniBand', c4: '22.9ms', action: 'Rebalance', done: 'Balanced' },
+          { c1: 'pop-nrt-gpu-04', c2: 'Tokyo, JP (ap-northeast-1)', c3: '16x H100 · RoCEv2', c4: '35.2ms', action: 'Rebalance', done: 'Balanced' },
+          { c1: 'pop-lhr-edge-09', c2: 'London, UK (eu-west-2)', c3: 'Anycast TLS Ingress', c4: '9.4ms', action: 'Rebalance', done: 'Balanced' }
+        ]
+      },
+      'Error Traces': {
+        tag: '3 OPEN EXCEPTION FINGERPRINTS',
+        subtitle: 'Automated stack-trace deduplication, upstream timeout circuit-breaking, and deterministic request replay.',
+        ctaLabel: 'Replay Failed Dead-Letter',
+        ctaToast: 'Replayed 3 dead-letter inference spans on fallback region us-east-1',
+        kpis: [
+          { label: 'Global Success Rate', val: '99.982%', badge: 'SLO >99.95%', tone: 'emerald', sub: 'Well within 30d error budget' },
+          { label: 'Active Error Groups', val: '3 Open', badge: '-5 vs Wk', tone: 'rose', sub: 'Triaged by fingerprint hash' },
+          { label: 'Circuit Failovers', val: '14 Auto', badge: '0 User Impact', tone: 'amber', sub: 'Sub-80ms region retry' },
+          { label: 'Mean Time to Mitigate', val: '3m 42s', badge: 'Automated', tone: 'blue', sub: 'Canary rollback armed' }
+        ],
+        chartTitle: 'Exception Classification & HTTP/gRPC Status Breakdown',
+        chartSub: 'Share of non-200 responses across rate-limiting, upstream timeouts, and schema validation',
+        bars: [
+          { label: '429 Tenant Token Burst Rate-Limited (Expected)', pct: 64, meta: '64% of Non-2xx · Auto-Backoff', color: '#F59E0B' },
+          { label: '504 Vision Tensor Decode Upstream Timeout', pct: 22, meta: '22% of Non-2xx · ap-northeast-1', color: '#F43F5E' },
+          { label: '400 Malformed JSON Schema Tool-Call Payload', pct: 11, meta: '11% of Non-2xx · Client SDK', color: '#3B82F6' },
+          { label: '503 Transient Spot Node Preemption', pct: 3, meta: '3% of Non-2xx · Zero-Drop Retry', color: '#8B5CF6' }
+        ],
+        svgPts: '12,56 92,72 172,64 252,88 332,96 412,112 488,122',
+        svgColor: '#F43F5E',
+        tableTitle: 'Deduplicated Error Trace Fingerprints',
+        cols: ['Trace Fingerprint', 'Endpoint & Region', 'Occurrences', 'Root Signal', 'Triage'],
+        rows: [
+          { c1: 'err_504_vision_nrt', c2: 'POST /v2/vision/tensor · ap-ne-1', c3: '19 events (1h)', c4: '502.4ms Deadline', action: 'Isolate & Fix', done: 'Mitigated' },
+          { c1: 'err_429_burst_rerank', c2: 'POST /v2/rerank/hybrid · eu-c-1', c3: '84 events (1h)', c4: 'Token Bucket Cap', action: 'Raise Burst', done: 'Adjusted' },
+          { c1: 'err_503_kv_evict', c2: 'POST /v2/inference/stream · us-w-2', c3: '6 events (1h)', c4: 'VRAM Pressure 96%', action: 'Scale Replica', done: 'Scaled +2' },
+          { c1: 'err_400_schema_ast', c2: 'POST /v2/chat/tools · global', c3: '31 events (1h)', c4: 'Strict JSON Draft-7', action: 'Mute Client', done: 'Muted' },
+          { c1: 'err_499_client_rst', c2: 'POST /v2/embeddings · us-e-1', c3: '12 events (1h)', c4: 'Caller Cancelled', action: 'Archive', done: 'Archived' }
+        ]
+      },
+      'Alerts': {
+        tag: 'SLO MULTI-WINDOW BURN MONITORS',
+        subtitle: 'Low-noise Prometheus & OpenTelemetry burn-rate rules routed to PagerDuty, Slack #sre-ops, and automated autoscalers.',
+        ctaLabel: 'Send Test Webhook',
+        ctaToast: 'Delivered synthetic PagerDuty + Slack #sre-ops verification ping (200 OK)',
+        kpis: [
+          { label: 'Firing Critical Alerts', val: '0 P1', badge: 'All Clear', tone: 'emerald', sub: '142 days since last P1 page' },
+          { label: 'Active Warning Advisories', val: '1 P3', badge: 'ap-ne-1 Lat', tone: 'amber', sub: 'Auto-remediation running' },
+          { label: '30d SLO Error Budget', val: '91.4% Left', badge: 'Healthy', tone: 'blue', sub: '99.95% availability target' },
+          { label: 'Alert Signal-to-Noise', val: '98.6%', badge: 'Actionable', tone: 'violet', sub: 'AI correlation deduped' }
+        ],
+        chartTitle: '30-Day SLO Error Budget Consumption by Domain',
+        chartSub: 'Remaining quarterly reliability budget across core platform SLIs',
+        bars: [
+          { label: 'Core Streaming Inference Availability (99.99%)', pct: 94, meta: '94% Budget Remaining', color: '#10B981' },
+          { label: 'Global P95 Latency < 45ms Target', pct: 88, meta: '88% Budget Remaining', color: '#3B82F6' },
+          { label: 'Stripe Metering Webhook Delivery (99.999%)', pct: 99, meta: '99% Budget Remaining', color: '#8B5CF6' },
+          { label: 'APAC Vision Tensor Latency Advisory', pct: 62, meta: '62% Budget Remaining · Watching', color: '#F59E0B' }
+        ],
+        svgPts: '12,118 92,114 172,110 252,102 332,98 412,94 488,90',
+        svgColor: '#F59E0B',
+        tableTitle: 'Configured SLO Burn-Rate Alert Policies',
+        cols: ['Monitor Name', 'Threshold Condition', 'Routing Channel', 'Current State', 'Action'],
+        rows: [
+          { c1: 'APAC Vision P95 Spike', c2: 'p95 > 250ms for 5m', c3: 'Slack #sre-apac', c4: 'Warning (P3)', action: 'Acknowledge', done: 'Acked' },
+          { c1: 'Global 5xx Fast Burn', c2: 'error_rate > 0.5% (2m)', c3: 'PagerDuty Primary', c4: 'OK (0.018%)', action: 'Test Rule', done: 'Tested' },
+          { c1: 'H100 VRAM Saturation', c2: 'vram_used > 95% (10m)', c3: 'Karpenter Autoscaler', c4: 'OK (87.4%)', action: 'Test Rule', done: 'Tested' },
+          { c1: 'Kafka Billing Consumer Lag', c2: 'offset_lag > 10,000', c3: 'Slack #revops-eng', c4: 'OK (0 lag)', action: 'Test Rule', done: 'Tested' },
+          { c1: 'TLS Cert Expiry Guard', c2: 'days_left < 21d', c3: 'Vault Auto-Rotate', c4: 'OK (78 days)', action: 'Test Rule', done: 'Tested' }
+        ]
+      },
+      'Settings': {
+        tag: 'WORKSPACE & COLLECTOR GOVERNANCE',
+        subtitle: 'Manage production OTel ingestion keys, ClickHouse trace retention tiers, RBAC SSO enforcement, and cost guardrails.',
+        ctaLabel: 'Save Control Plane Config',
+        ctaToast: 'Saved PulseOps control-plane configuration across all 42 edge PoPs',
+        kpis: [
+          { label: 'Organization Plan', val: 'Enterprise', badge: 'SOC2 Type II', tone: 'blue', sub: 'HIPAA BAA + ISO 27001' },
+          { label: 'Trace Retention Hot', val: '30 Days', badge: 'NVMe Tier', tone: 'violet', sub: '365d S3 Parquet cold archive' },
+          { label: 'Active API Keys', val: '12 Keys', badge: 'HSM Rotated', tone: 'emerald', sub: 'Zero keys older than 45d' },
+          { label: 'Daily Cost Cap Guard', val: '$65,000 / d', badge: '74% Used', tone: 'amber', sub: 'Hard anomaly circuit armed' }
+        ],
+        chartTitle: 'Telemetry Storage & Ingestion Quota Allocation',
+        chartSub: 'Current monthly commitment utilization across spans, metrics, and audit logs',
+        bars: [
+          { label: 'Hot NVMe Distributed Trace Spans', pct: 72, meta: '72.4 TB / 100 TB Included', color: '#3B82F6' },
+          { label: 'High-Cardinality Prometheus Series', pct: 58, meta: '2.9M / 5.0M Active Series', color: '#8B5CF6' },
+          { label: 'Immutable Billing & Audit Event Log', pct: 44, meta: '8.8 TB / 20 TB Included', color: '#10B981' },
+          { label: 'Synthetic Global Canary Checks', pct: 80, meta: '48,000 / 60,000 Runs/day', color: '#F59E0B' }
+        ],
+        svgPts: '12,120 92,112 172,105 252,96 332,88 412,78 488,70',
+        svgColor: '#3B82F6',
+        tableTitle: 'Control-Plane Governance & Security Policies',
+        cols: ['Policy Control', 'Scope & Specification', 'Audit Cadence', 'State', 'Toggle'],
+        rows: [
+          { c1: 'SAML 2.0 + WebAuthn Passkeys', c2: 'Mandatory hardware MFA for SRE roles', c3: 'Continuous', c4: 'Enforced', action: 'Rotate Cert', done: 'Rotated' },
+          { c1: 'PII Prompt Payload Redaction', c2: 'Zero-retention regex + NER scrubber at edge', c3: 'Every Request', c4: 'Enforced', action: 'Verify Rule', done: 'Verified' },
+          { c1: 'Auto-Scale Spot GPU Fallback', c2: 'Burst up to +32 H100 nodes on P95 > 40ms', c3: 'Real-time', c4: 'Enabled', action: 'Calibrate', done: 'Calibrated' },
+          { c1: 'Daily Spend Anomaly Breaker', c2: 'Alert & throttle non-prod at $65k/day', c3: '1-min Window', c4: 'Armed', action: 'Verify Rule', done: 'Verified' },
+          { c1: 'OTel gRPC Zstd Compression', c2: '4.4x wire reduction across 42 PoPs', c3: 'Active', c4: 'Enabled', action: 'Benchmark', done: '4.4x OK' }
+        ]
+      }
+    };
+
+    function handlePulseSubAction(btn, msg, doneLabel) {
+      btn.textContent = doneLabel;
+      btn.className = 'rounded-xl border border-pulseEmerald/30 bg-pulseEmerald/15 px-3 py-1.5 font-mono text-xs font-semibold text-pulseEmerald transition';
+      showToast(msg);
+    }
+
+    function renderPulseSubpage(sectionName) {
+      const cfg = pulseSubpages[sectionName];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const kpisHtml = cfg.kpis.map((k) => {
+        const pill = k.tone === 'emerald'
+          ? 'border-pulseEmerald/30 bg-pulseEmerald/10 text-pulseEmerald'
+          : k.tone === 'violet'
+            ? 'border-pulseViolet/30 bg-pulseViolet/15 text-pulseViolet'
+            : k.tone === 'amber'
+              ? 'border-pulseAmber/30 bg-pulseAmber/10 text-pulseAmber'
+              : k.tone === 'rose'
+                ? 'border-pulseRose/30 bg-pulseRose/10 text-pulseRose'
+                : 'border-carbonBlue/30 bg-carbonBlue/15 text-carbonBlue';
+        return `
+          <article class="bento-card rounded-2xl p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">${k.label}</p>
+                <p class="mt-2.5 font-mono text-2xl font-bold tracking-tight text-white tabular-nums">${k.val}</p>
+              </div>
+              <span class="rounded-full border px-2.5 py-0.5 font-mono text-xs font-semibold tabular-nums ${pill}">${k.badge}</span>
+            </div>
+            <div class="mt-4 border-t border-white/10 pt-3 text-xs text-slate-400 font-mono">${k.sub}</div>
+          </article>
+        `;
+      }).join('');
+
+      const barsHtml = cfg.bars.map((b) => `
+        <div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-200">${b.label}</span>
+            <span class="font-mono text-slate-400 tabular-nums">${b.meta}</span>
+          </div>
+          <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-white/10">
+            <div class="h-full rounded-full transition-all duration-500" style="width:${b.pct}%; background-color:${b.color};"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map((r) => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3.5 pr-3 font-mono text-xs font-semibold text-carbonBlue">${r.c1}</td>
+          <td class="py-3.5 px-3 text-xs text-slate-300">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono text-xs text-slate-400 tabular-nums">${r.c3}</td>
+          <td class="py-3.5 px-3 font-mono text-xs font-semibold text-white tabular-nums">${r.c4}</td>
+          <td class="py-3.5 pl-3 text-right">
+            <button onclick="handlePulseSubAction(this, '${sectionName}: ${r.c1} -> ${r.done}', '${r.done}')" class="rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-xs font-semibold text-slate-200 hover:border-carbonBlue hover:bg-carbonBlue/20 hover:text-white transition">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <section class="bento-card rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="switchPulseSection('Overview')" class="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-xs font-semibold text-slate-200 hover:border-carbonBlue/40 hover:bg-white/10 hover:text-white transition">
+                <svg class="h-3.5 w-3.5 text-carbonBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Overview</span>
+              </button>
+              <span class="rounded-md border border-carbonBlue/30 bg-carbonBlue/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-carbonBlue">${cfg.tag}</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white pt-1">${sectionName}</h2>
+            <p class="text-xs sm:text-sm text-slate-400 max-w-2xl">${cfg.subtitle}</p>
+          </div>
+          <button onclick="showToast('${cfg.ctaToast}')" class="self-start sm:self-center inline-flex items-center gap-2 rounded-xl bg-carbonBlue px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-carbonBlue/25 hover:bg-blue-500 transition shrink-0">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span>${cfg.ctaLabel}</span>
+          </button>
+        </section>
+
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          ${kpisHtml}
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div class="bento-card rounded-2xl p-5 sm:p-6 lg:col-span-5 flex flex-col justify-between space-y-5">
+            <div>
+              <h3 class="text-base font-bold text-white">${cfg.chartTitle}</h3>
+              <p class="mt-1 text-xs text-slate-400">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-obsidian/70 p-4">
+              <svg class="h-36 w-full overflow-visible" viewBox="0 0 500 150" fill="none">
+                <defs>
+                  <linearGradient id="pulseSubSvgGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${cfg.svgColor}" stop-opacity="0.32" />
+                    <stop offset="100%" stop-color="${cfg.svgColor}" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <line x1="12" y1="35" x2="488" y2="35" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3" />
+                <line x1="12" y1="85" x2="488" y2="85" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3" />
+                <line x1="12" y1="132" x2="488" y2="132" stroke="rgba(255,255,255,0.12)" />
+                <polygon points="${cfg.svgPts} 488,132 12,132" fill="url(#pulseSubSvgGrad)" />
+                <polyline points="${cfg.svgPts}" fill="none" stroke="${cfg.svgColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                <text x="12" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">-60m</text>
+                <text x="232" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">-30m</text>
+                <text x="452" y="147" fill="#F8FAFC" font-family="JetBrains Mono" font-size="12">LIVE</text>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="bento-card rounded-2xl p-5 sm:p-6 lg:col-span-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-3.5">
+                <div>
+                  <h3 class="text-base font-bold text-white">${cfg.tableTitle}</h3>
+                  <p class="mt-0.5 text-xs text-slate-400">Click any control button to execute live control-plane action</p>
+                </div>
+                <span class="rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseEmerald">prod-global</span>
+              </div>
+              <div class="mt-3 overflow-x-auto">
+                <table class="w-full min-w-[560px] text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <th class="py-2.5 pr-3">${cfg.cols[0]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[1]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[2]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[3]}</th>
+                      <th class="py-2.5 pl-3 text-right">${cfg.cols[4]}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5 text-xs">
+                    ${rowsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-4 border-t border-white/10 pt-3 flex items-center justify-between font-mono text-xs text-slate-400">
+              <span>ClickHouse Distributed Ring · 0ms Lag</span>
+              <span class="text-pulseEmerald">99.998% SLA</span>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function switchPulseSection(sectionName) {
+      document.querySelectorAll('#sidebarNav .nav-item-btn').forEach((b) => {
+        if (b.getAttribute('data-nav') === sectionName) {
+          b.className = 'nav-item-btn group flex w-full items-center justify-between rounded-xl bg-carbonBlue/15 px-3 py-2.5 text-left text-xs font-semibold text-white ring-1 ring-inset ring-carbonBlue/30 transition';
+        } else {
+          b.className = 'nav-item-btn group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-slate-100 transition';
+        }
+      });
+
+      document.getElementById('activeSectionTitle').textContent = sectionName === 'Overview' ? 'Executive Telemetry' : sectionName;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (sectionName === 'Overview') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        renderMainChart();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderPulseSubpage(sectionName);
+      }
+
+      toggleMobileSidebar(false);
+    }
+
+    // Sidebar navigation selection
+    document.querySelectorAll('#sidebarNav .nav-item-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sectionName = btn.getAttribute('data-nav');
+        switchPulseSection(sectionName);
+      });
+    });
+
+    // Sparkline helper
+    function buildSparkPaths(points) {
+      const xs = [0, 18, 36, 54, 72, 90, 108, 120];
+      const line = points.map((y, idx) => `${idx === 0 ? 'M' : 'L'}${xs[idx]} ${y}`).join(' ');
+      const area = `${line} L120 38 L0 38 Z`;
+      return { line, area };
+    }
+
+    // Timeframe update
+    function selectTimeframe(tf) {
+      currentTimeframe = tf;
+      document.querySelectorAll('#timeframeSelector .tf-btn').forEach((btn) => {
+        if (btn.getAttribute('data-tf') === tf) {
+          btn.className = 'tf-btn rounded-lg bg-carbonBlue text-white shadow-sm shadow-carbonBlue/30 px-2.5 py-1 font-mono text-[12.5px] font-semibold transition';
+        } else {
+          btn.className = 'tf-btn rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-semibold text-slate-400 hover:text-white transition';
+        }
+      });
+
+      const d = telemetryByTimeframe[tf];
+      document.getElementById('chartRangeBadge').textContent = d.badge;
+
+      document.getElementById('kpiMrrVal').textContent = d.kpis.mrr;
+      document.getElementById('kpiMrrSub').textContent = d.kpis.mrrSub;
+      document.getElementById('kpiReqVal').textContent = d.kpis.req;
+      document.getElementById('kpiReqSub').textContent = d.kpis.reqSub;
+      document.getElementById('kpiLatVal').textContent = d.kpis.lat;
+      document.getElementById('kpiLatSub').textContent = d.kpis.latSub;
+      document.getElementById('kpiNdrVal').textContent = d.kpis.ndr;
+      document.getElementById('kpiNdrSub').textContent = d.kpis.ndrSub;
+
+      // Update sparklines
+      const sMrr = buildSparkPaths(d.sparks.mrr);
+      document.getElementById('sparkMrrLine').setAttribute('d', sMrr.line);
+      document.getElementById('sparkMrrArea').setAttribute('d', sMrr.area);
+
+      const sReq = buildSparkPaths(d.sparks.req);
+      document.getElementById('sparkReqLine').setAttribute('d', sReq.line);
+      document.getElementById('sparkReqArea').setAttribute('d', sReq.area);
+
+      const sLat = buildSparkPaths(d.sparks.lat);
+      document.getElementById('sparkLatLine').setAttribute('d', sLat.line);
+      document.getElementById('sparkLatArea').setAttribute('d', sLat.area);
+
+      const sNdr = buildSparkPaths(d.sparks.ndr);
+      document.getElementById('sparkNdrLine').setAttribute('d', sNdr.line);
+      document.getElementById('sparkNdrArea').setAttribute('d', sNdr.area);
+
+      document.getElementById('summaryGrossRev').textContent = d.summary.rev;
+      document.getElementById('summaryComputeCost').textContent = d.summary.cost;
+      document.getElementById('summaryGrossMargin').textContent = d.summary.margin;
+
+      // Update GPU Gauge (max arc length = 330)
+      const arcLen = ((d.gpuUtil / 100) * 330).toFixed(1);
+      document.getElementById('gpuGaugeArc').setAttribute('stroke-dasharray', `${arcLen} 440`);
+      document.getElementById('gpuUtilValue').textContent = d.gpuUtil.toFixed(1) + '%';
+      document.getElementById('gpuVramNote').textContent = d.vram;
+
+      // Update regional bars
+      renderRegionalClusters(d.regions);
+      renderMainChart();
+    }
+
+    document.querySelectorAll('#timeframeSelector .tf-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tf = btn.getAttribute('data-tf');
+        selectTimeframe(tf);
+        showToast('Telemetry window set to ' + tf);
+      });
+    });
+
+    function renderRegionalClusters(regions) {
+      const container = document.getElementById('regionalClusterList');
+      container.innerHTML = regions.map((r) => `
+        <div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-mono font-semibold text-slate-200">${r.id}</span>
+            <div class="flex items-center gap-2.5 font-mono text-[12.5px] tabular-nums">
+              <span class="text-slate-400">${r.lat}</span>
+              <span class="w-9 text-right font-bold text-white">${r.load}%</span>
+            </div>
+          </div>
+          <div class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+            <div class="h-full rounded-full transition-all duration-500" style="width:${r.load}%; background-color:${r.color};"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Smooth SVG Catmull-Rom / cubic curve helper
+    function createSmoothPath(pts) {
+      if (!pts.length) return '';
+      let d = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i === 0 ? i : i - 1];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    function renderMainChart() {
+      const svg = document.getElementById('revenueComputeSvg');
+      const showRev = document.getElementById('toggleRevenueSeries').checked;
+      const showCost = document.getElementById('toggleCostSeries').checked;
+      const d = telemetryByTimeframe[currentTimeframe];
+
+      const W = 760;
+      const H = 260;
+      const padL = 48;
+      const padR = 16;
+      const padT = 16;
+      const padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const maxVal = Math.max(...d.revenue) * 1.12;
+      const stepX = plotW / (d.labels.length - 1);
+
+      const revPts = d.revenue.map((v, i) => ({
+        x: padL + i * stepX,
+        y: padT + plotH - (v / maxVal) * plotH,
+        val: v
+      }));
+      const costPts = d.cost.map((v, i) => ({
+        x: padL + i * stepX,
+        y: padT + plotH - (v / maxVal) * plotH,
+        val: v
+      }));
+
+      // Grid lines
+      let gridHtml = '';
+      for (let g = 0; g <= 4; g++) {
+        const gy = padT + (plotH / 4) * g;
+        const labelVal = Math.round(maxVal * (1 - g / 4));
+        gridHtml += `
+          <line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3" />
+          <text x="${padL - 10}" y="${gy + 4}" text-anchor="end" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10">$${labelVal}${d.unit}</text>
+        `;
+      }
+
+      // X labels
+      const xLabelsHtml = d.labels.map((lbl, i) => {
+        const x = padL + i * stepX;
+        return `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10">${lbl}</text>`;
+      }).join('');
+
+      const revCurve = createSmoothPath(revPts);
+      const revArea = `${revCurve} L ${revPts[revPts.length - 1].x} ${padT + plotH} L ${revPts[0].x} ${padT + plotH} Z`;
+
+      const costCurve = createSmoothPath(costPts);
+      const costArea = `${costCurve} L ${costPts[costPts.length - 1].x} ${padT + plotH} L ${costPts[0].x} ${padT + plotH} Z`;
+
+      // Interactive hover columns
+      const hoverRects = d.labels.map((lbl, i) => {
+        const colW = stepX;
+        const x = padL + i * stepX - colW / 2;
+        return `<rect x="${Math.max(padL - 12, x)}" y="${padT}" width="${colW}" height="${plotH}" fill="transparent" class="cursor-crosshair" data-idx="${i}" />`;
+      }).join('');
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="revAreaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.34" />
+            <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0" />
+          </linearGradient>
+          <linearGradient id="costAreaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.0" />
+          </linearGradient>
+        </defs>
+        ${gridHtml}
+        ${xLabelsHtml}
+        ${showRev ? `<path d="${revArea}" fill="url(#revAreaFill)" /><path d="${revCurve}" fill="none" stroke="#3B82F6" stroke-width="2.6" stroke-linecap="round" />` : ''}
+        ${showCost ? `<path d="${costArea}" fill="url(#costAreaFill)" /><path d="${costCurve}" fill="none" stroke="#8B5CF6" stroke-width="2.3" stroke-dasharray="5 3" stroke-linecap="round" />` : ''}
+        <line id="chartHoverGuide" x1="0" y1="${padT}" x2="0" y2="${padT + plotH}" stroke="rgba(255,255,255,0.22)" stroke-width="1" class="hidden" />
+        <circle id="chartRevDot" cx="0" cy="0" r="4.5" fill="#3B82F6" stroke="#07090F" stroke-width="2" class="hidden" />
+        <circle id="chartCostDot" cx="0" cy="0" r="4.5" fill="#8B5CF6" stroke="#07090F" stroke-width="2" class="hidden" />
+        <g id="chartHoverZones">${hoverRects}</g>
+      `;
+
+      const tooltip = document.getElementById('chartTooltip');
+      const guide = document.getElementById('chartHoverGuide');
+      const revDot = document.getElementById('chartRevDot');
+      const costDot = document.getElementById('chartCostDot');
+
+      svg.querySelectorAll('#chartHoverZones rect').forEach((zone) => {
+        zone.addEventListener('mouseenter', () => {
+          const idx = Number(zone.getAttribute('data-idx'));
+          const rp = revPts[idx];
+          const cp = costPts[idx];
+          guide.setAttribute('x1', rp.x);
+          guide.setAttribute('x2', rp.x);
+          guide.classList.remove('hidden');
+
+          if (showRev) {
+            revDot.setAttribute('cx', rp.x);
+            revDot.setAttribute('cy', rp.y);
+            revDot.classList.remove('hidden');
+          }
+          if (showCost) {
+            costDot.setAttribute('cx', cp.x);
+            costDot.setAttribute('cy', cp.y);
+            costDot.classList.remove('hidden');
+          }
+
+          const gm = (((rp.val - cp.val) / rp.val) * 100).toFixed(1);
+          document.getElementById('ttPeriod').textContent = d.labels[idx] + ' (' + currentTimeframe + ')';
+          document.getElementById('ttMargin').textContent = gm + '% GM';
+          document.getElementById('ttRev').textContent = '$' + rp.val.toFixed(1) + d.unit;
+          document.getElementById('ttCost').textContent = '$' + cp.val.toFixed(1) + d.unit;
+
+          tooltip.classList.remove('hidden');
+          const pctX = rp.x / W;
+          const leftPx = Math.min(Math.max(8, pctX * svg.clientWidth - 95), Math.max(8, svg.clientWidth - 205));
+          tooltip.style.transform = `translate(${leftPx}px, 6px)`;
+        });
+      });
+
+      svg.addEventListener('mouseleave', () => {
+        tooltip.classList.add('hidden');
+        guide.classList.add('hidden');
+        revDot.classList.add('hidden');
+        costDot.classList.add('hidden');
+      });
+    }
+
+    // --- LIVE TRANSACTION STREAM TABLE ---
+    function setStatusFilter(status) {
+      currentStatusFilter = status;
+      document.querySelectorAll('#statusFilterTabs .status-pill').forEach((btn) => {
+        if (btn.getAttribute('data-status') === status) {
+          btn.className = 'status-pill rounded-lg bg-white/10 px-2.5 py-1 text-xs font-semibold text-white transition';
+        } else {
+          btn.className = 'status-pill rounded-lg px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-white/[0.05] hover:text-white transition';
+        }
+      });
+      renderTransactionTable();
+    }
+
+    document.querySelectorAll('#statusFilterTabs .status-pill').forEach((btn) => {
+      btn.addEventListener('click', () => setStatusFilter(btn.getAttribute('data-status')));
+    });
+
+    function statusBadgeHtml(status) {
+      if (status === 'Succeeded') {
+        return `<span class="inline-flex items-center gap-1.5 rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseEmerald"><span class="h-1.5 w-1.5 rounded-full bg-pulseEmerald"></span>Succeeded</span>`;
+      }
+      if (status === 'Warning') {
+        return `<span class="inline-flex items-center gap-1.5 rounded-full border border-pulseAmber/30 bg-pulseAmber/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseAmber"><span class="h-1.5 w-1.5 rounded-full bg-pulseAmber"></span>Warning</span>`;
+      }
+      return `<span class="inline-flex items-center gap-1.5 rounded-full border border-pulseRose/30 bg-pulseRose/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseRose"><span class="h-1.5 w-1.5 rounded-full bg-pulseRose"></span>Failed</span>`;
+    }
+
+    function latencyBadgeHtml(latency, status) {
+      const cls = status === 'Failed'
+        ? 'border-pulseRose/30 bg-pulseRose/10 text-pulseRose'
+        : status === 'Warning'
+          ? 'border-pulseAmber/30 bg-pulseAmber/10 text-pulseAmber'
+          : 'border-white/10 bg-white/[0.04] text-slate-300';
+      return `<span class="rounded-md border px-2 py-0.5 font-mono text-[12.5px] tabular-nums ${cls}">${latency}</span>`;
+    }
+
+    function renderTransactionTable() {
+      const query = document.getElementById('streamSearchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('streamTableBody');
+
+      const filtered = streamTransactions.filter((item) => {
+        const matchStatus = currentStatusFilter === 'All' || item.status === currentStatusFilter;
+        const matchQuery = !query ||
+          item.id.toLowerCase().includes(query) ||
+          item.tenant.toLowerCase().includes(query) ||
+          item.endpoint.toLowerCase().includes(query) ||
+          item.region.toLowerCase().includes(query);
+        return matchStatus && matchQuery;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-xs text-slate-500">No telemetry traces match current filter criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.slice(0, 7).map((row) => `
+        <tr class="group hover:bg-white/[0.03] transition">
+          <td class="py-3 pr-3 align-middle">
+            <div class="font-mono text-xs font-semibold text-carbonBlue">${row.id}</div>
+            <div class="font-mono text-xs text-slate-500 tabular-nums">${row.time} &middot; ${row.region}</div>
+          </td>
+          <td class="py-3 px-3 align-middle">
+            <div class="font-semibold text-slate-100">${row.tenant}</div>
+            <div class="font-mono text-[12.5px] text-slate-400">${row.endpoint}</div>
+          </td>
+          <td class="py-3 px-3 align-middle">
+            ${latencyBadgeHtml(row.latency, row.status)}
+          </td>
+          <td class="py-3 px-3 text-right align-middle font-mono tabular-nums">
+            <div class="font-semibold text-white">${row.amount}</div>
+            <div class="text-xs text-slate-500">${row.tokens}</div>
+          </td>
+          <td class="py-3 pl-3 text-right align-middle">
+            <div class="flex items-center justify-end gap-2">
+              ${statusBadgeHtml(row.status)}
+              <button onclick="inspectTrace('${row.id}')" class="opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-lg border border-white/15 bg-white/[0.06] px-2 py-1 text-xs font-semibold text-white hover:border-carbonBlue transition">
+                Inspect
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function inspectTrace(traceId) {
+      const row = streamTransactions.find((r) => r.id === traceId);
+      if (!row) return;
+      document.getElementById('modalTraceId').textContent = row.id;
+      document.getElementById('modalTraceDetails').innerHTML = `
+        <div class="flex justify-between border-b border-white/[0.06] py-1.5"><span class="text-slate-500">Timestamp</span><span>${row.time} UTC</span></div>
+        <div class="flex justify-between border-b border-white/[0.06] py-1.5"><span class="text-slate-500">Tenant</span><span class="text-white">${row.tenant}</span></div>
+        <div class="flex justify-between border-b border-white/[0.06] py-1.5"><span class="text-slate-500">Endpoint</span><span>${row.endpoint}</span></div>
+        <div class="flex justify-between border-b border-white/[0.06] py-1.5"><span class="text-slate-500">Edge Region</span><span>${row.region}</span></div>
+        <div class="flex justify-between border-b border-white/[0.06] py-1.5"><span class="text-slate-500">P95 Latency</span><span>${row.latency}</span></div>
+        <div class="flex justify-between border-b border-white/[0.06] py-1.5"><span class="text-slate-500">Settlement</span><span class="text-pulseEmerald">${row.amount} (${row.tokens})</span></div>
+        <div class="flex justify-between py-1.5"><span class="text-slate-500">Status</span><span>${row.status}</span></div>
+      `;
+      const modal = document.getElementById('traceModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeTraceModal() {
+      const modal = document.getElementById('traceModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function toggleLiveStream() {
+      liveStreamActive = !liveStreamActive;
+      const dot = document.getElementById('streamDot');
+      const label = document.getElementById('streamLabel');
+      const btn = document.getElementById('streamToggleBtn');
+      if (liveStreamActive) {
+        label.textContent = 'STREAMING';
+        dot.className = 'h-1.5 w-1.5 rounded-full bg-pulseEmerald';
+        btn.className = 'inline-flex items-center gap-1.5 rounded-full border border-pulseEmerald/30 bg-pulseEmerald/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseEmerald hover:bg-pulseEmerald/20 transition';
+        showToast('Realtime telemetry stream resumed');
+      } else {
+        label.textContent = 'PAUSED';
+        dot.className = 'h-1.5 w-1.5 rounded-full bg-pulseAmber';
+        btn.className = 'inline-flex items-center gap-1.5 rounded-full border border-pulseAmber/30 bg-pulseAmber/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-pulseAmber hover:bg-pulseAmber/20 transition';
+        showToast('Realtime telemetry stream paused');
+      }
+    }
+
+    function injectSimulatedEvent() {
+      const sampleTenants = [
+        { tenant: 'Cursor IDE Cloud', endpoint: 'POST /v2/autocomplete/fim', region: 'us-west-2', latency: '16.2ms', amount: '$512.40', tokens: '18.4M tok', status: 'Succeeded' },
+        { tenant: 'Stripe Radar ML', endpoint: 'POST /v2/fraud/score', region: 'us-east-1', latency: '12.9ms', amount: '$284.10', tokens: '9.1M tok', status: 'Succeeded' },
+        { tenant: 'Synthesia Render Grid', endpoint: 'POST /v2/video/latents', region: 'eu-central-1', latency: '162.5ms', amount: '$149.00', tokens: '5.2M tok', status: 'Warning' }
+      ];
+      const pick = sampleTenants[Math.floor(Math.random() * sampleTenants.length)];
+      const now = new Date();
+      const ts = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).slice(0, 2).padStart(2, '0');
+      const hex = Math.floor(100000 + Math.random() * 899999).toString(16).slice(0, 6);
+      streamTransactions.unshift({
+        id: 'trc_' + hex,
+        time: ts,
+        ...pick
+      });
+      renderTransactionTable();
+      showToast('Ingested trace trc_' + hex);
+    }
+
+    function triggerSnapshotExport() {
+      showToast('Exported PULSEOPS_' + currentTimeframe + '_telemetry.json');
+    }
+
+    // Command modal
+    function openCommandModal() {
+      const modal = document.getElementById('commandModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      const input = document.getElementById('commandInput');
+      input.value = '';
+      filterCommands();
+      setTimeout(() => input.focus(), 40);
+    }
+
+    function closeCommandModal() {
+      const modal = document.getElementById('commandModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function filterCommands() {
+      const q = document.getElementById('commandInput').value.toLowerCase();
+      document.querySelectorAll('#commandList .cmd-item').forEach((item) => {
+        item.style.display = item.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openCommandModal();
+      } else if (e.key === 'Escape') {
+        closeCommandModal();
+        closeTraceModal();
+      }
+    });
+
+    // Periodic gentle background stream simulation
+    setInterval(() => {
+      if (liveStreamActive && document.visibilityState === 'visible') {
+        const sample = [
+          { tenant: 'Figma AI Canvas', endpoint: 'POST /v2/diffusion/layout', region: 'us-west-2', latency: '22.4ms', amount: '$342.00', tokens: '11.4M tok', status: 'Succeeded' },
+          { tenant: 'Databricks Mosaic', endpoint: 'POST /v2/inference/stream', region: 'us-east-1', latency: '18.7ms', amount: '$790.20', tokens: '26.1M tok', status: 'Succeeded' }
+        ];
+        const pick = sample[Math.floor(Math.random() * sample.length)];
+        const now = new Date();
+        const ts = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).slice(0, 2).padStart(2, '0');
+        const hex = Math.floor(100000 + Math.random() * 899999).toString(16).slice(0, 6);
+        streamTransactions.unshift({ id: 'trc_' + hex, time: ts, ...pick });
+        if (streamTransactions.length > 20) streamTransactions.pop();
+        renderTransactionTable();
+      }
+    }, 9000);
+
+    window.addEventListener('resize', () => renderMainChart());
+
+    // Initial render
+    selectTimeframe('30D');
+    renderTransactionTable();
+  </script>
+</body>
+</html>

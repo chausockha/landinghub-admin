@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sullivan PM — 12. Project Management, Kanban &amp; Timeline</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            plum: '#260D53',
+            violetBrand: '#6C4CF6',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      color: #1E293B;
+      background:
+        radial-gradient(circle at 18% 15%, rgba(255, 255, 255, 0.7) 0%, transparent 45%),
+        linear-gradient(145deg, #DDE1EC 0%, #E7EAF3 50%, #D5DAE8 100%);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    html.dark body {
+      color: #F1F5F9;
+      background: linear-gradient(145deg, #090B14 0%, #121528 100%);
+    }
+    .pm-shell {
+      background: #F4F6FB;
+      box-shadow: 0 28px 70px -18px rgba(30, 20, 70, 0.18), 0 4px 18px rgba(15, 23, 42, 0.04);
+      transition: background 0.3s ease;
+    }
+    html.dark .pm-shell {
+      background: #0F1324;
+      box-shadow: 0 28px 70px -18px rgba(0, 0, 0, 0.75);
+    }
+    .plum-rail {
+      background: linear-gradient(180deg, #2B0F5E 0%, #240B50 60%, #1E0844 100%);
+    }
+    .rail-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.65);
+      transition: all 0.2s ease;
+    }
+    .rail-icon:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.10);
+    }
+    .rail-icon.active {
+      background: #7B5CFA;
+      color: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(123, 92, 250, 0.55);
+    }
+    .kanban-card {
+      background: #FFFFFF;
+      border: 1px solid #F1F3F9;
+      border-radius: 18px;
+      box-shadow: 0 6px 22px -8px rgba(30, 41, 59, 0.06);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, border-color 0.2s ease;
+      cursor: grab;
+    }
+    .kanban-card:hover {
+      transform: translateY(-2px);
+      border-color: #E0E5F5;
+      box-shadow: 0 14px 28px -10px rgba(108, 76, 246, 0.14);
+    }
+    html.dark .kanban-card {
+      background: #1A2036;
+      border-color: rgba(71, 85, 105, 0.4);
+    }
+    /* Signature Tilted Floating Card in On Going Column */
+    .featured-tilt {
+      transform: rotate(4.2deg);
+      box-shadow: 0 18px 36px -10px rgba(30, 20, 70, 0.14);
+      border-color: #EAE6FF;
+    }
+    .featured-tilt:hover {
+      transform: rotate(0deg) translateY(-2px);
+    }
+    .drop-col-highlight {
+      background: rgba(108, 76, 246, 0.05);
+      border-radius: 18px;
+    }
+    @keyframes ringSweep {
+      from { stroke-dashoffset: 340; }
+    }
+    .ring-anim {
+      animation: ringSweep 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-3">
+
+  <!-- Rounded Project Management App Shell -->
+  <div class="pm-shell max-w-[1520px] mx-auto rounded-[28px] overflow-hidden flex">
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         LEFT DEEP-PLUM ICON SIDEBAR
+    ════════════════════════════════════════════════════════════════════ -->
+    <aside class="plum-rail w-[70px] flex-shrink-0 flex flex-col items-center justify-between py-5 select-none">
+      <div class="flex flex-col items-center gap-6">
+        <!-- 3-Sphere Brand Mark -->
+        <button onclick="returnToPmOverview()" class="w-10 h-10 flex items-center justify-center cursor-pointer" title="Projects Kanban Overview">
+          <svg class="w-7 h-7" viewBox="0 0 32 32">
+            <circle cx="16" cy="9" r="5" fill="#9B7BFF"/>
+            <circle cx="9.5" cy="21" r="5" fill="#7C5CFA"/>
+            <circle cx="22.5" cy="21" r="5" fill="#F59E6C"/>
+          </svg>
+        </button>
+
+        <nav class="flex flex-col items-center gap-3 mt-2">
+          <button data-pm-nav="Projects Kanban" onclick="switchPmNav('Projects Kanban', this)" class="rail-icon active cursor-pointer" title="Projects Kanban">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </button>
+
+          <button data-pm-nav="Team Members" onclick="switchPmNav('Team Members', this)" class="rail-icon cursor-pointer" title="Team Members">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+
+          <button data-pm-nav="Internal Messages" onclick="switchPmNav('Internal Messages', this)" class="rail-icon cursor-pointer" title="Internal Messages">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </button>
+
+          <button data-pm-nav="Sprint Timeline" onclick="switchPmNav('Sprint Timeline', this)" class="rail-icon cursor-pointer" title="Sprint Timeline">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+          </button>
+
+          <button data-pm-nav="Project Docs" onclick="switchPmNav('Project Docs', this)" class="rail-icon cursor-pointer" title="Project Docs">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+          </button>
+
+          <button data-pm-nav="Workspace Settings" onclick="switchPmNav('Workspace Settings', this)" class="rail-icon cursor-pointer" title="Workspace Settings">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+          </button>
+        </nav>
+      </div>
+
+      <button onclick="showPmToast('Workspace state saved for Sullivan')" class="rail-icon cursor-pointer" title="Sign Out">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </aside>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         MAIN BODY: TOPBAR + (KANBAN / TIMELINE BOARD + TEAM PROGRESS PANEL)
+    ════════════════════════════════════════════════════════════════════ -->
+    <div class="flex-1 flex flex-col min-w-0 px-5 py-3.5 space-y-3.5">
+
+      <!-- TOP HEADER -->
+      <header class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4 flex-1 min-w-[220px]">
+          <button onclick="toggleModeQuick()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer" title="Switch Kanban / Timeline">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="18" y2="7"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="17" x2="18" y2="17"/></svg>
+          </button>
+
+          <div class="relative flex-1 max-w-md">
+            <svg class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input
+              id="pmSearchInput"
+              oninput="renderKanban()"
+              type="text"
+              placeholder="Search projects, tags, or tasks..."
+              class="w-full rounded-full bg-white dark:bg-[#181E34] pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-violetBrand/30"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3.5">
+          <button onclick="showPmToast('2 sprint milestones due before Friday')" class="text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer" title="Alerts">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          </button>
+
+          <button onclick="toggleModeQuick()" class="text-slate-400 hover:text-violetBrand cursor-pointer" title="Toggle Sprint Timeline">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+
+          <button onclick="togglePmDark()" class="text-slate-400 hover:text-violetBrand dark:hover:text-white cursor-pointer" title="Toggle Dark / Light Mode" aria-label="Toggle Dark or Light Mode">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+
+          <span class="h-5 w-px bg-slate-200 dark:bg-slate-700"></span>
+
+          <button onclick="cycleSelectedTeam()" class="flex items-center gap-2.5 cursor-pointer">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 via-orange-400 to-indigo-500 text-white text-xs font-bold flex items-center justify-center shadow-sm">
+              SV
+            </div>
+            <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">Sullivan</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- WORKSPACE GRID: LEFT KANBAN/TIMELINE (9 COLS) + RIGHT TEAM STATS (3 COLS) -->
+      <div id="defaultDashboardView" class="flex-1 flex flex-col">
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 flex-1 items-stretch">
+
+        <!-- ══════════════════════════════════════════════════════════════
+             CENTER BOARD CONTAINER (KANBAN + INTERACTIVE TIMELINE VIEW)
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="xl:col-span-9 bg-white dark:bg-[#14192D] rounded-[24px] p-5 shadow-sm flex flex-col justify-between">
+          <!-- Projects Header -->
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3.5">
+            <div class="flex items-center gap-4">
+              <h1 class="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Projects</h1>
+
+              <!-- Kanban / Timeline View Pill Switcher -->
+              <div class="inline-flex rounded-full bg-[#F4F6FB] dark:bg-slate-800 p-0.5 text-xs font-semibold">
+                <button id="tabKanbanBtn" onclick="switchBoardTab('kanban')" class="rounded-full bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 py-1 shadow-sm cursor-pointer">Kanban</button>
+                <button id="tabTimelineBtn" onclick="switchBoardTab('timeline')" class="rounded-full text-slate-500 dark:text-slate-400 px-3 py-1 cursor-pointer">Timeline</button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button onclick="resetTiltDemo()" class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 cursor-pointer" title="Sort by Progress">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="9" cy="8" r="2" fill="currentColor"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="15" cy="16" r="2" fill="currentColor"/></svg>
+              </button>
+
+              <button
+                onclick="openCreateProjectModal('started')"
+                class="rounded-full bg-violetBrand hover:bg-[#5938E8] text-white px-5 py-2 text-xs font-semibold shadow-md shadow-indigo-500/25 transition cursor-pointer"
+              >
+                Create Project
+              </button>
+            </div>
+          </div>
+
+          <!-- KANBAN 3-COLUMN GRID -->
+          <div id="kanbanBoardView" class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+            <!-- Column 1: Started -->
+            <div
+              class="flex flex-col gap-3"
+              ondragover="handleDragOver(event, this)"
+              ondragleave="handleDragLeave(this)"
+              ondrop="handleDrop(event, 'started', this)"
+            >
+              <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Started</span>
+                <button onclick="openCreateProjectModal('started')" class="w-6 h-6 rounded-full bg-[#F2F4FA] dark:bg-slate-800 hover:bg-violetBrand hover:text-white text-slate-500 flex items-center justify-center text-xs font-bold transition cursor-pointer" title="Add to Started">+</button>
+              </div>
+              <div id="col-started" class="space-y-3 flex-1"></div>
+            </div>
+
+            <!-- Column 2: On Going -->
+            <div
+              class="flex flex-col gap-3"
+              ondragover="handleDragOver(event, this)"
+              ondragleave="handleDragLeave(this)"
+              ondrop="handleDrop(event, 'ongoing', this)"
+            >
+              <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-bold text-slate-600 dark:text-slate-300">On Going</span>
+                <button onclick="openCreateProjectModal('ongoing')" class="w-6 h-6 rounded-full bg-[#F2F4FA] dark:bg-slate-800 hover:bg-violetBrand hover:text-white text-slate-500 flex items-center justify-center text-xs font-bold transition cursor-pointer" title="Add to On Going">+</button>
+              </div>
+              <div id="col-ongoing" class="space-y-3 flex-1"></div>
+            </div>
+
+            <!-- Column 3: Completed -->
+            <div
+              class="flex flex-col gap-3"
+              ondragover="handleDragOver(event, this)"
+              ondragleave="handleDragLeave(this)"
+              ondrop="handleDrop(event, 'completed', this)"
+            >
+              <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Completed</span>
+                <button onclick="openCreateProjectModal('completed')" class="w-6 h-6 rounded-full bg-[#F2F4FA] dark:bg-slate-800 hover:bg-violetBrand hover:text-white text-slate-500 flex items-center justify-center text-xs font-bold transition cursor-pointer" title="Add to Completed">+</button>
+              </div>
+              <div id="col-completed" class="space-y-3 flex-1"></div>
+            </div>
+          </div>
+
+          <!-- SPRINT TIMELINE GANTT VIEW (Toggled via Timeline pill or Sidebar Clock) -->
+          <div id="timelineBoardView" class="hidden flex-1 flex-col justify-between py-2">
+            <div class="grid grid-cols-12 text-xs font-semibold text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-2 mb-3">
+              <div class="col-span-3">Deliverable</div>
+              <div class="col-span-9 grid grid-cols-6 text-center">
+                <span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span><span>Week 5</span><span>Week 6</span>
+              </div>
+            </div>
+            <div id="timelineRowsWrap" class="space-y-3.5 my-auto"></div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             RIGHT TEAM PROGRESS & SCHEDULE INSPECTOR (3 COLS)
+        ══════════════════════════════════════════════════════════════ -->
+        <aside class="xl:col-span-3 flex flex-col gap-3.5 justify-between">
+
+          <!-- Top Card: Selected Team + 72% Ring + 2x2 Projects Summary -->
+          <div class="bg-white dark:bg-[#14192D] rounded-[24px] p-4 sm:p-5 shadow-sm flex-1 flex flex-col justify-between">
+            <!-- Selected Team Pill -->
+            <div onclick="cycleSelectedTeam()" class="rounded-2xl bg-[#F5F7FC] dark:bg-slate-800/80 p-3 flex items-center justify-between gap-2 cursor-pointer hover:ring-2 hover:ring-violetBrand/25 transition">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Selected</p>
+                <p id="selectedTeamName" class="font-display text-sm font-extrabold text-slate-800 dark:text-white mt-0.5">Design Team</p>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-[#F98622] text-white flex items-center justify-center shadow-md shadow-orange-500/25 flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              </div>
+            </div>
+
+            <!-- Concentric Soft-Lavender Halo + 72% Progress Arc -->
+            <div class="flex justify-center my-2">
+              <div class="relative w-40 h-40 flex items-center justify-center">
+                <svg viewBox="0 0 160 160" class="w-40 h-40 -rotate-90 overflow-visible">
+                  <!-- Thick Soft Lavender Halo -->
+                  <circle cx="80" cy="80" r="62" fill="none" stroke="#F0ECFF" class="dark:opacity-15" stroke-width="22"/>
+                  <!-- Inner Track -->
+                  <circle cx="80" cy="80" r="52" fill="none" stroke="#E4DEFF" stroke-width="5"/>
+                  <!-- Active Royal Purple Arc -->
+                  <circle
+                    id="teamProgressArc"
+                    class="ring-anim"
+                    cx="80" cy="80" r="52"
+                    fill="none"
+                    stroke="#6C4CF6"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                    stroke-dasharray="235 330"
+                  />
+                </svg>
+                <span id="teamProgressPct" class="absolute font-display text-xl font-extrabold text-slate-900 dark:text-white">72%</span>
+              </div>
+            </div>
+
+            <!-- 2x2 Projects Progress KPI Cards -->
+            <div>
+              <h3 class="font-display text-sm font-bold text-slate-800 dark:text-white mb-2.5">Projects</h3>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="rounded-2xl bg-[#ECF4FF] dark:bg-blue-500/15 p-3">
+                  <p class="text-xs font-semibold uppercase text-slate-400">Total</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="w-1 h-4 rounded-full bg-blue-500"></span>
+                    <span id="kpiTotalProj" class="font-display text-lg font-extrabold text-slate-900 dark:text-white">144</span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-[#FFF1E6] dark:bg-orange-500/15 p-3">
+                  <p class="text-xs font-semibold uppercase text-slate-400">Completed</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="w-1 h-4 rounded-full bg-orange-500"></span>
+                    <span id="kpiCompletedProj" class="font-display text-lg font-extrabold text-slate-900 dark:text-white">56</span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-[#FFEBF5] dark:bg-pink-500/15 p-3">
+                  <p class="text-xs font-semibold uppercase text-slate-400">In Progress</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="w-1 h-4 rounded-full bg-pink-500"></span>
+                    <span id="kpiInProgProj" class="font-display text-lg font-extrabold text-slate-900 dark:text-white">72</span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-[#F2ECFF] dark:bg-purple-500/15 p-3">
+                  <p class="text-xs font-semibold uppercase text-slate-400">Waiting</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="w-1 h-4 rounded-full bg-purple-600"></span>
+                    <span id="kpiWaitingProj" class="font-display text-lg font-extrabold text-slate-900 dark:text-white">24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Card: Timeline Schedule Slot + Internal Messages -->
+          <div class="bg-white dark:bg-[#14192D] rounded-[24px] p-4 shadow-sm space-y-3">
+            <div onclick="showPmToast('Sprint Review: Sunday, 20 December · 08:00–11:00 AM')" class="flex items-center justify-between gap-2.5 cursor-pointer hover:opacity-85 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-[#7B5CFA] text-white flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+                </div>
+                <div class="leading-tight">
+                  <p class="text-xs text-slate-400">Sunday, 20 December</p>
+                  <p class="text-xs font-extrabold text-slate-800 dark:text-white mt-0.5">08:00-11:00 AM</p>
+                </div>
+              </div>
+              <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+
+            <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+              <div onclick="toggleMessagesDrawer()" class="flex items-center justify-between gap-2.5 cursor-pointer hover:opacity-85 transition">
+                <div class="flex items-center gap-3">
+                  <div class="relative w-9 h-9 rounded-xl bg-[#1D7AFC] text-white flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-slate-900"></span>
+                  </div>
+                  <div class="leading-tight">
+                    <p class="text-xs text-slate-400">Declaration centre</p>
+                    <p class="text-xs font-extrabold text-slate-800 dark:text-white mt-0.5">Internal Messages</p>
+                  </div>
+                </div>
+                <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div id="msgPreviewBox" class="hidden mt-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 p-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <strong>Maya:</strong> Updated Figma tokens for Dashboard v2 (90% ready).
+              </div>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+      </div>
+      <div id="tabSubpageView" class="hidden flex-1"></div>
+    </div>
+  </div>
+
+  <!-- Create Project Modal -->
+  <div id="createProjModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/45 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-[#161C32] border border-slate-200 dark:border-slate-700 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white">Create New Project Card</h3>
+        <button onclick="closeCreateProjectModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form onsubmit="submitCreateProject(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Category Badge</label>
+          <select id="projBadgeInput" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-800 dark:text-white">
+            <option value="Web Design|blue">Web Design</option>
+            <option value="Mobile App|orange">Mobile App</option>
+            <option value="Dashboard|violet">Dashboard</option>
+            <option value="App Development|pink">App Development</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Task Summary</label>
+          <input id="projDescInput" required type="text" value="Wireframing, mockups, clients collaboration" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-800 dark:text-white focus:outline-none"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Progress (%)</label>
+            <input id="projPctInput" type="number" min="5" max="100" step="5" value="45" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-800 dark:text-white"/>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 dark:text-slate-300 mb-1">Column</label>
+            <select id="projColInput" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-sm text-slate-800 dark:text-white">
+              <option value="started">Started</option>
+              <option value="ongoing">On Going</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeCreateProjectModal()" class="rounded-full px-4 py-2 font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">Cancel</button>
+          <button type="submit" class="rounded-full bg-violetBrand text-white px-5 py-2 font-semibold cursor-pointer">Add Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="pmToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 rounded-full bg-[#240B50] text-white px-4 py-2 text-xs font-semibold shadow-xl flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-[#9B7BFF]"></span>
+    <span id="pmToastMsg">Board synced</span>
+  </div>
+
+  <script>
+    const PILL_STYLES = {
+      blue: 'bg-[#E6F0FF] text-[#2563EB] dark:bg-blue-500/20 dark:text-blue-300',
+      orange: 'bg-[#FFF0E5] text-[#EA580C] dark:bg-orange-500/20 dark:text-orange-300',
+      violet: 'bg-[#EFEAFF] text-[#6D28D9] dark:bg-purple-500/20 dark:text-purple-300',
+      pink: 'bg-[#FFEAF6] text-[#DB2777] dark:bg-pink-500/20 dark:text-pink-300',
+    };
+
+    const AVATAR_COLORS = [
+      ['#F59E0B', '#EF4444', '#6366F1', '#10B981'],
+      ['#8B5CF6', '#EC4899', '#14B8A6'],
+      ['#0EA5E9', '#F97316', '#6366F1'],
+    ];
+
+    let CARDS = [
+      // Started (3 cards)
+      { id: 'c1', col: 'started', badge: 'Web Design', tone: 'blue', desc: 'Wireframing, mockups, clients collaboration', pct: 50, files: 6, chats: 4, avatars: 0 },
+      { id: 'c2', col: 'started', badge: 'App Development', tone: 'pink', desc: 'Wireframing, mockups, clients collaboration', pct: 60, files: 6, chats: 4, avatars: 1 },
+      { id: 'c3', col: 'started', badge: 'Mobile App', tone: 'orange', desc: 'Wireframing, mockups, clients collaboration', pct: 65, files: 6, chats: 4, avatars: 2 },
+      // On Going (3 cards — middle card c5 has signature tactile drag tilt!)
+      { id: 'c4', col: 'ongoing', badge: 'Mobile App', tone: 'orange', desc: 'Wireframing, mockups, clients collaboration', pct: 30, files: 6, chats: 4, avatars: 1 },
+      { id: 'c5', col: 'ongoing', badge: 'Dashboard', tone: 'violet', desc: 'Wireframing, mockups, clients collaboration', pct: 40, files: 6, chats: 4, avatars: 0, tilted: true },
+      { id: 'c6', col: 'ongoing', badge: 'Web Development', tone: 'blue', desc: 'Wireframing, mockups, clients collaboration', pct: 50, files: 6, chats: 4, avatars: 2 },
+      // Completed (3 cards)
+      { id: 'c7', col: 'completed', badge: 'Dashboard', tone: 'violet', desc: 'Wireframing, mockups, clients collaboration', pct: 90, files: 6, chats: 4, avatars: 1 },
+      { id: 'c8', col: 'completed', badge: 'Landing Page', tone: 'blue', desc: 'Wireframing, mockups, clients collaboration', pct: 70, files: 6, chats: 4, avatars: 2 },
+      { id: 'c9', col: 'completed', badge: 'App Development', tone: 'pink', desc: 'Wireframing, mockups, clients collaboration', pct: 80, files: 6, chats: 4, avatars: 0 },
+    ];
+
+    const TEAMS = [
+      { name: 'Design Team', pct: 72, total: 144, comp: 56, prog: 72, wait: 24 },
+      { name: 'Frontend Squad', pct: 84, total: 118, comp: 68, prog: 38, wait: 12 },
+      { name: 'Mobile Core', pct: 65, total: 96, comp: 41, prog: 39, wait: 16 },
+    ];
+    let teamIdx = 0;
+    let draggedCardId = null;
+
+    function renderAvatarStack(setIdx) {
+      const palette = AVATAR_COLORS[setIdx % AVATAR_COLORS.length];
+      const names = ['AL', 'MK', 'SR', 'JD'];
+      return palette
+        .map(
+          (bg, i) => `
+          <span class="w-5 h-5 rounded-full text-[12px] font-bold text-white flex items-center justify-center ring-2 ring-white dark:ring-slate-800 ${i > 0 ? '-ml-1.5' : ''}" style="background:${bg}; font-size:12px;">
+            ${names[i].slice(0, 1)}
+          </span>
+        `
+        )
+        .join('');
+    }
+
+    function renderCardHtml(c) {
+      const pillCls = PILL_STYLES[c.tone] || PILL_STYLES.blue;
+      const innerCard = `
+        <article
+          draggable="true"
+          ondragstart="handleDragStart(event, '${c.id}')"
+          onclick="bumpCardProgress('${c.id}')"
+          class="kanban-card p-3.5 ${c.tilted ? 'featured-tilt' : ''}"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ${pillCls}">${c.badge}</span>
+            <span class="text-slate-300 hover:text-slate-500">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg>
+            </span>
+          </div>
+
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-2.5 line-clamp-2">
+            ${c.desc}
+          </p>
+
+          <div class="mt-2.5">
+            <div class="flex justify-end text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+              <span>${c.pct}%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-[#ECEEF6] dark:bg-slate-700 overflow-hidden">
+              <div class="h-full rounded-full bg-violetBrand transition-all duration-500" style="width:${c.pct}%"></div>
+            </div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between">
+            <div class="flex items-center">
+              ${renderAvatarStack(c.avatars)}
+            </div>
+            <div class="flex items-center gap-2.5 text-xs text-slate-400 font-medium">
+              <span class="inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                ${c.files}
+              </span>
+              <span class="inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                ${c.chats}
+              </span>
+            </div>
+          </div>
+        </article>
+      `;
+
+      // Dashed drop-slot behind tilted card matching reference screenshot
+      if (c.tilted) {
+        return `
+          <div class="rounded-[18px] border-2 border-dashed border-slate-200 dark:border-slate-700 p-0.5">
+            ${innerCard}
+          </div>
+        `;
+      }
+      return innerCard;
+    }
+
+    function renderKanban() {
+      const q = document.getElementById('pmSearchInput').value.trim().toLowerCase();
+      ['started', 'ongoing', 'completed'].forEach((colKey) => {
+        const container = document.getElementById(`col-${colKey}`);
+        const list = CARDS.filter(
+          (c) =>
+            c.col === colKey &&
+            (!q || c.badge.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q))
+        );
+        container.innerHTML = list.map(renderCardHtml).join('');
+      });
+      renderTimelineRows();
+    }
+
+    function renderTimelineRows() {
+      const wrap = document.getElementById('timelineRowsWrap');
+      const barColors = {
+        blue: 'bg-blue-500',
+        orange: 'bg-orange-500',
+        violet: 'bg-violetBrand',
+        pink: 'bg-pink-500',
+      };
+      wrap.innerHTML = CARDS.slice(0, 6)
+        .map((c, idx) => {
+          const leftPct = (idx * 11) % 45;
+          const widthPct = Math.max(28, Math.min(55, c.pct * 0.65));
+          return `
+            <div class="grid grid-cols-12 items-center gap-3 text-xs">
+              <div class="col-span-3 font-semibold text-slate-700 dark:text-slate-200 truncate">${c.badge} · ${c.pct}%</div>
+              <div class="col-span-9 h-7 rounded-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden p-1">
+                <div class="h-5 rounded-full ${barColors[c.tone]} text-white text-xs font-bold px-3 flex items-center justify-between shadow-sm" style="margin-left:${leftPct}%; width:${widthPct}%">
+                  <span class="truncate">${c.col.toUpperCase()}</span>
+                  <span>${c.pct}%</span>
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function handleDragStart(e, cardId) {
+      draggedCardId = cardId;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e, colEl) {
+      e.preventDefault();
+      colEl.classList.add('drop-col-highlight');
+    }
+
+    function handleDragLeave(colEl) {
+      colEl.classList.remove('drop-col-highlight');
+    }
+
+    function handleDrop(e, targetCol, colEl) {
+      e.preventDefault();
+      colEl.classList.remove('drop-col-highlight');
+      const card = CARDS.find((c) => c.id === draggedCardId);
+      if (!card) return;
+      card.col = targetCol;
+      card.tilted = false;
+      if (targetCol === 'completed') card.pct = 100;
+      renderKanban();
+      recalcSummaryFromBoard();
+      showPmToast(`Moved "${card.badge}" to ${targetCol.toUpperCase()}`);
+    }
+
+    function bumpCardProgress(cardId) {
+      const card = CARDS.find((c) => c.id === cardId);
+      if (!card) return;
+      card.tilted = false;
+      card.pct = card.pct >= 100 ? 35 : Math.min(100, card.pct + 10);
+      renderKanban();
+      recalcSummaryFromBoard();
+      showPmToast(`${card.badge} progress → ${card.pct}%`);
+    }
+
+    function recalcSummaryFromBoard() {
+      const avg = Math.round(CARDS.reduce((s, c) => s + c.pct, 0) / CARDS.length);
+      updateRingGauge(avg);
+    }
+
+    function updateRingGauge(pct) {
+      const circum = 2 * Math.PI * 52;
+      const arcLen = (pct / 100) * circum;
+      document.getElementById('teamProgressArc').setAttribute('stroke-dasharray', `${arcLen.toFixed(1)} ${circum.toFixed(1)}`);
+      document.getElementById('teamProgressPct').textContent = `${pct}%`;
+    }
+
+    function cycleSelectedTeam() {
+      teamIdx = (teamIdx + 1) % TEAMS.length;
+      const t = TEAMS[teamIdx];
+      document.getElementById('selectedTeamName').textContent = t.name;
+      document.getElementById('kpiTotalProj').textContent = t.total;
+      document.getElementById('kpiCompletedProj').textContent = t.comp;
+      document.getElementById('kpiInProgProj').textContent = t.prog;
+      document.getElementById('kpiWaitingProj').textContent = t.wait;
+      updateRingGauge(t.pct);
+      showPmToast(`Selected Squad: ${t.name} (${t.pct}%)`);
+    }
+
+    function switchBoardTab(mode) {
+      const kb = document.getElementById('kanbanBoardView');
+      const tl = document.getElementById('timelineBoardView');
+      const bKb = document.getElementById('tabKanbanBtn');
+      const bTl = document.getElementById('tabTimelineBtn');
+      if (mode === 'timeline') {
+        kb.classList.add('hidden');
+        tl.classList.remove('hidden');
+        tl.classList.add('flex');
+        bTl.className = 'rounded-full bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 py-1 shadow-sm cursor-pointer';
+        bKb.className = 'rounded-full text-slate-500 dark:text-slate-400 px-3 py-1 cursor-pointer';
+      } else {
+        tl.classList.add('hidden');
+        tl.classList.remove('flex');
+        kb.classList.remove('hidden');
+        bKb.className = 'rounded-full bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 py-1 shadow-sm cursor-pointer';
+        bTl.className = 'rounded-full text-slate-500 dark:text-slate-400 px-3 py-1 cursor-pointer';
+      }
+    }
+
+    const PM_SUBPAGES = {
+      'Team Members': {
+        title: 'Team Members & Squad Capacity',
+        subtitle: 'Cross-functional bandwidth across Design, Frontend, and Mobile squads',
+        badge: '18 Active Builders',
+        ctaLabel: 'Invite Squad Member',
+        ctaAction: "showPmToast('Invitation link copied for Sullivan PM Workspace')",
+        kpis: [
+          { label: 'Active Squad Members', val: '18', pill: '3 Squads', tone: 'blue', sub: '100% sprint check-in' },
+          { label: 'Sprint 24 Velocity', val: '94 pts', pill: '+12% QoQ', tone: 'violet', sub: '82 pts committed' },
+          { label: 'Avg Bandwidth Load', val: '78%', pill: 'Balanced', tone: 'orange', sub: 'Zero burnout alerts' },
+          { label: 'On-Time Milestone Rate', val: '96.2%', pill: 'Top 5%', tone: 'pink', sub: 'Across 144 deliverables' }
+        ],
+        visualTitle: 'Squad Capacity Allocation',
+        visualSub: 'Story-point utilization across active engineering & product pods',
+        bars: [
+          { label: 'Design Systems & UI Pod', val: '82% allocated', pct: 82, color: 'bg-violetBrand', detail: '6 designers · 34 pts' },
+          { label: 'Frontend Web Core', val: '88% allocated', pct: 88, color: 'bg-blue-500', detail: '5 engineers · 31 pts' },
+          { label: 'iOS & Android Mobile Core', val: '71% allocated', pct: 71, color: 'bg-orange-500', detail: '4 engineers · 19 pts' },
+          { label: 'QA & Release Automation', val: '64% allocated', pct: 64, color: 'bg-pink-500', detail: '3 specialists · 10 pts' }
+        ],
+        tableTitle: 'Squad Roster & Active Assignments',
+        columns: ['Builder', 'Squad Role', 'Active Cards', 'Capacity', 'Action'],
+        rows: [
+          { c1: 'Maya Lin', c2: 'Lead Product Designer', c3: '4 cards · 18 pts', c4: '85%', tone: 'violet', btn: 'Assign Card' },
+          { c1: 'Alex Rivera', c2: 'Staff Frontend Architect', c3: '5 cards · 21 pts', c4: '90%', tone: 'blue', btn: 'Assign Card' },
+          { c1: 'Sora Takahashi', c2: 'Design Tokens Lead', c3: '3 cards · 14 pts', c4: '75%', tone: 'pink', btn: 'Assign Card' },
+          { c1: 'Jordan Vance', c2: 'Mobile Core Lead', c3: '3 cards · 16 pts', c4: '70%', tone: 'orange', btn: 'Assign Card' },
+          { c1: 'Elena Rostova', c2: 'QA Release Engineer', c3: '4 cards · 12 pts', c4: '65%', tone: 'blue', btn: 'Assign Card' }
+        ]
+      },
+      'Internal Messages': {
+        title: 'Internal Messages & Design Critiques',
+        subtitle: 'Async declaration centre threads, blocker escalations, and client review notes',
+        badge: '4 Unread Mentions',
+        ctaLabel: 'Post Update',
+        ctaAction: "showPmToast('Broadcast posted to #sprint-24-general')",
+        kpis: [
+          { label: 'Unread Mentions', val: '4', pill: '2 Priority', tone: 'violet', sub: 'In #design-tokens & #qa' },
+          { label: 'Active Project Channels', val: '9', pill: 'Synced', tone: 'blue', sub: 'Linked to Kanban cards' },
+          { label: 'Median Async Reply', val: '11m', pill: '-4m WoW', tone: 'orange', sub: 'Across EU & US timezones' },
+          { label: 'Resolved Blockers', val: '27', pill: 'Sprint 24', tone: 'pink', sub: '100% SLA resolution' }
+        ],
+        visualTitle: 'Channel Thread Volume (7d)',
+        visualSub: 'Message distribution across core Sullivan PM rooms',
+        bars: [
+          { label: '#sprint-24-shiproom', val: '64 threads', pct: 90, color: 'bg-violetBrand', detail: 'Release cutover coordination' },
+          { label: '#design-tokens-v2', val: '48 threads', pct: 74, color: 'bg-pink-500', detail: 'Figma variable handoff' },
+          { label: '#mobile-offline-sync', val: '35 threads', pct: 56, color: 'bg-orange-500', detail: 'SQLite queue benchmarks' },
+          { label: '#client-stakeholder-qa', val: '22 threads', pct: 38, color: 'bg-blue-500', detail: 'UAT sign-off approvals' }
+        ],
+        tableTitle: 'Declaration Centre Priority Threads',
+        columns: ['Sender', 'Channel & Topic', 'Timestamp', 'Status', 'Action'],
+        rows: [
+          { c1: 'Maya Lin', c2: '#design-tokens · Updated Dashboard v2 dark elevation tokens', c3: '6m ago', c4: 'Unread', tone: 'violet', btn: 'Acknowledge' },
+          { c1: 'Alex Rivera', c2: '#sprint-24 · WebSocket drag-sync PR #418 green on CI', c3: '24m ago', c4: 'Unread', tone: 'blue', btn: 'Acknowledge' },
+          { c1: 'Jordan Vance', c2: '#mobile-sync · iOS TestFlight build 4.8.2 uploaded', c3: '1h ago', c4: 'Reviewed', tone: 'orange', btn: 'Send Reply' },
+          { c1: 'Sora Takahashi', c2: '#client-qa · Client approved Landing Page hero motion', c3: '3h ago', c4: 'Signed Off', tone: 'pink', btn: 'Send Reply' },
+          { c1: 'Elena Rostova', c2: '#sprint-24 · Zero P1 regressions on Safari + Firefox matrix', c3: '5h ago', c4: 'Verified', tone: 'blue', btn: 'Send Reply' }
+        ]
+      },
+      'Sprint Timeline': {
+        title: 'Sprint 24 Master Timeline & Roadmap',
+        subtitle: '6-week critical path schedule, milestone dependencies, and burndown velocity',
+        badge: 'Week 4 of 6 · On Track',
+        ctaLabel: 'Add Milestone Card',
+        ctaAction: "openCreateProjectModal('ongoing')",
+        kpis: [
+          { label: 'Overall Sprint Progress', val: '72%', pill: '+8% WoW', tone: 'violet', sub: 'Ahead of ideal burndown' },
+          { label: 'Deliverables Shipped', val: '8 / 11', pill: '3 Remaining', tone: 'blue', sub: 'Zero slipped epics' },
+          { label: 'Dependency Risks', val: '1 Low', pill: 'Mitigated', tone: 'orange', sub: 'OAuth sandbox approved' },
+          { label: 'Release Countdown', val: '9 Days', pill: 'Dec 20', tone: 'pink', sub: 'Sunday 08:00 AM review' }
+        ],
+        visualTitle: '6-Week Critical Path Gantt',
+        visualSub: 'Click any roadmap bar to inspect milestone readiness',
+        bars: [
+          { label: 'W1–W2 · Design System Foundations', val: '100%', pct: 100, color: 'bg-violetBrand', detail: 'Completed ahead of gate' },
+          { label: 'W2–W4 · Interactive Kanban & Drag Engine', val: '90%', pct: 90, color: 'bg-blue-500', detail: 'In final QA polish' },
+          { label: 'W3–W5 · Mobile App Offline Queue', val: '65%', pct: 65, color: 'bg-orange-500', detail: 'TestFlight beta active' },
+          { label: 'W5–W6 · Client Portal & GA Cutover', val: '40%', pct: 40, color: 'bg-pink-500', detail: 'Scheduled next Monday' }
+        ],
+        tableTitle: 'Upcoming Milestone Gates',
+        columns: ['Milestone', 'Owner Squad', 'Target Date', 'Readiness', 'Action'],
+        rows: [
+          { c1: 'Dashboard v2 Token Freeze', c2: 'Design Team', c3: '12 Dec', c4: '95% Ready', tone: 'violet', btn: 'Verify Gate' },
+          { c1: 'Kanban Realtime Sync API', c2: 'Frontend Squad', c3: '14 Dec', c4: '88% Ready', tone: 'blue', btn: 'Verify Gate' },
+          { c1: 'Mobile Push Notification SDK', c2: 'Mobile Core', c3: '16 Dec', c4: '70% Ready', tone: 'orange', btn: 'Nudge Owner' },
+          { c1: 'Accessibility WCAG AA Audit', c2: 'QA Ops', c3: '18 Dec', c4: '80% Ready', tone: 'pink', btn: 'Verify Gate' },
+          { c1: 'Sprint 24 Executive Demo', c2: 'All Squads', c3: '20 Dec', c4: 'Scheduled', tone: 'violet', btn: 'Copy Invite' }
+        ]
+      },
+      'Project Docs': {
+        title: 'Project Docs, PRDs & Specs',
+        subtitle: 'Living product requirements, architecture RFCs, and Figma handoff checklists',
+        badge: '32 Verified Docs',
+        ctaLabel: 'Export Burndown PDF',
+        ctaAction: "showPmToast('Exported Sullivan_Sprint24_Specs_Bundle.pdf')",
+        kpis: [
+          { label: 'Published PRDs', val: '14', pill: 'v4.8 Cycle', tone: 'violet', sub: '100% linked to epics' },
+          { label: 'Engineering RFCs', val: '11', pill: '9 Approved', tone: 'blue', sub: '2 in architecture review' },
+          { label: 'Design Token Guides', val: '7', pill: 'Figma Sync', tone: 'pink', sub: 'Auto-updated tokens' },
+          { label: 'Stakeholder Sign-Off', val: '91%', pill: '+6% QoQ', tone: 'orange', sub: 'Zero unreviewed specs' }
+        ],
+        visualTitle: 'Documentation Coverage by Stage',
+        visualSub: 'Specification completeness across active Sullivan product streams',
+        bars: [
+          { label: 'Approved & In Engineering', val: '22 docs', pct: 86, color: 'bg-violetBrand', detail: 'Locked for Sprint 24' },
+          { label: 'Client & PM Review', val: '7 docs', pct: 52, color: 'bg-blue-500', detail: 'Awaiting final comment' },
+          { label: 'Q1 Discovery Drafts', val: '3 docs', pct: 28, color: 'bg-orange-500', detail: 'Backlog grooming' }
+        ],
+        tableTitle: 'Recent Workspace Specifications',
+        columns: ['Doc ID & Title', 'Author', 'Last Edited', 'Spec Status', 'Action'],
+        rows: [
+          { c1: 'PRD-104 · Sullivan Kanban v5 Drag UX', c2: 'Maya Lin', c3: '18m ago', c4: 'Approved', tone: 'violet', btn: 'Open Doc' },
+          { c1: 'RFC-089 · Optimistic State & Conflict CRDT', c2: 'Alex Rivera', c3: '2h ago', c4: 'Approved', tone: 'blue', btn: 'Open Doc' },
+          { c1: 'UI-202 · Plum & Dark Lavender Palette Spec', c2: 'Sora Takahashi', c3: 'Yesterday', c4: 'Synced', tone: 'pink', btn: 'Open Doc' },
+          { c1: 'PRD-108 · External Client Guest View', c2: 'Jordan Vance', c3: '2d ago', c4: 'In Review', tone: 'orange', btn: 'Approve Spec' },
+          { c1: 'QA-041 · Release Regression Matrix', c2: 'Elena Rostova', c3: '3d ago', c4: 'Approved', tone: 'blue', btn: 'Open Doc' }
+        ]
+      },
+      'Workspace Settings': {
+        title: 'Workspace Settings & Board Rules',
+        subtitle: 'Configure Kanban workflow automations, sprint notifications, integrations, and theme',
+        badge: 'Sullivan Enterprise',
+        ctaLabel: 'Save Workspace Rules',
+        ctaAction: "showPmToast('Workspace automation preferences saved')",
+        kpis: [
+          { label: 'Sprint Cadence', val: '2 Weeks', pill: 'Mon–Fri', tone: 'violet', sub: 'Auto-rollover enabled' },
+          { label: 'Connected Apps', val: '3 Active', pill: 'Healthy', tone: 'blue', sub: 'Figma · GitHub · Slack' },
+          { label: 'Seat Utilization', val: '18 / 25', pill: '7 Open', tone: 'orange', sub: 'SOC2 SSO enforced' }
+        ],
+        visualTitle: 'Integration Sync Telemetry',
+        visualSub: 'Live webhook status across connected product & code tools',
+        bars: [
+          { label: 'GitHub PR -> Kanban Column Sync', val: '99.98%', pct: 98, color: 'bg-violetBrand', detail: 'Auto-moves merged PRs' },
+          { label: 'Figma Component Preview Embeds', val: '100%', pct: 100, color: 'bg-pink-500', detail: 'Synced 2 mins ago' },
+          { label: 'Slack #sprint-24 Digest Bot', val: '09:00 AM', pct: 90, color: 'bg-blue-500', detail: 'Daily standup summary' }
+        ],
+        tableTitle: 'Board Automation & Theme Preferences',
+        toggles: [
+          { title: 'Auto-set Progress to 100% in Completed Column', desc: 'Automatically marks card progress bar complete when dropped into Completed', on: true },
+          { title: 'GitHub Pull Request Status Sync', desc: 'Moves linked task card to On Going when branch PR is opened', on: true },
+          { title: 'Slack Blocker Escalation Ping', desc: 'Notifies Squad Lead if a high-priority card stalls for >48 hours', on: true },
+          { title: 'External Client Read-Only Timeline Link', desc: 'Allows stakeholders to view Gantt roadmap without editing cards', on: false },
+          { title: 'Dark Plum Workspace Theme', desc: 'Switch between Light Lavender shell and Dark Plum midnight canvas', isDarkToggle: true }
+        ]
+      }
+    };
+
+    function togglePmSubSetting(idx) {
+      const t = PM_SUBPAGES['Workspace Settings'].toggles[idx];
+      if (!t) return;
+      if (t.isDarkToggle) {
+        togglePmDark();
+        renderPmSubpage('Workspace Settings');
+        return;
+      }
+      t.on = !t.on;
+      renderPmSubpage('Workspace Settings');
+      showPmToast(`${t.title}: ${t.on ? 'Enabled' : 'Disabled'}`);
+    }
+
+    function renderPmSubpage(navKey) {
+      const data = PM_SUBPAGES[navKey];
+      const container = document.getElementById('tabSubpageView');
+      if (!data || !container) return;
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const kpiCols = data.kpis.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 xl:grid-cols-4';
+
+      const kpiHtml = data.kpis.map((k) => {
+        const pillCls = PILL_STYLES[k.tone] || PILL_STYLES.violet;
+        return `
+          <div class="kanban-card cursor-default p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">${k.label}</span>
+              <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ${pillCls}">${k.pill}</span>
+            </div>
+            <p class="font-display text-2xl font-extrabold text-slate-900 dark:text-white mt-2.5">${k.val}</p>
+            <p class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">${k.sub}</p>
+          </div>
+        `;
+      }).join('');
+
+      const barsHtml = data.bars.map((b) => `
+        <div onclick="showPmToast('${b.label}: ${b.val} (${b.detail})')" class="kanban-card cursor-pointer p-3.5">
+          <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+            <span class="font-bold text-slate-800 dark:text-white">${b.label}</span>
+            <span class="font-semibold text-violetBrand dark:text-purple-300">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-[#ECEEF6] dark:bg-slate-700 overflow-hidden">
+            <div class="h-full rounded-full ${b.color} transition-all duration-500" style="width:${b.pct}%"></div>
+          </div>
+          <p class="text-xs text-slate-400 mt-1.5">${b.detail}</p>
+        </div>
+      `).join('');
+
+      let rightHtml = '';
+      if (data.toggles) {
+        rightHtml = `
+          <div class="space-y-2.5">
+            ${data.toggles.map((t, idx) => {
+              const activeState = t.isDarkToggle ? isDark : t.on;
+              return `
+                <div onclick="togglePmSubSetting(${idx})" class="kanban-card cursor-pointer p-3.5 flex items-center justify-between gap-4">
+                  <div class="min-w-0">
+                    <p class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">${t.title}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${t.desc}</p>
+                  </div>
+                  <button type="button" aria-pressed="${activeState}" class="w-11 h-6 rounded-full p-0.5 flex items-center flex-shrink-0 transition ${activeState ? 'bg-violetBrand justify-end' : 'bg-slate-300 dark:bg-slate-600 justify-start'}">
+                    <span class="w-5 h-5 rounded-full bg-white shadow-sm"></span>
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        rightHtml = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-400">
+                  <th class="pb-2.5 pr-2">${data.columns[0]}</th>
+                  <th class="pb-2.5 px-2">${data.columns[1]}</th>
+                  <th class="pb-2.5 px-2">${data.columns[2]}</th>
+                  <th class="pb-2.5 px-2">${data.columns[3]}</th>
+                  <th class="pb-2.5 pl-2 text-right">${data.columns[4]}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                ${data.rows.map((r) => {
+                  const pillCls = PILL_STYLES[r.tone] || PILL_STYLES.violet;
+                  return `
+                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                      <td class="py-3 pr-2 font-bold text-slate-800 dark:text-white">${r.c1}</td>
+                      <td class="py-3 px-2 text-slate-600 dark:text-slate-300">${r.c2}</td>
+                      <td class="py-3 px-2 text-slate-500 dark:text-slate-400 font-medium">${r.c3}</td>
+                      <td class="py-3 px-2"><span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ${pillCls}">${r.c4}</span></td>
+                      <td class="py-3 pl-2 text-right">
+                        <button onclick="showPmToast('${r.btn}: ${r.c1}')" class="rounded-full bg-[#F4F6FB] dark:bg-slate-800 hover:bg-violetBrand hover:text-white text-slate-700 dark:text-slate-200 px-3 py-1 text-xs font-semibold transition cursor-pointer">
+                          ${r.btn}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="w-full space-y-4">
+          <!-- Sub-page Header -->
+          <div class="bg-white dark:bg-[#14192D] rounded-[24px] p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button onclick="returnToPmOverview()" class="inline-flex items-center gap-1.5 rounded-full bg-[#F4F6FB] dark:bg-slate-800 hover:bg-violetBrand hover:text-white text-slate-700 dark:text-slate-200 px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Overview</span>
+                </button>
+                <span class="rounded-full bg-[#EFEAFF] text-[#6D28D9] dark:bg-purple-500/20 dark:text-purple-300 px-3 py-1 text-xs font-semibold">${data.badge}</span>
+              </div>
+              <h1 class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight pt-0.5">${data.title}</h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400">${data.subtitle}</p>
+            </div>
+            <button onclick="${data.ctaAction}" class="inline-flex items-center gap-1.5 rounded-full bg-violetBrand hover:bg-[#5938E8] text-white px-5 py-2 text-xs font-semibold shadow-md shadow-indigo-500/25 transition cursor-pointer">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>${data.ctaLabel}</span>
+            </button>
+          </div>
+
+          <!-- KPI Row -->
+          <div class="grid grid-cols-1 ${kpiCols} gap-3.5">
+            ${kpiHtml}
+          </div>
+
+          <!-- Visual Block + Interactive Table / Toggles -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-stretch">
+            <section class="xl:col-span-5 bg-white dark:bg-[#14192D] rounded-[24px] p-5 shadow-sm flex flex-col justify-between">
+              <div class="mb-3">
+                <h2 class="font-display text-base font-bold text-slate-900 dark:text-white">${data.visualTitle}</h2>
+                <p class="text-xs text-slate-400 mt-0.5">${data.visualSub}</p>
+              </div>
+              <div class="space-y-3 my-auto">
+                ${barsHtml}
+              </div>
+            </section>
+
+            <section class="xl:col-span-7 bg-white dark:bg-[#14192D] rounded-[24px] p-5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="font-display text-base font-bold text-slate-900 dark:text-white">${data.tableTitle}</h2>
+                  <p class="text-xs text-slate-400 mt-0.5">Synced with Sullivan PM Sprint 24 workspace</p>
+                </div>
+                <span class="rounded-full bg-[#F4F6FB] dark:bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Live</span>
+              </div>
+              ${rightHtml}
+            </section>
+          </div>
+        </div>
+      `;
+    }
+
+    function returnToPmOverview(silent = false) {
+      document.querySelectorAll('aside nav .rail-icon').forEach((b) => {
+        b.classList.toggle('active', b.dataset.pmNav === 'Projects Kanban');
+      });
+      const sub = document.getElementById('tabSubpageView');
+      sub.classList.add('hidden');
+      sub.classList.remove('flex');
+      document.getElementById('defaultDashboardView').classList.remove('hidden');
+      if (!silent) showPmToast('Returned to Projects Kanban Overview');
+    }
+
+    function switchPmNav(navKey, btn) {
+      document.querySelectorAll('aside nav .rail-icon').forEach((b) => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (navKey === 'Projects Kanban') {
+        returnToPmOverview(true);
+        switchBoardTab('kanban');
+        showPmToast('Projects Kanban Board');
+      } else {
+        document.getElementById('defaultDashboardView').classList.add('hidden');
+        const sub = document.getElementById('tabSubpageView');
+        sub.classList.remove('hidden');
+        sub.classList.add('flex');
+        renderPmSubpage(navKey);
+        showPmToast(`Opened ${navKey}`);
+      }
+    }
+
+    function setWorkspaceMode(mode, btn) {
+      returnToPmOverview(true);
+      switchBoardTab(mode);
+    }
+
+    function toggleModeQuick() {
+      const sub = document.getElementById('tabSubpageView');
+      if (sub && !sub.classList.contains('hidden')) {
+        returnToPmOverview(true);
+      }
+      const isHidden = document.getElementById('timelineBoardView').classList.contains('hidden');
+      switchBoardTab(isHidden ? 'timeline' : 'kanban');
+    }
+
+    function resetTiltDemo() {
+      CARDS.sort((a, b) => b.pct - a.pct);
+      renderKanban();
+      showPmToast('Sorted Kanban columns by completion %');
+    }
+
+    function toggleMessagesDrawer() {
+      document.getElementById('msgPreviewBox').classList.toggle('hidden');
+    }
+
+    function openCreateProjectModal(defaultCol) {
+      document.getElementById('projColInput').value = defaultCol || 'started';
+      const m = document.getElementById('createProjModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeCreateProjectModal() {
+      const m = document.getElementById('createProjModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function submitCreateProject(e) {
+      e.preventDefault();
+      const [badge, tone] = document.getElementById('projBadgeInput').value.split('|');
+      const desc = document.getElementById('projDescInput').value.trim();
+      const pct = Number(document.getElementById('projPctInput').value) || 45;
+      const col = document.getElementById('projColInput').value;
+
+      CARDS.unshift({
+        id: 'c' + Date.now(),
+        col,
+        badge,
+        tone,
+        desc,
+        pct,
+        files: 3,
+        chats: 2,
+        avatars: 0,
+      });
+
+      const currTotal = Number(document.getElementById('kpiTotalProj').textContent) + 1;
+      document.getElementById('kpiTotalProj').textContent = currTotal;
+      renderKanban();
+      closeCreateProjectModal();
+      showPmToast(`Created "${badge}" in ${col.toUpperCase()}`);
+    }
+
+    function togglePmDark() {
+      document.documentElement.classList.toggle('dark');
+      const dark = document.documentElement.classList.contains('dark');
+      const activeBtn = document.querySelector('aside nav .rail-icon.active');
+      if (activeBtn && activeBtn.dataset.pmNav === 'Workspace Settings') {
+        renderPmSubpage('Workspace Settings');
+      }
+      showPmToast(dark ? 'Dark Plum Workspace enabled' : 'Light Lavender Workspace enabled');
+    }
+
+    let pmTimer = null;
+    function showPmToast(msg) {
+      const el = document.getElementById('pmToast');
+      document.getElementById('pmToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(pmTimer);
+      pmTimer = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+      }, 2500);
+    }
+
+    // Initial Render
+    renderKanban();
+  </script>
+</body>
+</html>

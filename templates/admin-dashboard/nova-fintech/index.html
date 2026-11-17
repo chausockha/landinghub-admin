@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QUANTUM VAULT — Autonomous Corporate Treasury &amp; Multi-Currency Liquidity OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            velvet: '#070A12',
+            chalk: '#F8FAFC',
+            slateMuted: '#94A3B8',
+            sapphire: '#3B82F6',
+            emeraldInst: '#10B981',
+            liquidGold: '#F59E0B',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #070A12;
+      color: #F8FAFC;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 68% 52% at 14% 6%, rgba(37, 99, 235, 0.14), transparent 70%),
+        radial-gradient(ellipse 58% 48% at 88% 12%, rgba(16, 185, 129, 0.10), transparent 68%),
+        radial-gradient(ellipse 50% 45% at 52% 96%, rgba(37, 99, 235, 0.09), transparent 72%);
+      background-attachment: fixed;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .smoked-glass {
+      background: rgba(17, 24, 39, 0.74);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow: 0 24px 54px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .smoked-glass:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+    .smoked-sidebar {
+      background: rgba(11, 15, 26, 0.84);
+      backdrop-filter: blur(28px) saturate(165%);
+      -webkit-backdrop-filter: blur(28px) saturate(165%);
+      border-right: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 16px 0 48px -12px rgba(0, 0, 0, 0.7);
+    }
+    .smoked-topbar {
+      background: rgba(7, 10, 18, 0.78);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .titanium-card-wrap {
+      perspective: 1100px;
+    }
+    .titanium-card {
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      background:
+        linear-gradient(135deg, rgba(38, 46, 66, 0.92) 0%, rgba(15, 20, 32, 0.96) 52%, rgba(9, 13, 22, 0.98) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow:
+        0 28px 60px -12px rgba(0, 0, 0, 0.82),
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        inset 0 1px 1px rgba(255, 255, 255, 0.28);
+      overflow: hidden;
+    }
+    .titanium-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.015) 0px,
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+    }
+    .titanium-glare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle 220px at var(--mx, 70%) var(--my, 25%), rgba(255, 255, 255, 0.18), transparent 70%);
+      mix-blend-mode: screen;
+      transition: opacity 0.2s ease;
+    }
+    @keyframes flowDash {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+    .flow-stream-line {
+      stroke-dasharray: 6 6;
+      animation: flowDash 1.6s linear infinite;
+    }
+    .flow-node-btn {
+      transition: all 0.22s ease;
+    }
+    .flow-node-btn.active {
+      border-color: rgba(59, 130, 246, 0.65);
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.88) 0%, rgba(17, 24, 39, 0.95) 100%);
+      box-shadow: 0 16px 36px -10px rgba(37, 99, 235, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .sidebar-collapsed .sidebar-text {
+      display: none;
+    }
+    .sidebar-collapsed .sidebar-brand-wrap {
+      justify-content: center;
+    }
+    .sidebar-collapsed .nav-item-btn {
+      justify-content: center;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070A12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.24);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex text-chalk selection:bg-sapphire/30 selection:text-white">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+  <!-- Collapsible Smoked-Glass Sidebar -->
+  <aside id="sidebar" class="smoked-sidebar fixed lg:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 flex flex-col justify-between transition-all duration-300 -translate-x-full lg:translate-x-0">
+    <div>
+      <!-- Brand Header -->
+      <div class="h-16 px-4 flex items-center justify-between border-b border-white/10 sidebar-brand-wrap">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sapphire/30 via-sapphire/10 to-emeraldInst/30 border border-white/20 flex items-center justify-center shrink-0 shadow-lg shadow-sapphire/15">
+            <svg class="w-5 h-5 text-chalk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+              <circle cx="12" cy="12" r="3.2"></circle>
+              <path d="M12 2v6.8M21 7l-6 3.4M21 17l-6-3.4M12 22v-6.8M3 17l6-3.4M3 7l6 3.4"></path>
+            </svg>
+          </div>
+          <div class="sidebar-text truncate">
+            <div class="font-display font-bold tracking-tight text-sm text-chalk leading-none">QUANTUM VAULT</div>
+            <div class="font-mono text-xs text-slateMuted tracking-widest uppercase mt-1">Liquidity OS v4.8</div>
+          </div>
+        </div>
+        <button id="collapseBtn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar" class="hidden lg:flex w-7 h-7 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] items-center justify-center text-slateMuted hover:text-chalk transition">
+          <svg id="collapseIcon" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="p-3 space-y-1">
+        <div class="sidebar-text px-3 pt-2 pb-1.5 text-xs font-mono uppercase tracking-widest text-slateMuted/75">Institutional Desk</div>
+
+        <button data-nav="Treasury Overview" onclick="selectNav(this, 'Treasury Overview')" class="nav-item-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-sapphire/20 to-emeraldInst/10 text-chalk border border-sapphire/35 shadow-sm transition">
+          <svg class="w-4 h-4 text-sapphire shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+          </svg>
+          <span class="sidebar-text truncate">Treasury Overview</span>
+        </button>
+
+        <button data-nav="FX Liquidity" onclick="selectNav(this, 'FX Liquidity')" class="nav-item-btn w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slateMuted hover:text-chalk hover:bg-white/[0.04] border border-transparent transition">
+          <span class="flex items-center gap-3 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M7 10h14l-4-4M17 14H3l4 4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span class="sidebar-text truncate">FX Liquidity</span>
+          </span>
+          <span class="sidebar-text font-mono text-xs px-1.5 py-0.5 rounded bg-emeraldInst/15 text-emeraldInst border border-emeraldInst/25">0.02%</span>
+        </button>
+
+        <button data-nav="Yield Vaults" onclick="selectNav(this, 'Yield Vaults')" class="nav-item-btn w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slateMuted hover:text-chalk hover:bg-white/[0.04] border border-transparent transition">
+          <span class="flex items-center gap-3 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span class="sidebar-text truncate">Yield Vaults</span>
+          </span>
+          <span class="sidebar-text font-mono text-xs px-1.5 py-0.5 rounded bg-sapphire/15 text-sapphire border border-sapphire/25">5.42%</span>
+        </button>
+
+        <button data-nav="Corporate Cards" onclick="selectNav(this, 'Corporate Cards')" class="nav-item-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slateMuted hover:text-chalk hover:bg-white/[0.04] border border-transparent transition">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <rect x="2" y="5" width="20" height="14" rx="2.5"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+          </svg>
+          <span class="sidebar-text truncate">Corporate Cards</span>
+        </button>
+
+        <button data-nav="Risk & VaR" onclick="selectNav(this, 'Risk & VaR')" class="nav-item-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slateMuted hover:text-chalk hover:bg-white/[0.04] border border-transparent transition">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span class="sidebar-text truncate">Risk &amp; VaR</span>
+        </button>
+
+        <button data-nav="Ledger" onclick="selectNav(this, 'Ledger')" class="nav-item-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slateMuted hover:text-chalk hover:bg-white/[0.04] border border-transparent transition">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="8" y1="13" x2="16" y2="13"></line>
+            <line x1="8" y1="17" x2="13" y2="17"></line>
+          </svg>
+          <span class="sidebar-text truncate">Ledger</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Custody HSM Status Footer -->
+    <div class="p-3 border-t border-white/10">
+      <div class="sidebar-text rounded-xl p-3 bg-white/[0.03] border border-white/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[12.5px] font-medium text-chalk flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emeraldInst animate-pulse"></span>
+            MPC Quorum 5/7
+          </span>
+          <span class="font-mono text-xs text-emeraldInst">SYNCED</span>
+        </div>
+        <div class="text-[12.5px] text-slateMuted leading-relaxed">
+          BNY Mellon · JPMorgan Kinexys · Fireblocks HSM
+        </div>
+      </div>
+      <div class="mt-2.5 flex items-center gap-2.5 px-2 py-1">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sapphire to-emeraldInst flex items-center justify-center font-display font-bold text-xs text-velvet shrink-0">
+          EV
+        </div>
+        <div class="sidebar-text min-w-0">
+          <div class="text-xs font-semibold text-chalk truncate">Elena Vance, CFA</div>
+          <div class="text-[12.5px] text-slateMuted truncate">Group Treasurer</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Sticky Topbar -->
+    <header class="smoked-topbar sticky top-0 z-30 h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <button onclick="toggleMobileSidebar()" class="lg:hidden w-9 h-9 rounded-xl border border-white/10 bg-white/[0.04] flex items-center justify-center text-chalk">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="activeSectionBadge" class="font-display font-semibold text-base sm:text-lg text-chalk truncate">Treasury Overview</span>
+          <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-emeraldInst/10 text-emeraldInst border border-emeraldInst/25">
+            <span class="w-1.5 h-1.5 rounded-full bg-emeraldInst"></span>
+            FIX 4.4 · 0.4ms LDN-NY4
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 sm:gap-3.5">
+        <!-- Currency Base Switcher -->
+        <div class="flex items-center p-1 rounded-xl bg-white/[0.04] border border-white/10" role="group" aria-label="Base Currency Switcher">
+          <button onclick="setBaseCurrency('USD')" data-ccy="USD" class="ccy-btn px-2.5 py-1 rounded-lg font-mono text-xs font-semibold bg-sapphire text-white shadow-sm transition">
+            USD $
+          </button>
+          <button onclick="setBaseCurrency('EUR')" data-ccy="EUR" class="ccy-btn px-2.5 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition">
+            EUR €
+          </button>
+          <button onclick="setBaseCurrency('SGD')" data-ccy="SGD" class="ccy-btn px-2.5 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition">
+            SGD S$
+          </button>
+        </div>
+
+        <!-- Instant Settlement Modal Trigger -->
+        <button onclick="openSettlementModal()" class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-chalk bg-gradient-to-r from-sapphire to-blue-500 hover:from-blue-500 hover:to-sapphire border border-white/20 shadow-lg shadow-sapphire/25 transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-linecap="round" stroke-linejoin="round"></polygon>
+          </svg>
+          <span>Instant Settlement</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 space-y-6 max-w-[1600px] w-full mx-auto">
+
+      <!-- Toast Feedback Banner -->
+      <div id="vaultToast" class="hidden fixed bottom-6 right-6 z-50 smoked-glass rounded-2xl px-4 py-3.5 flex items-center gap-3 border-emeraldInst/40 max-w-md">
+        <div class="w-8 h-8 rounded-xl bg-emeraldInst/15 border border-emeraldInst/30 flex items-center justify-center text-emeraldInst shrink-0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+        </div>
+        <div class="text-xs">
+          <div id="vaultToastTitle" class="font-semibold text-chalk">Settlement Executed</div>
+          <div id="vaultToastMsg" class="text-slateMuted font-mono mt-0.5">Atomic rail confirmed in 1.14s</div>
+        </div>
+      </div>
+
+      <div id="defaultDashboardView" class="space-y-6">
+      <!-- HERO ROW: 3D Fintech Glass Visual Banner + Interactive Frosted Titanium Corporate Card -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <!-- Smoked-Glass Hero Visual Showcase -->
+        <div class="xl:col-span-7 smoked-glass rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[300px]">
+          <!-- Embedded Visual Banner Art with subtle luxury vignette -->
+          <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute inset-0 bg-gradient-to-br from-sapphire/20 via-velvet/60 to-emeraldInst/15"></div>
+            <img
+              src="/templates/assets/fintech-visual.jpg"
+              onerror="if(!this.dataset.rel){this.dataset.rel='1';this.src='../../assets/fintech-visual.jpg';}else{this.style.opacity='0';}"
+              alt="Quantum Vault Institutional 3D Glass Architecture"
+              class="w-full h-full object-cover object-center opacity-40 mix-blend-luminosity scale-105"
+            />
+            <div class="absolute inset-0 bg-gradient-to-r from-[#0B101E]/95 via-[#0B101E]/80 to-[#0B101E]/35"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0B101E]/95 via-transparent to-transparent"></div>
+          </div>
+
+          <div class="relative z-10 flex flex-wrap items-center justify-between gap-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/15 backdrop-blur-md">
+              <span class="w-2 h-2 rounded-full bg-emeraldInst"></span>
+              <span class="font-mono text-[12.5px] uppercase tracking-wider text-chalk">Autonomous Sweep Engine · Active</span>
+            </div>
+            <div class="font-mono text-xs text-slateMuted bg-black/35 px-3 py-1 rounded-lg border border-white/10">
+              SOFR <span class="text-chalk font-semibold">5.31%</span> · UST 3M <span class="text-emeraldInst font-semibold">5.46%</span>
+            </div>
+          </div>
+
+          <div class="relative z-10 my-5 max-w-xl">
+            <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-chalk leading-tight">
+              Institutional Multi-Currency Liquidity &amp; Autonomous T-Bill Sweeps
+            </h1>
+            <p class="mt-2.5 text-sm text-slateMuted leading-relaxed">
+              Idle balances across 18 global operating accounts are continuously swept into sovereign overnight repo &amp; direct US Treasury bills with sub-second programmatic recall.
+            </p>
+          </div>
+
+          <div class="relative z-10 grid grid-cols-3 gap-3 pt-4 border-t border-white/10">
+            <div>
+              <div class="text-[12.5px] text-slateMuted">Annualized Yield Run-Rate</div>
+              <div id="heroAnnualAlpha" class="font-display font-bold text-base sm:text-lg text-emeraldInst tabular-nums mt-0.5">+$2,651,485</div>
+            </div>
+            <div>
+              <div class="text-[12.5px] text-slateMuted">Unencumbered Instant Cash</div>
+              <div id="heroInstantCash" class="font-display font-bold text-base sm:text-lg text-chalk tabular-nums mt-0.5">$14,280,000</div>
+            </div>
+            <div>
+              <div class="text-[12.5px] text-slateMuted">FX Router Execution Alpha</div>
+              <div class="font-mono font-semibold text-base sm:text-lg text-liquidGold tabular-nums mt-0.5">+14.2 bps</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Tilt-Interactive Frosted Titanium Corporate Card -->
+        <div class="xl:col-span-5 smoked-glass rounded-2xl p-6 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <div>
+              <span class="text-[12.5px] font-mono uppercase tracking-widest text-slateMuted">Executive Commercial Rail</span>
+              <h2 class="font-display font-semibold text-base text-chalk mt-0.5">Frosted Titanium Virtual Metal</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="revealCardBtn" onclick="toggleCardDigits()" class="px-2.5 py-1 rounded-lg text-[12.5px] font-mono text-slateMuted hover:text-chalk bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition">
+                Reveal PAN
+              </button>
+              <button id="freezeCardBtn" onclick="toggleFreezeCard()" class="px-2.5 py-1 rounded-lg text-[12.5px] font-mono text-emeraldInst bg-emeraldInst/10 border border-emeraldInst/25 transition">
+                Active
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D Card Container -->
+          <div id="titaniumWrap" class="titanium-card-wrap my-auto py-1">
+            <div id="titaniumCard" class="titanium-card rounded-2xl p-5 sm:p-6 select-none cursor-pointer">
+              <div id="titaniumGlare" class="titanium-glare"></div>
+
+              <div class="relative z-10 flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-display font-bold tracking-widest text-xs text-chalk">QUANTUM BLACK</span>
+                    <span class="px-1.5 py-0.5 rounded text-xs font-mono uppercase bg-liquidGold/20 text-liquidGold border border-liquidGold/35">Titanium</span>
+                  </div>
+                  <div class="font-mono text-[12.5px] text-slateMuted mt-1">TREASURY COMMERCIAL WORLD ELITE</div>
+                </div>
+                <!-- Contactless & Institutional Emblem -->
+                <svg class="w-6 h-6 text-slateMuted/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                  <path d="M8.5 14.5A4 4 0 0 1 8.5 9.5M11.5 17A7.5 7.5 0 0 1 11.5 7M14.5 19.5a11 11 0 0 1 0-15" stroke-linecap="round"></path>
+                </svg>
+              </div>
+
+              <!-- Precision EMV Chip + Number -->
+              <div class="relative z-10 mt-6 mb-5 flex items-center justify-between">
+                <svg class="w-11 h-8 text-liquidGold/85" viewBox="0 0 44 32" fill="none">
+                  <rect x="1" y="1" width="42" height="30" rx="5" fill="rgba(245,158,11,0.16)" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M15 1v30M29 1v30M1 11h14M29 11h14M1 21h14M29 21h14" stroke="currentColor" stroke-width="1.1"/>
+                </svg>
+                <div id="cardPanDisplay" class="font-mono text-sm sm:text-base tracking-[0.2em] text-chalk tabular-nums">
+                  4921 •••• •••• 8842
+                </div>
+              </div>
+
+              <!-- Card Footer Metadata -->
+              <div class="relative z-10 pt-3 border-t border-white/15 flex items-end justify-between gap-4">
+                <div>
+                  <div class="text-xs font-mono uppercase tracking-widest text-slateMuted">Monthly Limit · Auto-FX</div>
+                  <div class="font-display font-bold text-sm sm:text-base text-chalk tabular-nums mt-0.5">
+                    <span id="cardLimitDisplay">$250,000</span> <span class="text-xs font-normal text-slateMuted">Limit · 1.75% Rebate</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs font-mono uppercase tracking-widest text-slateMuted">Valid Thru</div>
+                  <div class="font-mono text-xs text-chalk mt-0.5">09/29 · CVV •••</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Utilization Progress Bar -->
+          <div class="mt-4 pt-3 border-t border-white/10">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="text-slateMuted">Current Cycle Utilization</span>
+              <span class="font-mono text-chalk tabular-nums"><span id="cardSpentDisplay">$64,250</span> / <span id="cardCapSmall">$250,000</span> (25.7%)</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-white/[0.07] overflow-hidden">
+              <div class="h-full w-[25.7%] rounded-full bg-gradient-to-r from-sapphire to-emeraldInst"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 KPI BENTO CARDS WITH SVG SPARKLINES -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <!-- KPI 1: Total Treasury AUM -->
+        <div class="smoked-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slateMuted">Total Treasury AUM</span>
+              <div id="kpiAum" class="font-display text-2xl sm:text-[26px] font-bold text-chalk tabular-nums mt-1.5 tracking-tight">
+                $48,920,400
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-emeraldInst/15 text-emeraldInst border border-emeraldInst/25">
+              +12.8%
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <div class="text-[12.5px] font-mono text-slateMuted">Across 14 Custodians</div>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <defs>
+                <linearGradient id="sparkAum" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.38"/>
+                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 31 L18 28 L34 29 L50 21 L66 22 L82 13 L98 9 L110 4 L110 37 L2 37 Z" fill="url(#sparkAum)"/>
+              <path d="M2 31 L18 28 L34 29 L50 21 L66 22 L82 13 L98 9 L110 4" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="110" cy="4" r="3" fill="#3B82F6"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- KPI 2: Net Yield Earned -->
+        <div class="smoked-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slateMuted">Net Yield Earned</span>
+              <div class="font-display text-2xl sm:text-[26px] font-bold text-chalk tabular-nums mt-1.5 tracking-tight">
+                5.42% <span class="text-sm font-mono font-medium text-emeraldInst">APY</span>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-emeraldInst/15 text-emeraldInst border border-emeraldInst/25">
+              +38 bps
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <div class="text-[12.5px] font-mono text-slateMuted">Direct UST + Repo</div>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <defs>
+                <linearGradient id="sparkYield" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.38"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 30 L20 26 L38 24 L56 19 L74 15 L92 10 L110 6 L110 37 L2 37 Z" fill="url(#sparkYield)"/>
+              <path d="M2 30 L20 26 L38 24 L56 19 L74 15 L92 10 L110 6" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="110" cy="6" r="3" fill="#10B981"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- KPI 3: 24h FX Settlement Volume -->
+        <div class="smoked-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slateMuted">24h FX Settlement Volume</span>
+              <div id="kpiFxVol" class="font-display text-2xl sm:text-[26px] font-bold text-chalk tabular-nums mt-1.5 tracking-tight">
+                $6.18M
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-liquidGold/15 text-liquidGold border border-liquidGold/30">
+              0.02% Spread
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <div class="text-[12.5px] font-mono text-slateMuted">92% PvP Atomic</div>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <defs>
+                <linearGradient id="sparkFx" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 27 L18 22 L36 28 L54 16 L72 19 L90 9 L110 11 L110 37 L2 37 Z" fill="url(#sparkFx)"/>
+              <path d="M2 27 L18 22 L36 28 L54 16 L72 19 L90 9 L110 11" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="110" cy="11" r="3" fill="#F59E0B"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- KPI 4: Value-at-Risk 99% -->
+        <div class="smoked-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slateMuted">Value-at-Risk 99%</span>
+              <div class="font-display text-2xl sm:text-[26px] font-bold text-chalk tabular-nums mt-1.5 tracking-tight">
+                0.18% <span class="text-sm font-mono font-medium text-sapphire">Low</span>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-sapphire/15 text-sapphire border border-sapphire/30">
+              AA+ Rated
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <div class="text-[12.5px] font-mono text-slateMuted">1-Day Monte Carlo</div>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <path d="M2 14 L22 17 L42 15 L62 21 L82 23 L110 26" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="110" cy="26" r="3" fill="#10B981"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANIMATED GLOBAL LIQUIDITY & SETTLEMENT DATA FLOW PIPELINE -->
+      <section class="smoked-glass rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[12.5px] uppercase tracking-widest text-sapphire">Real-Time Liquidity Telemetry</span>
+              <span class="px-2 py-0.5 rounded-full text-xs font-mono bg-emeraldInst/15 text-emeraldInst border border-emeraldInst/25">STREAMING PACKETS</span>
+            </div>
+            <h2 class="font-display text-lg sm:text-xl font-bold text-chalk mt-1">
+              Autonomous Global Liquidity &amp; Settlement Data Flow Pipeline
+            </h2>
+          </div>
+          <div class="text-xs text-slateMuted font-mono">
+            Click any pipeline stage to inspect live counterparty routing
+          </div>
+        </div>
+
+        <!-- Animated SVG Connector Visualization -->
+        <div class="hidden lg:block relative mb-2 px-6">
+          <svg class="w-full h-16 overflow-visible" viewBox="0 0 1100 64" fill="none">
+            <defs>
+              <linearGradient id="pipeGrad1" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.7"/>
+                <stop offset="50%" stop-color="#F59E0B" stop-opacity="0.85"/>
+                <stop offset="100%" stop-color="#10B981" stop-opacity="0.85"/>
+              </linearGradient>
+              <filter id="packetGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Base Track -->
+            <path id="liquidityTrack" d="M 90 32 C 240 8, 300 56, 415 32 C 530 8, 600 56, 715 32 C 830 8, 900 56, 1010 32" stroke="rgba(255,255,255,0.09)" stroke-width="3" fill="none"/>
+            <!-- Animated Dashed Stream -->
+            <path d="M 90 32 C 240 8, 300 56, 415 32 C 530 8, 600 56, 715 32 C 830 8, 900 56, 1010 32" stroke="url(#pipeGrad1)" stroke-width="2.2" class="flow-stream-line" fill="none"/>
+
+            <!-- Streaming Gold & Emerald Liquidity Packets -->
+            <circle r="4.5" fill="#F59E0B" filter="url(#packetGlow)">
+              <animateMotion dur="4.2s" repeatCount="indefinite" path="M 90 32 C 240 8, 300 56, 415 32 C 530 8, 600 56, 715 32 C 830 8, 900 56, 1010 32"/>
+            </circle>
+            <circle r="4.5" fill="#10B981" filter="url(#packetGlow)">
+              <animateMotion dur="4.2s" begin="1.4s" repeatCount="indefinite" path="M 90 32 C 240 8, 300 56, 415 32 C 530 8, 600 56, 715 32 C 830 8, 900 56, 1010 32"/>
+            </circle>
+            <circle r="4" fill="#3B82F6" filter="url(#packetGlow)">
+              <animateMotion dur="4.2s" begin="2.8s" repeatCount="indefinite" path="M 90 32 C 240 8, 300 56, 415 32 C 530 8, 600 56, 715 32 C 830 8, 900 56, 1010 32"/>
+            </circle>
+
+            <!-- Anchor Nodes -->
+            <circle cx="90" cy="32" r="7" fill="#070A12" stroke="#3B82F6" stroke-width="2.5"/>
+            <circle cx="415" cy="32" r="7" fill="#070A12" stroke="#F59E0B" stroke-width="2.5"/>
+            <circle cx="715" cy="32" r="7" fill="#070A12" stroke="#10B981" stroke-width="2.5"/>
+            <circle cx="1010" cy="32" r="7" fill="#070A12" stroke="#10B981" stroke-width="2.5"/>
+          </svg>
+        </div>
+
+        <!-- 4 Clickable Pipeline Stage Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button onclick="selectFlowNode(0)" id="flowNode0" class="flow-node-btn active text-left rounded-xl p-4 bg-white/[0.03] border border-white/10">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-sapphire font-semibold">01 · INGESTION</span>
+              <span class="w-2 h-2 rounded-full bg-sapphire"></span>
+            </div>
+            <div class="font-display font-semibold text-sm text-chalk mt-2">
+              01 Operating Accounts (USD/EUR/GBP)
+            </div>
+            <div class="font-mono text-xs text-slateMuted mt-1.5 tabular-nums" data-usd-node="14280000">
+              Pool: $14,280,000
+            </div>
+          </button>
+
+          <button onclick="selectFlowNode(1)" id="flowNode1" class="flow-node-btn text-left rounded-xl p-4 bg-white/[0.03] border border-white/10">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-liquidGold font-semibold">02 · FX ENGINE</span>
+              <span class="w-2 h-2 rounded-full bg-liquidGold"></span>
+            </div>
+            <div class="font-display font-semibold text-sm text-chalk mt-2">
+              02 AI FX Smart Router (0.02% Spread)
+            </div>
+            <div class="font-mono text-xs text-slateMuted mt-1.5 tabular-nums" data-usd-node="6180000">
+              24h Routed: $6,180,000
+            </div>
+          </button>
+
+          <button onclick="selectFlowNode(2)" id="flowNode2" class="flow-node-btn text-left rounded-xl p-4 bg-white/[0.03] border border-white/10">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-emeraldInst font-semibold">03 · YIELD VAULT</span>
+              <span class="w-2 h-2 rounded-full bg-emeraldInst"></span>
+            </div>
+            <div class="font-display font-semibold text-sm text-chalk mt-2">
+              03 T-Bill &amp; Overnight Repo Pool (5.42%)
+            </div>
+            <div class="font-mono text-xs text-slateMuted mt-1.5 tabular-nums" data-usd-node="34640400">
+              Allocated: $34,640,400
+            </div>
+          </button>
+
+          <button onclick="selectFlowNode(3)" id="flowNode3" class="flow-node-btn text-left rounded-xl p-4 bg-white/[0.03] border border-white/10">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-emeraldInst font-semibold">04 · DISBURSEMENT</span>
+              <span class="w-2 h-2 rounded-full bg-emeraldInst"></span>
+            </div>
+            <div class="font-display font-semibold text-sm text-chalk mt-2">
+              04 Instant Global Payouts (&lt; 1.8s)
+            </div>
+            <div class="font-mono text-xs text-slateMuted mt-1.5 tabular-nums">
+              Finality: 1.18s Median
+            </div>
+          </button>
+        </div>
+
+        <!-- Live Node Telemetry Detail Strip -->
+        <div class="mt-4 rounded-xl p-4 bg-black/35 border border-white/10 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+          <div class="md:col-span-2">
+            <div id="nodeDetailTitle" class="font-display font-semibold text-sm text-chalk">
+              Stage 01 · Multi-Bank Operating Accounts (JPMorgan, Citi, HSBC, DBS)
+            </div>
+            <p id="nodeDetailDesc" class="text-xs text-slateMuted mt-1 leading-relaxed">
+              Real-time ISO 20022 camt.053 balance telemetry across 18 global IBANs. Zero-balance sweep threshold triggers automatically above target operating buffers.
+            </p>
+          </div>
+          <div class="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4">
+            <div class="text-[12.5px] text-slateMuted">Active Liquidity / Throughput</div>
+            <div id="nodeDetailMetric1" class="font-mono font-semibold text-sm text-chalk tabular-nums mt-0.5">$14,280,000 · 18 Accounts</div>
+          </div>
+          <div class="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4">
+            <div class="text-[12.5px] text-slateMuted">Execution SLA &amp; Counterparty</div>
+            <div id="nodeDetailMetric2" class="font-mono font-semibold text-sm text-emeraldInst tabular-nums mt-0.5">99.998% Uptime · Tier-1 G-SIB</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MIDDLE ROW: Interactive Net Worth / Yield Curve SVG Area Chart + Instant Currency Swap & Allocation Calculator -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <!-- Net Worth & Yield Curve Interactive SVG Area Chart -->
+        <div class="xl:col-span-8 smoked-glass rounded-2xl p-6 flex flex-col justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+            <div>
+              <span class="text-xs font-mono uppercase tracking-wider text-slateMuted">Portfolio Trajectory &amp; Benchmark Yield</span>
+              <div class="flex items-baseline gap-3 mt-1">
+                <h2 id="chartHeadlineValue" class="font-display text-2xl sm:text-3xl font-bold text-chalk tabular-nums">$48,920,400</h2>
+                <span id="chartDeltaBadge" class="font-mono text-xs font-semibold text-emeraldInst bg-emeraldInst/10 px-2 py-0.5 rounded border border-emeraldInst/25">+$5,542,100 (+12.8%)</span>
+              </div>
+            </div>
+
+            <!-- Timeframe Switcher: 1W / 1M / 1Q / 1Y -->
+            <div class="flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 self-start">
+              <button onclick="setChartRange('1W')" data-range="1W" class="range-btn px-3 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition">1W</button>
+              <button onclick="setChartRange('1M')" data-range="1M" class="range-btn px-3 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition">1M</button>
+              <button onclick="setChartRange('1Q')" data-range="1Q" class="range-btn px-3 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition">1Q</button>
+              <button onclick="setChartRange('1Y')" data-range="1Y" class="range-btn px-3 py-1 rounded-lg font-mono text-xs font-semibold bg-sapphire text-white shadow-sm transition">1Y</button>
+            </div>
+          </div>
+
+          <!-- Interactive SVG Area Chart -->
+          <div class="relative w-full h-[270px] select-none">
+            <!-- Hover Tooltip -->
+            <div id="chartTooltip" class="hidden absolute z-20 pointer-events-none px-3 py-2 rounded-xl bg-[#0B0F1A]/95 border border-white/15 shadow-xl text-xs">
+              <div id="ttDate" class="font-mono text-xs text-slateMuted">Nov 2026</div>
+              <div id="ttValue" class="font-display font-bold text-chalk tabular-nums mt-0.5">$48,920,400</div>
+              <div id="ttYield" class="font-mono text-[12.5px] text-emeraldInst tabular-nums">Yield: 5.42% APY</div>
+            </div>
+
+            <svg id="treasuryChartSvg" class="w-full h-full overflow-visible" viewBox="0 0 760 250" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="areaSapphire" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.36"/>
+                  <stop offset="65%" stop-color="#10B981" stop-opacity="0.09"/>
+                  <stop offset="100%" stop-color="#070A12" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Horizontal Subtle Grid Lines -->
+              <line x1="0" y1="30" x2="760" y2="30" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3"/>
+              <line x1="0" y1="90" x2="760" y2="90" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3"/>
+              <line x1="0" y1="150" x2="760" y2="150" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3"/>
+              <line x1="0" y1="210" x2="760" y2="210" stroke="rgba(255,255,255,0.08)"/>
+
+              <!-- Filled Area & Primary Net Worth Path -->
+              <path id="chartAreaPath" d="" fill="url(#areaSapphire)"/>
+              <path id="chartBenchmarkPath" d="" fill="none" stroke="#10B981" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.75"/>
+              <path id="chartLinePath" d="" fill="none" stroke="#3B82F6" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+              <!-- Hover Crosshair -->
+              <line id="chartHoverLine" x1="0" y1="15" x2="0" y2="210" stroke="rgba(248,250,252,0.28)" stroke-width="1" stroke-dasharray="3 3" class="hidden"/>
+              <circle id="chartHoverDot" cx="0" cy="0" r="5" fill="#3B82F6" stroke="#F8FAFC" stroke-width="2" class="hidden"/>
+
+              <!-- Interactive Hit Columns -->
+              <g id="chartHitLayer"></g>
+            </svg>
+
+            <!-- X-Axis Labels -->
+            <div id="chartXLabels" class="flex items-center justify-between text-[12.5px] font-mono text-slateMuted mt-1 px-1"></div>
+          </div>
+
+          <!-- Legend Footer -->
+          <div class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slateMuted">
+            <div class="flex items-center gap-5">
+              <span class="inline-flex items-center gap-2">
+                <span class="w-3 h-0.5 bg-sapphire inline-block"></span>
+                Total Autonomous AUM
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <span class="w-3 h-0.5 bg-emeraldInst inline-block"></span>
+                T-Bill Yield Curve Benchmark
+              </span>
+            </div>
+            <span class="font-mono text-[12.5px] text-chalk">Weighted Duration: 41 Days · Zero Credit Default Exposure</span>
+          </div>
+        </div>
+
+        <!-- Instant Currency Swap & Treasury Allocation Calculator -->
+        <div class="xl:col-span-4 smoked-glass rounded-2xl p-6 flex flex-col justify-between space-y-5">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[12.5px] uppercase tracking-wider text-liquidGold">Atomic PvP Desk</span>
+              <span class="font-mono text-[12.5px] text-emeraldInst">Spread: 0.02%</span>
+            </div>
+            <h2 class="font-display text-lg font-bold text-chalk mt-0.5">Instant FX Swap &amp; Yield Allocator</h2>
+          </div>
+
+          <!-- Swap Input Box -->
+          <div class="space-y-2.5">
+            <div class="rounded-xl p-3.5 bg-black/40 border border-white/10">
+              <div class="flex items-center justify-between text-[12.5px] text-slateMuted mb-1.5">
+                <span>Sell Liquidity</span>
+                <span class="font-mono">Avail: $14,280,000</span>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <input id="swapAmountInput" type="number" value="250000" min="1000" step="5000" oninput="recalcSwap()" class="w-full bg-transparent font-mono text-lg font-bold text-chalk focus:outline-none tabular-nums" />
+                <select id="swapFromCcy" onchange="recalcSwap()" class="bg-white/[0.07] border border-white/15 rounded-lg px-2.5 py-1.5 font-mono text-xs font-semibold text-chalk focus:outline-none">
+                  <option value="USD" class="bg-slate-900">USD</option>
+                  <option value="EUR" class="bg-slate-900">EUR</option>
+                  <option value="GBP" class="bg-slate-900">GBP</option>
+                  <option value="SGD" class="bg-slate-900">SGD</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Flip Button Divider -->
+            <div class="flex items-center justify-center -my-1 relative z-10">
+              <button onclick="flipSwapCurrencies()" title="Flip Pair" class="w-8 h-8 rounded-full bg-[#131C2E] border border-white/15 hover:border-sapphire text-chalk flex items-center justify-center shadow-md transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="rounded-xl p-3.5 bg-black/40 border border-white/10">
+              <div class="flex items-center justify-between text-[12.5px] text-slateMuted mb-1.5">
+                <span>Receive Settled (&lt; 1.8s)</span>
+                <span id="swapRateLabel" class="font-mono text-sapphire">1 USD = 0.9204 EUR</span>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <div id="swapOutputDisplay" class="font-mono text-lg font-bold text-emeraldInst tabular-nums">230,054.00</div>
+                <select id="swapToCcy" onchange="recalcSwap()" class="bg-white/[0.07] border border-white/15 rounded-lg px-2.5 py-1.5 font-mono text-xs font-semibold text-chalk focus:outline-none">
+                  <option value="EUR" selected class="bg-slate-900">EUR</option>
+                  <option value="USD" class="bg-slate-900">USD</option>
+                  <option value="GBP" class="bg-slate-900">GBP</option>
+                  <option value="SGD" class="bg-slate-900">SGD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Treasury T-Bill Allocation Slider -->
+          <div class="rounded-xl p-3.5 bg-white/[0.03] border border-white/10 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slateMuted">T-Bill Vault Allocation</span>
+              <span id="allocPctLabel" class="font-mono font-semibold text-chalk tabular-nums">75% · 5.42% APY</span>
+            </div>
+            <input id="allocSlider" type="range" min="10" max="95" value="75" oninput="recalcSwap()" class="w-full accent-sapphire cursor-pointer h-1.5 bg-white/10 rounded-lg" />
+            <div class="flex items-center justify-between text-[12.5px] font-mono">
+              <span class="text-slateMuted">Projected 12M Yield:</span>
+              <span id="projectedYieldOut" class="text-emeraldInst font-semibold tabular-nums">+$1,990,103 / yr</span>
+            </div>
+          </div>
+
+          <button onclick="executeSwapAction()" class="w-full py-2.5 px-4 rounded-xl font-display font-semibold text-sm text-velvet bg-gradient-to-r from-emeraldInst to-emerald-400 hover:brightness-110 transition shadow-lg shadow-emeraldInst/20">
+            Execute Atomic FX &amp; Sweep
+          </button>
+        </div>
+      </section>
+
+      <!-- BOTTOM ROW: LIVE INSTITUTIONAL LEDGER TABLE -->
+      <section class="smoked-glass rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+          <div>
+            <span class="font-mono text-[12.5px] uppercase tracking-widest text-slateMuted">Cryptographic Audit Trail</span>
+            <h2 class="font-display text-lg sm:text-xl font-bold text-chalk mt-0.5">Live Institutional Treasury Ledger</h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Category Filter Pills: All, Yield, FX Wire, Card Spend -->
+            <div class="flex items-center p-1 rounded-xl bg-white/[0.04] border border-white/10">
+              <button onclick="filterLedger('All')" data-lfilter="All" class="ledger-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-sapphire text-white transition">All</button>
+              <button onclick="filterLedger('Yield')" data-lfilter="Yield" class="ledger-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slateMuted hover:text-chalk transition">Yield</button>
+              <button onclick="filterLedger('FX Wire')" data-lfilter="FX Wire" class="ledger-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slateMuted hover:text-chalk transition">FX Wire</button>
+              <button onclick="filterLedger('Card Spend')" data-lfilter="Card Spend" class="ledger-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slateMuted hover:text-chalk transition">Card Spend</button>
+            </div>
+
+            <!-- Search Input -->
+            <div class="relative">
+              <svg class="w-3.5 h-3.5 text-slateMuted absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="ledgerSearch" type="text" oninput="renderLedger()" placeholder="Filter counterparty or ref..." class="pl-8 pr-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-chalk placeholder:text-slateMuted focus:outline-none focus:border-sapphire w-48 sm:w-56" />
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-white/10 text-[12.5px] font-mono uppercase tracking-wider text-slateMuted">
+                <th class="py-3 pr-4">Settlement ID</th>
+                <th class="py-3 px-4">Counterparty &amp; Instrument</th>
+                <th class="py-3 px-4">Category</th>
+                <th class="py-3 px-4">Rail / Desk</th>
+                <th class="py-3 px-4 text-right">Amount (<span id="ledgerCcyHeader">USD</span>)</th>
+                <th class="py-3 pl-4 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTableBody" class="divide-y divide-white/[0.06] text-sm"></tbody>
+          </table>
+        </div>
+      </section>
+      </div>
+
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+    </main>
+  </div>
+
+  <!-- INSTANT SETTLEMENT MODAL -->
+  <div id="settlementModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+    <div class="smoked-glass rounded-2xl max-w-lg w-full p-6 border border-white/15 relative">
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <span class="font-mono text-[12.5px] uppercase tracking-widest text-sapphire">Programmable Treasury Dispatch</span>
+          <h3 class="font-display text-xl font-bold text-chalk mt-0.5">Execute Instant Institutional Settlement</h3>
+        </div>
+        <button onclick="closeSettlementModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center text-slateMuted hover:text-chalk">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form onsubmit="submitInstantSettlement(event)" class="space-y-4 mt-4">
+        <div>
+          <label class="block text-xs text-slateMuted mb-1.5">Beneficiary Entity / Custodian</label>
+          <select id="modalBeneficiary" class="w-full rounded-xl bg-black/45 border border-white/15 px-3.5 py-2.5 text-sm text-chalk focus:outline-none focus:border-sapphire">
+            <option value="BNY Mellon Tri-Party Repo Desk" class="bg-slate-900">BNY Mellon Tri-Party Repo Desk (US912797)</option>
+            <option value="Stripe Europe Treasury Dublin" class="bg-slate-900">Stripe Europe Treasury Dublin (SEPA Instant)</option>
+            <option value="DBS Institutional Liquidity SG" class="bg-slate-900">DBS Institutional Liquidity SG (FAST / MEPS+)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slateMuted mb-1.5">Settlement Amount (USD)</label>
+            <input id="modalAmount" type="number" value="1250000" min="1000" required class="w-full rounded-xl bg-black/45 border border-white/15 px-3.5 py-2.5 font-mono text-sm text-chalk focus:outline-none focus:border-sapphire tabular-nums" />
+          </div>
+          <div>
+            <label class="block text-xs text-slateMuted mb-1.5">Settlement Rail</label>
+            <select id="modalRail" class="w-full rounded-xl bg-black/45 border border-white/15 px-3.5 py-2.5 font-mono text-xs text-chalk focus:outline-none focus:border-sapphire">
+              <option value="FedNow / JPM Kinexys" class="bg-slate-900">FedNow / JPM Kinexys (&lt;1.2s)</option>
+              <option value="SEPA Instant PvP" class="bg-slate-900">SEPA Instant PvP (&lt;1.6s)</option>
+              <option value="SWIFT gpi Express" class="bg-slate-900">SWIFT gpi Express</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="rounded-xl p-3 bg-emeraldInst/10 border border-emeraldInst/25 flex items-center justify-between text-xs">
+          <span class="text-slateMuted">MPC Policy Check (5/7 Hardware Quorum)</span>
+          <span class="font-mono text-emeraldInst font-semibold">PRE-AUTHORIZED</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onclick="closeSettlementModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slateMuted hover:text-chalk border border-white/10">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-sapphire hover:bg-blue-500 shadow-lg shadow-sapphire/25 transition">
+            Sign &amp; Broadcast Settlement
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Currency state & real-time FX conversion multipliers
+    const currencyConfig = {
+      USD: { symbol: '$', rate: 1.0, code: 'USD' },
+      EUR: { symbol: '€', rate: 0.92, code: 'EUR' },
+      SGD: { symbol: 'S$', rate: 1.34, code: 'SGD' }
+    };
+    let currentCcy = 'USD';
+    let currentRange = '1Y';
+    let currentLedgerFilter = 'All';
+    let cardRevealed = false;
+    let cardFrozen = false;
+
+    const fxMidRates = {
+      USD: 1.0,
+      EUR: 0.9204,
+      GBP: 0.7865,
+      SGD: 1.3415
+    };
+
+    const flowNodesData = [
+      {
+        title: 'Stage 01 · Multi-Bank Operating Accounts (JPMorgan, Citi, HSBC, DBS)',
+        desc: 'Real-time ISO 20022 camt.053 balance telemetry across 18 global IBANs. Zero-balance sweep threshold triggers automatically above target operating buffers.',
+        metric1Usd: 14280000,
+        metric1Suffix: ' · 18 Accounts',
+        metric2: '99.998% Uptime · Tier-1 G-SIB'
+      },
+      {
+        title: 'Stage 02 · AI FX Smart Router (Multi-Dealer Liquidity Aggregator)',
+        desc: 'Splits institutional FX orders across 9 prime liquidity venues usingTWAP/PvP execution, compressing effective spread to 0.02% with zero settlement herstatt risk.',
+        metric1Usd: 6180000,
+        metric1Suffix: ' · 24h Volume',
+        metric2: '0.018% Avg Slip · Atomic PvP'
+      },
+      {
+        title: 'Stage 03 · Direct Sovereign T-Bill & Overnight Repo Pool (5.42% APY)',
+        desc: 'Custodied in segregated BNY Mellon accounts holding 4-week & 13-week US Treasury Bills plus daily liquid tri-party overnight reverse repo.',
+        metric1Usd: 34640400,
+        metric1Suffix: ' · Earning 5.42%',
+        metric2: '+38 bps vs Benchmark · T+0 Recall'
+      },
+      {
+        title: 'Stage 04 · Instant Global Payouts (FedNow, SEPA Instant, FAST, Kinexys)',
+        desc: 'Automated programmable disbursements settle 24/7/365 across local instant clearing rails with cryptographic webhook finality in under 1.8 seconds.',
+        metric1Usd: 4910000,
+        metric1Suffix: ' · 24h Disbursed',
+        metric2: '1.18s Median Finality · 0 Failed'
+      }
+    ];
+    let activeFlowIdx = 0;
+
+    const chartSeriesByRange = {
+      '1W': {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        valuesUsd: [48120000, 48290000, 48240000, 48510000, 48680000, 48795000, 48920400],
+        yields: ['5.36%', '5.38%', '5.37%', '5.40%', '5.41%', '5.42%', '5.42%'],
+        deltaUsd: 800400,
+        deltaPct: '+1.66%'
+      },
+      '1M': {
+        labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Now'],
+        valuesUsd: [46850000, 47120000, 47690000, 48050000, 48490000, 48920400],
+        yields: ['5.28%', '5.31%', '5.35%', '5.39%', '5.41%', '5.42%'],
+        deltaUsd: 2070400,
+        deltaPct: '+4.42%'
+      },
+      '1Q': {
+        labels: ['Sep 01', 'Sep 18', 'Oct 05', 'Oct 22', 'Nov 04', 'Nov 16'],
+        valuesUsd: [45100000, 45890000, 46420000, 47380000, 48210000, 48920400],
+        yields: ['5.18%', '5.24%', '5.29%', '5.35%', '5.40%', '5.42%'],
+        deltaUsd: 3820400,
+        deltaPct: '+8.47%'
+      },
+      '1Y': {
+        labels: ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'],
+        valuesUsd: [43378300, 44250000, 45610000, 46480000, 47790000, 48920400],
+        yields: ['5.05%', '5.14%', '5.22%', '5.30%', '5.38%', '5.42%'],
+        deltaUsd: 5542100,
+        deltaPct: '+12.8%'
+      }
+    };
+
+    const ledgerEntries = [
+      { id: 'QV-99482', entity: 'US Treasury 13W Bill Coupon Sweep', category: 'Yield', rail: 'BNY Mellon Repo', usdAmount: 148920, sign: '+', status: 'Settled' },
+      { id: 'QV-99479', entity: 'Siemens Energy GmbH · Munich', category: 'FX Wire', rail: 'SEPA Instant PvP', usdAmount: 840000, sign: '-', status: 'Settled' },
+      { id: 'QV-99474', entity: 'AWS Enterprise Cloud Reserved', category: 'Card Spend', rail: 'Quantum Black ••8842', usdAmount: 42650, sign: '-', status: 'Cleared' },
+      { id: 'QV-99470', entity: 'Overnight Reverse Repo Accrual', category: 'Yield', rail: 'JPMorgan Kinexys', usdAmount: 19480, sign: '+', status: 'Streaming' },
+      { id: 'QV-99463', entity: 'Singapore Sovereign Liquidity Pool', category: 'FX Wire', rail: 'SGX FAST / PvP', usdAmount: 1620000, sign: '+', status: 'Settled' },
+      { id: 'QV-99458', entity: 'Bloomberg Terminal Desk Licenses', category: 'Card Spend', rail: 'Quantum Black ••8842', usdAmount: 21600, sign: '-', status: 'Cleared' }
+    ];
+
+    function formatMoney(usdAmount, compact = false) {
+      const cfg = currencyConfig[currentCcy];
+      const val = usdAmount * cfg.rate;
+      if (compact) {
+        if (Math.abs(val) >= 1e6) {
+          return cfg.symbol + (val / 1e6).toFixed(2) + 'M';
+        }
+      }
+      return cfg.symbol + Math.round(val).toLocaleString('en-US');
+    }
+
+    function setBaseCurrency(ccy) {
+      currentCcy = ccy;
+      document.querySelectorAll('.ccy-btn').forEach(btn => {
+        if (btn.dataset.ccy === ccy) {
+          btn.className = 'ccy-btn px-2.5 py-1 rounded-lg font-mono text-xs font-semibold bg-sapphire text-white shadow-sm transition';
+        } else {
+          btn.className = 'ccy-btn px-2.5 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition';
+        }
+      });
+
+      // Update KPIs & Hero metrics
+      document.getElementById('kpiAum').textContent = formatMoney(48920400);
+      document.getElementById('kpiFxVol').textContent = formatMoney(6180000, true);
+      document.getElementById('heroAnnualAlpha').textContent = '+' + formatMoney(2651485);
+      document.getElementById('heroInstantCash').textContent = formatMoney(14280000);
+      document.getElementById('cardLimitDisplay').textContent = formatMoney(250000);
+      document.getElementById('cardCapSmall').textContent = formatMoney(250000);
+      document.getElementById('cardSpentDisplay').textContent = formatMoney(64250);
+      document.getElementById('ledgerCcyHeader').textContent = ccy;
+
+      // Update Pipeline node values
+      const node0El = document.querySelector('#flowNode0 [data-usd-node]');
+      const node1El = document.querySelector('#flowNode1 [data-usd-node]');
+      const node2El = document.querySelector('#flowNode2 [data-usd-node]');
+      node0El.textContent = 'Pool: ' + formatMoney(14280000);
+      node1El.textContent = '24h Routed: ' + formatMoney(6180000);
+      node2El.textContent = 'Allocated: ' + formatMoney(34640400);
+
+      selectFlowNode(activeFlowIdx);
+      renderTreasuryChart();
+      recalcSwap();
+      renderLedger();
+    }
+
+    function selectFlowNode(idx) {
+      activeFlowIdx = idx;
+      for (let i = 0; i < 4; i++) {
+        const el = document.getElementById('flowNode' + i);
+        el.classList.toggle('active', i === idx);
+      }
+      const d = flowNodesData[idx];
+      document.getElementById('nodeDetailTitle').textContent = d.title;
+      document.getElementById('nodeDetailDesc').textContent = d.desc;
+      document.getElementById('nodeDetailMetric1').textContent = formatMoney(d.metric1Usd) + d.metric1Suffix;
+      document.getElementById('nodeDetailMetric2').textContent = d.metric2;
+    }
+
+    function setChartRange(range) {
+      currentRange = range;
+      document.querySelectorAll('.range-btn').forEach(btn => {
+        if (btn.dataset.range === range) {
+          btn.className = 'range-btn px-3 py-1 rounded-lg font-mono text-xs font-semibold bg-sapphire text-white shadow-sm transition';
+        } else {
+          btn.className = 'range-btn px-3 py-1 rounded-lg font-mono text-xs font-medium text-slateMuted hover:text-chalk transition';
+        }
+      });
+      renderTreasuryChart();
+    }
+
+    function renderTreasuryChart() {
+      const series = chartSeriesByRange[currentRange];
+      const vals = series.valuesUsd;
+      const minV = Math.min(...vals) * 0.988;
+      const maxV = Math.max(...vals) * 1.006;
+      const width = 760;
+      const topY = 26;
+      const bottomY = 210;
+
+      const pts = vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * width;
+        const y = bottomY - ((v - minV) / (maxV - minV)) * (bottomY - topY);
+        return { x, y, v, label: series.labels[i], yield: series.yields[i] };
+      });
+
+      const lineD = pts.map((p, i) => (i === 0 ? `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}` : `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)).join(' ');
+      const areaD = `${lineD} L ${width} ${bottomY} L 0 ${bottomY} Z`;
+      const benchD = pts.map((p, i) => {
+        const by = Math.min(bottomY - 8, p.y + 22 - i * 1.8);
+        return i === 0 ? `M ${p.x.toFixed(1)} ${by.toFixed(1)}` : `L ${p.x.toFixed(1)} ${by.toFixed(1)}`;
+      }).join(' ');
+
+      document.getElementById('chartLinePath').setAttribute('d', lineD);
+      document.getElementById('chartAreaPath').setAttribute('d', areaD);
+      document.getElementById('chartBenchmarkPath').setAttribute('d', benchD);
+
+      document.getElementById('chartHeadlineValue').textContent = formatMoney(vals[vals.length - 1]);
+      document.getElementById('chartDeltaBadge').textContent = `+${formatMoney(series.deltaUsd)} (${series.deltaPct})`;
+
+      // X-axis labels
+      document.getElementById('chartXLabels').innerHTML = series.labels.map(l => `<span>${l}</span>`).join('');
+
+      // Hit hover columns
+      const hitLayer = document.getElementById('chartHitLayer');
+      hitLayer.innerHTML = '';
+      const colW = width / pts.length;
+      pts.forEach((p, i) => {
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', Math.max(0, p.x - colW / 2));
+        rect.setAttribute('y', 0);
+        rect.setAttribute('width', colW);
+        rect.setAttribute('height', 220);
+        rect.setAttribute('fill', 'transparent');
+        rect.style.cursor = 'crosshair';
+        rect.addEventListener('mouseenter', () => showChartPoint(p));
+        rect.addEventListener('mouseleave', hideChartPoint);
+        hitLayer.appendChild(rect);
+      });
+    }
+
+    function showChartPoint(p) {
+      const hoverLine = document.getElementById('chartHoverLine');
+      const hoverDot = document.getElementById('chartHoverDot');
+      const tt = document.getElementById('chartTooltip');
+
+      hoverLine.setAttribute('x1', p.x);
+      hoverLine.setAttribute('x2', p.x);
+      hoverLine.classList.remove('hidden');
+
+      hoverDot.setAttribute('cx', p.x);
+      hoverDot.setAttribute('cy', p.y);
+      hoverDot.classList.remove('hidden');
+
+      document.getElementById('ttDate').textContent = `${p.label} · ${currentRange} Window`;
+      document.getElementById('ttValue').textContent = formatMoney(p.v);
+      document.getElementById('ttYield').textContent = `Yield: ${p.yield} APY`;
+
+      tt.classList.remove('hidden');
+      const pctX = (p.x / 760) * 100;
+      tt.style.left = `clamp(8px, calc(${pctX}% - 65px), calc(100% - 165px))`;
+      tt.style.top = `${Math.max(8, p.y - 68)}px`;
+    }
+
+    function hideChartPoint() {
+      document.getElementById('chartHoverLine').classList.add('hidden');
+      document.getElementById('chartHoverDot').classList.add('hidden');
+      document.getElementById('chartTooltip').classList.add('hidden');
+    }
+
+    // FX Swap & Allocation Calculator
+    function recalcSwap() {
+      const amt = parseFloat(document.getElementById('swapAmountInput').value) || 0;
+      const from = document.getElementById('swapFromCcy').value;
+      const to = document.getElementById('swapToCcy').value;
+      const crossRate = (fxMidRates[to] / fxMidRates[from]) * (1 - 0.0002);
+      const out = amt * crossRate;
+
+      document.getElementById('swapRateLabel').textContent = `1 ${from} = ${crossRate.toFixed(4)} ${to}`;
+      document.getElementById('swapOutputDisplay').textContent = out.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      const pct = parseInt(document.getElementById('allocSlider').value, 10);
+      document.getElementById('allocPctLabel').textContent = `${pct}% · 5.42% APY`;
+      const annualUsdYield = 48920400 * (pct / 100) * 0.0542;
+      document.getElementById('projectedYieldOut').textContent = `+${formatMoney(annualUsdYield)} / yr`;
+    }
+
+    function flipSwapCurrencies() {
+      const fromEl = document.getElementById('swapFromCcy');
+      const toEl = document.getElementById('swapToCcy');
+      const tmp = fromEl.value;
+      fromEl.value = toEl.value;
+      toEl.value = tmp;
+      recalcSwap();
+    }
+
+    function executeSwapAction() {
+      const amt = parseFloat(document.getElementById('swapAmountInput').value) || 250000;
+      const from = document.getElementById('swapFromCcy').value;
+      const to = document.getElementById('swapToCcy').value;
+      const outText = document.getElementById('swapOutputDisplay').textContent;
+      ledgerEntries.unshift({
+        id: 'QV-' + Math.floor(99500 + Math.random() * 450),
+        entity: `Atomic FX PvP (${from} -> ${to} · ${outText} ${to})`,
+        category: 'FX Wire',
+        rail: 'AI Smart Router',
+        usdAmount: Math.round(amt / fxMidRates[from]),
+        sign: '+',
+        status: 'Settled'
+      });
+      renderLedger();
+      showToast('Atomic FX Swap Settled', `Converted ${amt.toLocaleString()} ${from} -> ${outText} ${to} at 0.02% spread`);
+    }
+
+    // Ledger Table Filter & Search
+    function filterLedger(cat) {
+      currentLedgerFilter = cat;
+      document.querySelectorAll('.ledger-filter-btn').forEach(btn => {
+        if (btn.dataset.lfilter === cat) {
+          btn.className = 'ledger-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-sapphire text-white transition';
+        } else {
+          btn.className = 'ledger-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slateMuted hover:text-chalk transition';
+        }
+      });
+      renderLedger();
+    }
+
+    function renderLedger() {
+      const q = (document.getElementById('ledgerSearch').value || '').toLowerCase().trim();
+      const tbody = document.getElementById('ledgerTableBody');
+
+      const filtered = ledgerEntries.filter(item => {
+        const matchCat = currentLedgerFilter === 'All' || item.category === currentLedgerFilter;
+        const matchQuery = !q || item.entity.toLowerCase().includes(q) || item.id.toLowerCase().includes(q) || item.rail.toLowerCase().includes(q);
+        return matchCat && matchQuery;
+      });
+
+      tbody.innerHTML = filtered.map(item => {
+        const badgeStyle = item.category === 'Yield'
+          ? 'bg-emeraldInst/15 text-emeraldInst border-emeraldInst/25'
+          : item.category === 'FX Wire'
+            ? 'bg-sapphire/15 text-sapphire border-sapphire/25'
+            : 'bg-liquidGold/15 text-liquidGold border-liquidGold/30';
+
+        const statusDot = item.status === 'Streaming' ? 'bg-liquidGold animate-pulse' : 'bg-emeraldInst';
+        const amtColor = item.sign === '+' ? 'text-emeraldInst' : 'text-chalk';
+
+        return `
+          <tr class="hover:bg-white/[0.025] transition">
+            <td class="py-3.5 pr-4 font-mono text-xs text-slateMuted">${item.id}</td>
+            <td class="py-3.5 px-4 font-medium text-chalk">${item.entity}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-0.5 rounded-md font-mono text-[12.5px] border ${badgeStyle}">${item.category}</span>
+            </td>
+            <td class="py-3.5 px-4 font-mono text-xs text-slateMuted">${item.rail}</td>
+            <td class="py-3.5 px-4 text-right font-mono font-semibold tabular-nums ${amtColor}">
+              ${item.sign}${formatMoney(item.usdAmount)}
+            </td>
+            <td class="py-3.5 pl-4 text-right">
+              <span class="inline-flex items-center gap-1.5 font-mono text-xs text-chalk">
+                <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                ${item.status}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 3D Titanium Corporate Card Tilt Interaction
+    const cardWrap = document.getElementById('titaniumWrap');
+    const cardEl = document.getElementById('titaniumCard');
+    const glareEl = document.getElementById('titaniumGlare');
+
+    cardWrap.addEventListener('mousemove', (e) => {
+      const rect = cardWrap.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const rx = ((y / rect.height) - 0.5) * -14;
+      const ry = ((x / rect.width) - 0.5) * 16;
+      cardEl.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+      glareEl.style.setProperty('--mx', `${((x / rect.width) * 100).toFixed(1)}%`);
+      glareEl.style.setProperty('--my', `${((y / rect.height) * 100).toFixed(1)}%`);
+    });
+
+    cardWrap.addEventListener('mouseleave', () => {
+      cardEl.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+
+    function toggleCardDigits() {
+      cardRevealed = !cardRevealed;
+      document.getElementById('cardPanDisplay').textContent = cardRevealed
+        ? '4921 8400 1920 8842'
+        : '4921 •••• •••• 8842';
+      document.getElementById('revealCardBtn').textContent = cardRevealed ? 'Mask PAN' : 'Reveal PAN';
+    }
+
+    function toggleFreezeCard() {
+      cardFrozen = !cardFrozen;
+      const btn = document.getElementById('freezeCardBtn');
+      if (cardFrozen) {
+        btn.textContent = 'Frozen';
+        btn.className = 'px-2.5 py-1 rounded-lg text-[12.5px] font-mono text-liquidGold bg-liquidGold/15 border border-liquidGold/30 transition';
+        cardEl.style.opacity = '0.68';
+        showToast('Quantum Black Card Frozen', 'Card ••8842 authorizations paused instantaneously');
+      } else {
+        btn.textContent = 'Active';
+        btn.className = 'px-2.5 py-1 rounded-lg text-[12.5px] font-mono text-emeraldInst bg-emeraldInst/10 border border-emeraldInst/25 transition';
+        cardEl.style.opacity = '1';
+        showToast('Quantum Black Card Active', 'Commercial World Elite rail restored');
+      }
+    }
+
+    // Sidebar & Navigation Controls
+    function toggleSidebarCollapse() {
+      const sb = document.getElementById('sidebar');
+      const icon = document.getElementById('collapseIcon');
+      sb.classList.toggle('sidebar-collapsed');
+      if (sb.classList.contains('sidebar-collapsed')) {
+        sb.classList.remove('w-64');
+        sb.classList.add('w-20');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        sb.classList.remove('w-20');
+        sb.classList.add('w-64');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function toggleMobileSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('mobileOverlay');
+      sb.classList.toggle('-translate-x-full');
+      ov.classList.toggle('hidden');
+    }
+
+    const subpageConfigs = {
+      'FX Liquidity': {
+        tag: 'INSTITUTIONAL FX ROUTER · PVP ATOMIC',
+        subtitle: 'Multi-dealer spot & forward liquidity aggregated across 9 Tier-1 prime venues with zero Herstatt settlement risk.',
+        ctaLabel: 'Re-Sync Prime Quotes',
+        ctaToast: ['FIX 4.4 Venues Synced', 'Refreshed live quotes across JPM, Citi, UBS & SGX in 0.4ms'],
+        kpis: [
+          { label: '24h PvP Volume', val: '$6.18M', badge: '+18.4%', color: 'emeraldInst', sub: '92% Atomic Settlement' },
+          { label: 'Effective Spread', val: '0.02%', badge: '-1.4 bps', color: 'sapphire', sub: 'vs ECB / WM Fix' },
+          { label: 'Active LP Venues', val: '9 / 9', badge: '0.4ms', color: 'emeraldInst', sub: 'LDN-NY4-SG1 Mesh' },
+          { label: 'Forward Hedge Ratio', val: '84.5%', badge: 'Target 85%', color: 'liquidGold', sub: 'EUR & SGD Locked' }
+        ],
+        chartTitle: 'Prime Venue Execution Share & Spread Compression',
+        chartSub: 'Intraday order routing distribution across top institutional liquidity pools',
+        bars: [
+          { label: 'EUR / USD Spot PvP', pct: 92, meta: '$2.84M · 0.16 bps', tone: 'from-sapphire to-emeraldInst' },
+          { label: 'USD / SGD MAS FAST', pct: 78, meta: '$1.62M · 0.21 bps', tone: 'from-sapphire to-blue-400' },
+          { label: 'GBP / USD CHAPS', pct: 64, meta: '$1.09M · 0.24 bps', tone: 'from-emeraldInst to-teal-400' },
+          { label: 'USD / CHF SIX SIC', pct: 48, meta: '$630K · 0.19 bps', tone: 'from-liquidGold to-amber-400' }
+        ],
+        svgPoints: '10,128 90,114 170,119 250,92 330,78 410,64 490,42',
+        svgColor: '#3B82F6',
+        tableTitle: 'Live Multi-Currency Corridor Orderbook',
+        cols: ['Corridor Pair', 'Primary Liquidity Venue', 'Mid Rate / Spread', '24h Routed', 'Execution'],
+        rows: [
+          { c1: 'EUR / USD', c2: 'JPMorgan Kinexys PvP', c3: '1.0864 · 0.16 bps', c4: '$2,840,000', status: 'Streaming', action: 'Lock Hedge', doneText: 'Hedged' },
+          { c1: 'USD / SGD', c2: 'DBS Institutional SGX', c3: '1.3415 · 0.21 bps', c4: '$1,620,000', status: 'Streaming', action: 'Lock Hedge', doneText: 'Hedged' },
+          { c1: 'GBP / USD', c2: 'Barclays BARX London', c3: '1.2714 · 0.24 bps', c4: '$1,090,000', status: 'Streaming', action: 'Lock Hedge', doneText: 'Hedged' },
+          { c1: 'USD / CHF', c2: 'UBS Neo Zurich', c3: '0.8812 · 0.19 bps', c4: '$410,000', status: 'Active', action: 'Lock Hedge', doneText: 'Hedged' },
+          { c1: 'EUR / GBP', c2: 'Citigroup Velocity', c3: '0.8545 · 0.22 bps', c4: '$220,000', status: 'Active', action: 'Lock Hedge', doneText: 'Hedged' }
+        ]
+      },
+      'Yield Vaults': {
+        tag: 'SOVEREIGN CUSTODY · T+0 RECALL',
+        subtitle: 'Segregated US Treasury Bill ladders and tri-party overnight reverse repo sweep vaults with instant programmatic liquidity.',
+        ctaLabel: 'Sweep Idle Cash',
+        ctaToast: ['Autonomous Sweep Triggered', 'Moved $1,420,000 excess operating balance into 5.46% UST vault'],
+        kpis: [
+          { label: 'Allocated Vault Principal', val: '$34.64M', badge: '70.8% AUM', color: 'sapphire', sub: 'BNY Mellon Segregated' },
+          { label: 'Blended Net APY', val: '5.42%', badge: '+38 bps', color: 'emeraldInst', sub: 'Net of 3 bps custody' },
+          { label: 'Weighted Maturity', val: '29 Days', badge: 'T+0 Liquid', color: 'emeraldInst', sub: 'Runged 4W / 13W Bills' },
+          { label: 'YTD Accrued Yield', val: '+$2.18M', badge: '+14.2%', color: 'liquidGold', sub: 'Daily mark-to-market' }
+        ],
+        chartTitle: 'Treasury Maturity Ladder & Yield Curve Allocation',
+        chartSub: 'Principal distribution across overnight repo and sovereign T-Bill rungs',
+        bars: [
+          { label: 'Overnight Tri-Party Repo (SOFR+4)', pct: 88, meta: '$11.40M · 5.35% APY', tone: 'from-emeraldInst to-teal-400' },
+          { label: '4-Week US Treasury Bill (CUSIP 912797)', pct: 95, meta: '$13.20M · 5.46% APY', tone: 'from-sapphire to-emeraldInst' },
+          { label: '13-Week US Treasury Bill Ladder', pct: 68, meta: '$7.64M · 5.44% APY', tone: 'from-sapphire to-blue-400' },
+          { label: 'ECB Deposit Facility Euro Sweep', pct: 42, meta: '$2.40M · 3.68% APY', tone: 'from-liquidGold to-amber-400' }
+        ],
+        svgPoints: '10,132 90,118 170,104 250,88 330,74 410,56 490,38',
+        svgColor: '#10B981',
+        tableTitle: 'Active Custodial Yield Tranches',
+        cols: ['Vault Tranche', 'Custodian & CUSIP', 'Net APY', 'Allocated Balance', 'Vault Control'],
+        rows: [
+          { c1: 'UST 4-Week Auto-Roll', c2: 'BNY Mellon · 912797KR', c3: '5.46% APY', c4: '$13,200,000', status: 'Compounding', action: 'Rebalance', doneText: 'Balanced' },
+          { c1: 'Tri-Party Overnight Repo', c2: 'JPMorgan Kinexys Repo', c3: '5.35% APY', c4: '$11,400,000', status: 'T+0 Liquid', action: 'Rebalance', doneText: 'Balanced' },
+          { c1: 'UST 13-Week Sovereign', c2: 'State Street · 912797LM', c3: '5.44% APY', c4: '$7,640,400', status: 'Compounding', action: 'Rebalance', doneText: 'Balanced' },
+          { c1: 'EUR Sovereign MMF', c2: 'BlackRock ICS Euro Gov', c3: '3.68% APY', c4: '$1,550,000', status: 'Settled', action: 'Rebalance', doneText: 'Balanced' },
+          { c1: 'SGD MAS T-Bill Pool', c2: 'DBS Custody Singapore', c3: '3.82% APY', c4: '$850,000', status: 'Settled', action: 'Rebalance', doneText: 'Balanced' }
+        ]
+      },
+      'Corporate Cards': {
+        tag: 'COMMERCIAL METAL & VIRTUAL FLEET',
+        subtitle: 'Programmatic merchant category controls, zero-FX markup multi-currency spend, and instant 1.75% treasury cash rebate.',
+        ctaLabel: 'Issue Virtual Card',
+        ctaToast: ['Virtual Titanium Card Minted', 'Provisioned ••4109 with $50,000 monthly cloud spend cap'],
+        kpis: [
+          { label: '30d Fleet Spend', val: '$384,920', badge: '28 Cards', color: 'sapphire', sub: '15.4% of $2.5M credit line' },
+          { label: 'Cashback Rebate Earned', val: '+$6,736', badge: '1.75% Flat', color: 'emeraldInst', sub: 'Swept to T-Bill vault' },
+          { label: 'Auto-Receipt Match', val: '99.1%', badge: 'ERP Synced', color: 'emeraldInst', sub: 'NetSuite real-time OCR' },
+          { label: 'Blocked Out-of-Policy', val: '4 Auth', badge: '$14.2K Saved', color: 'liquidGold', sub: 'MCC & velocity rules' }
+        ],
+        chartTitle: 'Departmental Card Spend & Monthly Cap Utilization',
+        chartSub: 'Real-time authorization burn across cloud infrastructure, travel, and data terminals',
+        bars: [
+          { label: 'Cloud & GPU Infrastructure (AWS / GCP)', pct: 78, meta: '$196,400 / $250K', tone: 'from-sapphire to-emeraldInst' },
+          { label: 'Market Data & Financial Terminals', pct: 62, meta: '$93,000 / $150K', tone: 'from-sapphire to-blue-400' },
+          { label: 'Executive Global Aviation & Travel', pct: 46, meta: '$55,200 / $120K', tone: 'from-emeraldInst to-teal-400' },
+          { label: 'Security & Compliance SaaS', pct: 34, meta: '$40,320 / $120K', tone: 'from-liquidGold to-amber-400' }
+        ],
+        svgPoints: '10,120 90,108 170,115 250,86 330,91 410,68 490,54',
+        svgColor: '#F59E0B',
+        tableTitle: 'Active Executive & Departmental Cards',
+        cols: ['Cardholder / Desk', 'Card PAN & Tier', 'Cycle Spend / Limit', 'Rebate', 'Card Status'],
+        rows: [
+          { c1: 'Cloud Infra Reserve', c2: '••8842 · Titanium Virtual', c3: '$64,250 / $250,000', c4: '+$1,124', status: 'Active', action: 'Freeze Card', doneText: 'Frozen' },
+          { c1: 'Elena Vance, CFA', c2: '••1049 · Physical Metal', c3: '$18,900 / $100,000', c4: '+$330', status: 'Active', action: 'Freeze Card', doneText: 'Frozen' },
+          { c1: 'Quant Trading Desk', c2: '••7731 · Vendor Locked', c3: '$42,600 / $75,000', c4: '+$745', status: 'Active', action: 'Freeze Card', doneText: 'Frozen' },
+          { c1: 'EMEA Treasury Ops', c2: '••5520 · Zero-FX EUR', c3: '$29,400 / $80,000', c4: '+$514', status: 'Active', action: 'Freeze Card', doneText: 'Frozen' },
+          { c1: 'APAC Regional Travel', c2: '••3398 · Physical Metal', c3: '$14,120 / $60,000', c4: '+$247', status: 'Active', action: 'Freeze Card', doneText: 'Frozen' }
+        ]
+      },
+      'Risk & VaR': {
+        tag: 'MONTE CARLO 10,000-PATH ENGINE',
+        subtitle: 'Continuous parametric and historical stress testing across FX exposure, interest rate duration, and G-SIB counterparty tiers.',
+        ctaLabel: 'Run 99% Stress Sim',
+        ctaToast: ['Monte Carlo Stress Completed', '10,000 paths verified: 1-day 99% VaR steady at 0.18% ($88,056)'],
+        kpis: [
+          { label: '1-Day VaR (99% Conf)', val: '0.18%', badge: '$88,056', color: 'emeraldInst', sub: 'Well below 0.50% limit' },
+          { label: 'Portfolio Duration', val: '0.08 Yrs', badge: 'Ultra-Short', color: 'sapphire', sub: 'DV01: $3,910 per bp' },
+          { label: 'Counterparty Tiering', val: '100% G-SIB', badge: 'AA- Min', color: 'emeraldInst', sub: 'Zero unrated custody' },
+          { label: 'HSM Quorum Health', val: '5 / 7 Keys', badge: 'FIPS 140-3', color: 'liquidGold', sub: 'MPC hardware enclaves' }
+        ],
+        chartTitle: 'Macro Tail-Risk Stress Scenarios (bps Impact)',
+        chartSub: 'Simulated mark-to-market resilience under parallel rate shocks and FX volatility spikes',
+        bars: [
+          { label: 'Fed +100 bps Parallel Rate Shock', pct: 24, meta: '-0.08% NAV Impact · Passed', tone: 'from-emeraldInst to-teal-400' },
+          { label: 'EUR / USD 3-Sigma Volatility Event', pct: 36, meta: '-0.14% NAV Impact · Hedged', tone: 'from-sapphire to-blue-400' },
+          { label: 'G-SIB Intraday Settlement Delay', pct: 18, meta: 'T+0 Failover Ready · Passed', tone: 'from-emeraldInst to-sapphire' },
+          { label: 'Sovereign Repo Liquidity Squeeze', pct: 29, meta: '98.8% Instant Recall · Passed', tone: 'from-liquidGold to-amber-400' }
+        ],
+        svgPoints: '10,62 90,68 170,65 250,78 330,84 410,92 490,98',
+        svgColor: '#10B981',
+        tableTitle: 'Custodian & Counterparty Exposure Matrix',
+        cols: ['Institution', 'Credit Rating', 'Custodied Exposure', 'Concentration', 'Audit'],
+        rows: [
+          { c1: 'BNY Mellon Custody', c2: 'AA- · S&P Global', c3: '$20,840,400', c4: '42.6% (Segregated)', status: 'Compliant', action: 'Attest Proof', doneText: 'Attested' },
+          { c1: 'JPMorgan Chase N.A.', c2: 'A+ · S&P Global', c3: '$14,920,000', c4: '30.5% (Repo + Ops)', status: 'Compliant', action: 'Attest Proof', doneText: 'Attested' },
+          { c1: 'State Street Bank', c2: 'AA- · S&P Global', c3: '$7,640,000', c4: '15.6% (UST Ladder)', status: 'Compliant', action: 'Attest Proof', doneText: 'Attested' },
+          { c1: 'DBS Bank Ltd SG', c2: 'AA- · S&P Global', c3: '$3,410,000', c4: '7.0% (APAC Pool)', status: 'Compliant', action: 'Attest Proof', doneText: 'Attested' },
+          { c1: 'Citibank Europe plc', c2: 'A+ · S&P Global', c3: '$2,110,000', c4: '4.3% (SEPA Ops)', status: 'Compliant', action: 'Attest Proof', doneText: 'Attested' }
+        ]
+      },
+      'Ledger': {
+        tag: 'ISO 20022 · CRYPTOGRAPHIC SUB-LEDGER',
+        subtitle: 'Immutable double-entry treasury journal with real-time camt.053 bank reconciliation and zero-knowledge audit proofs.',
+        ctaLabel: 'Export ISO 20022 XML',
+        ctaToast: ['CAMT.053 Archive Exported', 'Signed cryptographic ledger bundle downloaded (SHA-256 verified)'],
+        kpis: [
+          { label: 'Reconciled Entries', val: '100.0%', badge: '14,820 Tx', color: 'emeraldInst', sub: 'Zero breaks QTD' },
+          { label: 'Median Post Latency', val: '380ms', badge: 'Real-Time', color: 'sapphire', sub: 'Webhook -> ERP GL' },
+          { label: 'Signed Merkle Roots', val: '1,024', badge: 'HSM Anchored', color: 'emeraldInst', sub: 'Hourly state proofs' },
+          { label: 'Pending Approvals', val: '2 Wires', badge: '$410,000', color: 'liquidGold', sub: 'Awaiting 5th MPC key' }
+        ],
+        chartTitle: 'Automated GL Reconciliation by Journal Class',
+        chartSub: 'Continuous three-way match between bank statement, custody feed, and NetSuite ERP',
+        bars: [
+          { label: 'Sovereign Coupon & Repo Accruals', pct: 100, meta: '4,210 Entries · 100% Matched', tone: 'from-emeraldInst to-teal-400' },
+          { label: 'Cross-Border FX PvP Wires', pct: 99, meta: '3,890 Entries · 99.9% Matched', tone: 'from-sapphire to-emeraldInst' },
+          { label: 'Commercial Card Clearing Batches', pct: 98, meta: '5,140 Entries · 99.4% Matched', tone: 'from-sapphire to-blue-400' },
+          { label: 'Intercompany Sweep Eliminations', pct: 100, meta: '1,580 Entries · 100% Matched', tone: 'from-liquidGold to-amber-400' }
+        ],
+        svgPoints: '10,126 90,110 170,98 250,86 330,70 410,55 490,40',
+        svgColor: '#3B82F6',
+        tableTitle: 'Cryptographic General Ledger Audit Entries',
+        cols: ['Journal Hash', 'GL Account & Entity', 'Rail / Reference', 'Net Amount', 'Verification'],
+        rows: [
+          { c1: '0x94f8...c21a', c2: '1010 · UST 13W Coupon Sweep', c3: 'BNY Mellon · QV-99482', c4: '+$148,920', status: 'Anchored', action: 'Verify Hash', doneText: 'Verified' },
+          { c1: '0x71b3...e09d', c2: '2040 · Siemens Energy GmbH', c3: 'SEPA Instant · QV-99479', c4: '-$840,000', status: 'Anchored', action: 'Verify Hash', doneText: 'Verified' },
+          { c1: '0x58a2...994f', c2: '1025 · SGX Sovereign Pool', c3: 'MAS FAST PvP · QV-99463', c4: '+$1,620,000', status: 'Anchored', action: 'Verify Hash', doneText: 'Verified' },
+          { c1: '0x33d9...118c', c2: '6120 · AWS Reserved Compute', c3: 'Card ••8842 · QV-99474', c4: '-$42,650', status: 'Anchored', action: 'Verify Hash', doneText: 'Verified' },
+          { c1: '0x19e4...770b', c2: '1015 · Kinexys Overnight Repo', c3: 'JPMorgan · QV-99470', c4: '+$19,480', status: 'Streaming', action: 'Verify Hash', doneText: 'Verified' }
+        ]
+      }
+    };
+
+    function returnToOverview() {
+      const homeBtn = document.querySelector('.nav-item-btn[data-nav="Treasury Overview"]');
+      if (homeBtn) {
+        selectNav(homeBtn, 'Treasury Overview');
+      }
+    }
+
+    function triggerSubpageRowAction(btn, section, rowLabel, doneText) {
+      btn.textContent = doneText;
+      btn.className = 'px-3 py-1.5 rounded-xl font-mono text-xs font-semibold bg-emeraldInst/15 text-emeraldInst border border-emeraldInst/30 transition';
+      showToast(section + ' Updated', rowLabel + ' -> ' + doneText + ' confirmed via HSM');
+    }
+
+    function renderSubpageView(label) {
+      const cfg = subpageConfigs[label];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const kpiHtml = cfg.kpis.map(k => {
+        const badgeStyles = k.color === 'emeraldInst'
+          ? 'bg-emeraldInst/15 text-emeraldInst border-emeraldInst/25'
+          : k.color === 'liquidGold'
+            ? 'bg-liquidGold/15 text-liquidGold border-liquidGold/30'
+            : 'bg-sapphire/15 text-sapphire border-sapphire/30';
+        return `
+          <div class="smoked-glass rounded-2xl p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-medium text-slateMuted">${k.label}</span>
+                <div class="font-display text-2xl font-bold text-chalk tabular-nums mt-1.5 tracking-tight">${k.val}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold border ${badgeStyles}">${k.badge}</span>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 text-xs font-mono text-slateMuted">${k.sub}</div>
+          </div>
+        `;
+      }).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-medium text-chalk">${b.label}</span>
+            <span class="font-mono text-slateMuted tabular-nums">${b.meta}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r ${b.tone}" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-3.5 pr-4 font-mono text-xs font-semibold text-chalk">${r.c1}</td>
+          <td class="py-3.5 px-4 text-xs text-slateMuted">${r.c2}</td>
+          <td class="py-3.5 px-4 font-mono text-xs text-chalk tabular-nums">${r.c3}</td>
+          <td class="py-3.5 px-4 font-mono text-xs font-semibold text-emeraldInst tabular-nums">${r.c4}</td>
+          <td class="py-3.5 pl-4 text-right">
+            <button onclick="triggerSubpageRowAction(this, '${label.replace(/'/g, "\\'")}', '${r.c1.replace(/'/g, "\\'")}', '${r.doneText}')" class="px-3 py-1.5 rounded-xl font-mono text-xs font-semibold bg-white/5 hover:bg-sapphire text-chalk border border-white/15 hover:border-sapphire transition">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <section class="smoked-glass rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="returnToOverview()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold text-chalk bg-white/5 hover:bg-white/10 border border-white/15 transition">
+                <svg class="w-3.5 h-3.5 text-sapphire" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <span>Overview</span>
+              </button>
+              <span class="px-2.5 py-1 rounded-full font-mono text-xs bg-sapphire/15 text-sapphire border border-sapphire/30">${cfg.tag}</span>
+            </div>
+            <h1 class="font-display text-2xl font-bold text-chalk pt-1">${label}</h1>
+            <p class="text-sm text-slateMuted max-w-2xl">${cfg.subtitle}</p>
+          </div>
+          <button onclick="showToast('${cfg.ctaToast[0]}', '${cfg.ctaToast[1]}')" class="self-start sm:self-center inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-sapphire to-blue-500 hover:brightness-110 border border-white/20 shadow-lg shadow-sapphire/25 transition shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-linecap="round" stroke-linejoin="round"></polygon>
+            </svg>
+            <span>${cfg.ctaLabel}</span>
+          </button>
+        </section>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          ${kpiHtml}
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-5 smoked-glass rounded-2xl p-6 flex flex-col justify-between space-y-5">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-widest text-sapphire">Real-Time Allocation</span>
+              <h2 class="font-display text-lg font-bold text-chalk mt-1">${cfg.chartTitle}</h2>
+              <p class="text-xs text-slateMuted mt-1">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl bg-black/35 border border-white/10 p-4">
+              <svg class="w-full h-36 overflow-visible" viewBox="0 0 500 150" fill="none">
+                <defs>
+                  <linearGradient id="subSvgGradNova" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${cfg.svgColor}" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="${cfg.svgColor}" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="10" y1="35" x2="490" y2="35" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3 3"/>
+                <line x1="10" y1="85" x2="490" y2="85" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3 3"/>
+                <line x1="10" y1="135" x2="490" y2="135" stroke="rgba(255,255,255,0.12)"/>
+                <polygon points="${cfg.svgPoints} 490,135 10,135" fill="url(#subSvgGradNova)"/>
+                <polyline points="${cfg.svgPoints}" fill="none" stroke="${cfg.svgColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="12" y="148" fill="#94A3B8" font-family="JetBrains Mono" font-size="12">T-6d</text>
+                <text x="235" y="148" fill="#94A3B8" font-family="JetBrains Mono" font-size="12">T-3d</text>
+                <text x="455" y="148" fill="#F8FAFC" font-family="JetBrains Mono" font-size="12">LIVE</text>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="xl:col-span-7 smoked-glass rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <span class="font-mono text-xs uppercase tracking-widest text-emeraldInst">Interactive Desk Queue</span>
+                  <h2 class="font-display text-lg font-bold text-chalk mt-0.5">${cfg.tableTitle}</h2>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg font-mono text-xs bg-emeraldInst/10 text-emeraldInst border border-emeraldInst/25">5 Active Records</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[580px]">
+                  <thead>
+                    <tr class="border-b border-white/10 text-xs font-mono uppercase tracking-wider text-slateMuted">
+                      <th class="py-3 pr-4">${cfg.cols[0]}</th>
+                      <th class="py-3 px-4">${cfg.cols[1]}</th>
+                      <th class="py-3 px-4">${cfg.cols[2]}</th>
+                      <th class="py-3 px-4">${cfg.cols[3]}</th>
+                      <th class="py-3 pl-4 text-right">${cfg.cols[4]}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/10">
+                    ${rowsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slateMuted">
+              <span>MPC Hardware Quorum 5/7 Active</span>
+              <span class="text-emeraldInst">ISO 20022 Synced</span>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function selectNav(btn, label) {
+      document.querySelectorAll('.nav-item-btn').forEach(b => {
+        b.classList.remove('bg-gradient-to-r', 'from-sapphire/20', 'to-emeraldInst/10', 'text-chalk', 'border-sapphire/35', 'shadow-sm');
+        b.classList.add('text-slateMuted', 'border-transparent');
+        const svg = b.querySelector('svg');
+        if (svg) svg.classList.remove('text-sapphire');
+      });
+      btn.classList.remove('text-slateMuted', 'border-transparent');
+      btn.classList.add('bg-gradient-to-r', 'from-sapphire/20', 'to-emeraldInst/10', 'text-chalk', 'border-sapphire/35', 'shadow-sm');
+      const activeSvg = btn.querySelector('svg');
+      if (activeSvg) activeSvg.classList.add('text-sapphire');
+
+      document.getElementById('activeSectionBadge').textContent = label;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (label === 'Treasury Overview') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        renderTreasuryChart();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderSubpageView(label);
+      }
+
+      if (window.innerWidth < 1024 && !document.getElementById('sidebar').classList.contains('-translate-x-full')) {
+        toggleMobileSidebar();
+      }
+    }
+
+    // Instant Settlement Modal
+    function openSettlementModal() {
+      const m = document.getElementById('settlementModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeSettlementModal() {
+      const m = document.getElementById('settlementModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function submitInstantSettlement(e) {
+      e.preventDefault();
+      const ben = document.getElementById('modalBeneficiary').value;
+      const amt = parseFloat(document.getElementById('modalAmount').value) || 1250000;
+      const rail = document.getElementById('modalRail').value;
+
+      ledgerEntries.unshift({
+        id: 'QV-' + Math.floor(99510 + Math.random() * 480),
+        entity: ben,
+        category: 'FX Wire',
+        rail: rail,
+        usdAmount: amt,
+        sign: '-',
+        status: 'Settled'
+      });
+      renderLedger();
+      closeSettlementModal();
+      showToast('Instant Settlement Dispatched', `${formatMoney(amt)} -> ${ben} via ${rail}`);
+    }
+
+    let toastTimer = null;
+    function showToast(title, msg) {
+      const t = document.getElementById('vaultToast');
+      document.getElementById('vaultToastTitle').textContent = title;
+      document.getElementById('vaultToastMsg').textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.add('hidden'), 4200);
+    }
+
+    // Initialize Dashboard
+    renderTreasuryChart();
+    recalcSwap();
+    renderLedger();
+  </script>
+</body>
+</html>

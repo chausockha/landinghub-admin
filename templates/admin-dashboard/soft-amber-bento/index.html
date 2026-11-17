@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSE &amp; SCOPE — Soft Bento &amp; Midnight-Amber Data Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            midnight: {
+              DEFAULT: '#15173D',
+              deep: '#0F1130',
+              soft: '#25295C',
+            },
+            periwinkle: {
+              DEFAULT: '#4E568C',
+              light: '#8E97CC',
+              pale: '#DCE2F5',
+            },
+            amberGlow: '#FBBF24',
+            coralGlow: '#F97316',
+            roseGlow: '#EC4899',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(199, 210, 254, 0.55) 0%, transparent 45%),
+        radial-gradient(circle at 88% 18%, rgba(254, 215, 170, 0.38) 0%, transparent 42%),
+        radial-gradient(circle at 50% 95%, rgba(224, 231, 255, 0.55) 0%, transparent 50%),
+        #E9EFF8;
+      color: #15173D;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Outer Floating Soft-Board Frame */
+    .board-shell {
+      background: rgba(246, 248, 253, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow:
+        0 32px 72px -18px rgba(21, 23, 61, 0.14),
+        0 8px 24px -8px rgba(21, 23, 61, 0.06),
+        inset 0 1px 0 #FFFFFF;
+    }
+
+    /* Tactile Soft White Bento Card */
+    .bento-card {
+      background: #FFFFFF;
+      border-radius: 24px;
+      border: 1px solid rgba(226, 232, 245, 0.95);
+      box-shadow:
+        0 14px 34px -10px rgba(21, 23, 61, 0.06),
+        0 3px 10px -3px rgba(21, 23, 61, 0.03),
+        inset 0 1px 0 #FFFFFF;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.25s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(99, 102, 241, 0.26);
+      box-shadow:
+        0 22px 44px -12px rgba(21, 23, 61, 0.11),
+        0 6px 16px -4px rgba(21, 23, 61, 0.05);
+    }
+
+    /* Signature Deep Midnight-Indigo Contrast Card */
+    .bento-midnight {
+      background: linear-gradient(160deg, #191C4B 0%, #121436 60%, #0D0F2B 100%);
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow:
+        0 24px 50px -12px rgba(15, 17, 48, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+    }
+    .bento-midnight:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 30px 60px -12px rgba(15, 17, 48, 0.54),
+        0 0 0 1px rgba(251, 191, 36, 0.28);
+    }
+
+    /* Recessed Cool Ice Chart Well */
+    .chart-well {
+      background: linear-gradient(180deg, #EEF2FA 0%, #F5F8FD 100%);
+      border: 1px solid rgba(203, 213, 235, 0.55);
+      box-shadow: inset 0 2px 6px rgba(21, 23, 61, 0.04);
+    }
+
+    /* Architectural L-Bracket Stat Frame (Bottom of Left Card) */
+    .stat-bracket {
+      border-left: 2px solid #25295C;
+      border-bottom: 2px solid #25295C;
+      padding: 0.5rem 0.75rem;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Kinetic SVG Animations */
+    @keyframes drawPath {
+      from { stroke-dashoffset: 900; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .animate-draw {
+      stroke-dasharray: 900;
+      animation: drawPath 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes barRise {
+      from { transform: scaleY(0.15); opacity: 0.3; }
+      to   { transform: scaleY(1); opacity: 1; }
+    }
+    .bar-grow {
+      transform-origin: bottom;
+      animation: barRise 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes pulseHalo {
+      0%, 100% { transform: scale(1); opacity: 0.75; }
+      50%      { transform: scale(1.65); opacity: 0; }
+    }
+    .pulse-halo {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pulseHalo 2.2s ease-in-out infinite;
+    }
+
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0px); }
+      50%      { transform: translateY(-3px); }
+    }
+    .float-pill {
+      animation: floatBadge 3.4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="py-5 px-4 sm:px-6 lg:px-8">
+
+  <!-- OUTER SOFT BENTO BOARD -->
+  <div class="max-w-[1440px] mx-auto board-shell rounded-[34px] p-5 sm:p-6 lg:p-7 space-y-5">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TOP ROW: 2 ASYMMETRIC HEADER BENTO CARDS (4-COL KPI + 8-COL TOPBAR)
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- Top-Left Executive Pulse Card -->
+      <div class="bento-card p-6 lg:col-span-4 flex flex-col justify-between">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h1 class="font-display text-xl sm:text-[22px] font-extrabold tracking-tight text-midnight">
+              Pulse &amp; Scope
+            </h1>
+            <p class="text-xs font-medium text-slate-500 mt-0.5">
+              Executive Revenue &amp; Attribution Matrix
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-700">
+            <span class="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span>
+            Q4 Live
+          </span>
+        </div>
+
+        <div class="mt-4 flex items-baseline justify-between gap-4">
+          <div class="flex items-baseline gap-3">
+            <span id="heroRateValue" class="font-display text-3xl sm:text-[34px] font-extrabold tracking-tight text-midnight">
+              89.4%
+            </span>
+            <span id="heroRateDelta" class="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+              +6.8% QoQ
+            </span>
+          </div>
+          <span class="text-xs font-medium text-slate-400">Net Goal Attainment</span>
+        </div>
+      </div>
+
+      <!-- Top-Right Dual-Tier Workspace Navigation & Telemetry Strip Card -->
+      <div class="bento-card p-5 lg:col-span-8 flex flex-col justify-between gap-3.5">
+        <!-- Tier 1: Period & Scope Switcher -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm font-bold text-amber-600 mr-2 flex items-center gap-1.5">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              Scope Stream
+            </span>
+
+            <button onclick="switchDataset('q4')" id="tab-q4" class="scope-tab rounded-xl px-3.5 py-1.5 text-sm font-bold bg-midnight text-white shadow-sm transition cursor-pointer">
+              Q4 Global
+            </button>
+            <button onclick="switchDataset('enterprise')" id="tab-enterprise" class="scope-tab rounded-xl px-3.5 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+              Enterprise SaaS
+            </button>
+            <button onclick="switchDataset('apac')" id="tab-apac" class="scope-tab rounded-xl px-3.5 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+              EMEA &amp; APAC
+            </button>
+            <button onclick="switchDataset('attribution')" id="tab-attribution" class="scope-tab rounded-xl px-3.5 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+              Attribution
+            </button>
+            <button onclick="switchDataset('forecasts')" id="tab-forecasts" class="scope-tab rounded-xl px-3.5 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+              Forecasts
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            <button id="livePulseBtn" onclick="toggleLiveSimulation()" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-semibold text-midnight hover:border-amber-400 transition cursor-pointer">
+              <span id="liveDot" class="h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span id="liveLabel">Kinetic Stream: ON</span>
+            </button>
+            <div class="flex items-center gap-2 rounded-xl bg-slate-100/80 px-3 py-1.5">
+              <div class="h-6 w-6 rounded-full bg-midnight text-amber-300 text-xs font-bold flex items-center justify-center">
+                EV
+              </div>
+              <span class="text-xs font-bold text-midnight">Elena V.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tier 2: Soft Ice Telemetry Pill Strip -->
+        <div class="rounded-2xl bg-[#EEF3FB] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-600">
+            <span class="inline-flex items-center gap-1.5 text-midnight font-bold">
+              <svg class="w-4 h-4 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+              Sync: 18ms
+            </span>
+            <span class="h-3.5 w-px bg-slate-300 hidden sm:inline-block"></span>
+            <span>Pipeline: <strong class="text-midnight">$4.82M</strong></span>
+            <span>Active Deals: <strong class="text-midnight">318</strong></span>
+            <span class="inline-flex items-center gap-1.5 text-amber-700 bg-amber-100/80 px-2.5 py-0.5 rounded-full font-bold">
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              AI Forecast 96.4%
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3 text-xs font-mono font-bold text-midnight">
+            <span>ARR +28.4%</span>
+            <button onclick="triggerReportToast('Executive Snapshot exported to PDF')" class="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-midnight shadow-sm hover:bg-amber-50 transition cursor-pointer">
+              Export Deck
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <div id="defaultDashboardView">
+        <!-- ══════════════════════════════════════════════════════════════════
+             MAIN ASYMMETRIC BENTO MOSAIC (LEFT 8 COLS + RIGHT 4 COLS)
+        ══════════════════════════════════════════════════════════════════ -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+
+      <!-- ── LEFT + CENTER COMPOSITE ZONE (8 COLUMNS) ── -->
+      <div class="lg:col-span-8 flex flex-col gap-5">
+
+        <!-- Upper 8-Col Split: Left Tall Arch Gauge Card (3/8) + Center 2 Stacked Chart Cards (5/8) -->
+        <div class="grid grid-cols-1 md:grid-cols-8 gap-5 flex-1">
+
+          <!-- CARD A (3 cols): Warm Sunset Semi-Circle Arch Gauge + L-Bracket Metrics -->
+          <div class="bento-card p-6 md:col-span-3 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                    <path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path>
+                  </svg>
+                </span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Velocity Core</span>
+              </div>
+              <span class="h-2.5 w-2.5 rounded-sm bg-rose-400"></span>
+            </div>
+
+            <!-- Signature Sunset Arch Cradling Dark Midnight Pill -->
+            <div class="my-4 relative flex items-center justify-center">
+              <svg viewBox="0 0 220 145" class="w-full max-w-[220px] overflow-visible">
+                <defs>
+                  <linearGradient id="sunsetArch" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#FBBF24" />
+                    <stop offset="50%" stop-color="#F97316" />
+                    <stop offset="100%" stop-color="#EC4899" />
+                  </linearGradient>
+                  <filter id="sunsetGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="5" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <!-- Soft Ambient Track -->
+                <path
+                  d="M 28 118 A 82 82 0 1 1 192 118"
+                  fill="none"
+                  stroke="#FDEBD0"
+                  stroke-width="22"
+                  stroke-linecap="round"
+                />
+                <!-- Active Sunset Gradient Arch -->
+                <path
+                  id="archGaugePath"
+                  d="M 28 118 A 82 82 0 1 1 192 118"
+                  fill="none"
+                  stroke="url(#sunsetArch)"
+                  stroke-width="22"
+                  stroke-linecap="round"
+                  stroke-dasharray="310 360"
+                  filter="url(#sunsetGlow)"
+                  style="transition: stroke-dasharray 0.8s cubic-bezier(0.22,1,0.36,1);"
+                />
+
+                <!-- Inner Deep Midnight Pill Core -->
+                <rect x="52" y="56" width="116" height="68" rx="34" fill="#15173D" />
+                <text id="archLeftNum" x="85" y="96" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700">4,410</text>
+                <line x1="112" y1="74" x2="112" y2="106" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" />
+                <text id="archRightNum" x="139" y="96" text-anchor="middle" fill="#FBBF24" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700">94.8%</text>
+              </svg>
+            </div>
+
+            <!-- Middle Progress Breakdown -->
+            <div class="space-y-2.5 my-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-midnight">Qualified Pipeline</span>
+                <span class="font-mono font-semibold text-slate-500">86%</span>
+              </div>
+              <div class="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                <div id="qualBar" class="h-full rounded-full bg-gradient-to-r from-midnight to-indigo-500 transition-all duration-700" style="width: 86%"></div>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Automated scoring across enterprise inbound &amp; partner channels.
+              </p>
+            </div>
+
+            <!-- Bottom 2 Architectural L-Bracket Stat Frames -->
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100">
+              <div>
+                <div class="stat-bracket">
+                  <p id="bracketVal1" class="font-display text-xl font-extrabold text-midnight leading-none">2,115</p>
+                </div>
+                <p class="text-xs font-medium text-slate-500 mt-1.5">Active Seats</p>
+              </div>
+              <div>
+                <div class="stat-bracket">
+                  <p id="bracketVal2" class="font-display text-xl font-extrabold text-midnight leading-none">78.3%</p>
+                </div>
+                <p class="text-xs font-medium text-slate-500 mt-1.5">Net Expansion</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CENTER 2 STACKED CARDS (5 cols) -->
+          <div class="md:col-span-5 flex flex-col gap-5">
+
+            <!-- CARD B (Top Center): Stepped Skyline + Vertical Indigo Histogram -->
+            <div class="bento-card p-6 flex-1 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="font-display text-base font-bold text-midnight"> Cohort Density &amp; Volume</h2>
+                  <p class="text-xs text-slate-500">Clustered enterprise seats vs weekly expansion</p>
+                </div>
+                <button onclick="triggerReportToast('Opened Cohort Density Breakdown')" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-700 cursor-pointer">
+                  Details
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <path d="m9 18 6-6-6-6"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Stepped Skyline + Spaced Indigo Columns SVG -->
+              <div class="chart-well rounded-2xl p-4 relative">
+                <svg id="skylineSvg" viewBox="0 0 440 135" class="w-full h-32 overflow-visible">
+                  <defs>
+                    <linearGradient id="skyBlock1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3B4278" />
+                      <stop offset="100%" stop-color="#1E224D" />
+                    </linearGradient>
+                    <linearGradient id="skyBlock2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#6C75B5" />
+                      <stop offset="100%" stop-color="#3B4278" />
+                    </linearGradient>
+                    <linearGradient id="colIndigo" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#25295C" />
+                      <stop offset="100%" stop-color="#7C86C4" />
+                    </linearGradient>
+                  </defs>
+
+                  <line x1="8" y1="30" x2="432" y2="30" stroke="#DCE3F2" stroke-dasharray="3 3" />
+                  <line x1="8" y1="75" x2="432" y2="75" stroke="#DCE3F2" stroke-dasharray="3 3" />
+                  <line x1="8" y1="122" x2="432" y2="122" stroke="#CBD5E8" stroke-width="1.5" />
+
+                  <!-- Left Clustered Skyline Blocks -->
+                  <g class="bar-grow">
+                    <rect x="16" y="64" width="18" height="58" rx="2" fill="url(#skyBlock2)" />
+                    <rect x="34" y="42" width="44" height="80" rx="3" fill="url(#skyBlock1)" />
+                    <rect x="78" y="54" width="28" height="68" rx="2" fill="url(#skyBlock2)" />
+                    <rect x="106" y="60" width="24" height="62" rx="2" fill="#8E97CC" />
+                    <rect x="130" y="48" width="26" height="74" rx="3" fill="url(#skyBlock1)" />
+                    <rect x="156" y="44" width="28" height="78" rx="3" fill="url(#skyBlock2)" />
+                    <rect x="184" y="66" width="22" height="56" rx="2" fill="#3B4278" />
+                    <rect x="206" y="96" width="16" height="26" rx="2" fill="#9BA4D6" />
+                  </g>
+
+                  <!-- Right Spaced Rounded Columns -->
+                  <g class="bar-grow" style="animation-delay: 0.12s;">
+                    <rect x="248" y="48" width="14" height="74" rx="4" fill="#6C75B5" class="hover:opacity-80 cursor-pointer" />
+                    <rect x="278" y="44" width="14" height="78" rx="4" fill="#8E97CC" class="hover:opacity-80 cursor-pointer" />
+                    <rect x="308" y="54" width="14" height="68" rx="4" fill="#7C86C4" class="hover:opacity-80 cursor-pointer" />
+                    <rect x="338" y="52" width="14" height="70" rx="4" fill="#9BA4D6" class="hover:opacity-80 cursor-pointer" />
+                    <rect x="368" y="68" width="16" height="54" rx="4" fill="#A5B4FC" class="hover:opacity-80 cursor-pointer" />
+                    <rect x="400" y="24" width="18" height="98" rx="4" fill="url(#colIndigo)" class="hover:opacity-80 cursor-pointer" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- CARD C (Bottom Center): Smooth Periwinkle Mountain Wave + Floating Dark Callout + 7 Bold Numbers -->
+            <div class="bento-card p-6 flex-1 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="font-display text-base font-bold text-midnight">Conversion Wave &amp; Channel Split</h2>
+                  <p class="text-xs text-slate-500">Rolling 7-stage attribution throughput</p>
+                </div>
+                <span class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
+                  +19.2% Peak
+                </span>
+              </div>
+
+              <div class="grid grid-cols-12 gap-3 items-center">
+                <!-- Mountain Wave Well (9 cols) -->
+                <div class="col-span-9 chart-well rounded-2xl p-3 relative">
+                  <svg viewBox="0 0 320 105" class="w-full h-24 overflow-visible">
+                    <defs>
+                      <linearGradient id="mountainFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#5B649E" stop-opacity="0.75" />
+                        <stop offset="100%" stop-color="#9BA4D6" stop-opacity="0.20" />
+                      </linearGradient>
+                    </defs>
+
+                    <path
+                      id="mountainWavePath"
+                      d="M 8 64 Q 32 82, 58 70 T 112 58 T 165 62 T 222 40 Q 248 76, 272 68 T 312 46 L 312 96 L 8 96 Z"
+                      fill="url(#mountainFill)"
+                    />
+                    <path
+                      d="M 8 64 Q 32 82, 58 70 T 112 58 T 165 62 T 222 40 Q 248 76, 272 68 T 312 46"
+                      fill="none"
+                      stroke="#3F477D"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      class="animate-draw"
+                    />
+
+                    <!-- Floating Midnight Pill Callout Above Crest -->
+                    <g class="float-pill">
+                      <rect x="158" y="14" width="76" height="24" rx="12" fill="#15173D" />
+                      <text id="wavePeakBadge" x="196" y="30" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">$48.9k</text>
+                    </g>
+                  </svg>
+                </div>
+
+                <!-- Right 6 Coral / Midnight Legend Swatches (3 cols) -->
+                <div class="col-span-3 grid grid-cols-2 gap-2">
+                  <div class="h-5 rounded bg-amber-400" title="Organic"></div>
+                  <div class="h-5 rounded bg-midnight" title="Enterprise"></div>
+                  <div class="h-5 rounded bg-orange-500" title="Partner"></div>
+                  <div class="h-5 rounded bg-[#2A2F66]" title="Direct"></div>
+                  <div class="h-5 rounded bg-rose-500" title="Social"></div>
+                  <div class="h-5 rounded bg-[#15173D]" title="Outbound"></div>
+                </div>
+              </div>
+
+              <!-- 7 Bold Stage Readouts Along Bottom -->
+              <div class="grid grid-cols-7 gap-1 pt-3 mt-2 border-t border-slate-100 text-center">
+                <div><p class="font-mono text-xs font-bold text-midnight">890</p><p class="text-xs text-slate-400">Mon</p></div>
+                <div><p class="font-mono text-xs font-bold text-midnight">628</p><p class="text-xs text-slate-400">Tue</p></div>
+                <div><p class="font-mono text-xs font-bold text-midnight">704</p><p class="text-xs text-slate-400">Wed</p></div>
+                <div><p class="font-mono text-xs font-bold text-midnight">865</p><p class="text-xs text-slate-400">Thu</p></div>
+                <div><p class="font-mono text-xs font-bold text-amber-600">1,095</p><p class="text-xs text-slate-400">Fri</p></div>
+                <div><p class="font-mono text-xs font-bold text-midnight">940</p><p class="text-xs text-slate-400">Sat</p></div>
+                <div><p class="font-mono text-xs font-bold text-midnight">820</p><p class="text-xs text-slate-400">Sun</p></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom 8-Col Split: 3 Equal Modular Sub-Bento Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+          <!-- SUB-CARD 1: Channel Activity & Action Badges -->
+          <div class="bento-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-display text-sm font-bold text-midnight">Channel Attribution</h3>
+                <span class="text-xs font-mono text-slate-400">•••</span>
+              </div>
+
+              <div class="space-y-2.5 text-xs text-slate-600">
+                <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span>Enterprise Inbound</span>
+                  <strong class="font-mono text-midnight">$1.92M</strong>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span>Product-Led Self-Serve</span>
+                  <strong class="font-mono text-midnight">$1.48M</strong>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span>Cloud Marketplace</span>
+                  <strong class="font-mono text-emerald-600">+34.2%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <p class="text-xs font-bold text-midnight">Smart Routing</p>
+                  <p class="text-xs text-slate-400">Auto-assign SDR pods</p>
+                </div>
+                <button onclick="triggerReportToast('Smart SDR Routing calibrated')" class="h-9 w-9 rounded-full bg-[#E8EEF9] text-midnight hover:bg-midnight hover:text-white flex items-center justify-center transition cursor-pointer">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <p class="text-xs font-bold text-midnight">Sync CRM</p>
+                  <p class="text-xs text-slate-400">Zero-lag webhook</p>
+                </div>
+                <button onclick="triggerReportToast('CRM Webhook synced in 14ms')" class="h-9 w-9 rounded-full bg-[#E8EEF9] text-midnight hover:bg-midnight hover:text-white flex items-center justify-center transition cursor-pointer">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-CARD 2: Floating Multi-Color Range / Candlestick Variance Matrix -->
+          <div class="bento-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-display text-sm font-bold text-midnight">Deal Spread Matrix</h3>
+                <span class="text-xs font-mono text-slate-400">•••</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">ACV min–max variance by tier</p>
+            </div>
+
+            <div class="chart-well rounded-2xl p-3.5">
+              <svg viewBox="0 0 210 135" class="w-full h-32 overflow-visible">
+                <line x1="24" y1="10" x2="24" y2="122" stroke="#CBD5E8" stroke-width="1" />
+                <line x1="24" y1="40" x2="198" y2="40" stroke="#DCE3F2" stroke-dasharray="3 3" />
+                <line x1="24" y1="80" x2="198" y2="80" stroke="#DCE3F2" stroke-dasharray="3 3" />
+                <line x1="24" y1="122" x2="198" y2="122" stroke="#CBD5E8" stroke-width="1" />
+
+                <text x="18" y="43" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B">80k</text>
+                <text x="18" y="83" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B">40k</text>
+
+                <!-- Floating Interval Bars (Matching Reference Candlestick Spread!) -->
+                <g class="bar-grow">
+                  <rect x="46" y="76" width="8" height="46" rx="4" fill="#15173D" />
+                  <rect x="68" y="64" width="8" height="58" rx="4" fill="#FBBF24" />
+                  <rect x="92" y="26" width="8" height="32" rx="4" fill="#F97316" />
+                  <rect x="116" y="58" width="8" height="24" rx="4" fill="#8E97CC" />
+                  <rect x="142" y="14" width="8" height="36" rx="4" fill="#15173D" />
+                  <rect x="168" y="22" width="8" height="16" rx="4" fill="#25295C" />
+                  <rect x="168" y="96" width="8" height="26" rx="4" fill="#EC4899" />
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- SUB-CARD 3: Micro Forecast Curve + Pill Midnight CTA Button -->
+          <div class="bento-card p-6 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-sm font-bold text-midnight">Runway Projection</h3>
+              <span class="text-xs font-mono font-bold text-rose-500">LIVE</span>
+            </div>
+
+            <div class="chart-well rounded-2xl p-3 my-1">
+              <svg viewBox="0 0 210 95" class="w-full h-24 overflow-visible">
+                <line x1="10" y1="25" x2="200" y2="25" stroke="#DCE3F2" stroke-dasharray="2 2" />
+                <line x1="10" y1="55" x2="200" y2="55" stroke="#DCE3F2" stroke-dasharray="2 2" />
+                <!-- Subtle Upper Reference Curve -->
+                <path d="M 12 42 L 52 28 L 94 38 L 138 22 L 196 34" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-dasharray="4 3" />
+                <!-- Sharp Midnight Primary Curve -->
+                <path d="M 12 68 L 48 64 L 82 74 L 122 46 L 162 62 L 196 58" fill="none" stroke="#15173D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="animate-draw" />
+              </svg>
+            </div>
+
+            <div class="text-center mt-2">
+              <p class="text-xs font-semibold text-slate-500 mb-2.5">98.2% Confidence Interval</p>
+              <button
+                onclick="triggerReportToast('AI Rebalance Simulation Executed (+4.8% Alpha)')"
+                class="w-full rounded-full bg-midnight hover:bg-midnight-soft text-white font-display text-sm font-bold py-2.5 px-5 shadow-lg shadow-midnight/25 transition cursor-pointer"
+              >
+                Calibrate Model
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── RIGHT COLUMN ANCHOR STACK (4 COLUMNS) ── -->
+      <div class="lg:col-span-4 flex flex-col gap-5">
+
+        <!-- SIGNATURE DEEP MIDNIGHT CARD (#15173D) WITH BOLD AMBER + ROSE + PERIWINKLE CURVES -->
+        <div class="bento-midnight p-6 sm:p-7 text-white flex-1 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-mono uppercase tracking-widest text-amber-300/90">Alpha Trajectory</p>
+              <h2 class="font-display text-xl font-extrabold tracking-tight text-white mt-0.5">
+                Scope Spectrum
+              </h2>
+            </div>
+            <span id="midnightHoverVal" class="rounded-full bg-white/10 border border-white/15 px-3 py-1 text-xs font-mono font-bold text-amber-300">
+              $284.6k Peak
+            </span>
+          </div>
+
+          <!-- Multi-Series Bold Glowing SVG Trajectory Chart -->
+          <div class="my-4 relative">
+            <svg viewBox="0 0 340 250" class="w-full h-60 overflow-visible">
+              <defs>
+                <linearGradient id="boldAmberLine" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#F59E0B" />
+                  <stop offset="55%" stop-color="#FBBF24" />
+                  <stop offset="100%" stop-color="#FDBA74" />
+                </linearGradient>
+                <filter id="amberNeon" x="-25%" y="-25%" width="150%" height="150%">
+                  <feGaussianBlur stdDeviation="4.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Horizontal Subtle Gridlines & Axis Labels -->
+              <g stroke="rgba(255,255,255,0.12)" stroke-width="1">
+                <line x1="36" y1="36" x2="312" y2="36" />
+                <line x1="36" y1="82" x2="312" y2="82" />
+                <line x1="36" y1="128" x2="312" y2="128" />
+                <line x1="36" y1="174" x2="312" y2="174" />
+                <line x1="36" y1="216" x2="312" y2="216" />
+              </g>
+
+              <g font-family="JetBrains Mono, monospace" font-size="12" fill="#94A3B8">
+                <text x="28" y="40" text-anchor="end">300</text>
+                <text x="28" y="86" text-anchor="end">220</text>
+                <text x="28" y="132" text-anchor="end">150</text>
+                <text x="28" y="178" text-anchor="end">90</text>
+                <text x="64" y="238" text-anchor="middle">Q1</text>
+                <text x="138" y="238" text-anchor="middle">Q2</text>
+                <text x="212" y="238" text-anchor="middle">Q3</text>
+                <text x="286" y="238" text-anchor="middle">Q4</text>
+              </g>
+
+              <!-- Series 3: Soft Periwinkle Secondary Spline -->
+              <path
+                d="M 56 176 C 82 140, 102 152, 134 118 C 166 84, 188 128, 224 76 C 254 42, 276 88, 304 38"
+                fill="none"
+                stroke="#93C5FD"
+                stroke-opacity="0.7"
+                stroke-width="2.8"
+                stroke-linecap="round"
+                class="animate-draw"
+              />
+
+              <!-- Series 2: Vibrant Rose-Magenta Node Curve -->
+              <path
+                id="roseCurve"
+                d="M 56 196 L 88 158 L 116 184 L 164 134 L 204 172 L 246 112 L 274 136 L 304 44"
+                fill="none"
+                stroke="#EC4899"
+                stroke-width="3.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="animate-draw"
+              />
+              <circle cx="88" cy="158" r="4.5" fill="#EC4899" />
+              <circle cx="164" cy="134" r="4.5" fill="#EC4899" />
+              <circle cx="246" cy="112" r="4.5" fill="#EC4899" />
+              <circle cx="274" cy="136" r="4.5" fill="#F472B6" />
+
+              <!-- Series 1: BOLD WARM GOLD-AMBER HERO TRAJECTORY WITH LARGE NODES -->
+              <path
+                id="amberHeroPath"
+                d="M 58 142 L 96 176 L 158 108 L 214 48 L 254 102 L 304 28"
+                fill="none"
+                stroke="url(#boldAmberLine)"
+                stroke-width="8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                filter="url(#amberNeon)"
+                class="animate-draw"
+              />
+
+              <!-- Interactive Glowing Amber Nodes -->
+              <g class="cursor-pointer" onmouseenter="inspectMidnightNode('Q1 Base · $142.0k')">
+                <circle cx="58" cy="142" r="9" fill="#F59E0B" stroke="#15173D" stroke-width="3" />
+              </g>
+              <g class="cursor-pointer" onmouseenter="inspectMidnightNode('Q2 Dip · $118.4k')">
+                <circle cx="96" cy="176" r="8" fill="#FB923C" stroke="#15173D" stroke-width="3" />
+              </g>
+              <g class="cursor-pointer" onmouseenter="inspectMidnightNode('Q3 Surge · $236.8k')">
+                <circle cx="214" cy="48" r="9.5" fill="#FBBF24" stroke="#15173D" stroke-width="3" />
+              </g>
+              <g class="cursor-pointer" onmouseenter="inspectMidnightNode('Q4 Retest · $194.2k')">
+                <circle cx="254" cy="102" r="8" fill="#F59E0B" stroke="#15173D" stroke-width="3" />
+              </g>
+              <g class="cursor-pointer" onmouseenter="inspectMidnightNode('Q4 Record · $284.6k')">
+                <circle cx="304" cy="28" r="14" fill="#FBBF24" fill-opacity="0.3" class="pulse-halo" />
+                <circle cx="304" cy="28" r="9.5" fill="#FDE047" stroke="#F97316" stroke-width="3" />
+              </g>
+
+              <!-- Kinetic Gliding Photon Along Hero Amber Path -->
+              <circle r="4.5" fill="#FFFFFF">
+                <animateMotion dur="4.2s" repeatCount="indefinite" path="M 58 142 L 96 176 L 158 108 L 214 48 L 254 102 L 304 28" />
+              </circle>
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-white/10 text-xs">
+            <span class="flex items-center gap-2 text-slate-300">
+              <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Revenue Alpha
+            </span>
+            <span class="flex items-center gap-2 text-slate-300">
+              <span class="h-2.5 w-2.5 rounded-full bg-pink-500"></span> Retention
+            </span>
+            <span class="flex items-center gap-2 text-slate-300">
+              <span class="h-2.5 w-2.5 rounded-full bg-sky-300"></span> Benchmark
+            </span>
+          </div>
+        </div>
+
+        <!-- RIGHT MIDDLE CARD: Recessed Ice Well + Coral-to-Amber Node Spline -->
+        <div class="bento-card p-6">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-display text-base font-bold text-midnight">Net Yield Momentum</h3>
+              <p class="text-xs text-slate-500">Quarterly margin elasticity</p>
+            </div>
+            <span class="text-xs font-mono text-slate-400">••••</span>
+          </div>
+
+          <div class="chart-well rounded-2xl p-4">
+            <svg viewBox="0 0 300 100" class="w-full h-24 overflow-visible">
+              <defs>
+                <linearGradient id="coralAmberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#EF4444" />
+                  <stop offset="55%" stop-color="#F97316" />
+                  <stop offset="100%" stop-color="#FBBF24" />
+                </linearGradient>
+              </defs>
+
+              <path
+                d="M 20 56 C 48 26, 82 28, 118 32 C 154 36, 174 68, 202 64 C 230 60, 244 30, 264 34 C 276 36, 282 46, 288 52"
+                fill="none"
+                stroke="url(#coralAmberGrad)"
+                stroke-width="3.5"
+                stroke-linecap="round"
+                class="animate-draw"
+              />
+
+              <circle cx="20" cy="56" r="4" fill="#EF4444" />
+              <circle cx="76" cy="28" r="4" fill="#EF4444" />
+              <circle cx="132" cy="34" r="4" fill="#F97316" />
+              <circle cx="196" cy="65" r="4.5" fill="#F59E0B" />
+              <circle cx="256" cy="33" r="4.5" fill="#FBBF24" />
+              <circle cx="288" cy="52" r="4" fill="#F59E0B" />
+
+              <circle r="4" fill="#EF4444">
+                <animateMotion dur="4.8s" repeatCount="indefinite" path="M 20 56 C 48 26, 82 28, 118 32 C 154 36, 174 68, 202 64 C 230 60, 244 30, 264 34 C 276 36, 282 46, 288 52" />
+              </circle>
+
+              <g font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#15173D">
+                <text x="36" y="92" text-anchor="middle">18%</text>
+                <text x="108" y="92" text-anchor="middle">24%</text>
+                <text x="188" y="92" text-anchor="middle">19%</text>
+                <text x="262" y="92" text-anchor="middle">31%</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2 pt-4 mt-3 border-t border-slate-100 text-xs">
+            <div>
+              <p class="text-slate-400">Gross</p>
+              <p class="font-mono font-bold text-midnight mt-0.5">82.4%</p>
+            </div>
+            <div>
+              <p class="text-slate-400">EBITDA</p>
+              <p class="font-mono font-bold text-midnight mt-0.5">31.8%</p>
+            </div>
+            <div>
+              <p class="text-slate-400">CAC Pay</p>
+              <p class="font-mono font-bold text-midnight mt-0.5">7.4 mo</p>
+            </div>
+            <div>
+              <p class="text-slate-400">LTV/CAC</p>
+              <p class="font-mono font-bold text-amber-600 mt-0.5">5.8x</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT BOTTOM SLIM STATUS BAR CARD -->
+        <div class="bento-card px-5 py-4 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="h-6 w-6 rounded-full bg-midnight text-white flex items-center justify-center text-xs font-bold">
+              1
+            </span>
+            <div>
+              <p class="text-xs font-bold text-midnight">Core Cluster</p>
+              <p class="text-xs text-slate-400">99.98% SLA</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            <span class="h-6 w-6 rounded-full border-2 border-midnight text-midnight flex items-center justify-center">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <div>
+              <p class="text-xs font-bold text-midnight">Audit Sync</p>
+              <p class="text-xs text-slate-400">SOC2 Verified</p>
+            </div>
+          </div>
+
+          <span class="rounded-xl bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-mono font-bold text-amber-700">
+            +4.2x ROI
+          </span>
+        </div>
+
+      </div>
+    </div>
+      </div>
+
+      <div id="tabSubpageView" class="hidden space-y-5"></div>
+    </main>
+  </div>
+
+  <!-- Interactive Toast Notification -->
+  <div id="toastBanner" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="rounded-2xl bg-midnight text-white px-5 py-3.5 shadow-2xl border border-white/15 flex items-center gap-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+      <span id="toastMessage" class="text-sm font-semibold">Updated</span>
+    </div>
+  </div>
+
+  <script>
+    const DATASETS = {
+      q4: {
+        rate: '89.4%',
+        delta: '+6.8% QoQ',
+        archDash: '310 360',
+        archLeft: '4,410',
+        archRight: '94.8%',
+        qualWidth: '86%',
+        b1: '2,115',
+        b2: '78.3%',
+        wavePeak: '$48.9k',
+        midnightPeak: '$284.6k Peak',
+      },
+      enterprise: {
+        rate: '93.8%',
+        delta: '+11.4% QoQ',
+        archDash: '332 360',
+        archLeft: '6,180',
+        archRight: '97.2%',
+        qualWidth: '92%',
+        b1: '3,490',
+        b2: '84.6%',
+        wavePeak: '$72.4k',
+        midnightPeak: '$412.0k Peak',
+      },
+      apac: {
+        rate: '84.2%',
+        delta: '+9.1% QoQ',
+        archDash: '286 360',
+        archLeft: '2,890',
+        archRight: '91.5%',
+        qualWidth: '79%',
+        b1: '1,640',
+        b2: '74.9%',
+        wavePeak: '$36.2k',
+        midnightPeak: '$198.4k Peak',
+      },
+      attribution: {
+        rate: '91.6%',
+        delta: '+8.4% QoQ',
+        archDash: '320 360',
+        archLeft: '5,120',
+        archRight: '96.1%',
+        qualWidth: '89%',
+        b1: '2,840',
+        b2: '81.5%',
+        wavePeak: '$61.8k',
+        midnightPeak: '$329.0k Peak',
+      },
+      forecasts: {
+        rate: '96.4%',
+        delta: '+12.9% QoQ',
+        archDash: '340 360',
+        archLeft: '6,840',
+        archRight: '98.2%',
+        qualWidth: '94%',
+        b1: '3,920',
+        b2: '88.1%',
+        wavePeak: '$84.2k',
+        midnightPeak: '$468.5k Peak',
+      },
+    };
+
+    const SUBPAGE_CONFIGS = {
+      enterprise: {
+        badge: 'Enterprise Segment',
+        title: 'Enterprise SaaS Portfolio',
+        subtitle: 'Multi-year ACV contracts, seat expansion cohorts, and strategic account health.',
+        ctaLabel: 'Export Enterprise Brief',
+        ctaToast: 'Enterprise SaaS executive brief exported to PDF',
+        kpis: [
+          { label: 'Enterprise ARR', val: '$3.48M', delta: '+18.4% YoY', icon: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' },
+          { label: 'Net Dollar Retention', val: '128.6%', delta: '+4.2% QoQ', icon: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>' },
+          { label: 'Strategic Accounts', val: '142', delta: '98.6% Renewal', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
+          { label: 'Median Deal Cycle', val: '34 Days', delta: '-6d Faster', icon: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>' }
+        ],
+        chartTitle: 'Enterprise ACV Tier Trajectory',
+        chartSub: 'Quarterly expansion across Fortune 1000 & Mid-Market cohorts',
+        curvePath: 'M 28 132 C 85 118, 130 92, 185 84 C 240 76, 280 46, 352 28',
+        bars: [
+          { label: 'Strategic ($100k+ ACV)', pct: 88, val: '$1.94M' },
+          { label: 'Upper Mid-Market ($50k–$100k)', pct: 74, val: '$1.02M' },
+          { label: 'Multi-Year Cloud Commit', pct: 62, val: '$520k' }
+        ],
+        tableTitle: 'Key Enterprise Renewals & Upsells',
+        cols: ['Account', 'Tier', 'Annual ACV', 'Health', 'Action'],
+        rows: [
+          { c1: 'Vanguard Cloud Corp', sub: '1,240 active seats', c2: 'Strategic', c3: '$248,000', status: 'Expanding', action: 'Sync QBR' },
+          { c1: 'Meridian BioLabs', sub: '860 active seats', c2: 'Strategic', c3: '$184,500', status: 'Healthy', action: 'Sync QBR' },
+          { c1: 'Northstar Logistics', sub: '620 active seats', c2: 'Enterprise', c3: '$136,000', status: 'Expanding', action: 'Sync QBR' },
+          { c1: 'Aether FinTech Group', sub: '510 active seats', c2: 'Enterprise', c3: '$118,400', status: 'Healthy', action: 'Sync QBR' },
+          { c1: 'Kinetix Semiconductor', sub: '390 active seats', c2: 'Mid-Market', c3: '$92,800', status: 'Review', action: 'Sync QBR' }
+        ]
+      },
+      apac: {
+        badge: 'Regional Telemetry',
+        title: 'EMEA & APAC Revenue Hubs',
+        subtitle: 'Cross-border pipeline velocity, localized currency yield, and partner channel contribution.',
+        ctaLabel: 'Rebalance Territory Quotas',
+        ctaToast: 'EMEA & APAC territory quotas synchronized across 6 pods',
+        kpis: [
+          { label: 'Regional Bookings', val: '$1.96M', delta: '+22.1% QoQ', icon: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>' },
+          { label: 'Partner Co-Sell Share', val: '41.8%', delta: '+5.4% Lift', icon: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>' },
+          { label: 'Active Regional Pods', val: '18 Pods', delta: 'London · Tokyo · SG', icon: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>' },
+          { label: 'FX Hedged Margin', val: '84.2%', delta: '+110 bps', icon: '<path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>' }
+        ],
+        chartTitle: 'Regional Hub Throughput Curve',
+        chartSub: 'Normalized bookings across DACH, UKI, Nordics, Japan & ANZ',
+        curvePath: 'M 28 136 C 90 124, 140 106, 192 78 C 244 50, 296 58, 352 34',
+        bars: [
+          { label: 'EMEA North & UKI (London)', pct: 84, val: '$890k' },
+          { label: 'DACH & Central Europe (Frankfurt)', pct: 71, val: '$610k' },
+          { label: 'APAC Growth Ring (Singapore & Tokyo)', pct: 66, val: '$460k' }
+        ],
+        tableTitle: 'Regional Territory Pod Leaderboard',
+        cols: ['Hub / Region', 'Lead Pod', 'Q4 Quota Attainment', 'Status', 'Action'],
+        rows: [
+          { c1: 'London — UK & Ireland', sub: 'GBP Hedged Book', c2: 'Pod Alpha-1', c3: '96.4% ($512k)', status: 'Exceeding', action: 'Inspect Hub' },
+          { c1: 'Frankfurt — DACH Enterprise', sub: 'EUR Direct Book', c2: 'Pod Europe-3', c3: '91.2% ($428k)', status: 'Healthy', action: 'Inspect Hub' },
+          { c1: 'Singapore — ASEAN Cloud', sub: 'USD Multi-FX', c2: 'Pod Pacific-2', c3: '88.7% ($364k)', status: 'Healthy', action: 'Inspect Hub' },
+          { c1: 'Tokyo — Japan Strategic', sub: 'JPY Partner Co-Sell', c2: 'Pod Nikkei-1', c3: '85.0% ($340k)', status: 'Expanding', action: 'Inspect Hub' },
+          { c1: 'Sydney — ANZ Commercial', sub: 'AUD Self-Serve', c2: 'Pod Tasman-4', c3: '81.5% ($316k)', status: 'Review', action: 'Inspect Hub' }
+        ]
+      },
+      attribution: {
+        badge: 'Multi-Touch Engine',
+        title: 'Channel Attribution & Funnel',
+        subtitle: 'Algorithmic W-shaped touchpoint weighting across inbound, product-led, and partner pipelines.',
+        ctaLabel: 'Recalibrate Weights',
+        ctaToast: 'Multi-touch W-shaped attribution weights recalibrated',
+        kpis: [
+          { label: 'Attributed Pipeline', val: '$4.82M', delta: '+19.2% Lift', icon: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>' },
+          { label: 'Blended LTV / CAC', val: '5.8x', delta: '+0.6x QoQ', icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
+          { label: 'PLG Conversion Rate', val: '8.94%', delta: '+1.4% vs Target', icon: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>' },
+          { label: 'CAC Payback Window', val: '7.4 Mo', delta: '-1.1 Mo', icon: '<path d="M20 6L9 17l-5-5"/>' }
+        ],
+        chartTitle: 'Touchpoint Conversion Velocity',
+        chartSub: '7-stage weighted pipeline influence from first-touch to closed-won',
+        curvePath: 'M 28 128 C 82 104, 134 112, 188 72 C 242 38, 294 52, 352 24',
+        bars: [
+          { label: 'Product-Led Self-Serve Signups', pct: 91, val: '$1.92M' },
+          { label: 'Enterprise Executive Inbound', pct: 79, val: '$1.64M' },
+          { label: 'AWS & GCP Cloud Marketplaces', pct: 68, val: '$1.26M' }
+        ],
+        tableTitle: 'Channel Attribution Performance Ledger',
+        cols: ['Acquisition Channel', 'Model Role', 'Pipeline Influenced', 'Efficiency', 'Action'],
+        rows: [
+          { c1: 'Interactive Product Sandbox', sub: 'PLG Workspace Trial', c2: 'First Touch', c3: '$1,540,000', status: '6.9x ROI', action: 'Boost Bid' },
+          { c1: 'AWS SaaS Marketplace', sub: 'EDP Cloud Commit', c2: 'Deal Closer', c3: '$1,180,000', status: '5.4x ROI', action: 'Boost Bid' },
+          { c1: 'Executive Benchmark Reports', sub: 'Organic Research', c2: 'Mid-Funnel', c3: '$920,000', status: '6.1x ROI', action: 'Boost Bid' },
+          { c1: 'Partner Solutions Architects', sub: 'SI Co-Selling', c2: 'Multi-Touch', c3: '$740,000', status: '4.8x ROI', action: 'Boost Bid' },
+          { c1: 'Outbound SDR Account Pods', sub: 'ABM Sequence', c2: 'First Touch', c3: '$440,000', status: '3.7x ROI', action: 'Boost Bid' }
+        ]
+      },
+      forecasts: {
+        badge: 'AI Predictive Core',
+        title: 'AI Revenue & Runway Forecasts',
+        subtitle: 'Monte Carlo revenue simulations, churn risk guardrails, and 4-quarter cashflow projections.',
+        ctaLabel: 'Run 10k Monte Carlo Sim',
+        ctaToast: 'Executed 10,000-run Monte Carlo forecast (98.2% confidence)',
+        kpis: [
+          { label: 'Projected FY27 ARR', val: '$19.4M', delta: '96.4% Confidence', icon: '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>' },
+          { label: 'Upside P90 Scenario', val: '$21.2M', delta: '+34.8% Growth', icon: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>' },
+          { label: 'Predicted Gross Churn', val: '2.1%', delta: 'Record Low', icon: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' },
+          { label: 'Cash Runway Horizon', val: '42 Mo', delta: 'Cashflow Positive', icon: '<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>' }
+        ],
+        chartTitle: 'Monte Carlo Confidence Cone',
+        chartSub: 'P50 baseline vs P90 alpha expansion trajectory across next 4 quarters',
+        curvePath: 'M 28 140 C 88 122, 146 96, 204 68 C 258 44, 308 36, 352 20',
+        bars: [
+          { label: 'Committed Renewal Base (Locked)', pct: 95, val: '$12.8M' },
+          { label: 'AI-Weighted Pipeline Commit', pct: 82, val: '$4.4M' },
+          { label: 'Net Seat Expansion Forecast', pct: 70, val: '$2.2M' }
+        ],
+        tableTitle: 'Quarterly Forecast Scenarios & Guardrails',
+        cols: ['Forecast Horizon', 'Baseline (P50)', 'Upside (P90)', 'Confidence', 'Action'],
+        rows: [
+          { c1: 'Q1 2027 Projection', sub: 'Enterprise renewal wave', c2: '$4.35M', c3: '$4.72M', status: '98.2% Conf', action: 'Lock Target' },
+          { c1: 'Q2 2027 Projection', sub: 'APAC cloud expansion', c2: '$4.68M', c3: '$5.10M', status: '96.8% Conf', action: 'Lock Target' },
+          { c1: 'Q3 2027 Projection', sub: 'PLG enterprise tier launch', c2: '$5.04M', c3: '$5.58M', status: '95.1% Conf', action: 'Lock Target' },
+          { c1: 'Q4 2027 Projection', sub: 'Year-end EDP surge', c2: '$5.33M', c3: '$5.80M', status: '93.9% Conf', action: 'Lock Target' },
+          { c1: 'FY27 Consolidated Model', sub: 'Audited board plan', c2: '$19.40M', c3: '$21.20M', status: '96.4% Avg', action: 'Lock Target' }
+        ]
+      }
+    };
+
+    let currentScope = 'q4';
+    let liveActive = true;
+
+    function renderSubpage(key) {
+      const cfg = SUBPAGE_CONFIGS[key];
+      const container = document.getElementById('tabSubpageView');
+      if (!cfg || !container) return;
+
+      const kpiHtml = cfg.kpis.map(k => `
+        <div class="bento-card p-5 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">${k.label}</span>
+            <span class="h-9 w-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${k.icon}</svg>
+            </span>
+          </div>
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="font-display text-2xl font-extrabold text-midnight tracking-tight">${k.val}</span>
+            <span class="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">${k.delta}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-200">${b.label}</span>
+            <span class="font-mono font-bold text-amber-300">${b.val} (${b.pct}%)</span>
+          </div>
+          <div class="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-pink-500" style="width: ${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map((r, idx) => `
+        <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50/80 transition">
+          <td class="py-3.5 pl-5 pr-3">
+            <p class="text-sm font-bold text-midnight">${r.c1}</p>
+            <p class="text-xs text-slate-500">${r.sub}</p>
+          </td>
+          <td class="py-3.5 px-3 text-xs font-semibold text-slate-600">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono text-sm font-bold text-midnight">${r.c3}</td>
+          <td class="py-3.5 px-3">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>${r.status}
+            </span>
+          </td>
+          <td class="py-3.5 pl-3 pr-5 text-right">
+            <button type="button" onclick="handleSubpageRowAction(this, '${r.c1}', '${r.action}')" class="rounded-xl bg-[#EEF3FB] hover:bg-midnight text-midnight hover:text-white px-3 py-1.5 text-xs font-bold transition cursor-pointer">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="bento-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button type="button" onclick="switchDataset('q4')" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-midnight hover:text-white px-3 py-1.5 text-xs font-bold text-midnight transition cursor-pointer">
+                <span>&larr; Overview</span>
+              </button>
+              <span class="rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-bold text-amber-700">${cfg.badge}</span>
+            </div>
+            <h2 class="font-display text-2xl font-extrabold text-midnight tracking-tight pt-1">${cfg.title}</h2>
+            <p class="text-sm text-slate-500">${cfg.subtitle}</p>
+          </div>
+          <button type="button" onclick="triggerReportToast('${cfg.ctaToast}')" class="rounded-2xl bg-midnight hover:bg-midnight-soft text-white font-display text-sm font-bold px-5 py-3 shadow-lg shadow-midnight/20 transition cursor-pointer shrink-0">
+            ${cfg.ctaLabel}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          ${kpiHtml}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <div class="bento-midnight p-6 text-white lg:col-span-5 flex flex-col justify-between gap-5">
+            <div>
+              <p class="text-xs font-mono uppercase tracking-widest text-amber-300">Module Telemetry</p>
+              <h3 class="font-display text-lg font-extrabold text-white mt-0.5">${cfg.chartTitle}</h3>
+              <p class="text-xs text-slate-300 mt-1">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+              <svg viewBox="0 0 380 160" class="w-full h-36 overflow-visible">
+                <line x1="24" y1="32" x2="356" y2="32" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3 3" />
+                <line x1="24" y1="84" x2="356" y2="84" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3 3" />
+                <line x1="24" y1="138" x2="356" y2="138" stroke="rgba(255,255,255,0.2)" />
+                <path d="${cfg.curvePath} L 352 138 L 28 138 Z" fill="rgba(251, 191, 36, 0.16)" />
+                <path d="${cfg.curvePath}" fill="none" stroke="#FBBF24" stroke-width="4" stroke-linecap="round" class="animate-draw" />
+                <circle cx="352" cy="28" r="6" fill="#FDE047" stroke="#F97316" stroke-width="2.5" />
+                <g font-family="JetBrains Mono, monospace" font-size="12" fill="#CBD5E1">
+                  <text x="36" y="154">W1</text>
+                  <text x="136" y="154">W4</text>
+                  <text x="236" y="154">W8</text>
+                  <text x="332" y="154">W12</text>
+                </g>
+              </svg>
+            </div>
+            <div class="space-y-3">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="bento-card lg:col-span-7 overflow-hidden flex flex-col justify-between">
+            <div class="p-6 pb-4 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div>
+                <h3 class="font-display text-base font-bold text-midnight">${cfg.tableTitle}</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Interactive live records with instant pod synchronization</p>
+              </div>
+              <span class="rounded-lg bg-[#EEF3FB] px-2.5 py-1 text-xs font-mono font-bold text-midnight">5 Active Rows</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-100 bg-slate-50/70 text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <th class="py-3 pl-5 pr-3">${cfg.cols[0]}</th>
+                    <th class="py-3 px-3">${cfg.cols[1]}</th>
+                    <th class="py-3 px-3">${cfg.cols[2]}</th>
+                    <th class="py-3 px-3">${cfg.cols[3]}</th>
+                    <th class="py-3 pl-3 pr-5 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleSubpageRowAction(btn, name, actionLabel) {
+      btn.textContent = 'Synced';
+      btn.className = 'rounded-xl bg-emerald-600 text-white px-3 py-1.5 text-xs font-bold transition cursor-pointer';
+      triggerReportToast(`${actionLabel} completed for ${name}`);
+    }
+
+    function switchDataset(key) {
+      currentScope = key;
+      const d = DATASETS[key] || DATASETS.q4;
+
+      document.querySelectorAll('.scope-tab').forEach(btn => {
+        btn.className = 'scope-tab rounded-xl px-3.5 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer';
+      });
+      const activeBtn = document.getElementById('tab-' + key);
+      if (activeBtn) {
+        activeBtn.className = 'scope-tab rounded-xl px-3.5 py-1.5 text-sm font-bold bg-midnight text-white shadow-sm transition cursor-pointer';
+      }
+
+      document.getElementById('heroRateValue').textContent = d.rate;
+      document.getElementById('heroRateDelta').textContent = d.delta;
+      document.getElementById('archGaugePath').setAttribute('stroke-dasharray', d.archDash);
+      document.getElementById('archLeftNum').textContent = d.archLeft;
+      document.getElementById('archRightNum').textContent = d.archRight;
+      document.getElementById('qualBar').style.width = d.qualWidth;
+      document.getElementById('bracketVal1').textContent = d.b1;
+      document.getElementById('bracketVal2').textContent = d.b2;
+      document.getElementById('wavePeakBadge').textContent = d.wavePeak;
+      document.getElementById('midnightHoverVal').textContent = d.midnightPeak;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (key === 'q4') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderSubpage(key);
+      }
+
+      // Re-trigger smooth SVG path draw animation
+      document.querySelectorAll('.animate-draw').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+    }
+
+    function inspectMidnightNode(label) {
+      document.getElementById('midnightHoverVal').textContent = label;
+    }
+
+    function toggleLiveSimulation() {
+      liveActive = !liveActive;
+      const dot = document.getElementById('liveDot');
+      const label = document.getElementById('liveLabel');
+      if (liveActive) {
+        dot.className = 'h-2 w-2 rounded-full bg-emerald-500';
+        label.textContent = 'Kinetic Stream: ON';
+        triggerReportToast('Live Kinetic Data Stream Resumed');
+      } else {
+        dot.className = 'h-2 w-2 rounded-full bg-slate-400';
+        label.textContent = 'Kinetic Stream: PAUSED';
+        triggerReportToast('Live Kinetic Data Stream Paused');
+      }
+    }
+
+    let toastTimer = null;
+    function triggerReportToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastMessage').textContent = msg;
+      banner.classList.remove('opacity-0', 'translate-y-3');
+      banner.classList.add('opacity-100', 'translate-y-0');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        banner.classList.remove('opacity-100', 'translate-y-0');
+        banner.classList.add('opacity-0', 'translate-y-3');
+      }, 2400);
+    }
+
+    // Gentle live telemetry micro-pulse
+    setInterval(() => {
+      if (!liveActive) return;
+      const base = DATASETS[currentScope];
+      const jitter = (Math.random() * 0.4 - 0.2);
+      const numeric = parseFloat(base.rate) + jitter;
+      document.getElementById('heroRateValue').textContent = numeric.toFixed(1) + '%';
+    }, 3200);
+  </script>
+</body>
+</html>

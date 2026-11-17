@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COMPREO — 11. Enterprise ERP Dashboard, KPIs &amp; Dense Ledger</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            brand: ['Cinzel', 'Georgia', 'serif'],
+          },
+          colors: {
+            erp: {
+              DEFAULT: '#15A394',
+              dark: '#0E877A',
+              soft: '#E6F6F4',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #F6F8FA;
+      color: #1E293B;
+      margin: 0;
+      min-height: 100vh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+    html.dark body {
+      background-color: #0B111E;
+      color: #F1F5F9;
+    }
+    .erp-card {
+      background: #FFFFFF;
+      border: 1px solid #EAEEF4;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.025);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+    }
+    .erp-card:hover {
+      border-color: #CBE5E2;
+      box-shadow: 0 8px 22px -10px rgba(21, 163, 148, 0.14);
+    }
+    html.dark .erp-card {
+      background: #131C2E;
+      border-color: rgba(51, 65, 85, 0.6);
+    }
+    .erp-sidebar {
+      transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .erp-sidebar.collapsed {
+      width: 72px;
+    }
+    .erp-sidebar.collapsed .mod-label,
+    .erp-sidebar.collapsed .mod-chevron,
+    .erp-sidebar.collapsed .mod-badge {
+      display: none;
+    }
+    .erp-sidebar.collapsed .erp-mod-btn {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .erp-mod-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #334155;
+      transition: all 0.16s ease;
+    }
+    .erp-mod-btn:hover {
+      background: #F1F5F9;
+      color: #0F172A;
+    }
+    html.dark .erp-mod-btn {
+      color: #CBD5E1;
+    }
+    html.dark .erp-mod-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+    .erp-mod-btn.active {
+      background: #15A394;
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(21, 163, 148, 0.28);
+    }
+    .erp-mod-btn.active .mod-icon-box {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+    }
+    @keyframes drawErpPath {
+      from { stroke-dashoffset: 900; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .erp-line-draw {
+      stroke-dasharray: 900;
+      animation: drawErpPath 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .donut-slice {
+      transition: stroke-width 0.18s ease, opacity 0.18s ease;
+      cursor: pointer;
+    }
+    .donut-slice:hover {
+      stroke-width: 25;
+    }
+    .hbar-fill {
+      transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       TOP ENTERPRISE HEADER BAR
+  ══════════════════════════════════════════════════════════════════════ -->
+  <header class="h-14 bg-white dark:bg-[#11192B] border-b border-slate-200/85 dark:border-slate-800 px-5 flex items-center justify-between gap-4 sticky top-0 z-30">
+    <!-- Left Brand + Sidebar Toggle -->
+    <div class="flex items-center gap-6">
+      <div onclick="returnToErpHome()" class="leading-none select-none cursor-pointer">
+        <div class="font-brand text-lg font-bold tracking-wider text-[#17253B] dark:text-white">COMPREO</div>
+        <div class="h-[2px] w-full my-0.5 rounded-full" style="background: linear-gradient(90deg, #15A394 0%, #15A394 58%, #F59E0B 100%);"></div>
+        <div class="text-[12px] tracking-[0.14em] font-semibold text-slate-500 dark:text-slate-400 uppercase" style="font-size: 12px;">Business Systems</div>
+      </div>
+
+      <button onclick="toggleErpSidebar()" class="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer" title="Collapse / Expand ERP Modules">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+
+    <!-- Right Global Search + Actions + AD Avatar -->
+    <div class="flex items-center gap-3 sm:gap-4">
+      <div class="relative w-52 sm:w-72">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input
+          id="erpGlobalSearch"
+          oninput="filterErpLedger()"
+          type="text"
+          placeholder="Search anything (PO, cost center, module)..."
+          class="w-full rounded-lg bg-[#F3F5F8] dark:bg-slate-800 pl-9 pr-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-erp/30"
+        />
+      </div>
+
+      <button onclick="scrollToDenseLedger()" class="relative w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer" title="Pending Approvals">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+      </button>
+
+      <button onclick="showErpToast('COMPREO SAP-Bridge v9.4 · All 12 ERP modules online')" class="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hidden sm:flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer" title="System Help">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+
+      <button onclick="toggleErpDark()" class="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 cursor-pointer" title="Toggle Dark / Light Enterprise UI">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+      </button>
+
+      <div class="flex items-center gap-1.5 cursor-pointer" onclick="showErpToast('Signed in: Admin Director · Plant 1000 & HQ Ledger')">
+        <div class="w-8 h-8 rounded-full bg-erp text-white text-xs font-bold flex items-center justify-center shadow-sm">
+          AD
+        </div>
+        <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       BODY: 12-MODULE ERP SIDEBAR + DENSE ENTERPRISE WORKSPACE
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="flex flex-1 min-w-0">
+
+    <!-- LEFT ERP MODULE SIDEBAR -->
+    <aside id="erpSidebar" class="erp-sidebar w-[232px] bg-white dark:bg-[#11192B] border-r border-slate-200/80 dark:border-slate-800 flex-shrink-0 hidden lg:flex flex-col p-3 space-y-1 select-none">
+      <button data-erp-mod="Home" onclick="selectErpModule(this, 'Home')" class="erp-mod-btn active cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md flex items-center justify-center">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10v11h6v-6h6v6h6V10L12 3z"/></svg>
+          </span>
+          <span class="mod-label">Home</span>
+        </span>
+      </button>
+
+      <button data-erp-mod="Financial Accounting" onclick="selectErpModule(this, 'Financial Accounting')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </span>
+          <span class="mod-label">Financial Accounting</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Sales & Distribution" onclick="selectErpModule(this, 'Sales & Distribution')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </span>
+          <span class="mod-label">Sales &amp; Distribution</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Material Management" onclick="selectErpModule(this, 'Material Management')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/></svg>
+          </span>
+          <span class="mod-label">Material Management</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Production Planning" onclick="selectErpModule(this, 'Production Planning')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7 4V7l7 4v10"/></svg>
+          </span>
+          <span class="mod-label">Production Planning</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Project Systems" onclick="selectErpModule(this, 'Project Systems')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          </span>
+          <span class="mod-label">Project Systems</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Quality Management" onclick="selectErpModule(this, 'Quality Management')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </span>
+          <span class="mod-label">Quality Management</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="HR Management" onclick="selectErpModule(this, 'HR Management')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          </span>
+          <span class="mod-label">HR Management</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Payroll Process" onclick="selectErpModule(this, 'Payroll Process')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </span>
+          <span class="mod-label">Payroll Process</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Reports & Analytics" onclick="selectErpModule(this, 'Reports & Analytics')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          </span>
+          <span class="mod-label">Reports &amp; Analytics</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <button data-erp-mod="Approvals" onclick="selectErpModule(this, 'Approvals')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </span>
+          <span class="mod-label">Approvals</span>
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span id="sidebarApprovalBadge" class="mod-badge rounded-full bg-rose-500 text-white px-2 py-0.5 text-xs font-bold">8</span>
+          <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </span>
+      </button>
+
+      <button data-erp-mod="Administration" onclick="selectErpModule(this, 'Administration')" class="erp-mod-btn cursor-pointer">
+        <span class="flex items-center gap-2.5">
+          <span class="mod-icon-box w-6 h-6 rounded-md bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+          </span>
+          <span class="mod-label">Administration</span>
+        </span>
+        <svg class="mod-chevron w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </aside>
+
+    <!-- MAIN ERP WORKSPACE -->
+    <main class="flex-1 px-5 py-3.5 min-w-0">
+      <div id="defaultDashboardView" class="space-y-3.5">
+
+      <!-- GREETING + PERIOD FILTER -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="erpGreetingTitle" class="font-display text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+              Welcome back, Admin!
+            </h1>
+            <!-- Warm Amber Greeting Spark Icon (Zero Unicode Emoji) -->
+            <span class="inline-flex w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-500 items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7L12 2z"/></svg>
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Here's what's happening in your business today.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <button onclick="scrollToDenseLedger()" class="inline-flex items-center gap-1.5 rounded-lg border border-erp/30 bg-erp-soft/70 dark:bg-teal-500/15 px-3 py-1.5 text-xs font-semibold text-erp hover:bg-erp hover:text-white transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span>Dense PO Ledger</span>
+          </button>
+
+          <div class="relative inline-flex items-center">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <select
+              id="erpPeriodSelect"
+              onchange="switchErpPeriod(this.value)"
+              class="appearance-none rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-8 pr-7 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+            >
+              <option value="month" selected>This Month</option>
+              <option value="quarter">This Quarter (Q2)</option>
+              <option value="fy">FY 2025-26</option>
+            </select>
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════
+           ROW 1: 6 ENTERPRISE KPI CARDS
+      ════════════════════════════════════════════════════════════════ -->
+      <section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+        <!-- KPI 1 -->
+        <div class="erp-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 9h6M9 12h6M11 12l3 4"/></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Total Revenue</p>
+              <p id="erpKpi1" class="font-display text-lg font-extrabold text-slate-900 dark:text-white mt-1">₹ 18.64 Cr</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2.5 text-slate-400"><span class="font-bold text-emerald-600">▲ 12.9%</span> vs last month</p>
+        </div>
+
+        <!-- KPI 2 -->
+        <div class="erp-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Gross Profit</p>
+              <p id="erpKpi2" class="font-display text-lg font-extrabold text-slate-900 dark:text-white mt-1">₹ 4.32 Cr</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2.5 text-slate-400"><span class="font-bold text-emerald-600">▲ 8.7%</span> vs last month</p>
+        </div>
+
+        <!-- KPI 3 -->
+        <div class="erp-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">EBITDA</p>
+              <p id="erpKpi3" class="font-display text-lg font-extrabold text-slate-900 dark:text-white mt-1">₹ 2.91 Cr</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2.5 text-slate-400"><span class="font-bold text-emerald-600">▲ 10.1%</span> vs last month</p>
+        </div>
+
+        <!-- KPI 4 -->
+        <div class="erp-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M16 13h2"/></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Net Profit</p>
+              <p id="erpKpi4" class="font-display text-lg font-extrabold text-slate-900 dark:text-white mt-1">₹ 1.85 Cr</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2.5 text-slate-400"><span class="font-bold text-emerald-600">▲ 10.1%</span> vs last month</p>
+        </div>
+
+        <!-- KPI 5 -->
+        <div class="erp-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Total Orders</p>
+              <p id="erpKpi5" class="font-display text-lg font-extrabold text-slate-900 dark:text-white mt-1">312</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2.5 text-slate-400"><span class="font-bold text-emerald-600">▲ 15.4%</span> vs last month</p>
+        </div>
+
+        <!-- KPI 6 -->
+        <div onclick="scrollToDenseLedger()" class="erp-card p-3.5 flex flex-col justify-between cursor-pointer">
+          <div class="flex items-start gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-erp-soft dark:bg-teal-500/15 text-erp flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Pending Approvals</p>
+              <p id="erpKpi6" class="font-display text-lg font-extrabold text-slate-900 dark:text-white mt-1">18</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2.5 text-slate-400"><span class="font-bold text-rose-500">▼ 3</span> vs yesterday</p>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════
+           ROW 2: REVENUE TREND + BUSINESS UNIT DONUT + TOP 5 PRODUCTS
+      ════════════════════════════════════════════════════════════════ -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+
+        <!-- Chart 1: Revenue Trend (₹ Cr) -->
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <h2 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-2">Revenue Trend (₹ Cr)</h2>
+          <svg id="erpRevTrendSvg" viewBox="0 0 360 172" class="w-full h-40 overflow-visible"></svg>
+        </div>
+
+        <!-- Chart 2: Revenue by Business Unit (₹ Cr) -->
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <h2 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-2">Revenue by Business Unit (₹ Cr)</h2>
+          <div class="flex items-center gap-4 my-auto">
+            <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+              <svg id="buDonutSvg" viewBox="0 0 150 150" class="w-36 h-36 -rotate-90 overflow-visible"></svg>
+              <span id="buDonutLabel" class="absolute text-xs font-extrabold text-slate-800 dark:text-white pointer-events-none">₹ 18.64 Cr</span>
+            </div>
+            <div id="buLegendList" class="flex-1 space-y-2 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- Chart 3: Top 5 Products by Sales (₹ Cr) -->
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <h2 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-2">Top 5 Products by Sales (₹ Cr)</h2>
+          <div id="topProductsWrap" class="space-y-2.5 my-auto"></div>
+          <div class="flex justify-between pl-16 pr-6 pt-1 text-xs text-slate-400">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════
+           ROW 3: RECEIVABLES AGING + ORDERS VS REVENUE + EXPENSES DONUT
+      ════════════════════════════════════════════════════════════════ -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+
+        <!-- Chart 4: Receivables Aging (₹ Cr) -->
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <h2 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-2">Receivables Aging (₹ Cr)</h2>
+          <div class="flex items-center gap-4 my-auto">
+            <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+              <svg id="agingDonutSvg" viewBox="0 0 150 150" class="w-36 h-36 -rotate-90 overflow-visible"></svg>
+              <span id="agingDonutLabel" class="absolute text-xs font-bold text-slate-500 dark:text-slate-300 pointer-events-none">DSO 34d</span>
+            </div>
+            <div id="agingLegendList" class="flex-1 space-y-2.5 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- Chart 5: Orders vs Revenue Combo (₹ Cr) -->
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <h2 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">Orders vs Revenue (₹ Cr)</h2>
+            <div class="flex items-center gap-3 text-xs text-slate-500">
+              <span class="inline-flex items-center gap-1.5"><span class="w-3 h-2 rounded-sm bg-erp"></span>Orders</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-3 h-0.5 bg-[#1D6AE5]"></span>Revenue</span>
+            </div>
+          </div>
+          <svg id="comboChartSvg" viewBox="0 0 370 166" class="w-full h-40 overflow-visible"></svg>
+        </div>
+
+        <!-- Chart 6: Expenses by Category (₹ Cr) -->
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <h2 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-2">Expenses by Category (₹ Cr)</h2>
+          <div class="flex items-center gap-4 my-auto">
+            <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+              <svg id="expDonutSvg" viewBox="0 0 150 150" class="w-36 h-36 -rotate-90 overflow-visible"></svg>
+              <span id="expDonutLabel" class="absolute text-xs font-extrabold text-slate-800 dark:text-white pointer-events-none">₹ 12.83 Cr</span>
+            </div>
+            <div id="expLegendList" class="flex-1 space-y-2 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════
+           ROW 4: DENSE ENTERPRISE SAP-STYLE PURCHASE ORDER & LEDGER TABLE
+      ════════════════════════════════════════════════════════════════ -->
+      <section id="denseLedgerSection" class="erp-card overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-white">Enterprise Procurement, Cost Center &amp; Approval Ledger</h2>
+            <p class="text-xs text-slate-400">Real-time multi-plant ERP postings · Click Approve to release pending vouchers</p>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs">
+            <button onclick="setLedgerFilter('ALL', this)" class="ledger-tab rounded-lg bg-erp text-white px-3 py-1 font-semibold cursor-pointer">All Vouchers</button>
+            <button onclick="setLedgerFilter('Pending', this)" class="ledger-tab rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 font-semibold cursor-pointer">Pending Approvals</button>
+            <button onclick="setLedgerFilter('Posted', this)" class="ledger-tab rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 font-semibold cursor-pointer">Posted</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/90 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
+                <th class="py-2.5 px-4">Doc No</th>
+                <th class="py-2.5 px-3">ERP Module</th>
+                <th class="py-2.5 px-3">Vendor / Cost Center</th>
+                <th class="py-2.5 px-3">Plant</th>
+                <th class="py-2.5 px-3 text-right">Net Value</th>
+                <th class="py-2.5 px-3">Aging</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="erpLedgerBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+          </table>
+        </div>
+      </section>
+      </div>
+      <div id="tabSubpageView" class="hidden"></div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="erpToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 rounded-xl bg-slate-900 text-white px-4 py-2.5 text-xs font-semibold shadow-xl flex items-center gap-2.5">
+    <span class="w-2 h-2 rounded-full bg-erp"></span>
+    <span id="erpToastMsg">ERP Synced</span>
+  </div>
+
+  <script>
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+    const PERIOD_DATA = {
+      month: {
+        kpis: ['₹ 18.64 Cr', '₹ 4.32 Cr', '₹ 2.91 Cr', '₹ 1.85 Cr', '312', '18'],
+        revTrend: [5.1, 10.0, 14.5, 11.4, 16.3, 21.8],
+        ordersBar: [200, 208, 236, 186, 228, 286],
+        revCombo: [11.6, 13.4, 15.8, 14.6, 17.2, 21.8],
+        buTotal: '₹ 18.64 Cr',
+        expTotal: '₹ 12.83 Cr',
+        products: [
+          { name: 'Product A', val: 4.25 },
+          { name: 'Product B', val: 3.65 },
+          { name: 'Product C', val: 2.80 },
+          { name: 'Product D', val: 2.10 },
+          { name: 'Product E', val: 1.95 },
+        ],
+      },
+      quarter: {
+        kpis: ['₹ 54.20 Cr', '₹ 12.85 Cr', '₹ 8.64 Cr', '₹ 5.48 Cr', '918', '14'],
+        revTrend: [12.4, 15.2, 18.0, 16.8, 20.4, 24.2],
+        ordersBar: [260, 290, 325, 298, 355, 412],
+        revCombo: [14.0, 16.2, 18.5, 17.8, 20.9, 24.2],
+        buTotal: '₹ 54.20 Cr',
+        expTotal: '₹ 36.40 Cr',
+        products: [
+          { name: 'Product A', val: 4.80 },
+          { name: 'Product B', val: 4.10 },
+          { name: 'Product C', val: 3.35 },
+          { name: 'Product D', val: 2.65 },
+          { name: 'Product E', val: 2.20 },
+        ],
+      },
+      fy: {
+        kpis: ['₹ 198.4 Cr', '₹ 47.10 Cr', '₹ 31.80 Cr', '₹ 20.40 Cr', '3,640', '9'],
+        revTrend: [14.0, 16.5, 19.2, 18.4, 21.8, 24.6],
+        ordersBar: [310, 340, 390, 365, 430, 478],
+        revCombo: [15.5, 17.9, 20.0, 19.2, 22.4, 24.6],
+        buTotal: '₹ 198.4 Cr',
+        expTotal: '₹ 134.2 Cr',
+        products: [
+          { name: 'Product A', val: 4.95 },
+          { name: 'Product B', val: 4.40 },
+          { name: 'Product C', val: 3.70 },
+          { name: 'Product D', val: 2.95 },
+          { name: 'Product E', val: 2.45 },
+        ],
+      },
+    };
+
+    const BU_SLICES = [
+      { name: 'Industrial', pct: 45, color: '#15A394' },
+      { name: 'Infrastructure', pct: 25, color: '#0284C7' },
+      { name: 'Trading', pct: 15, color: '#F97316' },
+      { name: 'Services', pct: 10, color: '#1D4ED8' },
+      { name: 'Others', pct: 5, color: '#4F46E5' },
+    ];
+
+    const AGING_SLICES = [
+      { name: '0-30 Days', pct: 40, color: '#15A394' },
+      { name: '31-60 Days', pct: 25, color: '#0284C7' },
+      { name: '61-90 Days', pct: 20, color: '#EA580C' },
+      { name: '90+ Days', pct: 15, color: '#5B21B6' },
+    ];
+
+    const EXP_SLICES = [
+      { name: 'Cost of Goods Sold', pct: 55, color: '#15A394' },
+      { name: 'Employee Cost', pct: 20, color: '#F97316' },
+      { name: 'Administrative', pct: 10, color: '#1D4ED8' },
+      { name: 'Sales & Marketing', pct: 10, color: '#5B21B6' },
+      { name: 'Finance Cost', pct: 5, color: '#EC4899' },
+    ];
+
+    const LEDGER_VOUCHERS = [
+      { doc: 'PO-45001928', mod: 'Material Management', vendor: 'Bharat Heavy Alloys Ltd', plant: 'IN-P101', net: '₹ 64.20 L', aging: '2 Days', status: 'Pending' },
+      { doc: 'FI-19008412', mod: 'Financial Accounting', vendor: 'Siemens Grid Automation', plant: 'IN-P104', net: '₹ 1.18 Cr', aging: 'Today', status: 'Pending' },
+      { doc: 'SD-88003109', mod: 'Sales & Distribution', vendor: 'Larsen & Toubro Infra', plant: 'IN-P101', net: '₹ 2.45 Cr', aging: '5 Days', status: 'Posted' },
+      { doc: 'PP-33004190', mod: 'Production Planning', vendor: ' Bosch Rexroth Hydraulics', plant: 'IN-P202', net: '₹ 42.80 L', aging: '1 Day', status: 'Pending' },
+      { doc: 'PS-71002284', mod: 'Project Systems', vendor: 'Tata Steel Industrial EPC', plant: 'IN-P104', net: '₹ 3.12 Cr', aging: '11 Days', status: 'Posted' },
+      { doc: 'HR-51009044', mod: 'Payroll Process', vendor: 'Q2 Plant Shift Disbursement', plant: 'ALL-HQ', net: '₹ 1.64 Cr', aging: '3 Days', status: 'Posted' },
+    ];
+
+    let currentPeriod = 'month';
+    let ledgerStatusFilter = 'ALL';
+    let pendingCount = 18;
+    let sidebarBadgeCount = 8;
+
+    function renderErpRevTrend() {
+      const svg = document.getElementById('erpRevTrendSvg');
+      const vals = PERIOD_DATA[currentPeriod].revTrend;
+      const leftX = 34;
+      const rightX = 344;
+      const topY = 14;
+      const botY = 144;
+      const w = rightX - leftX;
+      const h = botY - topY;
+      const maxY = 25;
+
+      const pts = vals.map((v, i) => ({
+        x: leftX + (i / (vals.length - 1)) * w,
+        y: botY - (v / maxY) * h,
+        v,
+        m: MONTHS[i],
+      }));
+
+      const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+      const areaPath = `${linePath} L ${pts[pts.length - 1].x.toFixed(1)} ${botY} L ${pts[0].x.toFixed(1)} ${botY} Z`;
+
+      const yGrid = [0, 5, 10, 15, 20, 25]
+        .map((tick) => {
+          const y = (botY - (tick / maxY) * h).toFixed(1);
+          return `
+            <line x1="${leftX}" y1="${y}" x2="${rightX}" y2="${y}" stroke="currentColor" class="text-slate-100 dark:text-slate-800" stroke-width="1"/>
+            <text x="${leftX - 8}" y="${Number(y) + 4}" text-anchor="end" class="fill-slate-400 text-[12px]">${tick}</text>
+          `;
+        })
+        .join('');
+
+      const nodes = pts
+        .map(
+          (p) => `
+          <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.6" fill="#15A394" stroke="#FFFFFF" stroke-width="1.5" class="cursor-pointer" onclick="showErpToast('${p.m} Revenue: ₹ ${p.v} Cr')"/>
+          <text x="${p.x.toFixed(1)}" y="164" text-anchor="middle" class="fill-slate-400 text-[12px]">${p.m}</text>
+        `
+        )
+        .join('');
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="erpTealGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#15A394" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="#15A394" stop-opacity="0.01"/>
+          </linearGradient>
+        </defs>
+        ${yGrid}
+        <path d="${areaPath}" fill="url(#erpTealGrad)"/>
+        <path class="erp-line-draw" d="${linePath}" fill="none" stroke="#15A394" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle r="3" fill="#0D9488">
+          <animateMotion dur="4.8s" repeatCount="indefinite" path="${linePath}"/>
+        </circle>
+        ${nodes}
+      `;
+    }
+
+    function renderDonutWidget(svgId, legendId, centerLabelId, slices, defaultCenterText) {
+      const svg = document.getElementById(svgId);
+      const legend = document.getElementById(legendId);
+      const centerEl = document.getElementById(centerLabelId);
+      if (defaultCenterText) centerEl.textContent = defaultCenterText;
+
+      const r = 54;
+      const circum = 2 * Math.PI * r;
+      let acc = 0;
+
+      svg.innerHTML = slices
+        .map((s) => {
+          const len = (s.pct / 100) * circum;
+          const offset = -acc;
+          acc += len;
+          return `
+            <circle
+              class="donut-slice"
+              cx="75" cy="75" r="${r}"
+              fill="none"
+              stroke="${s.color}"
+              stroke-width="21"
+              stroke-dasharray="${len.toFixed(1)} ${circum.toFixed(1)}"
+              stroke-dashoffset="${offset.toFixed(1)}"
+              onmouseenter="document.getElementById('${centerLabelId}').textContent='${s.pct}%'"
+              onmouseleave="document.getElementById('${centerLabelId}').textContent='${defaultCenterText}'"
+            />
+          `;
+        })
+        .join('');
+
+      legend.innerHTML = slices
+        .map(
+          (s) => `
+          <div class="flex items-center justify-between gap-2">
+            <span class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 truncate">
+              <span class="w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:${s.color}"></span>
+              <span class="truncate">${s.name}</span>
+            </span>
+            <span class="font-bold text-slate-800 dark:text-white">${s.pct}%</span>
+          </div>
+        `
+        )
+        .join('');
+    }
+
+    function renderTopProducts() {
+      const wrap = document.getElementById('topProductsWrap');
+      const items = PERIOD_DATA[currentPeriod].products;
+      wrap.innerHTML = items
+        .map((p) => {
+          const pct = Math.min((p.val / 5) * 100, 98);
+          return `
+            <div class="flex items-center gap-2.5 text-xs">
+              <span class="w-16 text-slate-500 dark:text-slate-400 font-medium flex-shrink-0">${p.name}</span>
+              <div class="flex-1 flex items-center gap-2">
+                <div class="hbar-fill h-3.5 rounded-r bg-erp" style="width:${pct}%"></div>
+                <span class="font-bold text-erp">${p.val.toFixed(2)}</span>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function renderComboOrdersRevenue() {
+      const svg = document.getElementById('comboChartSvg');
+      const d = PERIOD_DATA[currentPeriod];
+      const leftX = 34;
+      const rightX = 340;
+      const topY = 14;
+      const botY = 142;
+      const w = rightX - leftX;
+      const h = botY - topY;
+      const maxOrders = 500;
+      const maxRev = 25;
+
+      const yGrid = [0, 100, 200, 300, 400, 500]
+        .map((ord, idx) => {
+          const y = (botY - (ord / maxOrders) * h).toFixed(1);
+          const revTick = idx * 5;
+          return `
+            <line x1="${leftX}" y1="${y}" x2="${rightX}" y2="${y}" stroke="currentColor" class="text-slate-100 dark:text-slate-800" stroke-width="1"/>
+            <text x="${leftX - 6}" y="${Number(y) + 4}" text-anchor="end" class="fill-slate-400 text-[12px]">${ord}</text>
+            <text x="${rightX + 6}" y="${Number(y) + 4}" text-anchor="start" class="fill-slate-400 text-[12px]">${revTick}</text>
+          `;
+        })
+        .join('');
+
+      const slotW = w / MONTHS.length;
+      const bars = d.ordersBar
+        .map((ord, i) => {
+          const cx = leftX + slotW * i + slotW / 2;
+          const barH = (ord / maxOrders) * h;
+          const barY = botY - barH;
+          return `
+            <rect x="${(cx - 11).toFixed(1)}" y="${barY.toFixed(1)}" width="22" height="${barH.toFixed(1)}" rx="2" fill="#15A394" class="cursor-pointer hover:opacity-85" onclick="showErpToast('${MONTHS[i]}: ${ord} Orders · ₹ ${d.revCombo[i]} Cr')"/>
+            <text x="${cx.toFixed(1)}" y="160" text-anchor="middle" class="fill-slate-400 text-[12px]">${MONTHS[i]}</text>
+          `;
+        })
+        .join('');
+
+      const linePts = d.revCombo.map((rv, i) => ({
+        x: leftX + slotW * i + slotW / 2,
+        y: botY - (rv / maxRev) * h,
+      }));
+      const linePath = linePts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+      const dots = linePts
+        .map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.4" fill="#1D6AE5" stroke="#FFFFFF" stroke-width="1.4"/>`)
+        .join('');
+
+      svg.innerHTML = `
+        ${yGrid}
+        ${bars}
+        <path class="erp-line-draw" d="${linePath}" fill="none" stroke="#1D6AE5" stroke-width="2.2" stroke-linecap="round"/>
+        ${dots}
+      `;
+    }
+
+    function filterErpLedger() {
+      const q = document.getElementById('erpGlobalSearch').value.trim().toLowerCase();
+      const tbody = document.getElementById('erpLedgerBody');
+
+      const rows = LEDGER_VOUCHERS.filter((r) => {
+        const matchTab = ledgerStatusFilter === 'ALL' || r.status === ledgerStatusFilter;
+        const matchQuery =
+          !q ||
+          r.doc.toLowerCase().includes(q) ||
+          r.mod.toLowerCase().includes(q) ||
+          r.vendor.toLowerCase().includes(q) ||
+          r.plant.toLowerCase().includes(q);
+        return matchTab && matchQuery;
+      });
+
+      tbody.innerHTML = rows
+        .map((r) => {
+          const isPending = r.status === 'Pending';
+          const badge = isPending
+            ? 'bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300'
+            : 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400';
+
+          return `
+            <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/40 transition">
+              <td class="py-2.5 px-4 font-mono font-bold text-slate-800 dark:text-slate-200">${r.doc}</td>
+              <td class="py-2.5 px-3 text-slate-600 dark:text-slate-300">${r.mod}</td>
+              <td class="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-100">${r.vendor}</td>
+              <td class="py-2.5 px-3 font-mono text-slate-500">${r.plant}</td>
+              <td class="py-2.5 px-3 text-right font-bold text-slate-800 dark:text-white">${r.net}</td>
+              <td class="py-2.5 px-3 text-slate-400">${r.aging}</td>
+              <td class="py-2.5 px-3">
+                <span class="rounded-md px-2 py-0.5 text-xs font-semibold ${badge}">${r.status}</span>
+              </td>
+              <td class="py-2.5 px-4 text-right">
+                ${
+                  isPending
+                    ? `<button onclick="approveVoucher('${r.doc}')" class="rounded-md bg-erp hover:bg-erp-dark text-white px-2.5 py-1 text-xs font-semibold cursor-pointer">Approve</button>`
+                    : `<span class="text-slate-400 font-medium">Verified</span>`
+                }
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    function approveVoucher(docNo) {
+      const item = LEDGER_VOUCHERS.find((v) => v.doc === docNo);
+      if (!item || item.status === 'Posted') return;
+      item.status = 'Posted';
+      pendingCount = Math.max(0, pendingCount - 1);
+      sidebarBadgeCount = Math.max(0, sidebarBadgeCount - 1);
+      document.getElementById('erpKpi6').textContent = String(pendingCount);
+      document.getElementById('sidebarApprovalBadge').textContent = String(sidebarBadgeCount);
+      filterErpLedger();
+      showErpToast(`Approved ${docNo} · Posted to General Ledger`);
+    }
+
+    function setLedgerFilter(status, btn) {
+      ledgerStatusFilter = status;
+      document.querySelectorAll('.ledger-tab').forEach((b) => {
+        b.className = 'ledger-tab rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 font-semibold cursor-pointer';
+      });
+      btn.className = 'ledger-tab rounded-lg bg-erp text-white px-3 py-1 font-semibold cursor-pointer';
+      filterErpLedger();
+    }
+
+    function switchErpPeriod(p) {
+      currentPeriod = p;
+      const d = PERIOD_DATA[p];
+      d.kpis.forEach((val, idx) => {
+        document.getElementById(`erpKpi${idx + 1}`).textContent = val;
+      });
+      renderAllErpCharts();
+      showErpToast(`Updated COMPREO ERP metrics for ${p.toUpperCase()}`);
+    }
+
+    const ERP_SUBPAGES = {
+      'Financial Accounting': {
+        code: 'FI-GL',
+        title: 'Financial Accounting & General Ledger',
+        subtitle: 'Multi-entity trial balance, AP/AR reconciliation, and GST statutory books',
+        badge: 'Books Balanced · FY26',
+        ctaLabel: 'Post Journal Entry',
+        ctaToast: 'Initialized SAP-Bridge FB50 General Ledger journal draft',
+        kpis: [
+          { label: 'Cash & Bank Treasury', val: '₹ 42.80 Cr', delta: '+9.4% MoM', good: true },
+          { label: 'Accounts Receivable', val: '₹ 14.12 Cr', delta: 'DSO 34 Days', good: true },
+          { label: 'Accounts Payable', val: '₹ 8.65 Cr', delta: 'DPO 41 Days', good: true },
+          { label: 'Unreconciled Entries', val: '3 Vouchers', delta: '-11 vs last wk', good: true }
+        ],
+        visualTitle: 'Cost Center Liquidity & Aging Split',
+        bars: [
+          { label: 'HQ Treasury & Fixed Deposits', val: '₹ 24.50 Cr', pct: 86, note: 'AAA rated instruments' },
+          { label: 'Current 0–30d Receivables', val: '₹ 9.88 Cr', pct: 70, note: '70% collected on terms' },
+          { label: 'Vendor Trade Payables', val: '₹ 8.65 Cr', pct: 54, note: 'Early-pay discount 2%' },
+          { label: 'GST Input Tax Credit Pool', val: '₹ 3.18 Cr', pct: 36, note: 'GSTR-2B 99.4% matched' }
+        ],
+        tableTitle: 'General Ledger Posting Register',
+        columns: ['Voucher No', 'Ledger Account', 'Cost Center', 'Amount', 'Status', 'Action'],
+        rows: [
+          { c1: 'FI-19008412', c2: 'Siemens Grid Automation AP', c3: 'CC-1040 Power', c4: '₹ 1.18 Cr', status: 'Pending', btn: 'Post GL' },
+          { c1: 'FI-19008409', c2: 'HDFC Corporate Sweep Sweep-In', c3: 'CC-1000 Treasury', c4: '₹ 4.50 Cr', status: 'Posted', btn: 'View Audit' },
+          { c1: 'FI-19008398', c2: 'Q2 Advance Corporate Tax', c3: 'CC-1010 Tax', c4: '₹ 2.15 Cr', status: 'Posted', btn: 'View Audit' },
+          { c1: 'FI-19008391', c2: 'Plant P101 Power & Utility Accrual', c3: 'CC-2010 Mfg', c4: '₹ 38.40 L', status: 'Pending', btn: 'Post GL' },
+          { c1: 'FI-19008384', c2: 'Export Forex Hedge Settlement', c3: 'CC-1000 Treasury', c4: '₹ 92.10 L', status: 'Posted', btn: 'View Audit' }
+        ]
+      },
+      'Sales & Distribution': {
+        code: 'SD-OTC',
+        title: 'Sales & Distribution (Order-to-Cash)',
+        subtitle: 'Enterprise dealer orders, dispatch e-Way bills, and regional quota attainment',
+        badge: '94.6% Quota Attainment',
+        ctaLabel: 'Create Sales Order',
+        ctaToast: 'Opened VA01 Sales Order form for Plant IN-P101',
+        kpis: [
+          { label: 'Monthly Order Booking', val: '₹ 21.40 Cr', delta: '+15.4% MoM', good: true },
+          { label: 'Dispatched & Billed', val: '₹ 18.64 Cr', delta: '312 Invoices', good: true },
+          { label: 'Open Backorders', val: '₹ 2.76 Cr', delta: '19 Outbound', good: true },
+          { label: 'On-Time In-Full (OTIF)', val: '96.2%', delta: '+1.8% QoQ', good: true }
+        ],
+        visualTitle: 'Regional Sales Territory Quota',
+        bars: [
+          { label: 'Western Industrial Zone (Mumbai/Pune)', val: '₹ 8.12 Cr', pct: 92, note: '104% of monthly target' },
+          { label: 'Southern EPC Corridor (Chennai/BLR)', val: '₹ 5.45 Cr', pct: 76, note: '96% of monthly target' },
+          { label: 'Northern Infra Belt (NCR)', val: '₹ 3.82 Cr', pct: 58, note: '89% of monthly target' },
+          { label: 'MENA & ASEAN Export Desk', val: '₹ 1.25 Cr', pct: 34, note: 'LC backed shipments' }
+        ],
+        tableTitle: 'Outbound Sales Orders & Dispatch Queue',
+        columns: ['SO Number', 'Customer Account', 'Plant', 'Order Value', 'Status', 'Action'],
+        rows: [
+          { c1: 'SD-88003142', c2: 'Larsen & Toubro Infra EPC', c3: 'IN-P101', c4: '₹ 2.45 Cr', status: 'Dispatched', btn: 'e-Way Bill' },
+          { c1: 'SD-88003139', c2: 'Reliance Energy Utilities', c3: 'IN-P104', c4: '₹ 1.92 Cr', status: 'Ready', btn: 'Release GI' },
+          { c1: 'SD-88003131', c2: 'Tata Projects Industrial', c3: 'IN-P101', c4: '₹ 3.10 Cr', status: 'Dispatched', btn: 'e-Way Bill' },
+          { c1: 'SD-88003125', c2: 'Adani Transmission Grid', c3: 'IN-P202', c4: '₹ 84.50 L', status: 'Ready', btn: 'Release GI' },
+          { c1: 'SD-88003118', c2: 'JSW Steel Coated Products', c3: 'IN-P104', c4: '₹ 1.48 Cr', status: 'Billed', btn: 'e-Invoice' }
+        ]
+      },
+      'Material Management': {
+        code: 'MM-PUR',
+        title: 'Material Management & Procurement',
+        subtitle: 'Raw material inventory valuation, MRP safety stock alerts, and vendor POs',
+        badge: '3 Plants Synced',
+        ctaLabel: 'Raise Purchase Req',
+        ctaToast: 'Created ME51N Purchase Requisition for Plant IN-P101',
+        kpis: [
+          { label: 'Inventory Valuation', val: '₹ 31.20 Cr', delta: '4.8x Turns', good: true },
+          { label: 'Open Purchase Orders', val: '64 POs', delta: '₹ 9.40 Cr Net', good: true },
+          { label: 'Safety Stock Alerts', val: '5 Items', delta: 'Auto-PR raised', good: false },
+          { label: 'Vendor Quality Rating', val: '97.4%', delta: 'Tier-1 AVL', good: true }
+        ],
+        visualTitle: 'Warehouse Stock Utilization by Plant',
+        bars: [
+          { label: 'Plant IN-P101 (Pune Heavy Fab)', val: '₹ 14.80 Cr', pct: 84, note: '84% bin capacity' },
+          { label: 'Plant IN-P104 (Vadodara Switchgear)', val: '₹ 10.10 Cr', pct: 68, note: '68% bin capacity' },
+          { label: 'Plant IN-P202 (Hosur Precision)', val: '₹ 6.30 Cr', pct: 52, note: '52% bin capacity' }
+        ],
+        tableTitle: 'Active Material Requisitions & GRN Queue',
+        columns: ['Doc No', 'Material / Alloy Spec', 'Plant', 'Net Value', 'Status', 'Action'],
+        rows: [
+          { c1: 'PO-45001928', c2: 'CRGO Silicon Steel Coils (42 MT)', c3: 'IN-P101', c4: '₹ 64.20 L', status: 'Pending', btn: 'Release PO' },
+          { c1: 'GRN-5009120', c2: 'Electrolytic Copper Busbars', c3: 'IN-P104', c4: '₹ 48.90 L', status: 'Posted', btn: 'Inspect Lot' },
+          { c1: 'PR-10048219', c2: 'Bosch Hydraulic Servo Valves', c3: 'IN-P202', c4: '₹ 29.50 L', status: 'Pending', btn: 'Convert PO' },
+          { c1: 'GRN-5009114', c2: 'SF6 Circuit Breaker Bushings', c3: 'IN-P104', c4: '₹ 37.10 L', status: 'Posted', btn: 'Inspect Lot' },
+          { c1: 'PO-45001915', c2: 'Industrial Epoxy Powder Batch', c3: 'IN-P101', c4: '₹ 14.80 L', status: 'Posted', btn: 'Track ASN' }
+        ]
+      },
+      'Production Planning': {
+        code: 'PP-SFC',
+        title: 'Production Planning & Shop Floor OEE',
+        subtitle: 'MRP II capacity scheduling, BOM work orders, and line OEE telemetry',
+        badge: '89.4% Plant OEE',
+        ctaLabel: 'Release Work Order',
+        ctaToast: 'Released Shop Floor Production Order PP-33004210',
+        kpis: [
+          { label: 'Overall Equipment OEE', val: '89.4%', delta: '+2.3% MoM', good: true },
+          { label: 'Active Shop Orders', val: '47 Runs', delta: '3 Shifts Live', good: true },
+          { label: 'BOM Scrap Variance', val: '0.62%', delta: 'Below 1.0% cap', good: true },
+          { label: 'Unplanned Downtime', val: '1.4 hrs', delta: '-65% vs last mo', good: true }
+        ],
+        visualTitle: 'Work Center Capacity Load',
+        bars: [
+          { label: 'CNC Laser & Sheet Metal Line 1', val: '93% Load', pct: 93, note: 'Shift A + B + C active' },
+          { label: 'Robotic MIG Welding Bay 4', val: '86% Load', pct: 86, note: 'Zero bottleneck queue' },
+          { label: 'HV Transformer Winding Core', val: '79% Load', pct: 79, note: '14 units in curing oven' },
+          { label: 'Final Assembly & HV Test Bed', val: '72% Load', pct: 72, note: 'FAT witness scheduled' }
+        ],
+        tableTitle: 'Shop Floor Production Orders',
+        columns: ['Order ID', 'Assembly / SKU', 'Work Center', 'Output', 'Status', 'Action'],
+        rows: [
+          { c1: 'PP-33004190', c2: '220kV GIS Switchgear Bay', c3: 'WC-HV01', c4: '8 / 10 Units', status: 'Running', btn: 'Log Yield' },
+          { c1: 'PP-33004186', c2: '5MVA Dry-Type Transformer', c3: 'WC-TR04', c4: '6 / 6 Units', status: 'Completed', btn: 'Move FG' },
+          { c1: 'PP-33004182', c2: 'Industrial VFD Drive Cabinet', c3: 'WC-EL02', c4: '19 / 24 Units', status: 'Running', btn: 'Log Yield' },
+          { c1: 'PP-33004177', c2: 'Heavy Structural Gantry Beam', c3: 'WC-FB09', c4: '12 / 12 Units', status: 'Completed', btn: 'Move FG' },
+          { c1: 'PP-33004171', c2: 'SCADA Telemetry RTU Rack', c3: 'WC-EL05', c4: '15 / 20 Units', status: 'Running', btn: 'Log Yield' }
+        ]
+      },
+      'Project Systems': {
+        code: 'PS-WBS',
+        title: 'Project Systems & Turnkey EPC WBS',
+        subtitle: 'Work breakdown budgets, site milestone billing, and CapEx earned value',
+        badge: '11 Active EPC Sites',
+        ctaLabel: 'Create WBS Element',
+        ctaToast: 'Added new WBS milestone node to EPC Master Schedule',
+        kpis: [
+          { label: 'Active EPC Order Book', val: '₹ 146.0 Cr', delta: '11 Turnkey Sites', good: true },
+          { label: 'WBS Budget Consumed', val: '64.2%', delta: 'CPI 1.04 Green', good: true },
+          { label: 'Unbilled Milestones', val: '₹ 7.85 Cr', delta: '4 Ready for RA', good: true },
+          { label: 'Site Safety LTI-Free', val: '1.42M hrs', delta: '100% HSE Audit', good: true }
+        ],
+        visualTitle: 'Turnkey EPC Project Completion',
+        bars: [
+          { label: 'PS-710 · Tata Steel Blast Furnace Substation', val: '88%', pct: 88, note: '₹ 42 Cr · Commissioning' },
+          { label: 'PS-714 · Pune Metro Traction Package', val: '71%', pct: 71, note: '₹ 38 Cr · Cable laying' },
+          { label: 'PS-719 · Gujarat Solar Park Pooling Grid', val: '54%', pct: 54, note: '₹ 36 Cr · Civil complete' },
+          { label: 'PS-722 · Chennai Data Center HV Yard', val: '32%', pct: 32, note: '₹ 30 Cr · Equipment erection' }
+        ],
+        tableTitle: 'WBS Cost & Milestone Billing Control',
+        columns: ['WBS Code', 'Project Description', 'Sanctioned', 'Progress', 'Status', 'Action'],
+        rows: [
+          { c1: 'WBS-710-04', c2: 'Tata Steel EPC · Protection Relay FAT', c3: '₹ 8.40 Cr', c4: '92%', status: 'On Track', btn: 'Raise RA Bill' },
+          { c1: 'WBS-714-02', c2: 'Pune Metro · 33kV GIS Erection', c3: '₹ 11.20 Cr', c4: '75%', status: 'On Track', btn: 'Inspect Site' },
+          { c1: 'WBS-719-03', c2: 'Gujarat Solar · Power Transformer', c3: '₹ 9.60 Cr', c4: '60%', status: 'On Track', btn: 'Inspect Site' },
+          { c1: 'WBS-722-01', c2: 'Chennai DC · Trenching & Earthing', c3: '₹ 5.10 Cr', c4: '45%', status: 'Pending', btn: 'Audit CapEx' },
+          { c1: 'WBS-708-09', c2: 'NTPC Rihand · Handover & PG Test', c3: '₹ 6.80 Cr', c4: '100%', status: 'Closed', btn: 'Release BG' }
+        ]
+      },
+      'Quality Management': {
+        code: 'QM-ISO',
+        title: 'Quality Management & ISO Inspection Lots',
+        subtitle: 'Inward material QC, High-Voltage FAT certificates, and CAPA closure tracking',
+        badge: '98.7% First-Pass Yield',
+        ctaLabel: 'Log Inspection Lot',
+        ctaToast: 'Generated QA32 Usage Decision certificate',
+        kpis: [
+          { label: 'First-Pass Yield (FPY)', val: '98.7%', delta: '+0.8% QoQ', good: true },
+          { label: 'Lots Cleared (MTD)', val: '428 Lots', delta: 'Median 3.2h QC', good: true },
+          { label: 'Open NCR / CAPA', val: '4 Cases', delta: '-5 vs last mo', good: true },
+          { label: 'Customer Warranty Claims', val: '0.12%', delta: 'ISO 9001:2015', good: true }
+        ],
+        visualTitle: 'Inspection Clearance by Stage',
+        bars: [
+          { label: 'Inward Raw Material (IQC)', val: '99.1% Pass', pct: 99, note: '214 vendor batches' },
+          { label: 'In-Process Shop Floor Patrol (IPQC)', val: '98.4% Pass', pct: 98, note: 'Ultrasonic weld checks' },
+          { label: 'Final High-Voltage Dielectric Test', val: '99.6% Pass', pct: 99, note: 'Zero flashover faults' }
+        ],
+        tableTitle: 'Active Quality Inspection Lots',
+        columns: ['Lot ID', 'Component / Assembly', 'Plant', 'Sample Result', 'Decision', 'Action'],
+        rows: [
+          { c1: 'QL-890041', c2: 'CRGO Core Laminations Batch #18', c3: 'IN-P101', c4: '0.82 W/kg Core Loss', status: 'Accepted', btn: 'Issue CoA' },
+          { c1: 'QL-890039', c2: '220kV SF6 Breaker Interrupter', c3: 'IN-P104', c4: 'Zero Leak Verified', status: 'Accepted', btn: 'Issue CoA' },
+          { c1: 'QL-890036', c2: 'Cast Resin Insulator Housing', c3: 'IN-P202', c4: '2 Surface Pores', status: 'Pending', btn: 'Log CAPA' },
+          { c1: 'QL-890032', c2: 'Copper Busbar Silver Plating', c3: 'IN-P104', c4: '26 Micron Spec OK', status: 'Accepted', btn: 'Issue CoA' },
+          { c1: 'QL-890028', c2: 'SCADA Printed Circuit Harness', c3: 'IN-P202', c4: '100% Continuity', status: 'Accepted', btn: 'Issue CoA' }
+        ]
+      },
+      'HR Management': {
+        code: 'HCM-PA',
+        title: 'Human Capital & Plant Workforce Roster',
+        subtitle: 'Multi-plant shift attendance, skill certifications, and engineering hiring',
+        badge: '1,842 Active Workforce',
+        ctaLabel: 'New Requisition',
+        ctaToast: 'Opened HR Talent Requisition workflow',
+        kpis: [
+          { label: 'Total Enterprise Headcount', val: '1,842', delta: '+34 Net YoY', good: true },
+          { label: 'Biometric Shift Attendance', val: '96.4%', delta: 'All 3 Plants', good: true },
+          { label: 'Open Role Requisitions', val: '16 Roles', delta: '11 in Offer stage', good: true },
+          { label: 'Annualized Retention', val: '93.8%', delta: '+2.1% YoY', good: true }
+        ],
+        visualTitle: 'Workforce Allocation by Division',
+        bars: [
+          { label: 'Manufacturing & Plant Operations', val: '1,090 staff', pct: 84, note: 'Pune · Vadodara · Hosur' },
+          { label: 'EPC Site & Commissioning Engineers', val: '380 staff', pct: 62, note: '11 active project sites' },
+          { label: 'R&D, CAD & Design Engineering', val: '224 staff', pct: 46, note: 'HV lab & firmware' },
+          { label: 'Corporate Finance, Sales & Admin', val: '148 staff', pct: 32, note: 'HQ Mumbai & Regional' }
+        ],
+        tableTitle: 'Department Attendance & Hiring Status',
+        columns: ['Dept Code', 'Business Unit', 'Headcount', 'Attendance', 'Status', 'Action'],
+        rows: [
+          { c1: 'ORG-P101', c2: 'Pune Heavy Fabrication Plant', c3: '612', c4: '97.1%', status: 'Optimal', btn: 'Shift Roster' },
+          { c1: 'ORG-P104', c2: 'Vadodara HV Switchgear Plant', c3: '478', c4: '96.2%', status: 'Optimal', btn: 'Shift Roster' },
+          { c1: 'ORG-EPC1', c2: 'Turnkey Field Commissioning', c3: '380', c4: '95.8%', status: 'Active', btn: 'Site Deputation' },
+          { c1: 'ORG-RND2', c2: 'Grid Automation & Firmware R&D', c3: '224', c4: '98.0%', status: 'Hiring +6', btn: 'View Candidates' },
+          { c1: 'ORG-CORP', c2: 'HQ Finance, Legal & Sales', c3: '148', c4: '96.6%', status: 'Optimal', btn: 'Shift Roster' }
+        ]
+      },
+      'Payroll Process': {
+        code: 'PY-IN',
+        title: 'Payroll Process & Statutory Compliance',
+        subtitle: 'Automated monthly salary disbursement, EPF/ESI filings, and TDS Form-16 ledger',
+        badge: 'Cycle Locked · 100% Compliant',
+        ctaLabel: 'Run Bank Advice',
+        ctaToast: 'Generated NEFT/RTGS salary bank file for 1,842 employees',
+        kpis: [
+          { label: 'Monthly Gross Payroll', val: '₹ 6.48 Cr', delta: '1,842 Payslips', good: true },
+          { label: 'Net Bank Disbursement', val: '₹ 5.31 Cr', delta: 'Zero failures', good: true },
+          { label: 'EPF & ESI Challan', val: '₹ 54.20 L', delta: 'Filed on 11th', good: true },
+          { label: 'TDS Section 192', val: '₹ 62.80 L', delta: 'TRACES Synced', good: true }
+        ],
+        visualTitle: 'Payroll Cost Breakdown',
+        bars: [
+          { label: 'Basic + HRA + Fixed Allowances', val: '₹ 5.12 Cr', pct: 82, note: '79% of total CTC' },
+          { label: 'Plant Shift & Overtime Incentives', val: '₹ 74.00 L', pct: 48, note: 'Verified via biometric' },
+          { label: 'Employer PF, Gratuity & Insurance', val: '₹ 62.00 L', pct: 40, note: '100% statutory funded' }
+        ],
+        tableTitle: 'Plant & Division Payroll Batches',
+        columns: ['Batch ID', 'Payroll Group', 'Employees', 'Net Payout', 'Status', 'Action'],
+        rows: [
+          { c1: 'PY-2025-M01', c2: 'HQ & R&D Executive Cadre', c3: '372', c4: '₹ 2.14 Cr', status: 'Disbursed', btn: 'Download Register' },
+          { c1: 'PY-2025-M02', c2: 'Plant IN-P101 Pune Technical', c3: '612', c4: '₹ 1.42 Cr', status: 'Disbursed', btn: 'Download Register' },
+          { c1: 'PY-2025-M03', c2: 'Plant IN-P104 Vadodara Staff', c3: '478', c4: '₹ 1.08 Cr', status: 'Disbursed', btn: 'Download Register' },
+          { c1: 'PY-2025-M04', c2: 'EPC Site Allowance & Per-Diem', c3: '380', c4: '₹ 67.00 L', status: 'Verified', btn: 'Release NEFT' },
+          { c1: 'PY-2025-TAX', c2: 'Monthly EPFO + Income Tax Challan', c3: '1,842', c4: '₹ 1.17 Cr', status: 'Posted', btn: 'View Challan' }
+        ]
+      },
+      'Reports & Analytics': {
+        code: 'BI-BW',
+        title: 'Enterprise BI Reports & Statutory Filings',
+        subtitle: 'Board P&L packs, cost-center EBITDA variance, and automated GST/Audit exports',
+        badge: 'Data Warehouse Live',
+        ctaLabel: 'Export Board Pack',
+        ctaToast: 'Compiled Q2_COMPREO_Board_MIS_Pack.xlsx',
+        kpis: [
+          { label: 'Consolidated EBITDA', val: '15.6%', delta: '+110 bps YoY', good: true },
+          { label: 'ROCE (Annualized)', val: '22.4%', delta: '+2.8% vs Plan', good: true },
+          { label: 'Scheduled MIS Jobs', val: '28 Daily', delta: '100% Green', good: true },
+          { label: 'Audit Trail Coverage', val: '100%', delta: 'IFC Compliant', good: true }
+        ],
+        visualTitle: 'EBITDA Margin by Business Vertical',
+        bars: [
+          { label: 'HV Switchgear & Grid Automation', val: '18.4% Margin', pct: 88, note: '₹ 8.38 Cr Rev' },
+          { label: 'Turnkey Industrial EPC', val: '14.2% Margin', pct: 70, note: '₹ 4.66 Cr Rev' },
+          { label: 'Annual Maintenance & AMC Services', val: '26.8% Margin', pct: 94, note: '₹ 1.86 Cr Rev' },
+          { label: 'Allied Power Trading', val: '11.5% Margin', pct: 55, note: '₹ 3.74 Cr Rev' }
+        ],
+        tableTitle: 'Executive & Statutory Report Catalogue',
+        columns: ['Report ID', 'Report Name', 'Frequency', 'Last Generated', 'Format', 'Action'],
+        rows: [
+          { c1: 'MIS-FI-01', c2: 'Consolidated P&L and Balance Sheet', c3: 'Monthly', c4: 'Today, 06:00 AM', status: 'XLSX / PDF', btn: 'Download' },
+          { c1: 'MIS-TX-04', c2: 'GSTR-1 & GSTR-3B Multi-State Summary', c3: 'Monthly', c4: 'Yesterday', status: 'JSON / CSV', btn: 'Download' },
+          { c1: 'MIS-MM-09', c2: 'Slow-Moving & Aging Inventory Valuation', c3: 'Weekly', c4: '2 days ago', status: 'XLSX', btn: 'Download' },
+          { c1: 'MIS-SD-12', c2: 'Customer Receivables >60d Escalation', c3: 'Daily', c4: 'Today, 08:30 AM', status: 'PDF', btn: 'Download' },
+          { c1: 'MIS-PP-07', c2: 'Plant Wise OEE & Power Consumption', c3: 'Daily', c4: 'Today, 07:00 AM', status: 'XLSX', btn: 'Download' }
+        ]
+      },
+      'Approvals': {
+        code: 'WF-REL',
+        title: 'Enterprise Release Strategy & Approvals',
+        subtitle: 'Multi-level DOA workflow queue for high-value POs, CapEx, and GL postings',
+        badge: 'DOA Level-3 Director',
+        ctaLabel: 'Approve All Verified',
+        ctaToast: 'Batch-verified compliant vouchers under ₹ 50L threshold',
+        kpis: [
+          { label: 'Awaiting Your Sign-Off', val: '8 Items', delta: '₹ 3.42 Cr Total', good: false },
+          { label: 'Approved This Week', val: '41 Docs', delta: 'Median 2.4h SLA', good: true },
+          { label: 'Budget Policy Flags', val: '0 Breaches', delta: '100% Within DOA', good: true },
+          { label: 'Delegation Status', val: 'Active', delta: 'Plant + HQ Scope', good: true }
+        ],
+        visualTitle: 'Pending Approval Value by Module',
+        bars: [
+          { label: 'Material Management POs (> ₹ 25L)', val: '₹ 1.48 Cr', pct: 80, note: '3 high-priority alloy POs' },
+          { label: 'Financial Accounting GL Accruals', val: '₹ 1.18 Cr', pct: 64, note: '2 vendor settlements' },
+          { label: 'Project Systems CapEx Variations', val: '₹ 76.00 L', pct: 44, note: '3 site crane rentals' }
+        ],
+        tableTitle: 'Director Release Strategy Queue',
+        columns: ['Voucher', 'Module & Vendor', 'Plant', 'Net Value', 'Status', 'Action'],
+        isApprovalQueue: true,
+        rows: [
+          { c1: 'PO-45001928', c2: 'MM · Bharat Heavy Alloys Ltd', c3: 'IN-P101', c4: '₹ 64.20 L', status: 'Pending', btn: 'Approve' },
+          { c1: 'FI-19008412', c2: 'FI · Siemens Grid Automation', c3: 'IN-P104', c4: '₹ 1.18 Cr', status: 'Pending', btn: 'Approve' },
+          { c1: 'PP-33004190', c2: 'PP · Bosch Rexroth Hydraulics', c3: 'IN-P202', c4: '₹ 42.80 L', status: 'Pending', btn: 'Approve' },
+          { c1: 'PS-71002301', c2: 'PS · Sanghvi Heavy Crawler Crane', c3: 'SITE-04', c4: '₹ 53.40 L', status: 'Pending', btn: 'Approve' },
+          { c1: 'MM-45001934', c2: 'MM · Hindalco Copper Rods', c3: 'IN-P104', c4: '₹ 63.60 L', status: 'Pending', btn: 'Approve' }
+        ]
+      },
+      'Administration': {
+        code: 'BASIS-ADM',
+        title: 'System Administration, RBAC & Fiscal Controls',
+        subtitle: 'Manage SAP-Bridge sync nodes, plant master codes, fiscal posting periods, and security',
+        badge: 'v9.4 Cluster Healthy',
+        ctaLabel: 'Sync Master Data',
+        ctaToast: 'Synchronized Plant 1000–2020 master tables in 410ms',
+        kpis: [
+          { label: 'Active ERP Named Users', val: '284 / 300', delta: 'SSO SAML 2.0', good: true },
+          { label: 'Database Replication', val: '0.4s Lag', delta: 'Primary + DR Pune', good: true },
+          { label: 'Open Fiscal Period', val: 'Period 06', delta: 'Prior months locked', good: true },
+          { label: 'API Gateway Uptime', val: '99.99%', delta: 'GSTN + Banking', good: true }
+        ],
+        visualTitle: 'Enterprise Cluster & Interface Health',
+        bars: [
+          { label: 'Primary HANA / Ledger DB Node', val: '38% CPU', pct: 38, note: '1.2ms query P95' },
+          { label: 'GSTN e-Invoice & e-Way API Link', val: '99.98%', pct: 98, note: 'Auto IRN generation' },
+          { label: 'Corporate Host-to-Host Bank SFTP', val: '100% Up', pct: 100, note: '256-bit PGP signed' }
+        ],
+        tableTitle: 'Enterprise Governance & Security Controls',
+        toggles: [
+          { title: 'Lock Prior Fiscal Month GL Postings', desc: 'Prevents backdated journal modifications without CFO override token', on: true },
+          { title: 'Mandatory 3-Way PO / GRN / Invoice Match', desc: 'Blocks AP vendor payout if quantity or unit price deviates >0.5%', on: true },
+          { title: 'Automated GSTN e-Invoice IRN Generation', desc: 'Generates signed QR e-Invoice immediately upon Sales Order billing', on: true },
+          { title: 'Strict Multi-Factor Token for DOA > ₹ 50 Lakhs', desc: 'Prompts hardware passkey before releasing high-value procurement POs', on: false },
+          { title: 'COMPREO Dark Enterprise Interface', desc: 'Switch workspace between Corporate Light and High-Contrast Dark UI', isDarkToggle: true }
+        ]
+      }
+    };
+
+    function approveSubpageRow(idx) {
+      const rows = ERP_SUBPAGES['Approvals'].rows;
+      if (!rows[idx] || rows[idx].status === 'Approved') return;
+      rows[idx].status = 'Approved';
+      pendingCount = Math.max(0, pendingCount - 1);
+      sidebarBadgeCount = Math.max(0, sidebarBadgeCount - 1);
+      document.getElementById('erpKpi6').textContent = String(pendingCount);
+      document.getElementById('sidebarApprovalBadge').textContent = String(sidebarBadgeCount);
+      ERP_SUBPAGES['Approvals'].kpis[0].val = `${sidebarBadgeCount} Items`;
+      renderErpSubpage('Approvals');
+      showErpToast(`Approved ${rows[idx].c1} · Released to General Ledger`);
+    }
+
+    function toggleErpAdminSetting(idx) {
+      const t = ERP_SUBPAGES['Administration'].toggles[idx];
+      if (!t) return;
+      if (t.isDarkToggle) {
+        toggleErpDark();
+        renderErpSubpage('Administration');
+        return;
+      }
+      t.on = !t.on;
+      renderErpSubpage('Administration');
+      showErpToast(`${t.title}: ${t.on ? 'Enabled' : 'Disabled'}`);
+    }
+
+    function renderErpSubpage(modName) {
+      const data = ERP_SUBPAGES[modName];
+      const container = document.getElementById('tabSubpageView');
+      if (!data || !container) return;
+
+      const isDark = document.documentElement.classList.contains('dark');
+
+      const kpiHtml = data.kpis.map((k) => `
+        <div class="erp-card p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium text-slate-500 dark:text-slate-400">${k.label}</span>
+            <span class="rounded-md px-2 py-0.5 text-xs font-semibold ${k.good ? 'bg-erp-soft dark:bg-teal-500/15 text-erp' : 'bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300'}">${k.delta}</span>
+          </div>
+          <p class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-2">${k.val}</p>
+        </div>
+      `).join('');
+
+      const barsHtml = data.bars.map((b) => `
+        <div onclick="showErpToast('${b.label}: ${b.val} (${b.note})')" class="p-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 cursor-pointer hover:border-erp transition">
+          <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+            <span class="font-semibold text-slate-800 dark:text-slate-100">${b.label}</span>
+            <span class="font-bold text-erp">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+            <div class="h-full rounded-full bg-erp transition-all duration-500" style="width:${b.pct}%"></div>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">${b.note}</p>
+        </div>
+      `).join('');
+
+      let rightHtml = '';
+      if (data.toggles) {
+        rightHtml = `
+          <div class="p-4 space-y-2.5">
+            ${data.toggles.map((t, idx) => {
+              const activeState = t.isDarkToggle ? isDark : t.on;
+              return `
+                <div onclick="toggleErpAdminSetting(${idx})" class="p-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 flex items-center justify-between gap-4 cursor-pointer hover:border-erp transition">
+                  <div class="min-w-0">
+                    <p class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">${t.title}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${t.desc}</p>
+                  </div>
+                  <button type="button" aria-pressed="${activeState}" class="w-11 h-6 rounded-full p-0.5 flex items-center flex-shrink-0 transition ${activeState ? 'bg-erp justify-end' : 'bg-slate-300 dark:bg-slate-600 justify-start'}">
+                    <span class="w-5 h-5 rounded-full bg-white shadow-sm"></span>
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        rightHtml = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50/90 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
+                  <th class="py-2.5 px-4">${data.columns[0]}</th>
+                  <th class="py-2.5 px-3">${data.columns[1]}</th>
+                  <th class="py-2.5 px-3">${data.columns[2]}</th>
+                  <th class="py-2.5 px-3">${data.columns[3]}</th>
+                  <th class="py-2.5 px-3">${data.columns[4]}</th>
+                  <th class="py-2.5 px-4 text-right">${data.columns[5]}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                ${data.rows.map((r, idx) => {
+                  const isPending = r.status === 'Pending' || r.status === 'Ready';
+                  const badgeCls = isPending
+                    ? 'bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300'
+                    : 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400';
+                  const actionHtml = data.isApprovalQueue
+                    ? (r.status === 'Pending'
+                        ? `<button onclick="approveSubpageRow(${idx})" class="rounded-md bg-erp hover:bg-erp-dark text-white px-2.5 py-1 text-xs font-semibold cursor-pointer">Approve</button>`
+                        : `<span class="text-emerald-600 dark:text-emerald-400 font-semibold">Approved</span>`)
+                    : `<button onclick="showErpToast('${r.btn} executed for ${r.c1}')" class="rounded-md border border-slate-200 dark:border-slate-700 hover:bg-erp hover:text-white hover:border-erp text-slate-700 dark:text-slate-200 px-2.5 py-1 text-xs font-semibold transition cursor-pointer">${r.btn}</button>`;
+                  return `
+                    <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/40 transition">
+                      <td class="py-2.5 px-4 font-mono font-bold text-slate-800 dark:text-slate-200">${r.c1}</td>
+                      <td class="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-100">${r.c2}</td>
+                      <td class="py-2.5 px-3 font-mono text-slate-500 dark:text-slate-400">${r.c3}</td>
+                      <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-white">${r.c4}</td>
+                      <td class="py-2.5 px-3"><span class="rounded-md px-2 py-0.5 text-xs font-semibold ${badgeCls}">${r.status}</span></td>
+                      <td class="py-2.5 px-4 text-right">${actionHtml}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-3.5">
+          <!-- Module Sub-page Header -->
+          <div class="erp-card p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="returnToErpHome()" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-erp hover:text-white hover:border-erp px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Overview</span>
+                </button>
+                <span class="rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 font-mono text-xs font-bold text-slate-600 dark:text-slate-300">${data.code}</span>
+                <span class="rounded-md bg-erp-soft dark:bg-teal-500/15 px-2.5 py-0.5 text-xs font-semibold text-erp">${data.badge}</span>
+              </div>
+              <h1 class="font-display text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight pt-0.5">${data.title}</h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400">${data.subtitle}</p>
+            </div>
+            <button onclick="showErpToast('${data.ctaToast}')" class="inline-flex items-center gap-1.5 rounded-lg bg-erp hover:bg-erp-dark text-white px-3.5 py-2 text-xs font-semibold shadow-sm transition cursor-pointer">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>${data.ctaLabel}</span>
+            </button>
+          </div>
+
+          <!-- 4 Enterprise Module KPIs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            ${kpiHtml}
+          </div>
+
+          <!-- Visual Chart/Allocation Card + 5-Row Ledger/Toggles -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+            <div class="erp-card p-4 lg:col-span-5 flex flex-col justify-between">
+              <div class="mb-3">
+                <h2 class="text-sm font-bold text-slate-800 dark:text-white">${data.visualTitle}</h2>
+                <p class="text-xs text-slate-400">Real-time plant &amp; cost-center breakdown</p>
+              </div>
+              <div class="space-y-2.5 my-auto">
+                ${barsHtml}
+              </div>
+            </div>
+
+            <div class="erp-card overflow-hidden lg:col-span-7 flex flex-col justify-between">
+              <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div>
+                  <h2 class="text-sm font-bold text-slate-800 dark:text-white">${data.tableTitle}</h2>
+                  <p class="text-xs text-slate-400">SAP-Bridge live module transactions</p>
+                </div>
+                <span class="rounded-md bg-erp-soft dark:bg-teal-500/15 px-2.5 py-0.5 text-xs font-semibold text-erp">Synced</span>
+              </div>
+              ${rightHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function returnToErpHome(silent = false) {
+      document.querySelectorAll('#erpSidebar .erp-mod-btn').forEach((b) => {
+        b.classList.toggle('active', b.dataset.erpMod === 'Home');
+      });
+      document.getElementById('tabSubpageView').classList.add('hidden');
+      document.getElementById('defaultDashboardView').classList.remove('hidden');
+      document.getElementById('erpGreetingTitle').textContent = 'Welcome back, Admin!';
+      if (!silent) showErpToast('Returned to COMPREO ERP Home Overview');
+    }
+
+    function selectErpModule(btn, modName) {
+      document.querySelectorAll('#erpSidebar .erp-mod-btn').forEach((b) => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (modName === 'Home') {
+        returnToErpHome(true);
+        showErpToast('ERP Module: Home Overview');
+      } else {
+        document.getElementById('defaultDashboardView').classList.add('hidden');
+        const sub = document.getElementById('tabSubpageView');
+        sub.classList.remove('hidden');
+        renderErpSubpage(modName);
+        showErpToast(`ERP Module: ${modName}`);
+      }
+    }
+
+    function toggleErpSidebar() {
+      document.getElementById('erpSidebar').classList.toggle('collapsed');
+    }
+
+    function scrollToDenseLedger() {
+      const sub = document.getElementById('tabSubpageView');
+      if (sub && !sub.classList.contains('hidden')) {
+        returnToErpHome(true);
+      }
+      document.getElementById('denseLedgerSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleErpDark() {
+      document.documentElement.classList.toggle('dark');
+      const dark = document.documentElement.classList.contains('dark');
+      const activeBtn = document.querySelector('#erpSidebar .erp-mod-btn.active');
+      if (activeBtn && activeBtn.dataset.erpMod === 'Administration') {
+        renderErpSubpage('Administration');
+      }
+      showErpToast(dark ? 'COMPREO Dark Enterprise Theme enabled' : 'COMPREO Light Corporate Theme enabled');
+    }
+
+    let erpTimer = null;
+    function showErpToast(msg) {
+      const el = document.getElementById('erpToast');
+      document.getElementById('erpToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(erpTimer);
+      erpTimer = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+      }, 2600);
+    }
+
+    function renderAllErpCharts() {
+      const d = PERIOD_DATA[currentPeriod];
+      renderErpRevTrend();
+      renderDonutWidget('buDonutSvg', 'buLegendList', 'buDonutLabel', BU_SLICES, d.buTotal);
+      renderTopProducts();
+      renderDonutWidget('agingDonutSvg', 'agingLegendList', 'agingDonutLabel', AGING_SLICES, 'DSO 34d');
+      renderComboOrdersRevenue();
+      renderDonutWidget('expDonutSvg', 'expLegendList', 'expDonutLabel', EXP_SLICES, d.expTotal);
+    }
+
+    // Boot
+    renderAllErpCharts();
+    filterErpLedger();
+  </script>
+</body>
+</html>

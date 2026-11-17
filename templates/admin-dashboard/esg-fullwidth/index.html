@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERRA HORIZON — Full-Width Global Net-Zero Logistics & ESG Command Wall</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Plus Jakarta Sans', 'Space Grotesk', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      background: linear-gradient(135deg, #ECFDF5 0%, #F0F9FF 50%, #F8FAFC 100%);
+      color: #0F172A;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(16, 185, 129, 0.06);
+    }
+    .glass-pill-nav {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      box-shadow: 0 14px 34px -12px rgba(15, 23, 42, 0.10);
+    }
+    @keyframes corridorDraw {
+      from {
+        stroke-dashoffset: 1600;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    .corridor-line {
+      stroke-dasharray: 1600;
+      stroke-dashoffset: 1600;
+      animation: corridorDraw 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes hubBeacon {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.75;
+      }
+      50% {
+        transform: scale(1.7);
+        opacity: 0.15;
+      }
+    }
+    .hub-pulse {
+      animation: hubBeacon 2.4s infinite ease-in-out;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .bar-glide {
+      transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .telemetry-paused animateMotion,
+    .telemetry-paused .hub-pulse {
+      display: none;
+    }
+  </style>
+</head>
+<body class="w-full antialiased selection:bg-emerald-500/20 selection:text-emerald-900">
+
+  <!-- FLOATING GLASS TOOLTIP -->
+  <div id="esgTooltip" class="pointer-events-none fixed z-50 hidden rounded-xl border border-emerald-500/20 bg-slate-900/95 px-3.5 py-2.5 text-white shadow-xl backdrop-blur-md">
+    <div id="esgTipTitle" class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Corridor</div>
+    <div id="esgTipVal" class="mt-0.5 font-mono text-sm font-bold text-white">0 tCO2e</div>
+    <div id="esgTipSub" class="mt-0.5 text-xs text-sky-300">Verified SBTi</div>
+  </div>
+
+  <!-- FLOATING ESG TOAST -->
+  <div id="esgToast" class="fixed bottom-6 right-6 z-50 hidden items-center gap-3 rounded-2xl border border-emerald-500/25 bg-slate-900/95 px-4 py-3 text-sm font-medium text-white shadow-2xl backdrop-blur-md">
+    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </span>
+    <span id="esgToastMsg">Carbon ledger updated.</span>
+  </div>
+
+  <!-- FLOATING CENTERED GLASSMORPHISM PILL NAVBAR AT TOP (ZERO SIDEBARS) -->
+  <header class="sticky top-4 z-40 w-full px-6 lg:px-10">
+    <div class="glass-pill-nav mx-auto flex w-full flex-wrap items-center justify-between gap-4 rounded-2xl px-4 py-2.5 lg:px-6">
+      <!-- Left Brand -->
+      <a href="#" id="esgBrandHome" class="flex items-center gap-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-sky-500 text-white shadow-md shadow-emerald-500/20">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M3.6 9h16.8M3.6 15h16.8M12 3a14.5 14.5 0 000 18M12 3a14.5 14.5 0 010 18"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display text-base font-extrabold tracking-tight text-slate-900">TERRA HORIZON</span>
+            <span class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700">SBTi 1.5C</span>
+          </div>
+          <p class="hidden text-xs text-slate-500 sm:block">Global Net-Zero Supply-Chain &amp; Green Corridor Wall</p>
+        </div>
+      </a>
+
+      <!-- Centered Floating Pill Tabs -->
+      <nav class="flex items-center gap-1 overflow-x-auto rounded-xl bg-slate-900/5 p-1" aria-label="Command Wall Navigation">
+        <button type="button" data-esg-nav="overview" class="esg-nav-pill whitespace-nowrap rounded-lg bg-white px-3.5 py-1.5 text-sm font-semibold text-emerald-700 shadow-sm transition">Global Corridors</button>
+        <button type="button" data-esg-nav="kpis" class="esg-nav-pill whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-900">Carbon KPIs</button>
+        <button type="button" data-esg-nav="scopes" class="esg-nav-pill whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-900">Scope 1-2-3 Curve</button>
+        <button type="button" data-esg-nav="suppliers" class="esg-nav-pill whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-900">Supplier Audits</button>
+        <button type="button" data-esg-nav="cdr" class="esg-nav-pill whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-900">CDR Registry</button>
+      </nav>
+
+      <!-- Right Telemetry Controls -->
+      <div class="flex items-center gap-2.5">
+        <div class="hidden items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-800 md:flex">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          <span>Avoided Today: <strong id="headerAvoidedCo2" class="font-mono">1,482 tCO2e</strong></span>
+        </div>
+
+        <button id="esgPulseBtn" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white/90 px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-white">
+          <svg class="h-4 w-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span id="esgPulseLabel">Grid Telemetry: ON</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 100% EDGE-TO-EDGE FULL-WIDTH COMMAND WALL (w-full px-6 lg:px-10) -->
+  <main class="mt-6 w-full px-6 pb-10 lg:px-10">
+    <div id="defaultDashboardView" class="space-y-6">
+
+    <!-- 1. PANORAMIC FULL-WIDTH ANIMATED SVG WORLD CARBON & GREEN CORRIDOR VISUALIZATION (1200x300) -->
+    <section id="corridor-map-wall" class="glass-card w-full rounded-3xl p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">Widescreen Live Telemetry</span>
+            <span class="font-mono text-xs text-slate-500">142 Zero-Emission Vessels & Electric Freight Trains Active</span>
+          </div>
+          <h1 class="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-slate-900">Panoramic Global Green Logistics & Renewable Microgrid Horizon</h1>
+        </div>
+
+        <!-- Selected Hub Live Readout Pill -->
+        <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-500/20 bg-white/90 px-4 py-3 shadow-sm">
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-emerald-700" id="hubSelectedTitle">Rotterdam Green Port</div>
+            <div class="mt-0.5 text-sm text-slate-600" id="hubSelectedDesc">Green Hydrogen Bunkering · 96.4% Shore Power Electrified</div>
+          </div>
+          <div class="border-l border-slate-200 pl-3 text-right">
+            <div class="text-xs text-slate-500">Clean Output</div>
+            <div id="hubSelectedMwh" class="font-mono text-base font-bold text-slate-900">412 MWh/h</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1200x300 Widescreen Panoramic SVG Map / Horizon -->
+      <div class="mt-5 w-full overflow-x-auto rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-sky-50/90 via-emerald-50/50 to-white/90 p-3">
+        <svg id="worldHorizonSvg" class="h-[300px] min-w-[980px] w-full" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="corridorEmerald" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0EA5E9"/>
+              <stop offset="50%" stop-color="#10B981"/>
+              <stop offset="100%" stop-color="#059669"/>
+            </linearGradient>
+            <linearGradient id="corridorSolar" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#10B981"/>
+              <stop offset="100%" stop-color="#0284C7"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Subtle Latitude / Longitude Panoramic Grid -->
+          <g stroke="rgba(15, 23, 42, 0.06)" stroke-width="1">
+            <line x1="0" y1="60" x2="1200" y2="60"/>
+            <line x1="0" y1="120" x2="1200" y2="120"/>
+            <line x1="0" y1="180" x2="1200" y2="180"/>
+            <line x1="0" y1="240" x2="1200" y2="240"/>
+            <line x1="200" y1="0" x2="200" y2="300"/>
+            <line x1="450" y1="0" x2="450" y2="300"/>
+            <line x1="700" y1="0" x2="700" y2="300"/>
+            <line x1="950" y1="0" x2="950" y2="300"/>
+          </g>
+
+          <!-- Stylized Continental Landmass Silhouettes -->
+          <g fill="rgba(16, 185, 129, 0.10)" stroke="rgba(16, 185, 129, 0.24)" stroke-width="1.2">
+            <!-- North America -->
+            <path d="M 85,78 Q 165,52 255,82 Q 290,118 235,165 Q 185,184 142,155 Q 92,130 85,78 Z"/>
+            <!-- Europe & Nordic -->
+            <path d="M 480,52 Q 565,36 628,68 Q 645,112 585,134 Q 515,136 485,104 Z"/>
+            <!-- Asia-Pacific -->
+            <path d="M 710,82 Q 860,58 995,102 Q 1035,156 955,208 Q 845,214 775,172 Q 715,135 710,82 Z"/>
+            <!-- Southern Maritime Arch -->
+            <path d="M 980,226 Q 1065,212 1125,244 Q 1095,274 1015,266 Z"/>
+          </g>
+
+          <!-- Animated Global Green Shipping & Rail Corridors -->
+          <!-- Corridor 1: California EV Corridor -> Rotterdam Green Port (Transatlantic Clean Vessel) -->
+          <path id="routeCalRot" class="corridor-line"
+                d="M 168,136 C 310,74 420,76 538,104"
+                fill="none" stroke="url(#corridorEmerald)" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- Corridor 2: Nordic Hydro Grid -> Rotterdam Green Port (HVDC Interconnector + Electric Rail) -->
+          <path id="routeNordRot" class="corridor-line"
+                d="M 592,62 C 575,78 558,90 538,104"
+                fill="none" stroke="#0284C7" stroke-width="2.8" stroke-linecap="round"/>
+
+          <!-- Corridor 3: Rotterdam Green Port -> Singapore Jurong Solar (Green Hydrogen Vessel Corridor) -->
+          <path id="routeRotSing" class="corridor-line"
+                d="M 538,104 C 660,168 785,206 918,188"
+                fill="none" stroke="url(#corridorSolar)" stroke-width="3.2" stroke-linecap="round"/>
+
+          <!-- Corridor 4: Singapore Jurong Solar -> Transpacific Horizon -> California EV -->
+          <path id="routeSingPac" class="corridor-line"
+                d="M 918,188 C 1020,165 1095,148 1165,142"
+                fill="none" stroke="#10B981" stroke-width="2.5" stroke-dasharray="6 5"/>
+
+          <!-- <animateMotion> Green Hydrogen Vessels & Wind-Powered Rail Packets -->
+          <g>
+            <!-- H2 Vessel 1 -->
+            <circle r="6" fill="#059669">
+              <animateMotion dur="5.2s" repeatCount="indefinite" path="M 168,136 C 310,74 420,76 538,104"/>
+            </circle>
+            <!-- H2 Vessel 2 -->
+            <circle r="6.5" fill="#0284C7">
+              <animateMotion dur="6.0s" repeatCount="indefinite" path="M 538,104 C 660,168 785,206 918,188"/>
+            </circle>
+            <circle r="5" fill="#10B981">
+              <animateMotion dur="6.0s" begin="3.0s" repeatCount="indefinite" path="M 538,104 C 660,168 785,206 918,188"/>
+            </circle>
+            <!-- Nordic Hydro Power Packet -->
+            <circle r="5" fill="#0EA5E9">
+              <animateMotion dur="2.6s" repeatCount="indefinite" path="M 592,62 C 575,78 558,90 538,104"/>
+            </circle>
+          </g>
+
+          <!-- CLICKABLE GLOBAL GREEN HUBS -->
+          <!-- Hub 1: California EV Corridor -->
+          <g class="global-hub cursor-pointer" data-hub="california"
+             data-tip-title="California EV Freight Corridor" data-tip-val="295 MWh/h Solar+Storage" data-tip-sub="100% Zero-Tailpipe Drayage">
+            <circle class="hub-pulse" cx="168" cy="136" r="15" fill="rgba(16, 185, 129, 0.25)"/>
+            <circle cx="168" cy="136" r="7.5" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>
+            <rect x="86" y="152" width="164" height="26" rx="8" fill="rgba(255,255,255,0.92)" stroke="#10B981" stroke-width="1"/>
+            <text x="168" y="169" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#0F172A">California EV Corridor</text>
+          </g>
+
+          <!-- Hub 2: Rotterdam Green Port -->
+          <g class="global-hub cursor-pointer" data-hub="rotterdam"
+             data-tip-title="Rotterdam Green Port" data-tip-val="412 MWh/h Green H2" data-tip-sub="Shore Power Active on 28 Berths">
+            <circle class="hub-pulse" cx="538" cy="104" r="17" fill="rgba(5, 150, 105, 0.28)"/>
+            <circle cx="538" cy="104" r="8.5" fill="#059669" stroke="#FFFFFF" stroke-width="2.5"/>
+            <rect x="454" y="120" width="168" height="26" rx="8" fill="#0F172A"/>
+            <text x="538" y="137" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Rotterdam Green Port</text>
+          </g>
+
+          <!-- Hub 3: Nordic Hydro Grid -->
+          <g class="global-hub cursor-pointer" data-hub="nordic"
+             data-tip-title="Nordic Hydro & Wind Grid" data-tip-val="640 MWh/h Zero-Carbon" data-tip-sub="Carbon Intensity: 8 gCO2/kWh">
+            <circle class="hub-pulse" cx="592" cy="62" r="14" fill="rgba(2, 132, 199, 0.25)"/>
+            <circle cx="592" cy="62" r="7.5" fill="#0284C7" stroke="#FFFFFF" stroke-width="2.5"/>
+            <rect x="522" y="22" width="140" height="26" rx="8" fill="rgba(255,255,255,0.92)" stroke="#0284C7" stroke-width="1"/>
+            <text x="592" y="39" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Nordic Hydro Grid</text>
+          </g>
+
+          <!-- Hub 4: Singapore Jurong Solar -->
+          <g class="global-hub cursor-pointer" data-hub="singapore"
+             data-tip-title="Singapore Jurong Solar Microgrid" data-tip-val="348 MWh/h Floating PV" data-tip-sub="Automated Electric Crane Fleet">
+            <circle class="hub-pulse" cx="918" cy="188" r="16" fill="rgba(16, 185, 129, 0.25)"/>
+            <circle cx="918" cy="188" r="8" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>
+            <rect x="830" y="204" width="176" height="26" rx="8" fill="rgba(255,255,255,0.92)" stroke="#10B981" stroke-width="1"/>
+            <text x="918" y="221" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Singapore Jurong Solar</text>
+          </g>
+
+          <!-- Legend Strip Inside Panorama (12px minimum) -->
+          <g font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#334155">
+            <circle cx="28" cy="278" r="5" fill="#059669"/>
+            <text x="40" y="282">Green H2 Maritime Vessel</text>
+            <circle cx="222" cy="278" r="5" fill="#0284C7"/>
+            <text x="234" y="282">Wind-Powered Rail & HVDC</text>
+            <text x="1180" y="282" text-anchor="end" font-family="JetBrains Mono, monospace" fill="#059669">CLICK ANY HUB NODE TO INSPECT</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 2. FULL-WIDTH 5-COLUMN GLASS KPI RIBBON -->
+    <section id="kpi-ribbon-wall" class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <!-- KPI 1 -->
+      <article class="glass-card rounded-2xl p-5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Net Carbon Intensity</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpiIntensity" class="font-display text-2xl font-extrabold text-slate-900">11.4 gCO2</span>
+          <span class="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-700">-31.2% YoY</span>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">Per ton-km multimodal freight</p>
+        <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-emerald-950/10">
+          <div class="bar-glide h-full rounded-full bg-emerald-500" style="width: 78%"></div>
+        </div>
+      </article>
+
+      <!-- KPI 2 -->
+      <article class="glass-card rounded-2xl p-5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Green Fleet Share</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpiFleetShare" class="font-display text-2xl font-extrabold text-emerald-700">84.6%</span>
+          <span class="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-700">+9.4 pts</span>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">EV heavy trucks + H2 methanol ships</p>
+        <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-emerald-950/10">
+          <div class="bar-glide h-full rounded-full bg-emerald-600" style="width: 85%"></div>
+        </div>
+      </article>
+
+      <!-- KPI 3 -->
+      <article class="glass-card rounded-2xl p-5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Renewable MWh Generated</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpiMwhGen" class="font-display text-2xl font-extrabold text-slate-900">184,920</span>
+          <span class="rounded-full bg-sky-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-sky-700">MWh YTD</span>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">Warehouse rooftop PV + Nordic PPA</p>
+        <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sky-950/10">
+          <div class="bar-glide h-full rounded-full bg-sky-500" style="width: 91%"></div>
+        </div>
+      </article>
+
+      <!-- KPI 4 -->
+      <article class="glass-card rounded-2xl p-5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Scope 3 Supplier Audit</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span class="font-display text-2xl font-extrabold text-slate-900">92.8%</span>
+          <span class="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-700">Tier-1 Verified</span>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">418 carriers reporting primary data</p>
+        <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-emerald-950/10">
+          <div class="bar-glide h-full rounded-full bg-emerald-500" style="width: 93%"></div>
+        </div>
+      </article>
+
+      <!-- KPI 5 -->
+      <article class="glass-card rounded-2xl p-5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Carbon Credits Verified</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span class="font-display text-2xl font-extrabold text-slate-900">64,500 t</span>
+          <span class="rounded-full bg-sky-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-sky-700">CDR Gold</span>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">Direct air capture & kelp permanence</p>
+        <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sky-950/10">
+          <div class="bar-glide h-full rounded-full bg-sky-600" style="width: 74%"></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 3. FULL-WIDTH SCOPE 1-2-3 DECARBONIZATION TRAJECTORY CHART (2022..2030) -->
+    <section id="trajectory-wall" class="glass-card w-full rounded-3xl p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
+        <div>
+          <h2 class="font-display text-xl font-extrabold text-slate-900">Scope 1 · 2 · 3 Science-Based Decarbonization Trajectory (2022–2030)</h2>
+          <p class="mt-0.5 text-sm text-slate-600">Verified gross emissions glidepath (ktCO2e) vs Paris-Aligned 2030 Net-Zero Target Envelope</p>
+        </div>
+
+        <!-- Interactive Scope Switcher -->
+        <div class="flex flex-wrap items-center gap-1.5 rounded-xl bg-slate-900/5 p-1">
+          <button type="button" data-scope="all" class="scope-btn rounded-lg bg-white px-3.5 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition">All Scopes (1+2+3)</button>
+          <button type="button" data-scope="scope1" class="scope-btn rounded-lg px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Scope 1 Fleet</button>
+          <button type="button" data-scope="scope2" class="scope-btn rounded-lg px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Scope 2 Grid</button>
+          <button type="button" data-scope="scope3" class="scope-btn rounded-lg px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Scope 3 Upstream</button>
+        </div>
+      </div>
+
+      <div class="mt-5 overflow-x-auto">
+        <svg id="trajectorySvg" class="h-72 min-w-[900px] w-full" viewBox="0 0 1160 265">
+          <defs>
+            <linearGradient id="esgGlideGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#10B981" stop-opacity="0.28"/>
+              <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Horizontal Reference Lines -->
+          <g stroke="rgba(15, 23, 42, 0.08)" stroke-width="1">
+            <line x1="64" y1="24" x2="1130" y2="24"/>
+            <line x1="64" y1="76" x2="1130" y2="76"/>
+            <line x1="64" y1="128" x2="1130" y2="128"/>
+            <line x1="64" y1="180" x2="1130" y2="180"/>
+            <line x1="64" y1="226" x2="1130" y2="226"/>
+          </g>
+
+          <!-- Y-Axis Labels (12px) -->
+          <g font-family="JetBrains Mono, monospace" font-size="12" fill="#475569">
+            <text x="6" y="28" id="trajYMax">900 kt</text>
+            <text x="6" y="80" id="trajY75">675 kt</text>
+            <text x="6" y="132" id="trajY50">450 kt</text>
+            <text x="6" y="184" id="trajY25">225 kt</text>
+            <text x="14" y="230">Net 0</text>
+          </g>
+
+          <!-- SBTi Target Ceiling Dashed Line -->
+          <path d="M 85,42 L 1110,208" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+
+          <!-- Area Fill Under Trajectory -->
+          <path id="trajAreaPath"
+                d="M 85,38 C 230,58 355,92 470,118 C 600,148 740,174 880,194 C 980,208 1055,214 1110,218 L 1110,226 L 85,226 Z"
+                fill="url(#esgGlideGrad)"/>
+
+          <!-- Primary Decarbonization Curve -->
+          <path id="trajLinePath" class="corridor-line"
+                d="M 85,38 C 230,58 355,92 470,118 C 600,148 740,174 880,194 C 980,208 1055,214 1110,218"
+                fill="none" stroke="#059669" stroke-width="3.5" stroke-linecap="round"/>
+
+          <!-- Animated Net-Zero Glidepath Packet -->
+          <circle r="6" fill="#059669">
+            <animateMotion id="trajPacket" dur="4.8s" repeatCount="indefinite"
+                           path="M 85,38 C 230,58 355,92 470,118 C 600,148 740,174 880,194 C 980,208 1055,214 1110,218"/>
+          </circle>
+
+          <!-- Interactive Milestone Nodes (2022..2030) -->
+          <g id="trajMilestones">
+            <circle class="esg-point cursor-pointer" cx="85" cy="38" r="5.5" fill="#FFFFFF" stroke="#059669" stroke-width="2.5" data-tip-title="FY 2022 Baseline" data-tip-val="842 ktCO2e" data-tip-sub="Pre-electrification benchmark"/>
+            <circle class="esg-point cursor-pointer" cx="341" cy="86" r="5.5" fill="#FFFFFF" stroke="#059669" stroke-width="2.5" data-tip-title="FY 2024 Audited" data-tip-val="618 ktCO2e" data-tip-sub="-26.6% vs 2022 Baseline"/>
+            <circle class="esg-point cursor-pointer" cx="597" cy="142" r="7" fill="#059669" stroke="#FFFFFF" stroke-width="2.5" data-tip-title="FY 2026 Current Live" data-tip-val="394 ktCO2e" data-tip-sub="11.4% Ahead of SBTi Glidepath"/>
+            <circle class="esg-point cursor-pointer" cx="853" cy="190" r="5.5" fill="#FFFFFF" stroke="#0284C7" stroke-width="2.5" data-tip-title="FY 2028 Forecast" data-tip-val="172 ktCO2e" data-tip-sub="95% Green Methanol Corridor"/>
+            <circle class="esg-point cursor-pointer" cx="1110" cy="218" r="6.5" fill="#0284C7" stroke="#FFFFFF" stroke-width="2.5" data-tip-title="FY 2030 Net-Zero Target" data-tip-val="38 ktCO2e (100% CDR Offset)" data-tip-sub="Verified Net-Zero Supply Chain"/>
+          </g>
+
+          <!-- X-Axis Year Labels (12px) -->
+          <g font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">
+            <text x="85" y="250">2022</text>
+            <text x="213" y="250">2023</text>
+            <text x="341" y="250">2024</text>
+            <text x="469" y="250">2025</text>
+            <text x="597" y="250" fill="#059669">2026 (Live)</text>
+            <text x="725" y="250">2027</text>
+            <text x="853" y="250">2028</text>
+            <text x="981" y="250">2029</text>
+            <text x="1110" y="250" fill="#0284C7">2030 Net-Zero</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+    </div>
+
+    <!-- DEDICATED ESG COMMAND SUB-PAGE VIEW -->
+    <div id="tabSubpageView" class="hidden space-y-6"></div>
+
+  </main>
+
+  <script>
+    (function () {
+      const hubDetails = {
+        rotterdam: {
+          title: 'Rotterdam Green Port',
+          desc: 'Green Hydrogen Bunkering · 96.4% Shore Power Electrified',
+          mwh: '412 MWh/h',
+          intensity: '9.8 gCO2',
+          fleet: '88.2%'
+        },
+        california: {
+          title: 'California EV Corridor',
+          desc: 'Solar + Megapack Heavy Truck Plazas · Zero-Tailpipe Port Drayage',
+          mwh: '295 MWh/h',
+          intensity: '12.1 gCO2',
+          fleet: '82.4%'
+        },
+        nordic: {
+          title: 'Nordic Hydro Grid',
+          desc: '100% Pumped-Hydro & Offshore Wind Rail Freight Backbone',
+          mwh: '640 MWh/h',
+          intensity: '6.4 gCO2',
+          fleet: '94.1%'
+        },
+        singapore: {
+          title: 'Singapore Jurong Solar',
+          desc: 'Floating Offshore PV Array · Automated Electric Port Cranes',
+          mwh: '348 MWh/h',
+          intensity: '11.9 gCO2',
+          fleet: '81.5%'
+        }
+      };
+
+      const scopeCurves = {
+        all: {
+          yLabels: ['900 kt', '675 kt', '450 kt', '225 kt'],
+          path: 'M 85,38 C 230,58 355,92 470,118 C 600,148 740,174 880,194 C 980,208 1055,214 1110,218'
+        },
+        scope1: {
+          yLabels: ['320 kt', '240 kt', '160 kt', '80 kt'],
+          path: 'M 85,52 C 230,82 355,116 470,142 C 600,168 740,192 880,206 C 980,215 1055,219 1110,222'
+        },
+        scope2: {
+          yLabels: ['180 kt', '135 kt', '90 kt', '45 kt'],
+          path: 'M 85,68 C 230,112 355,152 470,178 C 600,198 740,210 880,218 C 980,221 1055,223 1110,224'
+        },
+        scope3: {
+          yLabels: ['480 kt', '360 kt', '240 kt', '120 kt'],
+          path: 'M 85,44 C 230,62 355,88 470,112 C 600,138 740,164 880,186 C 980,202 1055,210 1110,215'
+        }
+      };
+
+      let gridLive = true;
+      let avoidedCo2 = 1482;
+      let mwhTotal = 184920;
+
+      // Clickable Global Hubs
+      document.querySelectorAll('.global-hub').forEach(hub => {
+        hub.addEventListener('click', () => {
+          const key = hub.getAttribute('data-hub');
+          const info = hubDetails[key];
+          if (!info) return;
+          document.getElementById('hubSelectedTitle').textContent = info.title;
+          document.getElementById('hubSelectedDesc').textContent = info.desc;
+          document.getElementById('hubSelectedMwh').textContent = info.mwh;
+          document.getElementById('kpiIntensity').textContent = info.intensity;
+          document.getElementById('kpiFleetShare').textContent = info.fleet;
+        });
+      });
+
+      // Scope Curve Switcher
+      document.querySelectorAll('.scope-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.scope-btn').forEach(b => {
+            b.className = 'scope-btn rounded-lg px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+          });
+          btn.className = 'scope-btn rounded-lg bg-white px-3.5 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition';
+
+          const sc = scopeCurves[btn.getAttribute('data-scope')];
+          document.getElementById('trajYMax').textContent = sc.yLabels[0];
+          document.getElementById('trajY75').textContent = sc.yLabels[1];
+          document.getElementById('trajY50').textContent = sc.yLabels[2];
+          document.getElementById('trajY25').textContent = sc.yLabels[3];
+
+          const line = document.getElementById('trajLinePath');
+          line.setAttribute('d', sc.path);
+          document.getElementById('trajAreaPath').setAttribute('d', sc.path + ' L 1110,226 L 85,226 Z');
+          document.getElementById('trajPacket').setAttribute('path', sc.path);
+
+          line.classList.remove('corridor-line');
+          void line.offsetWidth;
+          line.classList.add('corridor-line');
+        });
+      });
+
+      // Tooltips
+      const tip = document.getElementById('esgTooltip');
+      document.querySelectorAll('.global-hub, .esg-point').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          document.getElementById('esgTipTitle').textContent = el.getAttribute('data-tip-title') || '';
+          document.getElementById('esgTipVal').textContent = el.getAttribute('data-tip-val') || '';
+          document.getElementById('esgTipSub').textContent = el.getAttribute('data-tip-sub') || '';
+          tip.classList.remove('hidden');
+        });
+        el.addEventListener('mousemove', (e) => {
+          tip.style.left = (e.clientX + 14) + 'px';
+          tip.style.top = (e.clientY - 28) + 'px';
+        });
+        el.addEventListener('mouseleave', () => tip.classList.add('hidden'));
+      });
+
+      function showEsgToast(msg) {
+        const toast = document.getElementById('esgToast');
+        document.getElementById('esgToastMsg').textContent = msg;
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+        clearTimeout(window.__esgToastTimer);
+        window.__esgToastTimer = setTimeout(() => {
+          toast.classList.add('hidden');
+          toast.classList.remove('flex');
+        }, 3200);
+      }
+
+      const esgSubpages = {
+        kpis: {
+          badge: 'ISO-14083 MULTIMODAL METRICS',
+          title: 'Global Carbon KPIs & Green Fleet Electrification',
+          subtitle: 'Granular corridor-by-corridor emissions intensity, shore-power berth utilization, and zero-tailpipe drayage share.',
+          kpis: [
+            { label: 'Multimodal Intensity', val: '11.4 gCO2', delta: '-31.2% YoY', tone: 'emerald', sub: 'GLEC Framework v3.0' },
+            { label: 'Zero-Emission Fleet', val: '84.6%', delta: '142 Active Assets', tone: 'emerald', sub: 'H2 Vessels + EV Heavy Rail' },
+            { label: 'Clean Shore Power', val: '96.4%', delta: '28 Port Berths', tone: 'sky', sub: 'Zero auxiliary diesel burn' },
+            { label: 'Renewable PPA Yield', val: '184,920 MWh', delta: '100% Hourly Match', tone: 'sky', sub: '24/7 Carbon-Free Energy' }
+          ],
+          visualTitle: 'Mode-Specific Carbon Intensity Reduction vs Baseline',
+          visualSub: 'Verified gCO2e per ton-km across ocean, rail, and port drayage',
+          curve: 'M 14,24 C 82,38 148,58 214,72 C 282,86 338,94 388,98',
+          bars: [
+            { name: 'Nordic Electric Freight Rail', pct: 96, val: '4.2 gCO2/tkm (-88%)', color: 'bg-emerald-500' },
+            { name: 'Green Methanol Container Vessels', pct: 88, val: '9.8 gCO2/tkm (-74%)', color: 'bg-sky-500' },
+            { name: 'Heavy Battery-Electric Port Drayage', pct: 84, val: '12.1 gCO2/tkm (-69%)', color: 'bg-emerald-600' },
+            { name: 'Sustainable Aviation Fuel (SAF Book-Claim)', pct: 68, val: 'SAF Blend 42% Active', color: 'bg-sky-600' }
+          ],
+          tableTitle: 'Regional Green Hub Performance & Grid Dispatch',
+          actionCol: 'Hub Action',
+          rows: [
+            { id: 'HUB-RTM', col1: 'Rotterdam Green H2 Bunkering', col2: '412 MWh/h Electrolyzer', col3: '9.8 gCO2/tkm', status: 'Optimal', done: 'Bunkering Synced', btn: 'Sync Berth', toast: 'Rotterdam Berth #14 green hydrogen bunkering schedule locked.' },
+            { id: 'HUB-LAX', col1: 'California Megapack Drayage Plaza', col2: '295 MWh/h Solar+BESS', col3: '12.1 gCO2/tkm', status: 'Peak Shaving', done: 'Dispatched V2G', btn: 'Balance Load', toast: 'Activated V2G depot peak-shaving across 64 electric Class-8 trucks.' },
+            { id: 'HUB-OSL', col1: 'Nordic Hydro-Rail Interconnector', col2: '640 MWh/h Pumped Hydro', col3: '6.4 gCO2/tkm', status: '100% Clean', done: 'GOO Certified', btn: 'Issue GOO', toast: 'Minted hourly Guarantee of Origin (GOO) certificates for Nordic rail.' },
+            { id: 'HUB-SIN', col1: 'Singapore Jurong Floating PV', col2: '348 MWh/h Offshore Solar', col3: '11.9 gCO2/tkm', status: 'Nominal', done: 'Cranes Synced', btn: 'Optimize Cranes', toast: 'Synchronized automated electric crane regenerative braking feed.' },
+            { id: 'HUB-HAM', col1: 'Hamburg Shore-to-Ship HVDC', col2: '190 MWh/h Wind PPA', col3: '8.9 gCO2/tkm', status: 'Online', done: 'Audit Logged', btn: 'Export Telemetry', toast: 'Exported ISO-14083 hourly shore-power telemetry packet.' }
+          ]
+        },
+        scopes: {
+          badge: 'SBTi 1.5C NET-ZERO STANDARD',
+          title: 'Scope 1 · 2 · 3 Science-Based Glidepath Ledger',
+          subtitle: 'Annualized gross emissions accounting from FY2022 baseline (842 kt) to verified 2030 Net-Zero envelope (38 kt residual).',
+          kpis: [
+            { label: 'FY26 Total Footprint', val: '394 ktCO2e', delta: '-53.2% vs FY22', tone: 'emerald', sub: '11.4% ahead of SBTi target' },
+            { label: 'Scope 1 Direct Fleet', val: '98 ktCO2e', delta: '-64.8% vs FY22', tone: 'emerald', sub: 'Diesel phase-out ahead 18m' },
+            { label: 'Scope 2 Market-Based', val: '14 ktCO2e', delta: '-89.1% vs FY22', tone: 'sky', sub: '96.8% renewable electricity' },
+            { label: 'Scope 3 Value Chain', val: '282 ktCO2e', delta: '-41.2% vs FY22', tone: 'emerald', sub: 'Cat 1, 4 & 9 primary data' }
+          ],
+          visualTitle: 'Decarbonization Abatement Levers to 2030',
+          visualSub: 'Cumulative ktCO2e abated per engineering initiative',
+          curve: 'M 14,22 C 85,44 152,64 218,78 C 284,90 338,96 388,100',
+          bars: [
+            { name: 'Green Methanol & H2 Vessel Retrofit', pct: 91, val: '-218 ktCO2e Abated', color: 'bg-emerald-500' },
+            { name: '24/7 Hourly Matched Renewable PPAs', pct: 96, val: '-114 ktCO2e Abated', color: 'bg-sky-500' },
+            { name: 'Modal Shift: Air/Road to Electric Rail', pct: 82, val: '-86 ktCO2e Abated', color: 'bg-emerald-600' },
+            { name: 'Circular Low-Carbon Steel & Packaging', pct: 74, val: '-54 ktCO2e Abated', color: 'bg-sky-600' }
+          ],
+          tableTitle: 'GHG Protocol Inventory & Assurance Checkpoints',
+          actionCol: 'Assurance',
+          rows: [
+            { id: 'SC1-01', col1: 'Scope 1 — Owned Maritime & EV Trucks', col2: 'Direct Telematics Metered', col3: '98.2 ktCO2e', status: 'Verified', done: 'Sealed Hash', btn: 'Seal Ledger', toast: 'Scope 1 direct telematics inventory sealed for limited assurance.' },
+            { id: 'SC2-02', col1: 'Scope 2 — Global Warehouse Microgrids', col2: 'Hourly EAC / I-REC', col3: '14.1 ktCO2e', status: 'Matched 97%', done: '100% Matched', btn: 'Retire EACs', toast: 'Retired 4,200 MWh of hourly Energy Attribute Certificates.' },
+            { id: 'SC3-04', col1: 'Scope 3 Cat 4 — Upstream Carrier Lanes', col2: 'Primary EDI Fuel Data', col3: '194.6 ktCO2e', status: '92.8% Primary', done: 'Audited DNV', btn: 'Run Check', toast: 'DNV verification check passed with 0.0% emission-factor variance.' },
+            { id: 'SC3-01', col1: 'Scope 3 Cat 1 — Green Steel Containers', col2: 'Supplier EPD Verified', col3: '56.0 ktCO2e', status: 'Compliant', done: 'EPDArchived', btn: 'Verify EPD', toast: 'Environmental Product Declarations verified for 2026 container fleet.' },
+            { id: 'SC3-09', col1: 'Scope 3 Cat 9 — Last-Mile Distribution', col2: 'Cargo E-Bike + EV Van', col3: '31.1 ktCO2e', status: 'On Glidepath', done: 'Locked FY26', btn: 'Lock Cut-Off', toast: 'Q4 last-mile Scope 3 reporting boundary locked.' }
+          ]
+        },
+        suppliers: {
+          badge: 'SCOPE 3 TIER-1 & TIER-2',
+          title: 'Global Carrier & Supplier ESG Audit Exchange',
+          subtitle: 'Primary emissions data exchange across 418 logistics carriers, ports, and equipment manufacturers.',
+          kpis: [
+            { label: 'Primary Data Coverage', val: '92.8%', delta: '418 / 450 Carriers', tone: 'emerald', sub: 'Up from 61% in FY23' },
+            { label: 'SBTi-Committed Suppliers', val: '79.4%', delta: 'Target: 80% by FY27', tone: 'sky', sub: 'By spend-weighted procurement' },
+            { label: 'Green Clause Contracts', val: '100%', delta: 'Mandatory SLA', tone: 'emerald', sub: 'Carbon price $95/t internal' },
+            { label: 'Open Corrective Actions', val: '6 Audits', delta: 'Due Within 30d', tone: 'sky', sub: 'Zero critical non-compliance' }
+          ],
+          visualTitle: 'Supplier Tier ESG Rating Distribution',
+          visualSub: 'Audit score attainment across global procurement categories',
+          curve: 'M 14,88 C 80,76 146,62 214,48 C 280,34 336,26 388,18',
+          bars: [
+            { name: 'Maritime & Feeder Liner Partners', pct: 95, val: '95% A-Rated · Primary API', color: 'bg-emerald-500' },
+            { name: 'European & NA Intermodal Rail Operators', pct: 98, val: '98% A-Rated · 100% Electric', color: 'bg-sky-500' },
+            { name: 'Regional 3PL Cold-Chain Warehouses', pct: 86, val: '86% B+ or Higher · HFC-Free', color: 'bg-emerald-600' },
+            { name: 'APAC Drayage & Feeder Sub-Carriers', pct: 74, val: '74% Transitioning EV', color: 'bg-sky-600' }
+          ],
+          tableTitle: 'Carrier ESG Scorecards & Primary Data Attestations',
+          actionCol: 'Audit Workflow',
+          rows: [
+            { id: 'SUP-108', col1: 'NordicRail Zero-Carbon Cargo AB', col2: 'Tier-1 Rail · Sweden', col3: 'Score 98/100 (AAA)', status: 'Verified', done: 'Renewed 2028', btn: 'Approve Preferred', toast: 'NordicRail granted Preferred Net-Zero Carrier tier through 2028.' },
+            { id: 'SUP-214', col1: 'Maersk Eco-Delivery Methanol Line', col2: 'Tier-1 Ocean · Global', col3: 'Score 95/100 (AA)', status: 'Verified', done: 'Cert Attached', btn: 'Sync Book-Claim', toast: 'Synced Q4 green methanol book-and-claim fuel certificates.' },
+            { id: 'SUP-309', col1: 'PacificWatt Heavy EV Drayage Co.', col2: 'Tier-1 Road · US West', col3: 'Score 91/100 (AA)', status: 'Verified', done: 'API Connected', btn: 'Ping Telematics', toast: 'Live truck charger telematics verified at 100% solar-matched.' },
+            { id: 'SUP-412', col1: 'Mekong Feeder Barge Logistics', col2: 'Tier-2 Inland · Vietnam', col3: 'Score 74/100 (B)', status: 'CAPA Open', done: 'Biofuel Plan Set', btn: 'Request CAPA', toast: 'Dispatched B30 sustainable marine biofuel transition plan to SUP-412.' },
+            { id: 'SUP-519', col1: 'EuroCold Ammonia Zero-GWP Hubs', col2: 'Tier-1 Cold Storage · NL', col3: 'Score 93/100 (AA)', status: 'Verified', done: 'CSRD Logged', btn: 'Log CSRD', toast: 'Recorded EU CSRD ESRS E1 supplier disclosure packet.' }
+          ]
+        },
+        cdr: {
+          badge: 'HIGH-DURABILITY CARBON REMOVAL',
+          title: 'Verified CDR Registry & Permanent Sequestration Vault',
+          subtitle: '1,000+ year permanence Direct Air Capture (DAC), basalt mineralization, and marine kelp carbon removal portfolio.',
+          kpis: [
+            { label: 'Verified CDR Retired', val: '64,500 t', delta: '100% Removal', tone: 'emerald', sub: 'Zero avoided-emission offsets' },
+            { label: 'Mean Permanence Horizon', val: '1,000+ Yr', delta: 'Geologic Lock', tone: 'sky', sub: 'Puro.earth & Isometric reg.' },
+            { label: 'Forward Offtake Locked', val: '180,000 t', delta: '2026–2030 Strip', tone: 'emerald', sub: '$168/t blended strike price' },
+            { label: 'MRV Digital Traceability', val: '100%', delta: 'On-Chain Serial', tone: 'sky', sub: 'Zero double-counting risk' }
+          ],
+          visualTitle: 'CDR Portfolio Mix by Geochemical Pathway',
+          visualSub: 'Allocation across engineered and hybrid permanent removal pathways',
+          curve: 'M 14,92 C 78,80 144,64 212,50 C 278,36 334,24 388,16',
+          bars: [
+            { name: 'Direct Air Capture + Basalt Mineralization', pct: 46, val: '29,670 tCO2e (Iceland / NO)', color: 'bg-emerald-600' },
+            { name: 'Biomass Carbon Removal & Storage (BiCRS)', pct: 28, val: '18,060 tCO2e (Nordic Bio-Oil)', color: 'bg-sky-500' },
+            { name: 'Enhanced Rock Weathering (Olivine)', pct: 16, val: '10,320 tCO2e (Agri-Basalt)', color: 'bg-emerald-500' },
+            { name: 'Deep-Ocean Kelp & Alkalinity Enhancement', pct: 10, val: '6,450 tCO2e (North Atlantic)', color: 'bg-sky-600' }
+          ],
+          tableTitle: 'Serial-Tracked CDR Batches & Retirement Execution',
+          actionCol: 'Registry Op',
+          rows: [
+            { id: 'CDR-9041', col1: 'Orca-Scale Basalt DAC Batch #19', col2: 'Isometric Registry · Iceland', col3: '18,500 tCO2e', status: 'Delivered', done: 'Retired FY26', btn: 'Retire Batch', toast: 'Permanently retired 18,500 tCO2e on Isometric Registry (CDR-9041).' },
+            { id: 'CDR-9048', col1: 'Nordic Pyrolysis Bio-Oil Injection', col2: 'Puro.earth CORC · Finland', col3: '14,200 tCO2e', status: 'Verified', done: 'Retired FY26', btn: 'Retire CORC', toast: 'Retired 14,200 Puro.earth CORCs against residual Scope 3 emissions.' },
+            { id: 'CDR-9052', col1: 'Scottish Highlands Enhanced Weathering', col2: 'Pore-Water ICP-MS MRV', col3: '10,320 tCO2e', status: 'MRV Complete', done: 'Minted Credits', btn: 'Mint Serial', toast: 'Verified pore-water alkalinity data and minted 10,320 serial credits.' },
+            { id: 'CDR-9060', col1: 'Mojave Solar-Thermal DAC Offtake', col2: '2027 Forward Tranche', col3: '25,000 tCO2e', status: 'Contracted', done: 'Escrow Funded', btn: 'Confirm Tranche', toast: 'Confirmed FY27 milestone tranche for Mojave Solar-Thermal DAC.' },
+            { id: 'CDR-9067', col1: 'North Atlantic Ocean Alkalinity Pilot', col2: 'Sensor Buoy Telemetry', col3: '6,450 tCO2e', status: 'Audited', done: 'Published Public', btn: 'Publish MRV', toast: 'Published open-access geochemical MRV dossier to public transparency wall.' }
+          ]
+        }
+      };
+
+      function renderEsgSubpage(navKey) {
+        const cfg = esgSubpages[navKey];
+        const subEl = document.getElementById('tabSubpageView');
+        if (!cfg || !subEl) return;
+
+        subEl.innerHTML = `
+          <!-- Sub-page Glass Header -->
+          <section class="glass-card w-full rounded-3xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <span class="rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider text-emerald-700">${cfg.badge}</span>
+                  <span class="font-mono text-xs text-slate-500">PARIS-ALIGNED 1.5C VERIFIED</span>
+                </div>
+                <h1 class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">${cfg.title}</h1>
+                <p class="mt-1 text-sm text-slate-600">${cfg.subtitle}</p>
+              </div>
+              <button type="button" id="esgBackOverviewBtn" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/25 bg-white/90 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-600 hover:text-white">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg>
+                <span>&larr; Overview</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 4 Glass KPI Cards -->
+          <section class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            ${cfg.kpis.map(k => `
+              <article class="glass-card rounded-2xl p-5">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">${k.label}</span>
+                  <span class="rounded-full px-2.5 py-0.5 font-mono text-xs font-semibold ${k.tone === 'sky' ? 'bg-sky-500/10 text-sky-700' : 'bg-emerald-500/10 text-emerald-700'}">${k.delta}</span>
+                </div>
+                <div class="mt-2 font-display text-3xl font-extrabold text-slate-900">${k.val}</div>
+                <p class="mt-1.5 text-xs text-slate-500">${k.sub}</p>
+              </article>
+            `).join('')}
+          </section>
+
+          <!-- Full-Width Split: SVG Abatement Visual + 5-Row Interactive Ledger -->
+          <section class="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
+            <div class="glass-card rounded-3xl p-6 lg:col-span-5">
+              <h2 class="font-display text-lg font-extrabold text-slate-900">${cfg.visualTitle}</h2>
+              <p class="mt-0.5 text-sm text-slate-600">${cfg.visualSub}</p>
+
+              <div class="mt-4 rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-50/60 to-white/90 p-4">
+                <div class="mb-2 flex items-center justify-between text-xs font-semibold text-emerald-800">
+                  <span>SBTi GLIDEPATH TELEMETRY</span>
+                  <span class="font-mono">AUDITED STREAM</span>
+                </div>
+                <svg class="h-28 w-full overflow-visible" viewBox="0 0 400 112">
+                  <line x1="14" y1="24" x2="388" y2="24" stroke="rgba(15,23,42,0.08)" stroke-dasharray="4 4"/>
+                  <line x1="14" y1="64" x2="388" y2="64" stroke="rgba(15,23,42,0.08)" stroke-dasharray="4 4"/>
+                  <line x1="14" y1="104" x2="388" y2="104" stroke="rgba(15,23,42,0.15)"/>
+                  <path class="corridor-line" d="${cfg.curve}" fill="none" stroke="#059669" stroke-width="3.2" stroke-linecap="round"/>
+                  <circle r="5" fill="#0284C7">
+                    <animateMotion dur="4.0s" repeatCount="indefinite" path="${cfg.curve}"/>
+                  </circle>
+                </svg>
+              </div>
+
+              <div class="mt-5 space-y-3.5">
+                ${cfg.bars.map(b => `
+                  <div>
+                    <div class="mb-1 flex items-center justify-between text-xs">
+                      <span class="font-semibold text-slate-800">${b.name}</span>
+                      <span class="font-mono text-slate-600">${b.val}</span>
+                    </div>
+                    <div class="h-2 w-full overflow-hidden rounded-full bg-emerald-950/10">
+                      <div class="bar-glide h-full rounded-full ${b.color}" style="width: ${b.pct}%"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-6 lg:col-span-7">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 class="font-display text-lg font-extrabold text-slate-900">${cfg.tableTitle}</h2>
+                  <p class="mt-0.5 text-sm text-slate-600">Execute live verification, EAC retirement, and supplier attestations</p>
+                </div>
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-semibold text-emerald-800">5 Verified Entries</span>
+              </div>
+
+              <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200/80 bg-white/75">
+                <table class="w-full text-left text-sm">
+                  <thead class="border-b border-slate-200/80 bg-emerald-50/50 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                    <tr>
+                      <th class="px-4 py-3">Corridor / Asset</th>
+                      <th class="px-4 py-3">Verification</th>
+                      <th class="px-4 py-3">Telemetry</th>
+                      <th class="px-4 py-3">Status</th>
+                      <th class="px-4 py-3 text-right">${cfg.actionCol}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200/70">
+                    ${cfg.rows.map((r, idx) => `
+                      <tr class="hover:bg-white/90 transition">
+                        <td class="px-4 py-3.5">
+                          <div class="font-semibold text-slate-900">${r.col1}</div>
+                          <div class="font-mono text-xs text-slate-500">${r.id}</div>
+                        </td>
+                        <td class="px-4 py-3.5 text-xs text-slate-600">${r.col2}</td>
+                        <td class="px-4 py-3.5 font-mono text-xs font-semibold text-slate-900">${r.col3}</td>
+                        <td class="px-4 py-3.5">
+                          <span id="esgSubBadge-${idx}" class="inline-flex rounded-full bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-emerald-800">${r.status}</span>
+                        </td>
+                        <td class="px-4 py-3.5 text-right">
+                          <button type="button" data-esg-row="${idx}" class="esg-sub-btn rounded-xl border border-emerald-600/25 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-600 hover:text-white">
+                            ${r.btn}
+                          </button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        `;
+
+        document.getElementById('esgBackOverviewBtn').addEventListener('click', () => switchEsgTab('overview'));
+        subEl.querySelectorAll('.esg-sub-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = parseInt(btn.getAttribute('data-esg-row'), 10);
+            const row = cfg.rows[idx];
+            const badge = document.getElementById('esgSubBadge-' + idx);
+            if (row && badge) {
+              badge.textContent = row.done;
+              badge.className = 'inline-flex rounded-full bg-sky-500/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-sky-800';
+              btn.textContent = 'Verified';
+              btn.className = 'esg-sub-btn rounded-xl border border-sky-500/25 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-800';
+              showEsgToast(row.toast);
+            }
+          });
+        });
+      }
+
+      function switchEsgTab(navKey) {
+        document.querySelectorAll('.esg-nav-pill').forEach(b => {
+          const act = b.getAttribute('data-esg-nav') === navKey;
+          b.className = act
+            ? 'esg-nav-pill whitespace-nowrap rounded-lg bg-white px-3.5 py-1.5 text-sm font-semibold text-emerald-700 shadow-sm transition'
+            : 'esg-nav-pill whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-900';
+        });
+
+        const defView = document.getElementById('defaultDashboardView');
+        const subView = document.getElementById('tabSubpageView');
+        if (navKey === 'overview' || !esgSubpages[navKey]) {
+          subView.classList.add('hidden');
+          defView.classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          defView.classList.add('hidden');
+          subView.classList.remove('hidden');
+          renderEsgSubpage(navKey);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      document.querySelectorAll('.esg-nav-pill').forEach(btn => {
+        btn.addEventListener('click', () => switchEsgTab(btn.getAttribute('data-esg-nav')));
+      });
+      document.getElementById('esgBrandHome').addEventListener('click', (e) => {
+        e.preventDefault();
+        switchEsgTab('overview');
+      });
+
+      // Live Grid Telemetry Toggle
+      document.getElementById('esgPulseBtn').addEventListener('click', () => {
+        gridLive = !gridLive;
+        document.getElementById('esgPulseLabel').textContent = gridLive ? 'Grid Telemetry: ON' : 'Grid Telemetry: PAUSED';
+        document.body.classList.toggle('telemetry-paused', !gridLive);
+      });
+
+      setInterval(() => {
+        if (!gridLive) return;
+        avoidedCo2 += Math.floor(Math.random() * 4) + 1;
+        mwhTotal += Math.floor(Math.random() * 9) + 3;
+        document.getElementById('headerAvoidedCo2').textContent = avoidedCo2.toLocaleString() + ' tCO2e';
+        document.getElementById('kpiMwhGen').textContent = mwhTotal.toLocaleString();
+      }, 2600);
+    })();
+  </script>
+</body>
+</html>

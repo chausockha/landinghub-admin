@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QUANTFX PRO — AI Forex, Crypto &amp; Multi-Asset Trading Terminal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            bull: '#10B981',
+            bear: '#EF4444',
+            fxblue: '#2563EB',
+            fxamber: '#F59E0B',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-app: #070A11;
+      --bg-panel: #0D121E;
+      --bg-sub: #131A2B;
+      --bg-input: #172035;
+      --line-fx: #1C263B;
+      --ink-1: #F8FAFC;
+      --ink-2: #CBD5E1;
+      --ink-3: #64748B;
+    }
+    html[data-mode="light"] {
+      --bg-app: #EEF2F7;
+      --bg-panel: #FFFFFF;
+      --bg-sub: #F8FAFC;
+      --bg-input: #F1F5F9;
+      --line-fx: #E2E8F0;
+      --ink-1: #0F172A;
+      --ink-2: #334155;
+      --ink-3: #64748B;
+    }
+
+    html { font-size: 16px; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-app);
+      color: var(--ink-1);
+      min-height: 100vh;
+      transition: background 0.22s ease, color 0.22s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .fx-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--line-fx);
+      border-radius: 16px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .fx-panel:hover {
+      border-color: rgba(59, 130, 246, 0.28);
+    }
+
+    .fx-input {
+      background: var(--bg-input);
+      border: 1px solid var(--line-fx);
+      color: var(--ink-1);
+      border-radius: 10px;
+    }
+    .fx-input:focus {
+      outline: none;
+      border-color: #2563EB;
+    }
+
+    .text-t1 { color: var(--ink-1); }
+    .text-t2 { color: var(--ink-2); }
+    .text-t3 { color: var(--ink-3); }
+    .border-fx { border-color: var(--line-fx); }
+
+    /* Signature Glowing Buy / Sell Buttons */
+    .btn-buy-glow {
+      background: linear-gradient(180deg, #16C784 0%, #059669 100%);
+      color: #FFFFFF;
+      box-shadow: 0 0 28px rgba(16, 185, 129, 0.45), inset 0 1px 0 rgba(255,255,255,0.28);
+    }
+    .btn-sell-glow {
+      background: linear-gradient(180deg, #F43F5E 0%, #DC2626 100%);
+      color: #FFFFFF;
+      box-shadow: 0 0 28px rgba(239, 68, 68, 0.45), inset 0 1px 0 rgba(255,255,255,0.28);
+    }
+    .btn-tf-active {
+      background: #2563EB;
+      color: #FFFFFF;
+      box-shadow: 0 0 18px rgba(37, 99, 235, 0.55);
+    }
+
+    @keyframes candleRise {
+      from { transform: scaleY(0.2); opacity: 0.3; }
+      to   { transform: scaleY(1); opacity: 1; }
+    }
+    .candle-anim {
+      transform-box: fill-box;
+      transform-origin: bottom;
+      animation: candleRise 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes emaDraw {
+      from { stroke-dashoffset: 900; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .ema-line {
+      stroke-dasharray: 900;
+      animation: emaDraw 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.35); border-radius: 999px; }
+  </style>
+</head>
+<body class="p-2.5 sm:p-4">
+
+  <div class="max-w-[1640px] mx-auto space-y-3">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TOP FULL-WIDTH ACCOUNT TELEMETRY HEADER BAR
+    ══════════════════════════════════════════════════════════════════ -->
+    <header class="fx-panel px-5 py-3 flex flex-wrap items-center justify-between gap-4">
+      <!-- Active Symbol Badge -->
+      <div class="flex items-center gap-3 pr-4 border-r border-fx">
+        <div id="headerPairBadge" class="h-10 w-10 rounded-full bg-fxblue flex items-center justify-center text-amber-300 shadow-lg shadow-fxblue/30">
+          <!-- EU Stars Circle SVG -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="4" r="1.2"/><circle cx="16" cy="5.2" r="1.2"/><circle cx="18.8" cy="8" r="1.2"/>
+            <circle cx="20" cy="12" r="1.2"/><circle cx="18.8" cy="16" r="1.2"/><circle cx="16" cy="18.8" r="1.2"/>
+            <circle cx="12" cy="20" r="1.2"/><circle cx="8" cy="18.8" r="1.2"/><circle cx="5.2" cy="16" r="1.2"/>
+            <circle cx="4" cy="12" r="1.2"/><circle cx="5.2" cy="8" r="1.2"/><circle cx="8" cy="5.2" r="1.2"/>
+          </svg>
+        </div>
+        <div>
+          <span id="headerSymbolTitle" class="font-display text-lg font-extrabold tracking-tight text-t1">EURUSD</span>
+          <p class="text-xs text-emerald-400 font-mono">ECN Raw · Live</p>
+        </div>
+      </div>
+
+      <!-- Horizontal Account Metrics Strip -->
+      <div class="flex flex-wrap items-center gap-5 xl:gap-7 text-xs">
+        <div>
+          <p class="text-t3">Balance</p>
+          <p id="accBalance" class="font-mono font-bold text-t1 text-sm mt-0.5">1,754.87</p>
+        </div>
+        <div>
+          <p class="text-t3">User Name</p>
+          <p class="font-semibold text-t1 text-sm mt-0.5">Dmitry Vremskovich</p>
+        </div>
+        <div>
+          <p class="text-t3">Account</p>
+          <p class="font-mono font-semibold text-t1 text-sm mt-0.5">50760365</p>
+        </div>
+        <div>
+          <p class="text-t3">Leverage</p>
+          <p class="font-mono font-semibold text-t1 text-sm mt-0.5">1:500</p>
+        </div>
+        <div>
+          <p class="text-t3">Open P/L</p>
+          <p id="accOpenPl" class="font-mono font-bold text-emerald-400 text-sm mt-0.5">+$45.91</p>
+        </div>
+        <div class="hidden md:block">
+          <p class="text-t3">Credit</p>
+          <p class="font-mono font-semibold text-t1 text-sm mt-0.5">0.00</p>
+        </div>
+        <div>
+          <p class="text-t3">Equity</p>
+          <p id="accEquity" class="font-mono font-bold text-t1 text-sm mt-0.5">1,800.78</p>
+        </div>
+        <div class="hidden sm:block">
+          <p class="text-t3">Margin</p>
+          <p class="font-mono font-semibold text-t1 text-sm mt-0.5">284.69</p>
+        </div>
+        <div class="hidden lg:block">
+          <p class="text-t3">Free Margin</p>
+          <p class="font-mono font-semibold text-t1 text-sm mt-0.5">1,516.09</p>
+        </div>
+        <div>
+          <p class="text-t3">Margin Level</p>
+          <p class="font-mono font-bold text-emerald-400 text-sm mt-0.5">632.31%</p>
+        </div>
+      </div>
+
+      <!-- Right Theme & Speed Controls -->
+      <div class="flex items-center gap-2.5 ml-auto">
+        <div class="flex items-center rounded-xl border border-fx p-1 gap-1" style="background: var(--bg-sub);">
+          <button id="btnDarkMode" onclick="setTerminalTheme('dark')" class="h-8 w-9 rounded-lg bg-fxblue text-white flex items-center justify-center shadow cursor-pointer" title="Dark Terminal">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+          <button id="btnLightMode" onclick="setTerminalTheme('light')" class="h-8 w-9 rounded-lg text-t3 hover:text-t1 flex items-center justify-center cursor-pointer" title="Daylight Terminal">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-14.93 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2"/></svg>
+          </button>
+          <button onclick="toggleTurboTicks()" class="h-8 w-9 rounded-lg text-amber-400 hover:bg-amber-500/10 flex items-center justify-center cursor-pointer" title="Toggle Live Quote Feed">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </button>
+        </div>
+
+        <button onclick="switchFxTab('risk')" title="Terminal &amp; Risk Settings" class="h-10 w-10 rounded-xl border border-fx flex items-center justify-center text-t2 hover:text-t1 cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- TERMINAL NAVIGATION BAR -->
+    <nav class="fx-panel px-3.5 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
+        <button data-fxtab="overview" onclick="switchFxTab('overview')" class="fx-nav-tab btn-tf-active rounded-xl px-3.5 py-2 inline-flex items-center gap-2 cursor-pointer transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>Terminal Overview</span>
+        </button>
+        <button data-fxtab="screener" onclick="switchFxTab('screener')" class="fx-nav-tab rounded-xl px-3.5 py-2 inline-flex items-center gap-2 text-t2 hover:text-t1 cursor-pointer transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Markets Screener</span>
+        </button>
+        <button data-fxtab="orders" onclick="switchFxTab('orders')" class="fx-nav-tab rounded-xl px-3.5 py-2 inline-flex items-center gap-2 text-t2 hover:text-t1 cursor-pointer transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+          <span>Order Book &amp; History</span>
+        </button>
+        <button data-fxtab="signals" onclick="switchFxTab('signals')" class="fx-nav-tab rounded-xl px-3.5 py-2 inline-flex items-center gap-2 text-t2 hover:text-t1 cursor-pointer transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>AI Signals</span>
+        </button>
+        <button data-fxtab="wallet" onclick="switchFxTab('wallet')" class="fx-nav-tab rounded-xl px-3.5 py-2 inline-flex items-center gap-2 text-t2 hover:text-t1 cursor-pointer transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h2"/></svg>
+          <span>Margin Wallet</span>
+        </button>
+        <button data-fxtab="risk" onclick="switchFxTab('risk')" class="fx-nav-tab rounded-xl px-3.5 py-2 inline-flex items-center gap-2 text-t2 hover:text-t1 cursor-pointer transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Risk Settings</span>
+        </button>
+      </div>
+      <div class="hidden xl:flex items-center gap-2 text-xs font-mono text-emerald-400 pr-2">
+        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+        <span>LD4 ECN · 0.6ms</span>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         MULTI-PANEL TRADING COCKPIT: LEFT WATCHLIST + RIGHT WORKSPACE
+    ══════════════════════════════════════════════════════════════════ -->
+    <div id="defaultDashboardView">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+
+      <!-- LEFT WATCHLIST DOCK (2 COLS / ~240px) -->
+      <aside class="fx-panel p-3.5 lg:col-span-2 flex flex-col max-h-[820px]">
+        <div class="relative mb-3">
+          <svg class="w-4 h-4 text-t3 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input
+            id="watchSearch"
+            oninput="renderWatchlist()"
+            type="text"
+            placeholder="Search..."
+            class="fx-input w-full pl-9 pr-3 py-2 text-xs font-medium placeholder:text-slate-500"
+          />
+        </div>
+
+        <div class="flex items-center justify-between px-1.5 pb-2.5 mb-2 border-b border-fx text-xs">
+          <span class="flex items-center gap-1.5 font-semibold text-amber-400">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Favorites
+          </span>
+          <span class="font-mono text-t3">12</span>
+        </div>
+
+        <div id="watchlistContainer" class="flex-1 overflow-y-auto space-y-1 pr-0.5"></div>
+      </aside>
+
+      <!-- RIGHT MAIN WORKSPACE (10 COLS) -->
+      <div class="lg:col-span-10 flex flex-col gap-3">
+
+        <!-- TOP ROW: 4 INTELLIGENCE BENTO CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+
+          <!-- Card 1: Today's Highlights -->
+          <div class="fx-panel p-4 flex flex-col justify-between gap-2.5">
+            <h2 class="text-xs font-bold text-t2">Today's Highlights</h2>
+
+            <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                Best Performer
+              </div>
+              <p class="font-display text-sm font-extrabold text-t1 mt-1">BTC/USD</p>
+              <p class="font-mono text-xs font-bold text-emerald-400 mt-0.5">+5.2% (+$124.50)</p>
+            </div>
+
+            <div class="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3">
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-blue-400">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Today's P/L
+              </div>
+              <p id="highlightTodayPl" class="font-display text-sm font-extrabold text-t1 mt-1">+$287.45</p>
+              <p class="font-mono text-xs font-bold text-emerald-400 mt-0.5">+16.4% ROI</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Market Sentiment -->
+          <div class="fx-panel p-4 flex flex-col justify-between gap-2.5">
+            <h2 class="text-xs font-bold text-t2">Market Sentiment</h2>
+
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="text-t3">Fear &amp; Greed</span>
+                <span class="font-mono font-bold text-t1">68</span>
+              </div>
+              <div class="h-2 rounded-full bg-slate-700/50 overflow-hidden">
+                <div class="h-full rounded-full bg-emerald-500" style="width: 68%; box-shadow: 0 0 12px rgba(16,185,129,0.6);"></div>
+              </div>
+              <p class="text-xs font-semibold text-emerald-400 mt-1">Greed</p>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="text-t3">Buyer / Seller</span>
+                <span id="buyerSellerLabel" class="font-mono font-bold text-t1">62% / 38%</span>
+              </div>
+              <div class="h-2 rounded-full overflow-hidden flex">
+                <div id="buyerBar" class="h-full bg-emerald-500 transition-all duration-500" style="width: 62%"></div>
+                <div id="sellerBar" class="h-full bg-rose-500 transition-all duration-500" style="width: 38%"></div>
+              </div>
+            </div>
+
+            <button onclick="showFxToast('Institutional Order-Flow Bias: Strongly Bullish')" class="w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2 text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              Bullish
+            </button>
+          </div>
+
+          <!-- Card 3: AI Trade Insights -->
+          <div class="fx-panel p-4 flex flex-col justify-between gap-2.5">
+            <div class="flex items-center gap-2 text-xs font-bold text-t2">
+              <span class="h-5 w-5 rounded-md bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>
+              </span>
+              AI Trade Insights
+            </div>
+
+            <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 flex items-center gap-2.5 text-xs">
+              <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span class="text-amber-200 font-medium">High volatility detected</span>
+            </div>
+
+            <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 flex items-center gap-2.5 text-xs">
+              <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+              <span id="aiInsightPairText" class="text-emerald-200 font-medium">Uptrend forming on EUR/USD</span>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="text-t3">AI Confidence</span>
+                <span id="aiConfPct" class="font-mono font-bold text-emerald-400">87%</span>
+              </div>
+              <div class="h-2 rounded-full bg-slate-700/50 overflow-hidden">
+                <div id="aiConfBar" class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width: 87%; box-shadow: 0 0 12px rgba(16,185,129,0.6);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Achievements -->
+          <div class="fx-panel p-4 flex flex-col justify-between gap-2.5">
+            <h2 class="text-xs font-bold text-t2">Achievements</h2>
+
+            <div class="grid grid-cols-4 gap-2">
+              <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 p-2 flex flex-col items-center text-center gap-1">
+                <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="text-xs font-semibold text-amber-200 leading-tight">First Trade</span>
+              </div>
+
+              <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 p-2 flex flex-col items-center text-center gap-1">
+                <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                <span class="text-xs font-semibold text-amber-200 leading-tight">10 Trades</span>
+              </div>
+
+              <div class="rounded-xl border border-purple-500/40 bg-purple-500/10 p-2 flex flex-col items-center text-center gap-1">
+                <svg class="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span class="text-xs font-semibold text-purple-200 leading-tight">Win Streak</span>
+              </div>
+
+              <div class="rounded-xl border border-slate-700 bg-slate-800/40 p-2 flex flex-col items-center text-center gap-1 opacity-60">
+                <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span class="text-xs font-semibold text-slate-400 leading-tight">Master</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="text-t2 font-semibold">Level 3</span>
+                <span class="font-mono text-t3">75%</span>
+              </div>
+              <div class="h-2 rounded-full bg-slate-700/50 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" style="width: 75%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- MIDDLE BAR + BOTTOM SPLIT: CANDLESTICK TERMINAL (8 COLS) + NEW ORDER TICKET (4 COLS) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-3 flex-1">
+
+          <!-- Left 8 Cols: AI Risk Banner + Interactive Candlestick Chart -->
+          <div class="xl:col-span-8 flex flex-col gap-3">
+
+            <!-- AI Risk Score Strip -->
+            <div class="fx-panel px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <p id="riskScoreTitle" class="text-xs text-t3">AI Risk Score · EURUSD</p>
+                  <p id="riskScoreLevel" class="text-sm font-bold text-amber-400">Medium Risk</p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-4 text-xs">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-t3">Volatility:</span>
+                  <div class="w-24 h-2 rounded-full bg-slate-700/60 overflow-hidden">
+                    <div id="volatilityBar" class="h-full rounded-full bg-amber-400" style="width: 58%"></div>
+                  </div>
+                  <span id="volatilityPct" class="font-mono font-bold text-amber-400">58%</span>
+                </div>
+
+                <span class="rounded-lg border border-fx px-2.5 py-1 font-mono text-t2" style="background: var(--bg-sub);">
+                  Spread: <strong id="spreadVal" class="text-t1">0.8</strong>
+                </span>
+
+                <span class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-semibold text-emerald-400">
+                  Liquidity: High
+                </span>
+              </div>
+            </div>
+
+            <!-- Interactive OHLC Candlestick + EMA-20 SVG Chart -->
+            <div class="fx-panel p-5 flex-1 flex flex-col justify-between">
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-3">
+                <div>
+                  <div class="flex items-baseline gap-2.5">
+                    <span id="chartPairName" class="font-display text-base font-bold text-t2">EURUSD</span>
+                    <span id="chartDeltaPct" class="font-mono text-xs font-bold text-emerald-400">↗ +0.47%</span>
+                  </div>
+                  <p id="chartLiveQuote" class="font-mono text-2xl sm:text-[26px] font-extrabold text-t1 tracking-tight mt-0.5">
+                    1.10517
+                  </p>
+                  <p id="ohlcReadout" class="font-mono text-xs text-t3 mt-1">
+                    H: 1.10534 | L: 1.09856 | O: 1.10010 · EMA(20) Active
+                  </p>
+                </div>
+
+                <!-- Timeframe Selector Pills -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono font-semibold">
+                  <button onclick="switchTf('1M', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">1M</button>
+                  <button onclick="switchTf('5M', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">5M</button>
+                  <button onclick="switchTf('15M', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">15M</button>
+                  <button onclick="switchTf('30M', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">30M</button>
+                  <button onclick="switchTf('1H', this)" class="tf-btn btn-tf-active rounded-lg px-3 py-1.5 cursor-pointer">1H</button>
+                  <button onclick="switchTf('4H', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">4H</button>
+                  <button onclick="switchTf('1D', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">1D</button>
+                  <button onclick="switchTf('1W', this)" class="tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer">1W</button>
+                </div>
+              </div>
+
+              <!-- OHLC Candlesticks + EMA + Volume SVG -->
+              <div class="relative mt-2">
+                <svg id="candleSvg" viewBox="0 0 760 330" class="w-full h-[330px] overflow-visible"></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 4 Cols: New Order Execution Ticket -->
+          <div class="fx-panel p-5 xl:col-span-4 flex flex-col justify-between gap-4">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <h2 class="font-display text-base font-bold text-t1">New Order</h2>
+                <span id="orderPairPill" class="rounded-lg bg-blue-500/20 border border-blue-500/35 px-2.5 py-1 font-mono text-xs font-bold text-blue-400">
+                  EURUSD
+                </span>
+              </div>
+
+              <!-- Glowing Buy / Sell Toggle -->
+              <div class="grid grid-cols-2 gap-3">
+                <button id="sideBuyBtn" onclick="selectOrderSide('BUY')" class="btn-buy-glow rounded-xl py-3 px-4 font-display text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="m8 12 4-4 4 4"/><path d="M12 16V8"/></svg>
+                  Buy
+                </button>
+                <button id="sideSellBtn" onclick="selectOrderSide('SELL')" class="rounded-xl border border-fx py-3 px-4 font-display text-sm font-bold text-t2 hover:text-t1 flex items-center justify-center gap-2 transition cursor-pointer" style="background: var(--bg-sub);">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="m8 12 4 4 4-4"/><path d="M12 8v8"/></svg>
+                  Sell
+                </button>
+              </div>
+
+              <!-- Volume (Lots) -->
+              <div>
+                <label class="block text-xs font-medium text-t3 mb-1.5">Volume (Lots)</label>
+                <div class="flex items-center gap-2">
+                  <input id="lotInput" type="number" step="0.01" min="0.01" value="0.10" oninput="recalcOrderPreview()" class="fx-input flex-1 px-3.5 py-2.5 font-mono text-sm font-semibold" />
+                  <button onclick="adjustLot(0.05)" class="fx-input h-10 w-10 font-mono text-base font-bold hover:border-blue-500 cursor-pointer">+</button>
+                  <button onclick="adjustLot(-0.05)" class="fx-input h-10 w-10 font-mono text-base font-bold hover:border-blue-500 cursor-pointer">-</button>
+                </div>
+              </div>
+
+              <!-- Stop Loss -->
+              <div>
+                <label class="block text-xs font-medium text-t3 mb-1.5">Stop Loss (SL)</label>
+                <div class="flex items-center gap-2">
+                  <input id="slInput" type="text" value="1.09850" class="fx-input flex-1 px-3.5 py-2.5 font-mono text-sm" />
+                  <button onclick="autoSetSlTp()" class="fx-input px-3 py-2.5 text-xs font-mono font-bold text-t2 hover:text-blue-400 cursor-pointer">TP / PIP</button>
+                </div>
+              </div>
+
+              <!-- Take Profit -->
+              <div>
+                <label class="block text-xs font-medium text-t3 mb-1.5">Take Profit (TP)</label>
+                <div class="flex items-center gap-2">
+                  <input id="tpInput" type="text" value="1.11250" class="fx-input flex-1 px-3.5 py-2.5 font-mono text-sm" />
+                  <button onclick="autoSetSlTp()" class="fx-input px-3 py-2.5 text-xs font-mono font-bold text-t2 hover:text-blue-400 cursor-pointer">TP / PIP</button>
+                </div>
+              </div>
+
+              <!-- Profit Limit -->
+              <div>
+                <label class="block text-xs font-medium text-t3 mb-1.5">Profit Limit ($)</label>
+                <input id="profitLimitInput" type="number" value="100" class="fx-input w-full px-3.5 py-2.5 font-mono text-sm" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5 pt-1 text-xs">
+                <div class="rounded-xl border border-fx p-3" style="background: var(--bg-sub);">
+                  <span class="text-t3">Req. Margin</span>
+                  <p id="reqMarginVal" class="font-mono font-bold text-t1 mt-0.5">$22.10</p>
+                </div>
+                <div class="rounded-xl border border-fx p-3" style="background: var(--bg-sub);">
+                  <span class="text-t3">Pip Value</span>
+                  <p id="pipValueLabel" class="font-mono font-bold text-emerald-400 mt-0.5">$1.00 / pip</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="executeOrderBtn"
+              onclick="executeMarketOrder()"
+              class="w-full btn-buy-glow rounded-xl py-3.5 px-5 font-display text-sm font-extrabold tracking-wide cursor-pointer transition"
+            >
+              Execute BUY 0.10 EURUSD
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- SUB-PAGE VIEW CONTAINER -->
+    <div id="tabSubpageView" class="hidden space-y-3"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="fxToast" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="rounded-2xl bg-slate-900 border border-emerald-500/40 text-white px-5 py-3.5 shadow-2xl flex items-center gap-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      <span id="fxToastMsg" class="text-sm font-semibold">Order Executed</span>
+    </div>
+  </div>
+
+  <script>
+    const PAIRS = [
+      { sym: 'EURUSD', price: 1.10517, chg: +0.47, digits: 5, spread: '0.8', risk: 'Medium Risk', vol: 58, sl: '1.09850', tp: '1.11250' },
+      { sym: 'AUDCAD', price: 0.87921, chg: -0.41, digits: 5, spread: '1.2', risk: 'Low Risk',    vol: 39, sl: '0.87400', tp: '0.88600' },
+      { sym: 'BABA',   price: 107.68,  chg: -1.18, digits: 2, spread: '0.04', risk: 'High Risk',  vol: 74, sl: '104.20',  tp: '114.50' },
+      { sym: 'AMAZON', price: 214.25,  chg: -1.02, digits: 2, spread: '0.03', risk: 'Medium Risk',vol: 52, sl: '208.00',  tp: '224.00' },
+      { sym: 'APPLE',  price: 227.45,  chg: -0.74, digits: 2, spread: '0.02', risk: 'Low Risk',   vol: 34, sl: '222.00',  tp: '236.00' },
+      { sym: 'AUDUSD', price: 0.65723, chg: +0.63, digits: 5, spread: '0.9', risk: 'Low Risk',    vol: 42, sl: '0.65200', tp: '0.66400' },
+      { sym: 'BRENT',  price: 74.55,   chg: -0.27, digits: 2, spread: '2.1', risk: 'High Risk',   vol: 78, sl: '72.40',   tp: '78.20' },
+      { sym: 'BTCUSD', price: 96282.5, chg: +2.34, digits: 1, spread: '14.0',risk: 'High Risk',   vol: 84, sl: '94200.0', tp: '99800.0' },
+      { sym: 'CAC40',  price: 7836.64, chg: +1.43, digits: 2, spread: '1.0', risk: 'Medium Risk', vol: 49, sl: '7740.00', tp: '7980.00' },
+      { sym: 'CADJPY', price: 109.363, chg: +0.39, digits: 3, spread: '1.4', risk: 'Medium Risk', vol: 55, sl: '108.600', tp: '110.400' },
+      { sym: 'DOW30',  price: 43232.3, chg: +0.49, digits: 1, spread: '1.8', risk: 'Low Risk',    vol: 37, sl: '42900.0', tp: '43800.0' },
+      { sym: 'ETHUSD', price: 3145.80, chg: +1.82, digits: 2, spread: '1.6', risk: 'High Risk',   vol: 79, sl: '3040.00', tp: '3320.00' },
+    ];
+
+    let activePair = PAIRS[0];
+    let orderSide = 'BUY';
+    let liveFeedOn = true;
+    let openPlVal = 45.91;
+    let todayPlVal = 287.45;
+
+    // Relative normalized OHLC candles [open, high, low, close, volume] (0..100 scale mapped to activePair price!)
+    let baseCandles = [
+      { o: 12, h: 20, l: 6,  c: 9,  v: 28 },
+      { o: 9,  h: 34, l: 7,  c: 26, v: 46 },
+      { o: 26, h: 46, l: 18, c: 40, v: 52 },
+      { o: 40, h: 62, l: 25, c: 52, v: 64 },
+      { o: 52, h: 58, l: 18, c: 30, v: 38 },
+      { o: 30, h: 64, l: 16, c: 22, v: 70 },
+      { o: 22, h: 68, l: 20, c: 56, v: 58 },
+      { o: 56, h: 68, l: 24, c: 42, v: 48 },
+      { o: 42, h: 82, l: 14, c: 52, v: 76 },
+      { o: 52, h: 86, l: 26, c: 40, v: 62 },
+      { o: 40, h: 84, l: 18, c: 76, v: 88 },
+      { o: 76, h: 92, l: 60, c: 88, v: 94 },
+    ];
+
+    function renderWatchlist() {
+      const q = document.getElementById('watchSearch').value.trim().toLowerCase();
+      const box = document.getElementById('watchlistContainer');
+      const list = PAIRS.filter(p => !q || p.sym.toLowerCase().includes(q));
+
+      box.innerHTML = list.map(p => {
+        const isSel = p.sym === activePair.sym;
+        const isUp = p.chg >= 0;
+        return `
+          <button
+            onclick="selectPair('${p.sym}')"
+            class="w-full text-left rounded-xl px-3 py-2.5 transition flex items-center justify-between cursor-pointer border ${
+              isSel
+                ? 'border-blue-500/50 bg-blue-500/15'
+                : 'border-transparent hover:bg-slate-500/10'
+            }"
+          >
+            <div>
+              <p class="font-display text-xs font-bold text-t1">${p.sym}</p>
+              <p class="font-mono text-xs text-t3 mt-0.5">${p.price.toFixed(p.digits)}</p>
+            </div>
+            <div class="text-right">
+              <span class="font-mono text-xs font-bold ${isUp ? 'text-emerald-400' : 'text-rose-400'}">
+                ${isUp ? '+' : ''}${p.chg.toFixed(2)}%
+              </span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectPair(sym) {
+      activePair = PAIRS.find(p => p.sym === sym) || PAIRS[0];
+      document.getElementById('headerSymbolTitle').textContent = activePair.sym;
+      document.getElementById('chartPairName').textContent = activePair.sym;
+      document.getElementById('orderPairPill').textContent = activePair.sym;
+      document.getElementById('riskScoreTitle').textContent = 'AI Risk Score · ' + activePair.sym;
+      document.getElementById('riskScoreLevel').textContent = activePair.risk;
+      document.getElementById('volatilityBar').style.width = activePair.vol + '%';
+      document.getElementById('volatilityPct').textContent = activePair.vol + '%';
+      document.getElementById('spreadVal').textContent = activePair.spread;
+      document.getElementById('slInput').value = activePair.sl;
+      document.getElementById('tpInput').value = activePair.tp;
+      document.getElementById('aiInsightPairText').textContent =
+        (activePair.chg >= 0 ? 'Bullish breakout forming on ' : 'Mean-reversion support near ') + activePair.sym;
+
+      const isUp = activePair.chg >= 0;
+      const dEl = document.getElementById('chartDeltaPct');
+      dEl.textContent = `${isUp ? '↗ +' : '↘ '}${activePair.chg.toFixed(2)}%`;
+      dEl.className = `font-mono text-xs font-bold ${isUp ? 'text-emerald-400' : 'text-rose-400'}`;
+      document.getElementById('chartLiveQuote').textContent = activePair.price.toFixed(activePair.digits);
+
+      recalcOrderPreview();
+      renderWatchlist();
+      renderCandlesticks();
+    }
+
+    function renderCandlesticks() {
+      const svg = document.getElementById('candleSvg');
+      const W = 760, H = 330, leftPad = 68, rightPad = 20, topPad = 14, botPad = 36;
+      const plotW = W - leftPad - rightPad;
+      const plotH = H - topPad - botPad;
+
+      const baseP = activePair.price;
+      const span = baseP * 0.008;
+      const minPrice = baseP - span * 0.75;
+      const maxPrice = baseP + span * 0.25;
+
+      const yFromNorm = n => topPad + plotH - (n / 100) * plotH;
+      const priceFromNorm = n => (minPrice + (n / 100) * (maxPrice - minPrice)).toFixed(activePair.digits);
+
+      let html = '';
+      // Horizontal price gridlines
+      [15, 38, 62, 85].forEach(n => {
+        const y = yFromNorm(n);
+        html += `<line x1="${leftPad}" y1="${y}" x2="${W - rightPad}" y2="${y}" stroke="rgba(148,163,184,0.12)" stroke-dasharray="3 3" />`;
+        html += `<text x="${leftPad - 10}" y="${y + 4}" text-anchor="end" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="12">${priceFromNorm(n)}</text>`;
+      });
+
+      const step = plotW / baseCandles.length;
+      const emaPts = [];
+
+      baseCandles.forEach((c, idx) => {
+        const cx = leftPad + idx * step + step / 2;
+        const isBull = c.c >= c.o;
+        const color = isBull ? '#16C784' : '#EF4444';
+        const yHigh = yFromNorm(c.h);
+        const yLow  = yFromNorm(c.l);
+        const yTop  = yFromNorm(Math.max(c.o, c.c));
+        const yBot  = yFromNorm(Math.min(c.o, c.c));
+        const bodyH = Math.max(6, yBot - yTop);
+
+        const emaNorm = (c.o + c.c + (idx > 0 ? baseCandles[idx - 1].c : c.c)) / 3 + 4;
+        emaPts.push(`${idx === 0 ? 'M' : 'L'} ${cx.toFixed(1)} ${yFromNorm(emaNorm).toFixed(1)}`);
+
+        // Volume footer bar
+        const volH = (c.v / 100) * 26;
+        html += `<rect x="${cx - 10}" y="${H - volH}" width="20" height="${volH}" rx="2" fill="${color}" fill-opacity="0.28" />`;
+
+        // Wick + Candle Body
+        html += `
+          <g class="candle-anim cursor-pointer" style="animation-delay:${idx * 35}ms"
+             onmouseenter="inspectCandle('${priceFromNorm(c.o)}','${priceFromNorm(c.h)}','${priceFromNorm(c.l)}','${priceFromNorm(c.c)}')">
+            <line x1="${cx}" y1="${yHigh}" x2="${cx}" y2="${yLow}" stroke="${color}" stroke-width="2.4" stroke-linecap="round" />
+            <rect x="${cx - 11}" y="${yTop}" width="22" height="${bodyH}" rx="3" fill="${color}" />
+          </g>
+        `;
+      });
+
+      const emaPath = emaPts.join(' ');
+      html += `
+        <path d="${emaPath}" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" class="ema-line" />
+        <circle r="4" fill="#38BDF8">
+          <animateMotion dur="4.6s" repeatCount="indefinite" path="${emaPath}" />
+        </circle>
+      `;
+
+      svg.innerHTML = html;
+    }
+
+    function inspectCandle(o, h, l, c) {
+      document.getElementById('ohlcReadout').textContent = `O: ${o} | H: ${h} | L: ${l} | C: ${c} · EMA(20) Active`;
+    }
+
+    function switchTf(tf, btn) {
+      document.querySelectorAll('.tf-btn').forEach(b => {
+        b.className = 'tf-btn rounded-lg px-2.5 py-1.5 text-t3 hover:text-t1 border border-fx cursor-pointer';
+      });
+      btn.className = 'tf-btn btn-tf-active rounded-lg px-3 py-1.5 cursor-pointer';
+      // Permute candles slightly for authentic timeframe change
+      baseCandles = baseCandles.map(c => {
+        const shift = Math.round(Math.random() * 12 - 6);
+        const no = Math.max(10, Math.min(85, c.o + shift));
+        const nc = Math.max(10, Math.min(92, c.c + shift));
+        return {
+          o: no,
+          c: nc,
+          h: Math.min(96, Math.max(no, nc) + 10),
+          l: Math.max(4, Math.min(no, nc) - 10),
+          v: c.v,
+        };
+      });
+      renderCandlesticks();
+    }
+
+    function selectOrderSide(side) {
+      orderSide = side;
+      const buyBtn = document.getElementById('sideBuyBtn');
+      const sellBtn = document.getElementById('sideSellBtn');
+      const execBtn = document.getElementById('executeOrderBtn');
+
+      if (side === 'BUY') {
+        buyBtn.className = 'btn-buy-glow rounded-xl py-3 px-4 font-display text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer';
+        buyBtn.removeAttribute('style');
+        sellBtn.className = 'rounded-xl border border-fx py-3 px-4 font-display text-sm font-bold text-t2 hover:text-t1 flex items-center justify-center gap-2 transition cursor-pointer';
+        sellBtn.style.background = 'var(--bg-sub)';
+        execBtn.className = 'w-full btn-buy-glow rounded-xl py-3.5 px-5 font-display text-sm font-extrabold tracking-wide cursor-pointer transition';
+      } else {
+        sellBtn.className = 'btn-sell-glow rounded-xl py-3 px-4 font-display text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer';
+        sellBtn.removeAttribute('style');
+        buyBtn.className = 'rounded-xl border border-fx py-3 px-4 font-display text-sm font-bold text-t2 hover:text-t1 flex items-center justify-center gap-2 transition cursor-pointer';
+        buyBtn.style.background = 'var(--bg-sub)';
+        execBtn.className = 'w-full btn-sell-glow rounded-xl py-3.5 px-5 font-display text-sm font-extrabold tracking-wide cursor-pointer transition';
+      }
+      recalcOrderPreview();
+    }
+
+    function adjustLot(delta) {
+      const inp = document.getElementById('lotInput');
+      const next = Math.max(0.01, +(parseFloat(inp.value || 0.01) + delta).toFixed(2));
+      inp.value = next.toFixed(2);
+      recalcOrderPreview();
+    }
+
+    function recalcOrderPreview() {
+      const lots = Math.max(0.01, parseFloat(document.getElementById('lotInput').value) || 0.01);
+      document.getElementById('reqMarginVal').textContent = '$' + (lots * 221).toFixed(2);
+      document.getElementById('pipValueLabel').textContent = '$' + (lots * 10).toFixed(2) + ' / pip';
+      document.getElementById('executeOrderBtn').textContent = `Execute ${orderSide} ${lots.toFixed(2)} ${activePair.sym}`;
+    }
+
+    function autoSetSlTp() {
+      showFxToast(`Auto-calculated 35-pip SL & 70-pip TP for ${activePair.sym}`);
+    }
+
+    function executeMarketOrder() {
+      const lots = Math.max(0.01, parseFloat(document.getElementById('lotInput').value) || 0.01);
+      openPlVal += +(lots * 42).toFixed(2);
+      todayPlVal += +(lots * 42).toFixed(2);
+      document.getElementById('accOpenPl').textContent = '+$' + openPlVal.toFixed(2);
+      document.getElementById('accEquity').textContent = (1754.87 + openPlVal).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('highlightTodayPl').textContent = '+$' + todayPlVal.toFixed(2);
+      showFxToast(`${orderSide} ${lots.toFixed(2)} lots ${activePair.sym} @ ${activePair.price.toFixed(activePair.digits)} Filled!`);
+    }
+
+    function setTerminalTheme(mode) {
+      document.documentElement.setAttribute('data-mode', mode);
+      document.getElementById('btnDarkMode').className = mode === 'dark'
+        ? 'h-8 w-9 rounded-lg bg-fxblue text-white flex items-center justify-center shadow cursor-pointer'
+        : 'h-8 w-9 rounded-lg text-t3 hover:text-t1 flex items-center justify-center cursor-pointer';
+      document.getElementById('btnLightMode').className = mode === 'light'
+        ? 'h-8 w-9 rounded-lg bg-fxblue text-white flex items-center justify-center shadow cursor-pointer'
+        : 'h-8 w-9 rounded-lg text-t3 hover:text-t1 flex items-center justify-center cursor-pointer';
+    }
+
+    function toggleTurboTicks() {
+      liveFeedOn = !liveFeedOn;
+      showFxToast(liveFeedOn ? 'Live ECN Tick Stream: ON' : 'Live ECN Tick Stream: PAUSED');
+    }
+
+    let fxTimer = null;
+    function showFxToast(msg) {
+      const el = document.getElementById('fxToast');
+      document.getElementById('fxToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      el.classList.add('opacity-100', 'translate-y-0');
+      if (fxTimer) clearTimeout(fxTimer);
+      fxTimer = setTimeout(() => {
+        el.classList.remove('opacity-100', 'translate-y-0');
+        el.classList.add('opacity-0', 'translate-y-3');
+      }, 2400);
+    }
+
+    const FX_SUBPAGES = {
+      screener: {
+        title: 'Multi-Asset Markets Screener',
+        subtitle: 'Live ECN raw spreads, intraday ADR% volatility and institutional liquidity across FX, Crypto & Indices',
+        cta: 'Refresh ECN Quotes',
+        kpis: [
+          { lbl: 'Tradable Symbols', val: '184 Pairs', sub: 'FX · Crypto · Equities', tone: 'text-blue-400' },
+          { lbl: 'Avg. EURUSD Spread', val: '0.1 pips', sub: 'Zero Markup Raw ECN', tone: 'text-emerald-400' },
+          { lbl: 'Top Intraday Mover', val: 'BTCUSD +2.34%', sub: '$96,282.50 Live', tone: 'text-emerald-400' },
+          { lbl: 'Session Liquidity', val: 'LD4 + NY4', sub: '99.98% Fill Ratio', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'Cross-Asset 24H Volatility Index (ADR %)',
+        bars: [
+          { lbl: 'EURUSD', v: 46, txt: '0.68%' },
+          { lbl: 'GBPUSD', v: 58, txt: '0.84%' },
+          { lbl: 'XAUUSD', v: 76, txt: '1.42%' },
+          { lbl: 'NAS100', v: 82, txt: '1.65%' },
+          { lbl: 'BTCUSD', v: 94, txt: '2.84%' }
+        ],
+        tableTitle: 'ECN Institutional Market Screener',
+        cols: ['Instrument', 'Bid / Ask', 'Raw Spread', '24H Chg', 'Quick Load'],
+        rows: [
+          ['EURUSD · Euro / US Dollar', '1.10517 / 1.10525', '0.8 pips', '+0.47%', 'EURUSD'],
+          ['BTCUSD · Bitcoin Spot ECN', '96,282.5 / 96,296.5', '14.0 pts', '+2.34%', 'BTCUSD'],
+          ['ETHUSD · Ethereum ECN', '3,145.80 / 3,147.40', '1.60 pts', '+1.82%', 'ETHUSD'],
+          ['CAC40 · France 40 Cash', '7,836.64 / 7,837.64', '1.00 pt', '+1.43%', 'CAC40'],
+          ['AUDUSD · Aussie / USD', '0.65723 / 0.65732', '0.9 pips', '+0.63%', 'AUDUSD']
+        ]
+      },
+      orders: {
+        title: 'Order Book Depth & Execution History',
+        subtitle: 'Level-2 ECN liquidity ladder, open positions and closed trade settlement Blotter',
+        cta: 'Export Trade Blotter',
+        kpis: [
+          { lbl: 'Open Floating P/L', val: '+$45.91', sub: '3 Active Positions', tone: 'text-emerald-400' },
+          { lbl: 'Closed 30D Profit', val: '+$1,428.60', sub: '74.2% Win Rate', tone: 'text-emerald-400' },
+          { lbl: 'Avg. Execution Speed', val: '0.64 ms', sub: 'Zero Requotes', tone: 'text-blue-400' },
+          { lbl: 'Profit Factor', val: '2.48', sub: 'Sharpe Ratio 1.94', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'Cumulative 5-Week Realized Equity Curve ($)',
+        bars: [
+          { lbl: 'Wk 1', v: 42, txt: '+$210' },
+          { lbl: 'Wk 2', v: 56, txt: '+$540' },
+          { lbl: 'Wk 3', v: 68, txt: '+$890' },
+          { lbl: 'Wk 4', v: 81, txt: '+$1.1k' },
+          { lbl: 'Wk 5', v: 93, txt: '+$1.4k' }
+        ],
+        tableTitle: 'Recent ECN Order Fills & Closed Positions',
+        cols: ['Ticket #', 'Symbol & Side', 'Volume', 'Fill Price', 'Net P/L'],
+        rows: [
+          ['#8849201', 'BUY EURUSD', '0.50 Lots', '1.10120 -> 1.10517', '+$198.50'],
+          ['#8849184', 'BUY BTCUSD', '0.15 Lots', '95,410 -> 96,282', '+$130.80'],
+          ['#8849150', 'SELL BRENT', '1.00 Lot', '75.10 -> 74.55', '+$55.00'],
+          ['#8849112', 'BUY DOW30', '0.20 Lots', '43,050 -> 43,232', '+$36.40'],
+          ['#8849089', 'SELL AUDCAD', '0.40 Lots', '0.88140 -> 0.87921', '+$64.90']
+        ]
+      },
+      signals: {
+        title: 'AI Quantitative Trade Signals',
+        subtitle: 'Neural regime detection, multi-timeframe EMA confluence and probability-scored trade setups',
+        cta: 'Scan All Timeframes',
+        kpis: [
+          { lbl: 'Active High-Conviction', val: '5 Setups', sub: '> 82% AI Confidence', tone: 'text-emerald-400' },
+          { lbl: '30D Signal Hit Rate', val: '78.6%', sub: '114 Verified Calls', tone: 'text-blue-400' },
+          { lbl: 'Dominant Regime', val: 'Risk-On Trend', sub: 'USD Softening Bias', tone: 'text-emerald-400' },
+          { lbl: 'Avg. Risk : Reward', val: '1 : 2.6', sub: 'ATR Stop Calibrated', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'AI Model Confidence by Strategy (%)',
+        bars: [
+          { lbl: 'Breakout', v: 89, txt: '89%' },
+          { lbl: 'EMA Flow', v: 87, txt: '87%' },
+          { lbl: 'VWAP Rev', v: 78, txt: '78%' },
+          { lbl: 'Vol Sqz', v: 84, txt: '84%' },
+          { lbl: 'Orderflow', v: 91, txt: '91%' }
+        ],
+        tableTitle: 'Live Neural Signal Feed',
+        cols: ['Pair & TF', 'Direction', 'Target / Stop', 'AI Confidence', 'Action'],
+        rows: [
+          ['EURUSD · H1', 'LONG BREAKOUT', 'TP 1.1125 / SL 1.0985', '87% Bullish', 'Copy Setup'],
+          ['BTCUSD · H4', 'LONG MOMENTUM', 'TP 99,800 / SL 94,200', '91% Bullish', 'Copy Setup'],
+          ['ETHUSD · H1', 'LONG CONTINUATION', 'TP 3,320 / SL 3,040', '84% Bullish', 'Copy Setup'],
+          ['BABA · D1', 'SHORT REJECTION', 'TP 101.50 / SL 111.20', '79% Bearish', 'Copy Setup'],
+          ['AUDUSD · M30', 'LONG SUPPORT', 'TP 0.6640 / SL 0.6520', '82% Bullish', 'Copy Setup']
+        ]
+      },
+      wallet: {
+        title: 'Margin Wallet & Instant Funding',
+        subtitle: 'Segregated client collateral, free margin buffer, USDT/Wire deposits and zero-fee withdrawals',
+        cta: 'Instant USDT Deposit',
+        kpis: [
+          { lbl: 'Account Equity', val: '$1,800.78', sub: 'Balance $1,754.87', tone: 'text-emerald-400' },
+          { lbl: 'Free Margin Available', val: '$1,516.09', sub: 'Used Margin $284.69', tone: 'text-blue-400' },
+          { lbl: 'Margin Level Health', val: '632.31%', sub: 'Stop-Out < 50%', tone: 'text-emerald-400' },
+          { lbl: 'Rebate Cashback', val: '$64.20', sub: '$4.50 / Lot Tier', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'Margin Utilization vs Free Buffer (%)',
+        bars: [
+          { lbl: 'Used', v: 16, txt: '16%' },
+          { lbl: 'Free', v: 84, txt: '84%' },
+          { lbl: 'FX Coll', v: 58, txt: '58%' },
+          { lbl: 'USDC', v: 42, txt: '42%' },
+          { lbl: 'Buffer', v: 92, txt: '6.3x' }
+        ],
+        tableTitle: 'Collateral & Funding Ledger',
+        cols: ['Ref ID', 'Channel', 'Type', 'Amount (USD)', 'Status'],
+        rows: [
+          ['WLT-90421', 'USDT-ERC20 Instant', 'Margin Deposit', '+$1,000.00', 'Settled'],
+          ['WLT-90388', 'ECN Volume Rebate', 'Cashback Credit', '+$64.20', 'Settled'],
+          ['WLT-90312', 'SEPA Bank Wire', 'Profit Withdrawal', '-$450.00', 'Completed'],
+          ['WLT-90274', 'Visa Direct Fast', 'Margin Deposit', '+$1,200.00', 'Settled'],
+          ['WLT-90210', 'Internal Sub-Transfer', 'Vault Sweep', '-$150.00', 'Completed']
+        ]
+      },
+      risk: {
+        title: 'Risk Guardrails & Execution Settings',
+        subtitle: 'Max daily drawdown circuit-breaker, leverage cap, one-click trading and LD4 server routing',
+        cta: 'Save Risk Profile',
+        isSettings: true,
+        kpis: [
+          { lbl: 'Active Leverage', val: '1 : 500', sub: 'Dynamic Margin Tier', tone: 'text-blue-400' },
+          { lbl: 'Daily Drawdown Cap', val: '4.0% ($72)', sub: 'Auto-Flatten Armed', tone: 'text-emerald-400' },
+          { lbl: 'Default SL Protection', val: '35 Pips', sub: 'Attached on Fill', tone: 'text-amber-400' },
+          { lbl: 'Execution Datacenter', val: 'LD4 London', sub: '0.6ms Cross-Connect', tone: 'text-emerald-400' }
+        ],
+        chartTitle: 'Daily Drawdown Utilization (%)',
+        bars: [
+          { lbl: 'Mon', v: 22, txt: '0.9%' },
+          { lbl: 'Tue', v: 35, txt: '1.4%' },
+          { lbl: 'Wed', v: 18, txt: '0.7%' },
+          { lbl: 'Thu', v: 28, txt: '1.1%' },
+          { lbl: 'Today', v: 15, txt: '0.6%' }
+        ]
+      }
+    };
+
+    function renderFxSubpage(tabKey) {
+      const cfg = FX_SUBPAGES[tabKey];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const barsSvg = cfg.bars.map((b, i) => {
+        const x = 36 + i * 74;
+        const h = Math.round((b.v / 100) * 120);
+        const y = 152 - h;
+        return `
+          <g class="cursor-pointer" onclick="showFxToast('${cfg.chartTitle} · ${b.lbl}: ${b.txt}')">
+            <rect x="${x}" y="28" width="42" height="124" rx="7" fill="rgba(148,163,184,0.10)"/>
+            <rect x="${x}" y="${y}" width="42" height="${h}" rx="7" fill="#2563EB" class="candle-anim"/>
+            <text x="${x + 21}" y="${y - 7}" text-anchor="middle" fill="#38BDF8" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">${b.txt}</text>
+            <text x="${x + 21}" y="174" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="12">${b.lbl}</text>
+          </g>
+        `;
+      }).join('');
+
+      const rightPanel = cfg.isSettings
+        ? `
+          <div class="fx-panel p-5 lg:col-span-7 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-base font-bold text-t1">Automated Risk &amp; Terminal Controls</h3>
+              <span class="rounded-lg border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-1 font-mono text-xs font-bold text-emerald-400">GUARDRAILS ACTIVE</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label class="block text-t3 mb-1.5">Account Leverage Cap</label>
+                <select onchange="showFxToast('Account leverage updated to ' + this.value)" class="fx-input w-full px-3.5 py-2.5 font-mono text-sm font-semibold cursor-pointer">
+                  <option value="1:500" selected>1 : 500 (Institutional Pro)</option>
+                  <option value="1:200">1 : 200 (Standard)</option>
+                  <option value="1:100">1 : 100 (Conservative)</option>
+                  <option value="1:30">1 : 30 (Retail ESMA)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-t3 mb-1.5">Max Daily Loss Circuit-Breaker ($)</label>
+                <input type="number" value="120" onchange="showFxToast('Max daily loss cap set to $' + this.value)" class="fx-input w-full px-3.5 py-2.5 font-mono text-sm font-semibold"/>
+              </div>
+            </div>
+            <div class="divide-y border-fx text-xs">
+              <label class="py-2.5 flex items-center justify-between cursor-pointer">
+                <span class="text-t2 font-medium">One-Click Instant ECN Market Execution</span>
+                <input type="checkbox" checked onchange="showFxToast('Toggled One-Click Market Execution')" class="h-4 w-4 accent-blue-600 cursor-pointer"/>
+              </label>
+              <label class="py-2.5 flex items-center justify-between cursor-pointer">
+                <span class="text-t2 font-medium">Auto-Attach 35-Pip Hard Stop-Loss on Every Order</span>
+                <input type="checkbox" checked onchange="showFxToast('Toggled Auto-SL Protection')" class="h-4 w-4 accent-blue-600 cursor-pointer"/>
+              </label>
+              <label class="py-2.5 flex items-center justify-between cursor-pointer">
+                <span class="text-t2 font-medium">Pause High-Impact News Slippage (&gt; 2.5 Pips Spread)</span>
+                <input type="checkbox" checked onchange="showFxToast('Toggled News Spread Filter')" class="h-4 w-4 accent-blue-600 cursor-pointer"/>
+              </label>
+            </div>
+            <button onclick="showFxToast('Risk Guardrails & LD4 Routing Preferences Saved')" class="btn-buy-glow rounded-xl py-3 px-4 font-display text-xs font-extrabold tracking-wide cursor-pointer">
+              Commit Risk Guardrails
+            </button>
+          </div>
+        `
+        : `
+          <div class="fx-panel p-5 lg:col-span-7 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-display text-base font-bold text-t1">${cfg.tableTitle}</h3>
+              <span class="font-mono text-xs text-emerald-400">ECN STREAMING</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-fx text-xs font-semibold text-t3">
+                    <th class="pb-2.5">${cfg.cols[0]}</th>
+                    <th class="pb-2.5">${cfg.cols[1]}</th>
+                    <th class="pb-2.5">${cfg.cols[2]}</th>
+                    <th class="pb-2.5">${cfg.cols[3]}</th>
+                    <th class="pb-2.5 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y border-fx text-xs sm:text-sm">
+                  ${cfg.rows.map((r) => `
+                    <tr class="hover:bg-slate-500/10 transition">
+                      <td class="py-2.5 font-semibold text-t1">${r[0]}</td>
+                      <td class="py-2.5 font-mono text-t2">${r[1]}</td>
+                      <td class="py-2.5 font-mono text-t3">${r[2]}</td>
+                      <td class="py-2.5 font-mono font-bold text-emerald-400">${r[3]}</td>
+                      <td class="py-2.5 text-right">
+                        <button onclick="${tabKey === 'screener' ? `selectPair('${r[4]}'); switchFxTab('overview');` : `showFxToast('${r[4]} · ${r[0]}')`}" class="rounded-lg bg-blue-500/20 border border-blue-500/35 px-2.5 py-1 font-mono text-xs font-bold text-blue-400 hover:bg-blue-500/30 cursor-pointer">${tabKey === 'screener' ? 'Trade ' + r[4] : r[4]}</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+      container.innerHTML = `
+        <div class="fx-panel p-4 sm:px-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <button onclick="switchFxTab('overview')" class="fx-input px-3 py-1.5 text-xs font-semibold text-t1 hover:border-blue-500 inline-flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+                <span>← Overview</span>
+              </button>
+              <h1 class="font-display text-xl font-extrabold text-t1 tracking-tight">${cfg.title}</h1>
+            </div>
+            <p class="text-xs text-t3 mt-1.5">${cfg.subtitle}</p>
+          </div>
+          <button onclick="showFxToast('${cfg.cta} completed on LD4 ECN')" class="btn-tf-active rounded-xl px-4 py-2 text-xs font-display font-bold cursor-pointer">
+            ${cfg.cta}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          ${cfg.kpis.map((k) => `
+            <div class="fx-panel p-4 flex flex-col justify-between">
+              <p class="text-xs font-semibold text-t3">${k.lbl}</p>
+              <p class="font-mono text-2xl font-extrabold text-t1 mt-1.5">${k.val}</p>
+              <p class="font-mono text-xs font-bold ${k.tone} mt-1">${k.sub}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+          <div class="fx-panel p-5 lg:col-span-5 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-t1">${cfg.chartTitle}</h3>
+              <span class="font-mono text-xs text-blue-400">LIVE</span>
+            </div>
+            <svg viewBox="0 0 420 185" class="w-full h-48 overflow-visible">
+              <line x1="24" y1="152" x2="400" y2="152" stroke="rgba(148,163,184,0.2)" stroke-width="1"/>
+              ${barsSvg}
+            </svg>
+          </div>
+          ${rightPanel}
+        </div>
+      `;
+    }
+
+    function switchFxTab(tabKey) {
+      document.querySelectorAll('.fx-nav-tab').forEach((b) => {
+        const active = b.getAttribute('data-fxtab') === tabKey;
+        b.className = active
+          ? 'fx-nav-tab btn-tf-active rounded-xl px-3.5 py-2 inline-flex items-center gap-2 cursor-pointer transition'
+          : 'fx-nav-tab rounded-xl px-3.5 py-2 inline-flex items-center gap-2 text-t2 hover:text-t1 cursor-pointer transition';
+      });
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+      if (!tabKey || tabKey === 'overview') {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+        showFxToast('Terminal Overview Active');
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderFxSubpage(tabKey);
+        showFxToast('Module: ' + FX_SUBPAGES[tabKey].title);
+      }
+    }
+
+    // Live market quote & last-candle micro-tick
+    setInterval(() => {
+      if (!liveFeedOn) return;
+      const step = activePair.price * (Math.random() * 0.0006 - 0.00028);
+      activePair.price = +(activePair.price + step).toFixed(activePair.digits);
+      document.getElementById('chartLiveQuote').textContent = activePair.price.toFixed(activePair.digits);
+      const last = baseCandles[baseCandles.length - 1];
+      last.c = Math.max(62, Math.min(94, last.c + (Math.random() * 6 - 3)));
+      last.h = Math.max(last.h, last.c + 3);
+      renderCandlesticks();
+    }, 2800);
+
+    renderWatchlist();
+    renderCandlesticks();
+    recalcOrderPreview();
+  </script>
+</body>
+</html>

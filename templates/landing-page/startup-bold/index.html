@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KINETIC — Deterministic Sub-Millisecond AI Inference Cloud</title>
+  <meta name="description" content="Run 70B open-weight models at 840+ tokens/sec on deterministic SRAM-native LPU compute. Zero data retention, OpenAI-compatible SDK." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            carbon: '#09090B',
+            zincCard: '#121318',
+            zincElevated: '#181A22',
+            flame: '#FF5500',
+            flameLight: '#FF7733',
+            volt: '#D4FF00',
+          },
+          fontFamily: {
+            display: ['"Space Grotesk"', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            flameGlow: '0 0 40px -8px rgba(255, 85, 0, 0.45)',
+            voltGlow: '0 0 30px -8px rgba(212, 255, 0, 0.3)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-carbon: #09090B;
+      --bg-card: #121318;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 85, 0, 0.45);
+      --flame: #FF5500;
+      --volt: #D4FF00;
+    }
+
+    body {
+      background-color: var(--bg-carbon);
+      color: #F4F4F5;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Architectural Precision Grid Background */
+    .arch-grid {
+      background-size: 64px 64px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Radial Mesh Glows */
+    .hero-mesh {
+      background:
+        radial-gradient(65% 55% at 50% 0%, rgba(255, 85, 0, 0.16) 0%, rgba(255, 85, 0, 0.03) 48%, transparent 100%),
+        radial-gradient(40% 35% at 82% 18%, rgba(212, 255, 0, 0.08) 0%, transparent 100%);
+    }
+
+    .cta-mesh {
+      background:
+        radial-gradient(80% 90% at 50% 100%, rgba(255, 85, 0, 0.24) 0%, rgba(212, 255, 0, 0.06) 45%, rgba(18, 19, 24, 0.95) 100%);
+    }
+
+    /* Bento Surface Card */
+    .bento-card {
+      background: linear-gradient(180deg, rgba(24, 26, 34, 0.72) 0%, rgba(18, 19, 24, 0.96) 100%);
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+    }
+
+    .bento-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.8), 0 0 28px -12px rgba(255, 85, 0, 0.22);
+    }
+
+    /* Scroll Reveal Animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom Range Slider */
+    input[type="range"].kinetic-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      outline: none;
+    }
+
+    input[type="range"].kinetic-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #FF5500;
+      border: 3px solid #09090B;
+      box-shadow: 0 0 0 2px #FF5500, 0 0 18px rgba(255, 85, 0, 0.75);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"].kinetic-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+
+    input[type="range"].kinetic-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #FF5500;
+      border: 3px solid #09090B;
+      box-shadow: 0 0 0 2px #FF5500, 0 0 18px rgba(255, 85, 0, 0.75);
+      cursor: pointer;
+    }
+
+    /* Animated SVG Arcs */
+    @keyframes dashFlow {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+
+    .edge-arc {
+      stroke-dasharray: 6 6;
+      animation: dashFlow 1.8s linear infinite;
+    }
+
+    /* Cursor blink */
+    @keyframes cursorPulse {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .stream-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background-color: #FF5500;
+      vertical-align: middle;
+      margin-left: 3px;
+      animation: cursorPulse 0.85s infinite;
+    }
+
+    /* Bar chart smooth transition */
+    .bench-bar {
+      transition: width 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="arch-grid selection:bg-flame selection:text-white">
+
+  <!-- Ambient Top Mesh -->
+  <div class="pointer-events-none fixed inset-x-0 top-0 h-[620px] hero-mesh z-0"></div>
+
+  <!-- 1. FLOATING GLASS PILL NAVIGATION BAR -->
+  <header class="fixed top-4 inset-x-0 z-50 px-4 sm:px-6">
+    <nav aria-label="Main Navigation" class="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-5 py-2.5 rounded-full bg-[#0D0E12]/80 backdrop-blur-xl border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.6)]">
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-2.5 group focus:outline-none">
+        <div class="w-8 h-8 rounded-full bg-flame flex items-center justify-center shadow-flameGlow group-hover:scale-105 transition-transform">
+          <svg class="w-4 h-4 text-carbon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <span class="font-display font-bold tracking-tight text-lg text-white">KINETIC</span>
+        <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono font-semibold uppercase tracking-wider bg-volt/15 text-volt border border-volt/30">LPU v4</span>
+      </a>
+
+      <!-- Desktop Links -->
+      <div class="hidden md:flex items-center gap-7 text-sm font-medium text-zinc-400">
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#benchmarks" class="hover:text-white transition-colors">Benchmarks</a>
+        <a href="#architecture" class="hover:text-white transition-colors">Architecture</a>
+        <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+        <a href="#sdk-docs" class="hover:text-white transition-colors flex items-center gap-1">
+          Docs
+          <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Right CTA + Mobile Menu Button -->
+      <div class="flex items-center gap-2.5">
+        <a href="#pricing" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono text-zinc-300 hover:text-white px-3 py-1.5 rounded-full border border-white/10 hover:border-white/25 transition-colors">
+          <span class="w-1.5 h-1.5 rounded-full bg-volt animate-pulse"></span>
+          API Status: 99.99%
+        </a>
+        <a href="#cta" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-flame hover:bg-flameLight text-white shadow-flameGlow transition-all">
+          <span>Start Building</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <button id="mobileMenuBtn" aria-label="Toggle Navigation Menu" class="md:hidden p-2 rounded-full border border-white/10 text-zinc-300 hover:text-white">
+          <svg id="menuOpenIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/>
+          </svg>
+          <svg id="menuCloseIcon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden max-w-6xl mx-auto mt-2 p-4 rounded-2xl bg-[#121318]/95 backdrop-blur-xl border border-white/10 shadow-2xl">
+      <div class="flex flex-col gap-3 text-sm font-medium text-zinc-300">
+        <a href="#features" class="mobile-nav-link py-1.5 hover:text-white">Features</a>
+        <a href="#benchmarks" class="mobile-nav-link py-1.5 hover:text-white">Benchmarks</a>
+        <a href="#architecture" class="mobile-nav-link py-1.5 hover:text-white">Architecture</a>
+        <a href="#pricing" class="mobile-nav-link py-1.5 hover:text-white">Pricing</a>
+        <a href="#sdk-docs" class="mobile-nav-link py-1.5 hover:text-white">Docs</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+    <!-- 2. OVERSIZED HERO + LIVE TOKEN STREAM SPEED SIMULATOR -->
+    <section class="pt-32 sm:pt-40 pb-20 lg:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+        <!-- Asymmetric Left Column -->
+        <div class="lg:col-span-7 space-y-7">
+          <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-zincCard border border-white/10 text-xs font-mono text-zinc-300">
+            <span class="px-1.5 py-0.5 rounded bg-flame/20 text-flame font-semibold">NEW</span>
+            <span>SRAM-Native Tensor Streaming Cluster — General Availability</span>
+            <svg class="w-3.5 h-3.5 text-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <h1 class="font-display font-bold text-4xl sm:text-6xl xl:text-[4.35rem] leading-[1.03] tracking-[-0.04em] text-white">
+            Run 70B Models at <span class="text-transparent bg-clip-text bg-gradient-to-r from-flame via-[#FF8833] to-volt">840 Tokens/sec.</span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
+            Eliminate HBM memory bottlenecks forever. KINETIC compiles open-weight frontier models directly onto deterministic on-chip SRAM—delivering <span class="text-zinc-100 font-medium">14ms time-to-first-token</span> for real-time voice agents, autonomous coding loops, and high-frequency reasoning.
+          </p>
+
+          <!-- CTAs -->
+          <div class="flex flex-wrap items-center gap-4 pt-1">
+            <a href="#cta" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-flame hover:bg-flameLight text-white font-semibold text-sm shadow-flameGlow transition-all">
+              <span>Deploy API Key in 10s</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a href="#benchmarks" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-zincCard hover:bg-zincElevated text-zinc-200 border border-white/10 hover:border-white/20 font-medium text-sm transition-all">
+              <svg class="w-4 h-4 text-volt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Inspect v4 Benchmarks</span>
+            </a>
+          </div>
+
+          <!-- Technical Telemetry Strip -->
+          <div class="pt-4 grid grid-cols-3 gap-4 sm:gap-8 border-t border-white/10 max-w-xl">
+            <div>
+              <div class="font-mono font-bold text-xl sm:text-2xl text-white">14<span class="text-flame">ms</span></div>
+              <div class="text-xs text-zinc-500 font-mono uppercase tracking-wider mt-0.5">Median TTFT</div>
+            </div>
+            <div>
+              <div class="font-mono font-bold text-xl sm:text-2xl text-white">842<span class="text-volt text-base"> tok/s</span></div>
+              <div class="text-xs text-zinc-500 font-mono uppercase tracking-wider mt-0.5">Per-User Stream</div>
+            </div>
+            <div>
+              <div class="font-mono font-bold text-xl sm:text-2xl text-white">$0.18</div>
+              <div class="text-xs text-zinc-500 font-mono uppercase tracking-wider mt-0.5">Blended / 1M Tok</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asymmetric Right Column: Interactive Token Stream Speed Simulator -->
+        <div class="lg:col-span-5">
+          <div class="bento-card rounded-2xl overflow-hidden shadow-2xl border border-white/15">
+            <!-- Simulator Header -->
+            <div class="px-4 py-3 bg-[#0C0D12] border-b border-white/10 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-flame"></span>
+                <span class="font-mono text-xs font-semibold tracking-wide text-zinc-200">LIVE LPU STREAM SIMULATOR</span>
+              </div>
+              <button id="replayStreamBtn" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-[12.5px] font-mono text-volt transition-colors">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Re-run Burst</span>
+              </button>
+            </div>
+
+            <!-- Model Selector Tabs -->
+            <div class="p-2 bg-[#0F1016] border-b border-white/10 grid grid-cols-3 gap-1.5" role="tablist" aria-label="Select Inference Model">
+              <button type="button" data-model="llama" class="sim-model-btn px-2.5 py-2 rounded-lg text-[12.5px] font-mono font-semibold transition-all bg-flame text-white shadow">
+                Llama-3.3-70B
+              </button>
+              <button type="button" data-model="deepseek" class="sim-model-btn px-2.5 py-2 rounded-lg text-[12.5px] font-mono font-medium transition-all text-zinc-400 hover:text-white hover:bg-white/5">
+                DeepSeek-R1
+              </button>
+              <button type="button" data-model="qwen" class="sim-model-btn px-2.5 py-2 rounded-lg text-[12.5px] font-mono font-medium transition-all text-zinc-400 hover:text-white hover:bg-white/5">
+                Qwen-2.5-Coder
+              </button>
+            </div>
+
+            <!-- Live Telemetry Readout Bar -->
+            <div class="px-4 py-2.5 bg-[#12141C] border-b border-white/5 grid grid-cols-3 gap-2 text-center">
+              <div class="bg-carbon/70 rounded-lg py-1.5 px-2 border border-white/5">
+                <div class="text-xs font-mono text-zinc-500 uppercase">TTFT</div>
+                <div id="simTtft" class="font-mono text-sm font-bold text-volt">14 ms</div>
+              </div>
+              <div class="bg-carbon/70 rounded-lg py-1.5 px-2 border border-white/5">
+                <div class="text-xs font-mono text-zinc-500 uppercase">Throughput</div>
+                <div id="simSpeed" class="font-mono text-sm font-bold text-flame">842 tok/s</div>
+              </div>
+              <div class="bg-carbon/70 rounded-lg py-1.5 px-2 border border-white/5">
+                <div class="text-xs font-mono text-zinc-500 uppercase">Elapsed</div>
+                <div id="simElapsed" class="font-mono text-sm font-bold text-white">0.19 s</div>
+              </div>
+            </div>
+
+            <!-- Streaming Output Console -->
+            <div class="p-4 bg-[#090A0E] min-h-[250px] max-h-[250px] overflow-y-auto font-mono text-xs leading-relaxed">
+              <div class="text-zinc-500 mb-2 flex items-center gap-1.5">
+                <span class="text-flame">&gt;</span>
+                <span id="simPrompt" class="truncate">prompt: "Synthesize lock-free ring buffer in Rust..."</span>
+              </div>
+              <pre id="simOutput" class="whitespace-pre-wrap text-zinc-200 font-mono text-[12.5px] leading-5"></pre><span id="simCursor" class="stream-cursor"></span>
+            </div>
+
+            <!-- Footer Progress & Token Counter -->
+            <div class="px-4 py-2.5 bg-[#0C0D12] border-t border-white/10 flex items-center justify-between text-[12.5px] font-mono text-zinc-400">
+              <div class="flex items-center gap-2">
+                <span id="simStatusDot" class="w-2 h-2 rounded-full bg-volt"></span>
+                <span id="simStatusLabel">STREAM COMPLETE</span>
+              </div>
+              <div>
+                <span id="simTokenCount" class="text-white font-semibold">164</span> tokens generated
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. INTERACTIVE BENCHMARK VISUAL DATA SECTION -->
+    <section id="benchmarks" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-flame mb-3">
+            <span class="w-2 h-2 rounded-full bg-flame"></span>
+            <span>01 // Independent MLPerf & ArtificialAnalysis Telemetry</span>
+          </div>
+          <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight text-white">
+            Physics-Level Speed Advantage.
+          </h2>
+        </div>
+
+        <!-- Metric Switcher Tabs -->
+        <div class="inline-flex p-1.5 rounded-xl bg-zincCard border border-white/10 self-start lg:self-auto" role="tablist">
+          <button type="button" data-metric="throughput" class="bench-tab px-3.5 py-2 rounded-lg text-xs font-mono font-semibold bg-flame text-white transition-all">
+            Throughput (tok/s)
+          </button>
+          <button type="button" data-metric="ttft" class="bench-tab px-3.5 py-2 rounded-lg text-xs font-mono font-medium text-zinc-400 hover:text-white transition-all">
+            Time-to-First-Token (ms)
+          </button>
+          <button type="button" data-metric="cost" class="bench-tab px-3.5 py-2 rounded-lg text-xs font-mono font-medium text-zinc-400 hover:text-white transition-all">
+            Cost / 1M Tokens
+          </button>
+        </div>
+      </div>
+
+      <!-- Comparative Chart Container -->
+      <div class="bento-card rounded-2xl p-6 sm:p-10">
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-white/10">
+          <div>
+            <h3 id="benchTitle" class="font-display font-bold text-xl text-white">Output Token Throughput — Llama-3.3-70B Instruct (FP8)</h3>
+            <p id="benchSubtitle" class="text-sm text-zinc-400 mt-1">Measured across 1,024-token input context, single-stream p50 production load (higher is better).</p>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-volt/10 border border-volt/30 font-mono text-xs text-volt font-semibold" id="benchDeltaBadge">
+            9.6x Faster than H100 Cloud
+          </div>
+        </div>
+
+        <div class="space-y-7">
+          <!-- Bar 1: KINETIC LPU -->
+          <div>
+            <div class="flex items-center justify-between text-sm mb-2.5">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-sm bg-flame"></span>
+                <span class="font-display font-bold text-white tracking-wide">KINETIC LPU v4 Rack</span>
+                <span class="hidden sm:inline-block px-2 py-0.5 text-xs font-mono rounded bg-flame/15 text-flame border border-flame/30">DETERMINISTIC SRAM</span>
+              </div>
+              <span id="valKinetic" class="font-mono font-bold text-lg text-volt">842 tok/s</span>
+            </div>
+            <div class="w-full h-10 bg-carbon rounded-xl border border-white/10 p-1.5 overflow-hidden">
+              <div id="barKinetic" class="bench-bar h-full rounded-lg bg-gradient-to-r from-flame to-volt shadow-flameGlow" style="width: 96%;"></div>
+            </div>
+          </div>
+
+          <!-- Bar 2: H100 Cloud -->
+          <div>
+            <div class="flex items-center justify-between text-sm mb-2.5">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-400"></span>
+                <span class="font-medium text-zinc-300">8x H100 SXM5 GPU Cloud</span>
+                <span class="hidden sm:inline-block px-2 py-0.5 text-xs font-mono rounded bg-white/5 text-zinc-400">HBM3e MEMORY BOUND</span>
+              </div>
+              <span id="valH100" class="font-mono font-semibold text-base text-zinc-300">88 tok/s</span>
+            </div>
+            <div class="w-full h-10 bg-carbon rounded-xl border border-white/5 p-1.5 overflow-hidden">
+              <div id="barH100" class="bench-bar h-full rounded-lg bg-zinc-600" style="width: 18%;"></div>
+            </div>
+          </div>
+
+          <!-- Bar 3: Legacy Frontier API -->
+          <div>
+            <div class="flex items-center justify-between text-sm mb-2.5">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-600"></span>
+                <span class="font-medium text-zinc-400">Legacy Hyperscaler Frontier API</span>
+                <span class="hidden sm:inline-block px-2 py-0.5 text-xs font-mono rounded bg-white/5 text-zinc-500">SHARED MULTI-TENANT</span>
+              </div>
+              <span id="valLegacy" class="font-mono font-semibold text-base text-zinc-400">54 tok/s</span>
+            </div>
+            <div class="w-full h-10 bg-carbon rounded-xl border border-white/5 p-1.5 overflow-hidden">
+              <div id="barLegacy" class="bench-bar h-full rounded-lg bg-zinc-800" style="width: 11%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Hardware Architecture Footnote -->
+        <div id="architecture" class="mt-9 pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono text-zinc-400">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-flame shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+            </svg>
+            <span><strong class="text-white">80 TB/s</strong> On-Die SRAM Bandwidth per Node</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span><strong class="text-white">Zero Packet Jitter</strong> Software-Scheduled Interconnect</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-flame shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span><strong class="text-white">p99 = 19ms</strong> Deterministic Tail Latency Guarantee</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ASYMMETRIC 6-CARD BENTO GRID FEATURE SHOWCASE -->
+    <section id="features" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="max-w-3xl mb-14">
+        <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-volt mb-3">
+          <span class="w-2 h-2 rounded-full bg-volt"></span>
+          <span>02 // Production Compute Primitives</span>
+        </div>
+        <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight text-white">
+          Engineered for Autonomous Scale.
+        </h2>
+        <p class="text-zinc-400 text-base sm:text-lg mt-3">
+          Drop-in OpenAI SDK compatibility backed by bare-metal optical interconnects, zero-disk enclave security, and sub-10ms dynamic LoRA routing.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Bento Card 1 (7 cols): Global Anycast Edge Map SVG -->
+        <article class="bento-card rounded-2xl p-6 sm:p-7 lg:col-span-7 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="text-xs font-mono uppercase tracking-wider text-flame">Global Anycast Fabric</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[12.5px] font-mono bg-volt/10 text-volt border border-volt/25">28 Edge PoPs Active</span>
+            </div>
+            <h3 class="font-display font-bold text-xl sm:text-2xl text-white">Sub-15ms Global Anycast Routing</h3>
+            <p class="text-sm text-zinc-400 mt-1.5 max-w-xl">
+              Requests terminate at the nearest BGP edge node and ride dedicated dark-fiber wavelengths straight to warm LPU clusters.
+            </p>
+          </div>
+
+          <!-- World Network SVG -->
+          <div class="mt-6 rounded-xl bg-[#090A0E] border border-white/10 p-4 relative overflow-hidden">
+            <svg viewBox="0 0 600 220" class="w-full h-auto" role="img" aria-label="Global Anycast Edge Network Map">
+              <!-- Subtle Latitude/Longitude Grid -->
+              <g stroke="rgba(255,255,255,0.04)" stroke-width="1">
+                <line x1="0" y1="55" x2="600" y2="55"/>
+                <line x1="0" y1="110" x2="600" y2="110"/>
+                <line x1="0" y1="165" x2="600" y2="165"/>
+                <line x1="120" y1="0" x2="120" y2="220"/>
+                <line x1="240" y1="0" x2="240" y2="220"/>
+                <line x1="360" y1="0" x2="360" y2="220"/>
+                <line x1="480" y1="0" x2="480" y2="220"/>
+              </g>
+
+              <!-- Stylized Continental Dot Clusters -->
+              <g fill="rgba(255,255,255,0.12)">
+                <!-- North America -->
+                <circle cx="95" cy="72" r="2"/><circle cx="110" cy="68" r="2"/><circle cx="125" cy="76" r="2"/><circle cx="140" cy="82" r="2"/><circle cx="155" cy="78" r="2"/><circle cx="132" cy="92" r="2"/><circle cx="115" cy="86" r="2"/>
+                <!-- South America -->
+                <circle cx="182" cy="148" r="2"/><circle cx="192" cy="160" r="2"/><circle cx="188" cy="175" r="2"/><circle cx="178" cy="190" r="2"/>
+                <!-- Europe -->
+                <circle cx="285" cy="64" r="2"/><circle cx="298" cy="60" r="2"/><circle cx="312" cy="68" r="2"/><circle cx="295" cy="76" r="2"/><circle cx="322" cy="74" r="2"/>
+                <!-- Asia & Japan/SG -->
+                <circle cx="415" cy="84" r="2"/><circle cx="435" cy="78" r="2"/><circle cx="458" cy="88" r="2"/><circle cx="482" cy="95" r="2"/><circle cx="512" cy="82" r="2"/><circle cx="468" cy="134" r="2"/>
+                <!-- Australia -->
+                <circle cx="505" cy="176" r="2"/><circle cx="522" cy="182" r="2"/>
+              </g>
+
+              <!-- Animated Optical Wavelength Arcs -->
+              <path d="M150 80 Q 225 30 296 68" fill="none" stroke="#FF5500" stroke-width="1.8" class="edge-arc"/>
+              <path d="M296 68 Q 385 45 468 134" fill="none" stroke="#D4FF00" stroke-width="1.6" class="edge-arc"/>
+              <path d="M296 68 Q 410 25 512 82" fill="none" stroke="#FF5500" stroke-width="1.6" class="edge-arc"/>
+              <path d="M150 80 Q 168 122 190 162" fill="none" stroke="#FF5500" stroke-width="1.4" class="edge-arc"/>
+              <path d="M102 78 Q 126 70 150 80" fill="none" stroke="#D4FF00" stroke-width="1.5" class="edge-arc"/>
+
+              <!-- Active Edge PoP Nodes -->
+              <!-- SFO -->
+              <circle cx="102" cy="78" r="7" fill="rgba(212,255,0,0.2)"/>
+              <circle cx="102" cy="78" r="3.5" fill="#D4FF00"/>
+              <text x="82" y="96" fill="#A1A1AA" font-family="JetBrains Mono" font-size="9">SFO 6ms</text>
+
+              <!-- IAD -->
+              <circle cx="150" cy="80" r="9" fill="rgba(255,85,0,0.25)"/>
+              <circle cx="150" cy="80" r="4" fill="#FF5500"/>
+              <text x="136" y="66" fill="#FFFFFF" font-family="JetBrains Mono" font-size="9" font-weight="600">IAD 4ms</text>
+
+              <!-- GRU -->
+              <circle cx="190" cy="162" r="7" fill="rgba(255,85,0,0.2)"/>
+              <circle cx="190" cy="162" r="3.5" fill="#FF5500"/>
+              <text x="202" y="166" fill="#A1A1AA" font-family="JetBrains Mono" font-size="9">GRU 13ms</text>
+
+              <!-- FRA -->
+              <circle cx="296" cy="68" r="9" fill="rgba(255,85,0,0.25)"/>
+              <circle cx="296" cy="68" r="4" fill="#FF5500"/>
+              <text x="280" y="53" fill="#FFFFFF" font-family="JetBrains Mono" font-size="9" font-weight="600">FRA 7ms</text>
+
+              <!-- SIN -->
+              <circle cx="468" cy="134" r="7" fill="rgba(212,255,0,0.22)"/>
+              <circle cx="468" cy="134" r="3.5" fill="#D4FF00"/>
+              <text x="446" y="152" fill="#A1A1AA" font-family="JetBrains Mono" font-size="9">SIN 9ms</text>
+
+              <!-- NRT -->
+              <circle cx="512" cy="82" r="8" fill="rgba(255,85,0,0.22)"/>
+              <circle cx="512" cy="82" r="3.8" fill="#FF5500"/>
+              <text x="524" y="85" fill="#FFFFFF" font-family="JetBrains Mono" font-size="9" font-weight="600">NRT 11ms</text>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Bento Card 2 (5 cols): Zero-Data-Retention Security Vault -->
+        <article class="bento-card rounded-2xl p-6 sm:p-7 lg:col-span-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono uppercase tracking-wider text-volt">Volatile Enclave Security</span>
+              <span class="px-2 py-0.5 rounded text-xs font-mono bg-white/5 text-zinc-300 border border-white/10">SOC2 II + HIPAA</span>
+            </div>
+            <h3 class="font-display font-bold text-xl sm:text-2xl text-white">Zero-Data-Retention Vault</h3>
+            <p class="text-sm text-zinc-400 mt-1.5">
+              Prompts and KV-caches live exclusively inside volatile on-chip SRAM registers and are cryptographically zeroed on stream EOF.
+            </p>
+          </div>
+
+          <!-- Security Enclave Diagram -->
+          <div class="mt-6 p-4 rounded-xl bg-[#090A0E] border border-white/10 space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-zincCard border border-white/10">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-volt/15 border border-volt/30 flex items-center justify-center text-volt">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-mono font-semibold text-white">SRAM Register Isolation</div>
+                  <div class="text-[12.5px] font-mono text-zinc-500">AES-256-GCM TLS 1.3 Tunnel</div>
+                </div>
+              </div>
+              <span class="text-[12.5px] font-mono text-volt font-semibold">VERIFIED</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 font-mono text-xs">
+              <div class="p-3 rounded-lg bg-zincCard/70 border border-white/5">
+                <div class="text-zinc-500 text-xs">NVMe Disk Writes</div>
+                <div class="text-white font-bold text-base mt-0.5">0 Bytes</div>
+              </div>
+              <div class="p-3 rounded-lg bg-zincCard/70 border border-white/5">
+                <div class="text-zinc-500 text-xs">Register Purge</div>
+                <div class="text-flame font-bold text-base mt-0.5">&lt; 0.4 us</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Bento Card 3 (4 cols): Auto-Batching Telemetry Sparkline -->
+        <article class="bento-card rounded-2xl p-6 sm:p-7 lg:col-span-4 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-wider text-flame">Speculative Scheduler</span>
+            <h3 class="font-display font-bold text-xl text-white mt-2">Continuous Auto-Batching</h3>
+            <p class="text-sm text-zinc-400 mt-1.5">
+              Draft-verifier speculative execution sustains 98.4% tensor utilization with sub-millisecond queue wait.
+            </p>
+          </div>
+
+          <div class="mt-6 p-4 rounded-xl bg-[#090A0E] border border-white/10">
+            <div class="flex items-baseline justify-between mb-3">
+              <div>
+                <div class="text-xs font-mono text-zinc-500 uppercase">SRAM Utilization</div>
+                <div class="font-mono font-bold text-xl text-white">98.4%</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs font-mono text-zinc-500 uppercase">p99 Queue</div>
+                <div class="font-mono font-bold text-sm text-volt">0.8 ms</div>
+              </div>
+            </div>
+            <!-- SVG Sparkline -->
+            <svg viewBox="0 0 280 84" class="w-full h-20" role="img" aria-label="Auto-batching throughput sparkline">
+              <defs>
+                <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FF5500" stop-opacity="0.42"/>
+                  <stop offset="100%" stop-color="#FF5500" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0 62 L24 56 L48 59 L72 41 L96 44 L120 28 L144 31 L168 19 L192 22 L216 14 L240 17 L264 9 L280 11 L280 84 L0 84 Z" fill="url(#sparkGrad)"/>
+              <path d="M0 62 L24 56 L48 59 L72 41 L96 44 L120 28 L144 31 L168 19 L192 22 L216 14 L240 17 L264 9 L280 11" fill="none" stroke="#FF5500" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="280" cy="11" r="4" fill="#D4FF00"/>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Bento Card 4 (8 cols): 3-Line SDK Code Switcher -->
+        <article id="sdk-docs" class="bento-card rounded-2xl p-6 sm:p-7 lg:col-span-8 flex flex-col justify-between">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <span class="text-xs font-mono uppercase tracking-wider text-volt">Zero-Refactor Migration</span>
+              <h3 class="font-display font-bold text-xl sm:text-2xl text-white mt-1">100% OpenAI SDK Compatible in 3 Lines</h3>
+              <p class="text-sm text-zinc-400 mt-1">
+                Swap <code class="font-mono text-xs text-zinc-200 bg-white/5 px-1.5 py-0.5 rounded">base_url</code> and keep structured JSON outputs, tool calling, and streaming intact.
+              </p>
+            </div>
+
+            <!-- Language Switcher + Copy -->
+            <div class="flex items-center gap-2">
+              <div class="inline-flex p-1 rounded-lg bg-[#090A0E] border border-white/10">
+                <button type="button" data-lang="python" class="sdk-tab px-3 py-1 rounded-md text-xs font-mono font-semibold bg-flame text-white transition-colors">Python</button>
+                <button type="button" data-lang="ts" class="sdk-tab px-3 py-1 rounded-md text-xs font-mono text-zinc-400 hover:text-white transition-colors">TypeScript</button>
+                <button type="button" data-lang="curl" class="sdk-tab px-3 py-1 rounded-md text-xs font-mono text-zinc-400 hover:text-white transition-colors">cURL</button>
+              </div>
+              <button id="copySdkBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 transition-colors">
+                <svg id="copyIcon" class="w-3.5 h-3.5 text-volt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <span id="copyLabel">Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-xl bg-[#090A0E] border border-white/10 p-4 overflow-x-auto">
+            <pre id="sdkCodeBlock" class="font-mono text-xs sm:text-[13px] leading-6 text-zinc-200"></pre>
+          </div>
+        </article>
+
+        <!-- Bento Card 5 (6 cols): 99.99% Uptime SLA Heatmap -->
+        <article class="bento-card rounded-2xl p-6 sm:p-7 lg:col-span-6 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="text-xs font-mono uppercase tracking-wider text-volt">High-Availability Mesh</span>
+              <h3 class="font-display font-bold text-xl text-white mt-1">99.994% Rolling Uptime SLA</h3>
+              <p class="text-sm text-zinc-400 mt-1">
+                Active-active N+2 rack redundancy with automatic stateful KV-cache failover across availability zones.
+              </p>
+            </div>
+            <span class="font-mono text-xs font-bold text-volt bg-volt/10 border border-volt/30 px-2.5 py-1 rounded-md shrink-0">60d Operational</span>
+          </div>
+
+          <!-- 60-bar Uptime Heatmap -->
+          <div class="mt-6 p-4 rounded-xl bg-[#090A0E] border border-white/10">
+            <div id="uptimeGrid" class="grid grid-cols-30 sm:grid-cols-30 gap-1" style="grid-template-columns: repeat(30, minmax(0, 1fr));" aria-label="60 day uptime status bars">
+              <!-- Populated crisply via JS for interactive hover readout -->
+            </div>
+            <div class="flex items-center justify-between text-[12.5px] font-mono text-zinc-500 mt-3 pt-2 border-t border-white/5">
+              <span>60 days ago</span>
+              <span id="uptimeTooltip" class="text-zinc-300">Hover any window: 100.00% SLA</span>
+              <span>Today</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Bento Card 6 (6 cols): Instant Fine-Tune LoRA Card -->
+        <article class="bento-card rounded-2xl p-6 sm:p-7 lg:col-span-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono uppercase tracking-wider text-flame">Multi-Tenant Weight Router</span>
+              <span class="text-xs font-mono text-zinc-400">Rank r=16..128</span>
+            </div>
+            <h3 class="font-display font-bold text-xl text-white mt-1">Instant Hot-Swap LoRA Adapters</h3>
+            <p class="text-sm text-zinc-400 mt-1">
+              Serve thousands of customer-specific fine-tunes atop a single base 70B model with zero cold-start penalty.
+            </p>
+          </div>
+
+          <div class="mt-6 p-4 rounded-xl bg-[#090A0E] border border-white/10 space-y-2.5 font-mono text-xs">
+            <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-flame/10 border border-flame/30">
+              <span class="text-white font-medium">lora://fintech-sql-v9</span>
+              <span class="text-volt">SWAP: 6.2ms [ACTIVE]</span>
+            </div>
+            <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-zincCard border border-white/5">
+              <span class="text-zinc-300">lora://med-scribe-hipaa-r64</span>
+              <span class="text-zinc-400">SWAP: 7.1ms [WARM]</span>
+            </div>
+            <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-zincCard border border-white/5">
+              <span class="text-zinc-300">lora://rust-compiler-agent</span>
+              <span class="text-zinc-400">SWAP: 5.8ms [WARM]</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. FOUNDER & STAFF ENGINEER TESTIMONIALS -->
+    <section class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-flame mb-3">
+            <span class="w-2 h-2 rounded-full bg-flame"></span>
+            <span>03 // Production Verdicts</span>
+          </div>
+          <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight text-white">
+            Trusted by Latency-Obsessed Teams.
+          </h2>
+        </div>
+        <p class="font-mono text-xs text-zinc-400">PROCESSING 4.8 TRILLION TOKENS / MONTH</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Testimonial 1 -->
+        <article class="bento-card rounded-2xl p-7 flex flex-col justify-between">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-flame/15 border border-flame/30 text-flame font-mono text-xs font-semibold mb-5">
+              6.4x Faster Voice Turnaround
+            </div>
+            <p class="text-zinc-200 text-sm sm:text-base leading-relaxed">
+              "Our voice AI agents felt robotic on H100 clusters because 420ms TTFT broke natural human cadence. Switching our 70B reasoning loop to KINETIC cut end-to-end voice response under 190ms."
+            </p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-white/10 flex items-center justify-between">
+            <div>
+              <div class="font-display font-bold text-sm text-white">Elena Rostova</div>
+              <div class="text-xs text-zinc-400">Co-Founder & CTO, VoxPulse AI</div>
+            </div>
+            <span class="font-mono text-[12.5px] text-zinc-500">YC W24</span>
+          </div>
+        </article>
+
+        <!-- Testimonial 2 -->
+        <article class="bento-card rounded-2xl p-7 flex flex-col justify-between">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-volt/15 border border-volt/30 text-volt font-mono text-xs font-semibold mb-5">
+              -74% Monthly Compute Spend
+            </div>
+            <p class="text-zinc-200 text-sm sm:text-base leading-relaxed">
+              "We decommissioned 64 reserved H100 GPUs within two weeks. KINETIC handles our multi-file IDE autocomplete bursts at 810 tokens/sec with zero cold-starts and rock-solid p99 latency."
+            </p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-white/10 flex items-center justify-between">
+            <div>
+              <div class="font-display font-bold text-sm text-white">Marcus Chen</div>
+              <div class="text-xs text-zinc-400">Principal Staff Infra Eng, ForgeCode</div>
+            </div>
+            <span class="font-mono text-[12.5px] text-zinc-500">180K DEVS</span>
+          </div>
+        </article>
+
+        <!-- Testimonial 3 -->
+        <article class="bento-card rounded-2xl p-7 flex flex-col justify-between">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-flame/15 border border-flame/30 text-flame font-mono text-xs font-semibold mb-5">
+              128 LoRAs at Zero Overhead
+            </div>
+            <p class="text-zinc-200 text-sm sm:text-base leading-relaxed">
+              "Hot-swapping tenant-specific compliance adapters in 6 milliseconds unlocked enterprise deals we couldn't touch before. Their volatile SRAM security passed bank infosec review in days."
+            </p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-white/10 flex items-center justify-between">
+            <div>
+              <div class="font-display font-bold text-sm text-white">Devon Alverez</div>
+              <div class="text-xs text-zinc-400">VP Engineering, LedgerShield</div>
+            </div>
+            <span class="font-mono text-[12.5px] text-zinc-500">SERIES B</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 6. INTERACTIVE USAGE SLIDER & TIER PRICING SECTION -->
+    <section id="pricing" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-volt mb-3">
+          <span class="w-2 h-2 rounded-full bg-volt"></span>
+          <span>04 // Predictable Token Economics</span>
+        </div>
+        <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight text-white">
+          Pay Only for Streamed Silicon Cycles.
+        </h2>
+        <p class="text-zinc-400 mt-3 text-base sm:text-lg">
+          No idle GPU burn. Estimate your monthly Llama-3.3-70B / DeepSeek-R1 spend below.
+        </p>
+      </div>
+
+      <!-- Live Interactive Token Cost Estimator -->
+      <div class="bento-card rounded-2xl p-6 sm:p-9 mb-10 max-w-4xl mx-auto">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-wider text-zinc-400">Monthly Volume Simulator</span>
+            <div class="font-display font-bold text-2xl sm:text-3xl text-white mt-1">
+              <span id="sliderTokensDisplay" class="text-flame font-mono">250M</span> Tokens / month
+            </div>
+          </div>
+          <div class="text-left sm:text-right">
+            <span class="text-xs font-mono uppercase tracking-wider text-zinc-400">Estimated Monthly Savings vs GPU Cloud</span>
+            <div id="sliderSavingsDisplay" class="font-mono font-bold text-xl sm:text-2xl text-volt mt-1">Save $330 / mo</div>
+          </div>
+        </div>
+
+        <input id="tokenVolumeSlider" type="range" min="10" max="2000" step="10" value="250" aria-label="Monthly Token Volume in Millions" class="kinetic-slider mb-4" />
+
+        <div class="flex justify-between text-[12.5px] font-mono text-zinc-500 mb-6">
+          <span>10M tok/mo</span>
+          <span>500M tok/mo</span>
+          <span>1,000M tok/mo</span>
+          <span>2,000M tok/mo</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5 border-t border-white/10">
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-flame/40">
+            <div class="text-xs font-mono text-zinc-400">KINETIC LPU Cost ($0.18/1M)</div>
+            <div id="calcKineticCost" class="font-mono font-bold text-2xl text-white mt-1">$45<span class="text-xs text-zinc-400 font-normal">/mo</span></div>
+          </div>
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-white/5">
+            <div class="text-xs font-mono text-zinc-500">Managed H100 API ($1.50/1M)</div>
+            <div id="calcH100Cost" class="font-mono font-semibold text-2xl text-zinc-400 line-through mt-1">$375</div>
+          </div>
+          <div class="p-4 rounded-xl bg-[#090A0E] border border-white/5">
+            <div class="text-xs font-mono text-zinc-500">Dedicated Wall-Clock Compute</div>
+            <div id="calcComputeTime" class="font-mono font-semibold text-2xl text-volt mt-1">4.9 mins</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Pricing Tiers -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Tier 1: Builder -->
+        <div class="bento-card rounded-2xl p-7 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-bold text-xl text-white">Builder</h3>
+              <span class="text-xs font-mono text-zinc-400">Instant Sandbox</span>
+            </div>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="font-display font-bold text-4xl text-white">$0</span>
+              <span class="text-sm text-zinc-400 font-mono">/mo + usage</span>
+            </div>
+            <p class="text-sm text-zinc-400 mt-2">Includes $25 free inference credit on signup. No credit card required.</p>
+
+            <ul class="mt-6 space-y-3 text-sm text-zinc-300">
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Up to 120 RPM &amp; 250K TPM rate limit</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>All open-weight 8B–70B models</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Zero-data-retention default</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#cta" class="mt-8 w-full py-3 rounded-xl border border-white/15 hover:border-white/30 text-center text-sm font-semibold text-white transition-colors">
+            Generate Free Key
+          </a>
+        </div>
+
+        <!-- Tier 2: Scale (Highlighted) -->
+        <div class="bento-card rounded-2xl p-7 flex flex-col justify-between relative border-flame/70 shadow-flameGlow">
+          <div class="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-flame text-white font-mono text-[12.5px] font-bold uppercase tracking-wider">
+            Most Popular
+          </div>
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-bold text-xl text-white">Scale</h3>
+              <span class="text-xs font-mono text-flame">Production Workloads</span>
+            </div>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="font-display font-bold text-4xl text-white">$49</span>
+              <span class="text-sm text-zinc-400 font-mono">/mo + metered tokens</span>
+            </div>
+            <p class="text-sm text-zinc-400 mt-2">Includes 300M Llama-3.3-70B tokens/mo, then $0.18 per 1M blended tokens.</p>
+
+            <ul class="mt-6 space-y-3 text-sm text-zinc-200">
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-flame shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>5,000 RPM &amp; 15M TPM burst capacity</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-flame shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Unlimited hot-swap LoRA adapters</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-flame shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>SOC2 Type II &amp; signed HIPAA BAA</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-flame shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>99.99% Anycast uptime SLA</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#cta" class="mt-8 w-full py-3 rounded-xl bg-flame hover:bg-flameLight text-center text-sm font-semibold text-white shadow-flameGlow transition-colors">
+            Deploy Scale Workspace
+          </a>
+        </div>
+
+        <!-- Tier 3: Dedicated Cluster -->
+        <div class="bento-card rounded-2xl p-7 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-bold text-xl text-white">Dedicated Cluster</h3>
+              <span class="text-xs font-mono text-volt">Single-Tenant Rack</span>
+            </div>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="font-display font-bold text-4xl text-white">Custom</span>
+              <span class="text-sm text-zinc-400 font-mono">/ reserved LPU pod</span>
+            </div>
+            <p class="text-sm text-zinc-400 mt-2">Isolated optical LPU pods with AWS PrivateLink / GCP VPC peering.</p>
+
+            <ul class="mt-6 space-y-3 text-sm text-zinc-300">
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Uncapped throughput &amp; deterministic p99</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Custom 405B / MoE weight compilation</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-volt shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>24/7 Staff Kernel Engineer Slack channel</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#cta" class="mt-8 w-full py-3 rounded-xl border border-white/15 hover:border-volt/50 text-center text-sm font-semibold text-white transition-colors">
+            Reserve LPU Capacity
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. HIGH-IMPACT GRADIENT MESH CTA -->
+    <section id="cta" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto reveal">
+      <div class="cta-mesh rounded-3xl border border-white/15 p-8 sm:p-14 lg:p-16 text-center relative overflow-hidden">
+        <div class="max-w-2xl mx-auto relative z-10">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-carbon/80 border border-white/15 font-mono text-xs text-volt mb-5">
+            <span class="w-2 h-2 rounded-full bg-volt animate-ping"></span>
+            <span>INSTANT PROVISIONING — $25 FREE CREDITS</span>
+          </span>
+          <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight text-white">
+            Stop Waiting on Memory-Bound GPUs.
+          </h2>
+          <p class="text-zinc-300 mt-4 text-base sm:text-lg">
+            Issue your first 840 tok/s streaming completion in under 30 seconds. Drop-in compatible with your existing OpenAI SDK code.
+          </p>
+
+          <form id="apiKeyForm" class="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+            <input type="email" required placeholder="work-email@company.dev" aria-label="Work Email Address" class="flex-1 px-4 py-3.5 rounded-xl bg-carbon/90 border border-white/15 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-flame font-mono" />
+            <button type="submit" class="px-6 py-3.5 rounded-xl bg-flame hover:bg-flameLight text-white font-semibold text-sm shadow-flameGlow transition-all shrink-0">
+              Issue Instant API Key
+            </button>
+          </form>
+          <p id="apiKeyFeedback" class="hidden mt-3 font-mono text-xs text-volt">
+            Provisioned sandbox token sent. Check your inbox to launch LPU Studio.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CLEAN TECHNICAL FOOTER -->
+  <footer class="border-t border-white/10 bg-[#070709] py-14 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-flame flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-carbon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <span class="font-display font-bold text-white tracking-tight">KINETIC COMPUTE INC.</span>
+        </div>
+        <p class="text-xs text-zinc-500 font-mono">San Francisco // Zurich // Tokyo — Deterministic LPU Cloud</p>
+      </div>
+
+      <div class="flex flex-wrap gap-6 text-xs font-mono text-zinc-400">
+        <a href="#features" class="hover:text-white transition-colors">Platform</a>
+        <a href="#benchmarks" class="hover:text-white transition-colors">MLPerf</a>
+        <a href="#sdk-docs" class="hover:text-white transition-colors">API Reference</a>
+        <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+        <a href="#cta" class="hover:text-white transition-colors">Security BAA</a>
+      </div>
+
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zincCard border border-white/10 text-xs font-mono text-zinc-300">
+        <span class="w-2 h-2 rounded-full bg-volt"></span>
+        <span>All 28 Edge Regions Operational</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE VANILLA JAVASCRIPT -->
+  <script>
+    (function () {
+      // 1. Mobile Menu Toggle
+      const mobileBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const openIcon = document.getElementById('menuOpenIcon');
+      const closeIcon = document.getElementById('menuCloseIcon');
+
+      mobileBtn.addEventListener('click', () => {
+        const isHidden = mobileMenu.classList.toggle('hidden');
+        openIcon.classList.toggle('hidden', !isHidden);
+        closeIcon.classList.toggle('hidden', isHidden);
+      });
+
+      document.querySelectorAll('.mobile-nav-link').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          openIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+        });
+      });
+
+      // 2. Hero Live Token Stream Speed Simulator
+      const simModels = {
+        llama: {
+          ttft: '14 ms',
+          speed: 842,
+          tokens: 168,
+          prompt: 'prompt: "Implement lock-free SPSC ring buffer in Rust with atomic acquire/release"',
+          output: `pub struct SpscRing<T, const N: usize> {\n  buf: [UnsafeCell<MaybeUninit<T>>; N],\n  head: AtomicUsize,\n  tail: AtomicUsize,\n}\n\nimpl<T, const N: usize> SpscRing<T, N> {\n  #[inline(always)]\n  pub fn try_push(&self, val: T) -> Result<(), T> {\n    let head = self.head.load(Ordering::Relaxed);\n    let next = (head + 1) & (N - 1);\n    if next == self.tail.load(Ordering::Acquire) {\n      return Err(val);\n    }\n    unsafe { (*self.buf[head].get()).write(val); }\n    self.head.store(next, Ordering::Release);\n    Ok(())\n  }\n}`
+        },
+        deepseek: {
+          ttft: '17 ms',
+          speed: 790,
+          tokens: 184,
+          prompt: 'prompt: "Derive optimal shard count k for 70B FP8 weights across 80MB SRAM tiles"',
+          output: `<think>\nModel weights W = 70e9 * 1 byte = 70 GB.\nPer-chip on-die SRAM capacity = 230 MB usable.\nMinimum deterministic pipeline stages:\n  N_chips = ceil(70,000 MB / 220 MB) = 319 -> 320 LPU dies.\nInter-die optical hop latency = 45 ns.\n</think>\n\nOptimal Partition Plan:\n- Tensor Parallel Degree (TP): 16\n- Pipeline Micro-Stages (PP): 20\n- Per-Token AllReduce Latency: 0.72 us\n- Sustained Decode Rate: 790.4 tokens/sec`
+        },
+        qwen: {
+          ttft: '12 ms',
+          speed: 915,
+          tokens: 156,
+          prompt: 'prompt: "Write zero-allocation WebSocket frame parser in TypeScript"',
+          output: `export function parseFrame(buf: Uint8Array) {\n  const fin = (buf[0] & 0x80) !== 0;\n  const opcode = buf[0] & 0x0f;\n  const masked = (buf[1] & 0x80) !== 0;\n  let len = buf[1] & 0x7f;\n  let offset = 2;\n  if (len === 126) {\n    len = (buf[2] << 8) | buf[3];\n    offset = 4;\n  }\n  const payload = buf.subarray(offset + (masked ? 4 : 0), offset + (masked ? 4 : 0) + len);\n  return { fin, opcode, payload };\n}`
+        }
+      };
+
+      let activeModelKey = 'llama';
+      let streamTimer = null;
+
+      const simTtft = document.getElementById('simTtft');
+      const simSpeed = document.getElementById('simSpeed');
+      const simElapsed = document.getElementById('simElapsed');
+      const simPrompt = document.getElementById('simPrompt');
+      const simOutput = document.getElementById('simOutput');
+      const simTokenCount = document.getElementById('simTokenCount');
+      const simStatusLabel = document.getElementById('simStatusLabel');
+      const simStatusDot = document.getElementById('simStatusDot');
+
+      function runStreamSimulation(modelKey) {
+        if (streamTimer) clearInterval(streamTimer);
+        const cfg = simModels[modelKey];
+        simTtft.textContent = cfg.ttft;
+        simPrompt.textContent = cfg.prompt;
+        simOutput.textContent = '';
+        simTokenCount.textContent = '0';
+        simElapsed.textContent = '0.00 s';
+        simStatusLabel.textContent = 'STREAMING ON LPU...';
+        simStatusDot.className = 'w-2 h-2 rounded-full bg-flame animate-ping';
+
+        const fullText = cfg.output;
+        let charIdx = 0;
+        const startTime = performance.now();
+
+        streamTimer = setInterval(() => {
+          charIdx += 14; // High-velocity burst
+          if (charIdx >= fullText.length) {
+            simOutput.textContent = fullText;
+            const totalSec = (cfg.tokens / cfg.speed).toFixed(2);
+            simElapsed.textContent = totalSec + ' s';
+            simSpeed.textContent = cfg.speed + ' tok/s';
+            simTokenCount.textContent = String(cfg.tokens);
+            simStatusLabel.textContent = 'STREAM COMPLETE';
+            simStatusDot.className = 'w-2 h-2 rounded-full bg-volt';
+            clearInterval(streamTimer);
+            return;
+          }
+          simOutput.textContent = fullText.slice(0, charIdx);
+          const progress = charIdx / fullText.length;
+          const liveTokens = Math.max(1, Math.round(progress * cfg.tokens));
+          const jitter = Math.round((Math.random() - 0.5) * 14);
+          simSpeed.textContent = (cfg.speed + jitter) + ' tok/s';
+          simTokenCount.textContent = String(liveTokens);
+          const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+          simElapsed.textContent = elapsed + ' s';
+        }, 22);
+      }
+
+      document.querySelectorAll('.sim-model-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeModelKey = btn.dataset.model;
+          document.querySelectorAll('.sim-model-btn').forEach((b) => {
+            b.className = 'sim-model-btn px-2.5 py-2 rounded-lg text-[12.5px] font-mono font-medium transition-all text-zinc-400 hover:text-white hover:bg-white/5';
+          });
+          btn.className = 'sim-model-btn px-2.5 py-2 rounded-lg text-[12.5px] font-mono font-semibold transition-all bg-flame text-white shadow';
+          runStreamSimulation(activeModelKey);
+        });
+      });
+
+      document.getElementById('replayStreamBtn').addEventListener('click', () => {
+        runStreamSimulation(activeModelKey);
+      });
+
+      runStreamSimulation('llama');
+
+      // 3. Interactive Benchmark Tabs
+      const benchMetrics = {
+        throughput: {
+          title: 'Output Token Throughput — Llama-3.3-70B Instruct (FP8)',
+          subtitle: 'Measured across 1,024-token input context, single-stream p50 production load (higher is better).',
+          badge: '9.6x Faster than H100 Cloud',
+          kineticVal: '842 tok/s', kineticWidth: '96%',
+          h100Val: '88 tok/s', h100Width: '18%',
+          legacyVal: '54 tok/s', legacyWidth: '11%'
+        },
+        ttft: {
+          title: 'Time-to-First-Token Latency — 1K Prompt Context (ms)',
+          subtitle: 'End-to-end prefill + first token emission latency at p50 (shorter bar / lower ms is faster).',
+          badge: '26x Lower Prefill Latency',
+          kineticVal: '14 ms', kineticWidth: '8%',
+          h100Val: '210 ms', h100Width: '58%',
+          legacyVal: '368 ms', legacyWidth: '94%'
+        },
+        cost: {
+          title: 'Blended Inference Price per 1 Million Tokens (USD)',
+          subtitle: '3:1 input-to-output production ratio on 70B class frontier open-weight models (lower is better).',
+          badge: '88% Lower Cost vs Legacy API',
+          kineticVal: '$0.18 / 1M', kineticWidth: '12%',
+          h100Val: '$0.95 / 1M', h100Width: '62%',
+          legacyVal: '$1.50 / 1M', legacyWidth: '95%'
+        }
+      };
+
+      document.querySelectorAll('.bench-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const data = benchMetrics[tab.dataset.metric];
+          document.querySelectorAll('.bench-tab').forEach((t) => {
+            t.className = 'bench-tab px-3.5 py-2 rounded-lg text-xs font-mono font-medium text-zinc-400 hover:text-white transition-all';
+          });
+          tab.className = 'bench-tab px-3.5 py-2 rounded-lg text-xs font-mono font-semibold bg-flame text-white transition-all';
+
+          document.getElementById('benchTitle').textContent = data.title;
+          document.getElementById('benchSubtitle').textContent = data.subtitle;
+          document.getElementById('benchDeltaBadge').textContent = data.badge;
+          document.getElementById('valKinetic').textContent = data.kineticVal;
+          document.getElementById('barKinetic').style.width = data.kineticWidth;
+          document.getElementById('valH100').textContent = data.h100Val;
+          document.getElementById('barH100').style.width = data.h100Width;
+          document.getElementById('valLegacy').textContent = data.legacyVal;
+          document.getElementById('barLegacy').style.width = data.legacyWidth;
+        });
+      });
+
+      // 4. SDK Code Switcher + Copy Button
+      const sdkSnippets = {
+        python: `from openai import OpenAI
+
+client = OpenAI(base_url="https://api.kinetic.compute/v1", api_key="kn_live_98f2a...")
+stream = client.chat.completions.create(model="llama-3.3-70b-sram", messages=[{"role": "user", "content": "Optimize SQL query"}], stream=True)`,
+        ts: `import OpenAI from "openai";
+
+const kinetic = new OpenAI({ baseURL: "https://api.kinetic.compute/v1", apiKey: process.env.KINETIC_API_KEY });
+const stream = await kinetic.chat.completions.create({ model: "llama-3.3-70b-sram", messages: [{ role: "user", content: "Optimize SQL query" }], stream: true });`,
+        curl: `curl https://api.kinetic.compute/v1/chat/completions \\
+  -H "Authorization: Bearer $KINETIC_API_KEY" -H "Content-Type: application/json" \\
+  -d '{"model":"llama-3.3-70b-sram","messages":[{"role":"user","content":"Optimize SQL query"}],"stream":true}'`
+      };
+
+      let currentSdk = 'python';
+      const sdkCodeBlock = document.getElementById('sdkCodeBlock');
+      sdkCodeBlock.textContent = sdkSnippets.python;
+
+      document.querySelectorAll('.sdk-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          currentSdk = tab.dataset.lang;
+          sdkCodeBlock.textContent = sdkSnippets[currentSdk];
+          document.querySelectorAll('.sdk-tab').forEach((t) => {
+            t.className = 'sdk-tab px-3 py-1 rounded-md text-xs font-mono text-zinc-400 hover:text-white transition-colors';
+          });
+          tab.className = 'sdk-tab px-3 py-1 rounded-md text-xs font-mono font-semibold bg-flame text-white transition-colors';
+        });
+      });
+
+      document.getElementById('copySdkBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText(sdkSnippets[currentSdk]);
+        const label = document.getElementById('copyLabel');
+        label.textContent = 'Copied!';
+        setTimeout(() => { label.textContent = 'Copy'; }, 1800);
+      });
+
+      // 5. 60-Window Uptime Heatmap Generator
+      const uptimeGrid = document.getElementById('uptimeGrid');
+      const uptimeTooltip = document.getElementById('uptimeTooltip');
+      for (let i = 60; i >= 1; i--) {
+        const cell = document.createElement('div');
+        const isMinorBlip = i === 37;
+        cell.className = isMinorBlip
+          ? 'h-7 rounded-sm bg-flame/80 hover:bg-flame cursor-pointer transition-transform hover:scale-110'
+          : 'h-7 rounded-sm bg-volt/80 hover:bg-volt cursor-pointer transition-transform hover:scale-110';
+        const sla = isMinorBlip ? '99.82% SLA (Auto-Failover 4ms)' : '100.00% SLA — 14ms p50';
+        cell.addEventListener('mouseenter', () => {
+          uptimeTooltip.textContent = `Day -${i}: ${sla}`;
+        });
+        uptimeGrid.appendChild(cell);
+      }
+
+      // 6. Interactive Monthly Token Pricing Slider
+      const slider = document.getElementById('tokenVolumeSlider');
+      const sliderTokensDisplay = document.getElementById('sliderTokensDisplay');
+      const sliderSavingsDisplay = document.getElementById('sliderSavingsDisplay');
+      const calcKineticCost = document.getElementById('calcKineticCost');
+      const calcH100Cost = document.getElementById('calcH100Cost');
+      const calcComputeTime = document.getElementById('calcComputeTime');
+
+      function updatePricingCalculator() {
+        const millions = Number(slider.value);
+        sliderTokensDisplay.textContent = millions >= 1000
+          ? (millions / 1000).toFixed(2).replace(/\.00$/, '') + 'B'
+          : millions + 'M';
+        const kineticCost = Math.round(millions * 0.18);
+        const h100Cost = Math.round(millions * 1.5);
+        const savings = Math.max(0, h100Cost - kineticCost);
+        const mins = ((millions * 1000000) / (842 * 1000 * 60)).toFixed(1);
+
+        calcKineticCost.innerHTML = '$' + kineticCost.toLocaleString() + '<span class="text-xs text-zinc-400 font-normal">/mo</span>';
+        calcH100Cost.textContent = '$' + h100Cost.toLocaleString();
+        sliderSavingsDisplay.textContent = 'Save $' + savings.toLocaleString() + ' / mo';
+        calcComputeTime.textContent = mins + ' mins';
+      }
+
+      slider.addEventListener('input', updatePricingCalculator);
+      updatePricingCalculator();
+
+      // 7. CTA Form Submit Handler
+      document.getElementById('apiKeyForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('apiKeyFeedback').classList.remove('hidden');
+        e.target.reset();
+      });
+
+      // 8. IntersectionObserver Scroll Reveal
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALPHA FOLIO — Multi-Asset Investment, Wealth Allocation &amp; Alpha Performance Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            midnight: '#090D16',
+            alphaEmerald: '#10B981',
+            benchSky: '#38BDF8',
+            folioIndigo: '#6366F1',
+            sovereignGold: '#F59E0B',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      color-scheme: dark;
+      scroll-behavior: smooth;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #090D16;
+      color: #F8FAFC;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 64% 48% at 14% 4%, rgba(16, 185, 129, 0.09), transparent 70%),
+        radial-gradient(ellipse 56% 44% at 88% 8%, rgba(56, 189, 248, 0.08), transparent 68%),
+        radial-gradient(ellipse 52% 45% at 50% 98%, rgba(99, 102, 241, 0.07), transparent 72%);
+      background-attachment: fixed;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 20px 48px -14px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .glass-panel:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+    .glass-sidebar {
+      background: rgba(11, 16, 28, 0.90);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-topbar {
+      background: rgba(9, 13, 22, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Collapsible Sidebar Shell */
+    .sidebar-shell {
+      width: 268px;
+      transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.sidebar-collapsed .sidebar-shell {
+      width: 78px;
+    }
+    body.sidebar-collapsed .sidebar-label,
+    body.sidebar-collapsed .sidebar-badge,
+    body.sidebar-collapsed .sidebar-footer-detail,
+    body.sidebar-collapsed .sidebar-section-heading {
+      display: none !important;
+    }
+    body.sidebar-collapsed .sidebar-nav-item {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    body.sidebar-collapsed .sidebar-brand-wrap {
+      justify-content: center;
+    }
+    @media (min-width: 1024px) {
+      .main-shell {
+        margin-left: 268px;
+        transition: margin-left 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      body.sidebar-collapsed .main-shell {
+        margin-left: 78px;
+      }
+    }
+
+    @keyframes donutSweepIn {
+      0% {
+        stroke-dasharray: 0 999;
+        opacity: 0.2;
+      }
+    }
+    .donut-segment {
+      transition: stroke-dasharray 0.55s cubic-bezier(0.22, 1, 0.36, 1), stroke-width 0.22s ease, opacity 0.22s ease;
+      animation: donutSweepIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      cursor: pointer;
+    }
+
+    @keyframes drawAlphaLine {
+      0% { stroke-dashoffset: 1000; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .alpha-line-draw {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawAlphaLine 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes fadeAlphaArea {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .alpha-area-fade {
+      opacity: 0;
+      animation: fadeAlphaArea 0.85s ease-out 0.18s forwards;
+    }
+
+    @keyframes sonarAlpha {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    .alpha-sonar-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: sonarAlpha 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes streamDashMove {
+      to { stroke-dashoffset: -56; }
+    }
+    .alpha-stream-dash {
+      stroke-dasharray: 7 7;
+      animation: streamDashMove 1.6s linear infinite;
+    }
+
+    @keyframes tickerMarquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-marquee-track {
+      display: flex;
+      width: max-content;
+      animation: tickerMarquee 34s linear infinite;
+    }
+    .ticker-marquee-track:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes quoteUpFlash {
+      0% { color: #6EE7B7; text-shadow: 0 0 14px rgba(16, 185, 129, 0.75); }
+      100% { color: #F8FAFC; text-shadow: none; }
+    }
+    @keyframes quoteDownFlash {
+      0% { color: #FDA4AF; text-shadow: 0 0 14px rgba(244, 63, 94, 0.75); }
+      100% { color: #F8FAFC; text-shadow: none; }
+    }
+    .tick-up {
+      animation: quoteUpFlash 1.1s ease-out;
+    }
+    .tick-down {
+      animation: quoteDownFlash 1.1s ease-out;
+    }
+
+    @keyframes positionPulse {
+      0% { background-color: rgba(16, 185, 129, 0.18); }
+      100% { background-color: transparent; }
+    }
+    .holding-flash {
+      animation: positionPulse 1.8s ease-out forwards;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.24);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.42);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 selection:bg-emerald-500 selection:text-slate-950">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileOverlay" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm hidden lg:hidden" onclick="toggleMobileSidebar(false)"></div>
+
+  <!-- Left Wealth Sidebar -->
+  <aside id="sidebar" class="sidebar-shell glass-sidebar fixed inset-y-0 left-0 z-50 flex flex-col -translate-x-full lg:translate-x-0">
+    <!-- Brand Header -->
+    <div class="h-16 px-4 flex items-center justify-between border-b border-white/10 sidebar-brand-wrap">
+      <a href="#" onclick="selectWealthNav(null, 'Portfolio Overview'); return false;" class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 via-sky-500/10 to-indigo-500/20 border border-emerald-400/50 text-emerald-400 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-950/50">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 21 12 17 22 21 12 2" />
+          </svg>
+        </div>
+        <div class="sidebar-label truncate">
+          <div class="font-display font-bold text-[15px] tracking-wider text-white leading-none">ALPHA FOLIO</div>
+          <div class="text-xs font-medium text-slate-400 mt-1">Wealth &amp; Alpha Terminal</div>
+        </div>
+      </a>
+      <button onclick="toggleMobileSidebar(false)" class="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:bg-white/10" aria-label="Close sidebar">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="flex-1 overflow-y-auto py-5 px-3 space-y-6">
+      <div>
+        <div class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 sidebar-section-heading">Portfolio Intelligence</div>
+        <nav class="space-y-1" id="wealthNav">
+          <button data-nav="Portfolio Overview" onclick="selectWealthNav(this, 'Portfolio Overview')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 transition-all">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <span class="sidebar-label truncate">Portfolio Overview</span>
+          </button>
+
+          <button data-nav="Asset Allocation" onclick="selectWealthNav(this, 'Asset Allocation')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between gap-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all">
+            <span class="flex items-center gap-3 min-w-0">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                <path d="M22 12A10 10 0 0 0 12 2v10z" />
+              </svg>
+              <span class="sidebar-label truncate">Asset Allocation</span>
+            </span>
+            <span class="sidebar-badge text-xs font-mono px-2 py-0.5 rounded-full bg-white/5 text-slate-300">5</span>
+          </button>
+
+          <button data-nav="Holdings & Equities" onclick="selectWealthNav(this, 'Holdings & Equities')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="20" x2="12" y2="10" />
+              <line x1="18" y1="20" x2="18" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="16" />
+            </svg>
+            <span class="sidebar-label truncate">Holdings &amp; Equities</span>
+          </button>
+
+          <button data-nav="Fixed Income & T-Bills" onclick="selectWealthNav(this, 'Fixed Income & T-Bills')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between gap-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all">
+            <span class="flex items-center gap-3 min-w-0">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <line x1="7" y1="9" x2="17" y2="9" />
+                <line x1="7" y1="13" x2="13" y2="13" />
+              </svg>
+              <span class="sidebar-label truncate">Fixed Income &amp; T-Bills</span>
+            </span>
+            <span class="sidebar-badge text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-400/20">5.3%</span>
+          </button>
+
+          <button data-nav="Dividends & Tax" onclick="selectWealthNav(this, 'Dividends & Tax')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M14.5 9a2.5 2.5 0 0 0-5 0c0 2.5 5 2 5 5a2.5 2.5 0 0 1-5 0" />
+              <line x1="12" y1="6" x2="12" y2="7" />
+              <line x1="12" y1="17" x2="12" y2="18" />
+            </svg>
+            <span class="sidebar-label truncate">Dividends &amp; Tax</span>
+          </button>
+
+          <button data-nav="Trade Execution" onclick="selectWealthNav(this, 'Trade Execution')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span class="sidebar-label truncate">Trade Execution</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Benchmark Telemetry Card -->
+      <div class="sidebar-footer-detail pt-2">
+        <div class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Live Market Pulse</div>
+        <div class="rounded-xl bg-white/5 border border-white/10 p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-400">S&amp;P 500</span>
+            <span class="font-mono font-semibold text-emerald-400 tabular-nums">5,984.20 (+0.48%)</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-400">US 10Y Yield</span>
+            <span class="font-mono font-semibold text-sky-400 tabular-nums">4.28% (-2 bps)</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-400">VIX Volatility</span>
+            <span class="font-mono font-semibold text-amber-400 tabular-nums">13.84</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Investor Profile + Rail Collapse -->
+    <div class="p-3 border-t border-white/10 space-y-2">
+      <div class="flex items-center gap-3 px-2.5 py-2 rounded-xl bg-white/5 border border-white/10">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-sky-500 text-slate-950 font-display font-bold text-xs flex items-center justify-center shrink-0">
+          JV
+        </div>
+        <div class="sidebar-footer-detail min-w-0 flex-1">
+          <div class="text-sm font-semibold text-white truncate">Julian Vance</div>
+          <div class="text-xs text-slate-400 truncate">Prime Family Office</div>
+        </div>
+      </div>
+      <button onclick="toggleDesktopSidebar()" class="hidden lg:flex w-full min-h-[40px] px-3 rounded-xl items-center justify-center gap-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+        <svg id="collapseIcon" class="w-4 h-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        <span class="sidebar-label">Collapse Terminal</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Shell -->
+  <div class="main-shell min-h-screen flex flex-col">
+
+    <!-- Sticky Glass Topbar -->
+    <header class="sticky top-0 z-30 h-16 glass-topbar px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <button onclick="toggleMobileSidebar(true)" class="lg:hidden w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-slate-200 hover:bg-white/5" aria-label="Open menu">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="7" x2="20" y2="7" stroke-linecap="round" />
+            <line x1="4" y1="12" x2="20" y2="12" stroke-linecap="round" />
+            <line x1="4" y1="17" x2="14" y2="17" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div class="flex items-center gap-3">
+          <h1 id="topbarTitle" class="font-display font-bold text-lg sm:text-xl text-white tracking-tight">Portfolio Overview</h1>
+          <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            NYSE &middot; LIVE
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <button id="liveFeedToggleBtn" type="button" onclick="toggleLiveMarketFeed()" class="h-10 px-3.5 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-300 text-sm font-semibold inline-flex items-center gap-2 transition-all">
+          <span id="liveFeedDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span id="liveFeedLabel">Live Market Feed: ON</span>
+        </button>
+
+        <button onclick="openDividendModal()" class="hidden md:inline-flex h-10 px-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-sm font-medium items-center gap-2 transition-colors">
+          <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+          <span>Tax-Loss Harvest</span>
+        </button>
+
+        <button onclick="selectWealthNav(null, 'Portfolio Overview'); document.getElementById('orderTicketSection').scrollIntoView({behavior:'smooth'})" class="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-sm font-bold inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            <polyline points="17 6 23 6 23 12" />
+          </svg>
+          <span>New Order</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Live Pulsing Institutional Ticker Tape -->
+    <div class="border-b border-white/10 bg-slate-950/70 backdrop-blur-md overflow-hidden py-2">
+      <div id="tickerTapeTrack" class="ticker-marquee-track items-center gap-8 px-4 text-xs font-mono tabular-nums"></div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-7 max-w-[1600px] w-full mx-auto space-y-6">
+      <div id="defaultDashboardView" class="space-y-6">
+
+      <!-- ROW 1: Net Worth Performance Hero Chart (lg:col-span-8) + Asset Allocation Donut (lg:col-span-4) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+        <!-- LEFT (lg:col-span-8): Portfolio Performance vs S&P 500 Benchmark -->
+        <div id="performanceSection" class="lg:col-span-8 glass-panel rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
+          <div>
+            <!-- Header Row: Net Worth + Timeframe Switcher -->
+            <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-4 mb-5">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Total Net Worth &amp; Alpha Performance</div>
+                <div class="flex flex-wrap items-baseline gap-3">
+                  <span id="netWorthReadout" class="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight tabular-nums">$1,284,950.40</span>
+                  <span id="ytdGainBadge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tabular-nums">
+                    +$142,380.20 (+12.46% YTD)
+                  </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 mt-2 text-sm">
+                  <span class="text-slate-300 tabular-nums">Daily P&amp;L: <strong id="dailyPnlReadout" class="text-emerald-400 font-mono font-semibold">+$8,412.60 (+0.66% Today)</strong></span>
+                  <span id="alphaSpreadBadge" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md bg-sky-500/10 text-sky-300 border border-sky-400/20">
+                    Alpha Outperformance +4.2%
+                  </span>
+                </div>
+              </div>
+
+              <!-- Interactive Timeframe Selector: 1D | 1W | 1M | 6M | 1Y | ALL -->
+              <div class="inline-flex p-1 rounded-xl bg-slate-950/80 border border-white/10 self-start" id="timeframeGroup">
+                <button onclick="setPerformanceRange('1D')" data-tf="1D" class="tf-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">1D</button>
+                <button onclick="setPerformanceRange('1W')" data-tf="1W" class="tf-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">1W</button>
+                <button onclick="setPerformanceRange('1M')" data-tf="1M" class="tf-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">1M</button>
+                <button onclick="setPerformanceRange('6M')" data-tf="6M" class="tf-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">6M</button>
+                <button onclick="setPerformanceRange('1Y')" data-tf="1Y" class="tf-btn min-h-[38px] px-3 rounded-lg text-sm font-semibold bg-emerald-500 text-slate-950 shadow-sm transition-all">1Y</button>
+                <button onclick="setPerformanceRange('ALL')" data-tf="ALL" class="tf-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">ALL</button>
+              </div>
+            </div>
+
+            <!-- Legend + Hover Readout Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 px-3.5 py-2 rounded-xl bg-white/5 border border-white/5 mb-4 text-xs">
+              <div class="flex items-center gap-5">
+                <span class="inline-flex items-center gap-2 font-medium text-slate-200">
+                  <span class="w-3 h-1 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400"></span>
+                  Alpha Portfolio
+                </span>
+                <span class="inline-flex items-center gap-2 font-medium text-slate-300">
+                  <span class="w-3 border-t-2 border-dashed border-sky-400"></span>
+                  S&amp;P 500 Benchmark
+                </span>
+              </div>
+              <div id="perfHoverReadout" class="font-mono text-slate-300 tabular-nums">
+                Point Return: <span class="text-emerald-400 font-semibold">Portfolio +18.4%</span> vs <span class="text-sky-400 font-semibold">S&amp;P +14.2%</span>
+              </div>
+            </div>
+
+            <!-- Dual-Line SVG Performance Chart -->
+            <div class="relative w-full">
+              <svg id="performanceSvg" viewBox="0 0 760 250" class="w-full h-[245px] overflow-visible select-none" aria-label="Portfolio performance versus S&P 500 benchmark chart"></svg>
+            </div>
+          </div>
+
+          <!-- 4 Metric Pills Below Chart -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 mt-3 border-t border-white/10">
+            <div class="rounded-xl bg-white/5 border border-white/10 px-3.5 py-3">
+              <div class="text-xs text-slate-400">Sharpe Ratio</div>
+              <div class="font-mono font-bold text-base text-white mt-0.5 tabular-nums">2.18</div>
+            </div>
+            <div class="rounded-xl bg-white/5 border border-white/10 px-3.5 py-3">
+              <div class="text-xs text-slate-400">Annualized Return</div>
+              <div class="font-mono font-bold text-base text-emerald-400 mt-0.5 tabular-nums">+18.4%</div>
+            </div>
+            <div class="rounded-xl bg-white/5 border border-white/10 px-3.5 py-3">
+              <div class="text-xs text-slate-400">Dividend Yield</div>
+              <div class="font-mono font-bold text-base text-sky-400 mt-0.5 tabular-nums">3.24%</div>
+            </div>
+            <div class="rounded-xl bg-white/5 border border-white/10 px-3.5 py-3">
+              <div class="text-xs text-slate-400">Max Drawdown</div>
+              <div class="font-mono font-bold text-base text-amber-400 mt-0.5 tabular-nums">-4.6%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT (lg:col-span-4): Interactive Asset Allocation Donut & Drift -->
+        <div id="allocationSection" class="lg:col-span-4 glass-panel rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="font-display font-bold text-base sm:text-lg text-white">Asset Allocation</h2>
+                <p class="text-sm text-slate-400">Click class to inspect weight &amp; drift</p>
+              </div>
+              <span id="driftStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                1.8% Drift
+              </span>
+            </div>
+
+            <!-- Multi-Segment SVG Donut Ring -->
+            <div class="relative flex items-center justify-center my-3">
+              <svg id="allocationDonutSvg" viewBox="0 0 210 210" class="w-48 h-48 -rotate-90 overflow-visible"></svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-4">
+                <span id="donutCenterLabel" class="text-xs font-medium text-slate-400 truncate max-w-[125px]">Total Capital</span>
+                <span id="donutCenterValue" class="font-display font-bold text-2xl text-white tracking-tight tabular-nums mt-0.5">$1.28M</span>
+                <span id="donutCenterSub" class="text-xs font-mono font-semibold text-emerald-400 mt-0.5">100% Deployed</span>
+              </div>
+            </div>
+
+            <!-- 5 Clickable Asset Classes List -->
+            <div id="allocationList" class="space-y-1.5 mt-4"></div>
+          </div>
+
+          <!-- Auto-Rebalance Drift CTA -->
+          <div class="pt-4 mt-4 border-t border-white/10">
+            <button id="rebalanceBtn" onclick="autoRebalanceDrift()" class="w-full h-11 rounded-xl bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-white border border-white/10 hover:border-emerald-400 text-sm font-semibold flex items-center justify-center gap-2 transition-all">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10" />
+                <polyline points="1 20 1 14 7 14" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              <span id="rebalanceBtnText">Auto-Rebalance Drift</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- MIDDLE TELEMETRY ROW: Autonomous Alpha Execution & Market Data Stream (SVG Bezier + animateMotion) -->
+      <section class="glass-panel rounded-2xl p-5 sm:p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h2 class="font-display font-bold text-base sm:text-lg text-white">Autonomous Alpha Execution &amp; Market Data Stream</h2>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span id="alphaMsgRateReadout" class="tabular-nums">48,200 msg/s</span>
+              </span>
+            </div>
+            <p id="alphaStageCaption" class="text-sm text-slate-400 mt-1">
+              Click any node to inspect execution telemetry: <strong class="text-emerald-400 font-semibold">0.8ms NBBO Routing</strong> &middot; <strong class="text-sky-400 font-semibold">+14.2 bps Price Improvement</strong> &middot; <strong class="text-amber-400 font-semibold">Zero Market Impact</strong>
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="triggerAlphaOrderBurst(false)" class="h-10 px-4 rounded-xl border border-emerald-400/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-sm font-semibold inline-flex items-center gap-2 transition-all">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <span>Simulate Alpha Sweep</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Animated Dark Glass SVG Execution Stream -->
+        <div class="w-full overflow-x-auto">
+          <div class="min-w-[780px]">
+            <svg id="alphaStreamSvg" viewBox="0 0 1080 188" class="w-full h-[188px] select-none overflow-visible" aria-label="Autonomous alpha execution and market data stream">
+              <defs>
+                <filter id="alphaPacketEmerald" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="alphaPacketSky" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <linearGradient id="alphaStreamGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.35" />
+                  <stop offset="50%" stop-color="#10B981" stop-opacity="0.65" />
+                  <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.45" />
+                </linearGradient>
+
+                <!-- Multi-Lane Bezier Motion Paths -->
+                <path id="alphaLane1A" d="M 224 76 C 274 40, 306 40, 356 76" />
+                <path id="alphaLane1B" d="M 224 108 C 274 144, 306 144, 356 108" />
+                <path id="alphaLane2A" d="M 532 76 C 582 38, 616 38, 666 76" />
+                <path id="alphaLane2B" d="M 532 108 C 582 146, 616 146, 666 108" />
+                <path id="alphaLane3A" d="M 842 78 C 888 46, 918 46, 956 84" />
+                <path id="alphaLane3B" d="M 842 106 C 888 138, 918 138, 956 100" />
+              </defs>
+
+              <!-- Dark Terminal Frame -->
+              <rect x="6" y="10" width="1068" height="168" rx="16" fill="rgba(9, 13, 22, 0.72)" stroke="rgba(255, 255, 255, 0.08)" />
+
+              <!-- Base Bezier Conduit Rails -->
+              <use href="#alphaLane1A" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="2" />
+              <use href="#alphaLane1B" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="2" />
+              <use href="#alphaLane2A" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="2" />
+              <use href="#alphaLane2B" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="2" />
+              <use href="#alphaLane3A" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="2" />
+              <use href="#alphaLane3B" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="2" />
+
+              <!-- Animated Dashed Signal Guides -->
+              <use href="#alphaLane1A" fill="none" stroke="url(#alphaStreamGrad)" stroke-width="2.4" class="alpha-stream-dash" />
+              <use href="#alphaLane2A" fill="none" stroke="url(#alphaStreamGrad)" stroke-width="2.4" class="alpha-stream-dash" />
+              <use href="#alphaLane3A" fill="none" stroke="#10B981" stroke-opacity="0.5" stroke-width="2.4" class="alpha-stream-dash" />
+
+              <!-- Continuous animateMotion Market Quote & Alpha Execution Particles -->
+              <g id="alphaParticlesBase">
+                <circle r="4.5" fill="#38BDF8" filter="url(#alphaPacketSky)">
+                  <animateMotion dur="1.65s" repeatCount="indefinite"><mpath href="#alphaLane1A" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#10B981" filter="url(#alphaPacketEmerald)">
+                  <animateMotion dur="2.05s" begin="0.7s" repeatCount="indefinite"><mpath href="#alphaLane1B" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#818CF8" filter="url(#alphaPacketSky)">
+                  <animateMotion dur="1.65s" begin="0.85s" repeatCount="indefinite"><mpath href="#alphaLane1A" /></animateMotion>
+                </circle>
+
+                <circle r="5" fill="#10B981" filter="url(#alphaPacketEmerald)">
+                  <animateMotion dur="1.55s" begin="0.15s" repeatCount="indefinite"><mpath href="#alphaLane2A" /></animateMotion>
+                </circle>
+                <circle r="4.5" fill="#38BDF8" filter="url(#alphaPacketSky)">
+                  <animateMotion dur="1.9s" begin="0.9s" repeatCount="indefinite"><mpath href="#alphaLane2B" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#F59E0B" filter="url(#alphaPacketEmerald)">
+                  <animateMotion dur="1.55s" begin="0.95s" repeatCount="indefinite"><mpath href="#alphaLane2A" /></animateMotion>
+                </circle>
+
+                <circle r="5.5" fill="#10B981" filter="url(#alphaPacketEmerald)">
+                  <animateMotion dur="1.45s" repeatCount="indefinite"><mpath href="#alphaLane3A" /></animateMotion>
+                </circle>
+                <circle r="4.5" fill="#F59E0B" filter="url(#alphaPacketEmerald)">
+                  <animateMotion dur="1.75s" begin="0.65s" repeatCount="indefinite"><mpath href="#alphaLane3B" /></animateMotion>
+                </circle>
+              </g>
+
+              <!-- Dynamic Order Execution Burst Particles -->
+              <g id="alphaBurstLayer"></g>
+
+              <!-- NODE 1: FIX / ITCH Market Feed -->
+              <g class="cursor-pointer" onclick="inspectAlphaStage(0)">
+                <rect id="alphaNode0" x="26" y="40" width="198" height="108" rx="14" fill="rgba(17,24,39,0.92)" stroke="#38BDF8" stroke-width="1.8" />
+                <rect x="42" y="54" width="34" height="34" rx="9" fill="rgba(56,189,248,0.14)" />
+                <polyline points="49 75 55 67 60 72 68 62" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <text x="86" y="69" fill="#FFFFFF" font-size="13" font-weight="700" font-family="Space Grotesk, sans-serif">FIX / ITCH Feed</text>
+                <text x="86" y="85" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">NYSE &middot; NASDAQ L2</text>
+                <text x="42" y="116" fill="#38BDF8" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">LATENCY &middot; 0.3ms</text>
+                <text x="42" y="134" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">NBBO Depth Book</text>
+              </g>
+
+              <!-- NODE 2: Alpha Factor Engine -->
+              <g class="cursor-pointer" onclick="inspectAlphaStage(1)">
+                <rect id="alphaNode1" x="356" y="40" width="176" height="108" rx="14" fill="rgba(17,24,39,0.92)" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" />
+                <circle cx="389" cy="71" r="14" fill="rgba(16,185,129,0.20)" class="alpha-sonar-ring" />
+                <rect x="372" y="54" width="34" height="34" rx="9" fill="rgba(16,185,129,0.14)" />
+                <polygon points="389 61 381 76 389 73 397 76 389 61" fill="none" stroke="#10B981" stroke-width="1.9" stroke-linejoin="round" />
+                <text x="416" y="69" fill="#FFFFFF" font-size="13" font-weight="700" font-family="Space Grotesk, sans-serif">Alpha Engine</text>
+                <text x="416" y="85" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">Drift &amp; Sharpe AI</text>
+                <text x="372" y="116" fill="#10B981" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">ALPHA +4.20%</text>
+                <text x="372" y="134" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">Bayesian Risk Opt</text>
+              </g>
+
+              <!-- NODE 3: Dark-Pool Smart SOR -->
+              <g class="cursor-pointer" onclick="inspectAlphaStage(2)">
+                <rect id="alphaNode2" x="666" y="40" width="176" height="108" rx="14" fill="rgba(17,24,39,0.92)" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" />
+                <rect x="682" y="54" width="34" height="34" rx="9" fill="rgba(99,102,241,0.18)" />
+                <circle cx="699" cy="71" r="8" fill="none" stroke="#818CF8" stroke-width="1.9" />
+                <circle cx="699" cy="71" r="2.5" fill="#818CF8" />
+                <text x="726" y="69" fill="#FFFFFF" font-size="13" font-weight="700" font-family="Space Grotesk, sans-serif">Smart SOR</text>
+                <text x="726" y="85" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">IEX &middot; Dark Pools</text>
+                <text x="682" y="116" fill="#818CF8" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">+14.2 bps EDGE</text>
+                <text x="682" y="134" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">VWAP / Midpoint</text>
+              </g>
+
+              <!-- NODE 4: Prime Custody Vault -->
+              <g class="cursor-pointer" onclick="inspectAlphaStage(3)">
+                <rect id="alphaNode3" x="956" y="40" width="98" height="108" rx="14" fill="rgba(6,78,59,0.32)" stroke="#10B981" stroke-width="1.8" />
+                <circle cx="1005" cy="69" r="15" fill="rgba(16,185,129,0.20)" />
+                <polyline points="998 69 1003 74 1013 64" fill="none" stroke="#34D399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                <text x="1005" y="104" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="700" font-family="Space Grotesk, sans-serif">Custody</text>
+                <text x="1005" y="121" text-anchor="middle" fill="#F59E0B" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">T+0 CLEAR</text>
+                <text x="1005" y="137" text-anchor="middle" fill="#CBD5E1" font-size="12" font-family="Inter, sans-serif">SIPC Prime</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROW 2: Holdings Performance Table (lg:col-span-8) + Quick Trade Order Ticket (lg:col-span-4) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT (lg:col-span-8): Portfolio Holdings & Live Sparklines Table -->
+        <div id="holdingsSection" class="lg:col-span-8 glass-panel rounded-2xl overflow-hidden">
+          <div class="p-5 sm:p-6 border-b border-white/10 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="font-display font-bold text-base sm:text-lg text-white">Portfolio Holdings &amp; Live Sparklines</h2>
+                <p class="text-sm text-slate-400">Click any position to pre-fill the institutional order ticket</p>
+              </div>
+              <button id="clearClassFilterBtn" onclick="selectAllocationSegment(null)" class="hidden h-9 px-3 rounded-lg bg-white/10 text-xs font-semibold text-slate-200 hover:bg-white/20 transition-colors">
+                Reset Class Filter
+              </button>
+            </div>
+
+            <!-- Filter Tabs + Search Ticker -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                <button onclick="setHoldingTab('All Assets')" data-htab="All Assets" class="holding-tab h-10 px-3.5 rounded-xl text-sm font-semibold bg-emerald-500 text-slate-950 shrink-0 transition-all">All Assets</button>
+                <button onclick="setHoldingTab('Equities')" data-htab="Equities" class="holding-tab h-10 px-3.5 rounded-xl text-sm font-medium bg-white/5 text-slate-300 hover:text-white shrink-0 transition-all">Equities</button>
+                <button onclick="setHoldingTab('ETFs & Bonds')" data-htab="ETFs & Bonds" class="holding-tab h-10 px-3.5 rounded-xl text-sm font-medium bg-white/5 text-slate-300 hover:text-white shrink-0 transition-all">ETFs &amp; Bonds</button>
+                <button onclick="setHoldingTab('Crypto')" data-htab="Crypto" class="holding-tab h-10 px-3.5 rounded-xl text-sm font-medium bg-white/5 text-slate-300 hover:text-white shrink-0 transition-all">Crypto</button>
+              </div>
+
+              <div class="relative w-full sm:w-64">
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input id="tickerSearchInput" oninput="renderHoldingsTable()" type="text" placeholder="Filter ticker or name..." class="w-full h-10 pl-10 pr-4 rounded-xl bg-slate-950/80 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400/80" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/10 bg-white/5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="py-3.5 pl-6 pr-3">Asset / Ticker</th>
+                  <th class="py-3.5 px-3 text-right">Price</th>
+                  <th class="py-3.5 px-3 text-right">24h Change</th>
+                  <th class="py-3.5 px-3 text-center">7D Trend</th>
+                  <th class="py-3.5 px-3">Allocation Weight</th>
+                  <th class="py-3.5 pl-3 pr-6 text-right">Market Value &amp; Total P&amp;L</th>
+                </tr>
+              </thead>
+              <tbody id="holdingsTableBody" class="divide-y divide-white/5 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RIGHT (lg:col-span-4): Instant Order Execution Ticket -->
+        <div id="orderTicketSection" class="lg:col-span-4 glass-panel rounded-2xl p-5 sm:p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="font-display font-bold text-base sm:text-lg text-white">Instant Order Ticket</h2>
+              <p class="text-sm text-slate-400">Smart-routed institutional liquidity</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-white/5 text-slate-300 border border-white/10">
+              ZERO COMM
+            </span>
+          </div>
+
+          <!-- Buy / Sell Toggle Tabs -->
+          <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-slate-950/90 border border-white/10">
+            <button id="sideBuyBtn" type="button" onclick="setOrderSide('BUY')" class="h-10 rounded-lg text-sm font-bold bg-emerald-500 text-slate-950 shadow-sm transition-all">
+              Buy Position
+            </button>
+            <button id="sideSellBtn" type="button" onclick="setOrderSide('SELL')" class="h-10 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition-all">
+              Sell Position
+            </button>
+          </div>
+
+          <!-- Ticker Selector -->
+          <div>
+            <label for="orderTickerSelect" class="block text-sm font-medium text-slate-300 mb-1.5">Instrument / Ticker</label>
+            <select id="orderTickerSelect" onchange="onOrderTickerChange()" class="w-full h-11 px-3.5 rounded-xl bg-slate-950/90 border border-white/10 text-sm font-semibold text-white focus:outline-none focus:border-emerald-400">
+              <option value="NVDA">NVDA &mdash; NVIDIA Corp ($142.80)</option>
+              <option value="MSFT">MSFT &mdash; Microsoft Corp ($428.50)</option>
+              <option value="VOO">VOO &mdash; Vanguard S&amp;P 500 ETF ($548.20)</option>
+              <option value="SGOV">SGOV &mdash; iShares 0-3M Treasury ($100.42)</option>
+              <option value="AAPL">AAPL &mdash; Apple Inc ($229.60)</option>
+              <option value="BTC">BTC &mdash; Bitcoin Institutional Trust ($91,420.00)</option>
+            </select>
+          </div>
+
+          <!-- Order Type: Limit / Market -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-medium text-slate-300">Order Type</span>
+              <span id="liveBidAskSpread" class="text-xs font-mono text-slate-400 tabular-nums">Spot: $142.80</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="typeLimitBtn" type="button" onclick="setOrderType('Limit')" class="h-10 rounded-xl text-sm font-semibold bg-white/10 text-white border border-emerald-400/50 transition-all">
+                Limit Order
+              </button>
+              <button id="typeMarketBtn" type="button" onclick="setOrderType('Market')" class="h-10 rounded-xl text-sm font-medium bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all">
+                Market Order
+              </button>
+            </div>
+          </div>
+
+          <!-- Shares & Limit Price Inputs -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="orderSharesInput" class="block text-sm font-medium text-slate-300 mb-1.5">Quantity (Units)</label>
+              <input id="orderSharesInput" oninput="updateOrderEstimate()" type="number" min="0.01" step="any" value="25" class="w-full h-11 px-3.5 rounded-xl bg-slate-950/90 border border-white/10 font-mono font-semibold text-[15px] text-white tabular-nums focus:outline-none focus:border-emerald-400" />
+            </div>
+            <div>
+              <label for="orderLimitPriceInput" class="block text-sm font-medium text-slate-300 mb-1.5">Execution Price ($)</label>
+              <input id="orderLimitPriceInput" oninput="updateOrderEstimate()" type="number" step="0.01" value="142.80" class="w-full h-11 px-3.5 rounded-xl bg-slate-950/90 border border-white/10 font-mono font-semibold text-[15px] text-white tabular-nums focus:outline-none focus:border-emerald-400" />
+            </div>
+          </div>
+
+          <!-- Order Cost & Buying Power Summary Box -->
+          <div class="rounded-xl bg-slate-950/70 border border-white/10 p-4 space-y-2.5 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Available Buying Power</span>
+              <span id="buyingPowerReadout" class="font-mono font-semibold text-slate-200 tabular-nums">$64,248.00</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Routing Venue</span>
+              <span class="font-mono text-xs text-sky-400">IEX / NASDAQ NBBO</span>
+            </div>
+            <div class="pt-2 border-t border-white/10 flex items-center justify-between">
+              <span class="font-medium text-white">Estimated Order Total</span>
+              <span id="estimatedOrderTotal" class="font-mono font-bold text-base text-emerald-400 tabular-nums">$3,570.00</span>
+            </div>
+          </div>
+
+          <!-- Place Institutional Order Button -->
+          <button id="submitOrderBtn" type="button" onclick="placeInstitutionalOrder()" class="w-full h-11 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span id="submitOrderBtnLabel">Place Institutional Buy Order</span>
+          </button>
+        </div>
+
+      </section>
+      </div>
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+    </main>
+  </div>
+
+  <!-- Dividends & Tax-Loss Harvesting Modal -->
+  <div id="dividendModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="glass-panel rounded-2xl max-w-md w-full p-6 space-y-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-lg text-white">Dividends &amp; Tax Optimization</h3>
+          <p class="text-sm text-slate-400">Projected 12M yield &amp; automated tax-lot harvesting</p>
+        </div>
+        <button onclick="closeDividendModal()" class="w-10 h-10 rounded-xl hover:bg-white/10 flex items-center justify-center text-slate-400">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+          <span class="text-slate-300">Projected Annual Dividends</span>
+          <span class="font-mono font-bold text-emerald-400 tabular-nums">+$41,632.40</span>
+        </div>
+        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+          <span class="text-slate-300">SGOV T-Bill Monthly Coupon</span>
+          <span class="font-mono font-bold text-sky-400 tabular-nums">+$1,248.50 / mo</span>
+        </div>
+        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+          <span class="text-slate-300">Harvestable Short-Term Offset</span>
+          <span class="font-mono font-bold text-amber-400 tabular-nums">$4,820.00</span>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2.5">
+        <button onclick="closeDividendModal()" class="h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-medium text-slate-300">Close</button>
+        <button onclick="closeDividendModal(); showAlphaToast('Automated Tax-Loss Harvesting sweep scheduled for market close')" class="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-sm font-bold">Run Tax Sweep</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Execution Confirmation Toast -->
+  <div id="alphaToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="px-4 py-3.5 rounded-xl bg-slate-900/95 backdrop-blur-xl text-white shadow-2xl border border-emerald-500/50 flex items-center gap-3 text-sm font-medium">
+      <span class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </span>
+      <span id="alphaToastMsg">Institutional order executed</span>
+    </div>
+  </div>
+
+  <script>
+    // --- Portfolio State ---
+    let buyingPower = 64248.00;
+    let totalNetWorth = 1284950.40;
+    let orderSide = 'BUY';
+    let orderType = 'Limit';
+    let activeTimeframe = '1Y';
+    let selectedAllocationId = null;
+    let activeHoldingTab = 'All Assets';
+
+    const performanceRanges = {
+      '1D': {
+        alphaBadge: 'Alpha Outperformance +0.18%',
+        labels: ['09:30', '10:30', '11:30', '12:30', '13:30', '14:30', '16:00'],
+        portfolio: [0.0, 0.14, 0.28, 0.21, 0.44, 0.53, 0.66],
+        benchmark: [0.0, 0.08, 0.15, 0.12, 0.29, 0.38, 0.48]
+      },
+      '1W': {
+        alphaBadge: 'Alpha Outperformance +0.85%',
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        portfolio: [0.0, 0.6, 1.1, 1.5, 2.25],
+        benchmark: [0.0, 0.4, 0.7, 0.95, 1.40]
+      },
+      '1M': {
+        alphaBadge: 'Alpha Outperformance +1.4%',
+        labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Now'],
+        portfolio: [0.0, 1.2, 0.9, 2.8, 4.1],
+        benchmark: [0.0, 0.8, 0.5, 1.9, 2.7]
+      },
+      '6M': {
+        alphaBadge: 'Alpha Outperformance +2.9%',
+        labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+        portfolio: [0.0, 2.4, 4.1, 6.2, 8.9, 11.4],
+        benchmark: [0.0, 1.9, 3.0, 4.4, 6.6, 8.5]
+      },
+      '1Y': {
+        alphaBadge: 'Alpha Outperformance +4.2%',
+        labels: ['Dec', 'Feb', 'Apr', 'Jun', 'Aug', 'Oct', 'Nov'],
+        portfolio: [0.0, 3.2, 5.8, 8.4, 11.9, 15.1, 18.4],
+        benchmark: [0.0, 2.4, 4.1, 6.3, 9.0, 11.8, 14.2]
+      },
+      'ALL': {
+        alphaBadge: 'Alpha Outperformance +19.6%',
+        labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
+        portfolio: [0.0, 8.5, 24.0, 46.5, 68.2, 92.4],
+        benchmark: [0.0, 4.2, 16.8, 33.4, 51.0, 72.8]
+      }
+    };
+
+    const assetClasses = [
+      { id: 'equities', name: 'US Growth Equities', pct: 46, value: 591077, color: '#10B981', drift: '+1.2%', targetPct: 45 },
+      { id: 'tbills', name: 'US Treasury Bills 5.3%', pct: 22, value: 282689, color: '#38BDF8', drift: '-0.6%', targetPct: 23 },
+      { id: 'etfs', name: 'Global Index ETFs', pct: 18, value: 231291, color: '#818CF8', drift: '+0.4%', targetPct: 18 },
+      { id: 'digital', name: 'Digital & Alternative', pct: 9, value: 115645, color: '#F59E0B', drift: '+0.8%', targetPct: 8 },
+      { id: 'cash', name: 'High-Yield Cash Sweep', pct: 5, value: 64248, color: '#94A3B8', drift: '-1.0%', targetPct: 6 }
+    ];
+
+    const holdings = [
+      {
+        ticker: 'NVDA',
+        name: 'NVIDIA Corp',
+        category: 'Equities',
+        allocClass: 'equities',
+        price: 142.80,
+        change24h: 3.42,
+        spark: [128, 131, 130, 135, 138, 140, 142.8],
+        weight: 21.4,
+        shares: 1925,
+        marketValue: 274890.00,
+        totalPnl: 68420.00,
+        badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+      },
+      {
+        ticker: 'MSFT',
+        name: 'Microsoft Corp',
+        category: 'Equities',
+        allocClass: 'equities',
+        price: 428.50,
+        change24h: 1.18,
+        spark: [416, 419, 421, 418, 423, 426, 428.5],
+        weight: 15.2,
+        shares: 456,
+        marketValue: 195396.00,
+        totalPnl: 31240.00,
+        badgeColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20'
+      },
+      {
+        ticker: 'VOO',
+        name: 'Vanguard S&P 500 ETF',
+        category: 'ETFs & Bonds',
+        allocClass: 'etfs',
+        price: 548.20,
+        change24h: 0.54,
+        spark: [539, 541, 540, 543, 545, 546, 548.2],
+        weight: 18.0,
+        shares: 422,
+        marketValue: 231340.40,
+        totalPnl: 28910.00,
+        badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      },
+      {
+        ticker: 'SGOV',
+        name: 'iShares 0-3M Treasury',
+        category: 'ETFs & Bonds',
+        allocClass: 'tbills',
+        price: 100.42,
+        change24h: 0.04,
+        spark: [100.31, 100.33, 100.35, 100.36, 100.38, 100.40, 100.42],
+        weight: 22.0,
+        shares: 2815,
+        marketValue: 282682.30,
+        totalPnl: 14190.00,
+        badgeColor: 'bg-sky-500/10 text-sky-300 border-sky-400/20'
+      },
+      {
+        ticker: 'AAPL',
+        name: 'Apple Inc',
+        category: 'Equities',
+        allocClass: 'equities',
+        price: 229.60,
+        change24h: -0.62,
+        spark: [234, 233, 232.5, 231, 231.8, 230.4, 229.6],
+        weight: 9.4,
+        shares: 526,
+        marketValue: 120769.60,
+        totalPnl: 19450.00,
+        badgeColor: 'bg-slate-500/20 text-slate-200 border-white/10'
+      },
+      {
+        ticker: 'BTC',
+        name: 'Bitcoin Institutional Trust',
+        category: 'Crypto',
+        allocClass: 'digital',
+        price: 91420.00,
+        change24h: 4.15,
+        spark: [84200, 85900, 85100, 87600, 89200, 90100, 91420],
+        weight: 9.0,
+        shares: 1.265,
+        marketValue: 115646.30,
+        totalPnl: 42180.00,
+        badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+      }
+    ];
+
+    // --- Helpers ---
+    function fmtCurrency(n, decimals = 2) {
+      return '$' + Math.abs(n).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    let alphaToastTimer = null;
+    function showAlphaToast(msg) {
+      const el = document.getElementById('alphaToast');
+      document.getElementById('alphaToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      el.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(alphaToastTimer);
+      alphaToastTimer = setTimeout(() => {
+        el.classList.remove('opacity-100', 'translate-y-0');
+        el.classList.add('opacity-0', 'translate-y-3');
+      }, 3000);
+    }
+
+    // --- Sidebar Controls ---
+    function toggleDesktopSidebar() {
+      document.body.classList.toggle('sidebar-collapsed');
+      const icon = document.getElementById('collapseIcon');
+      icon.style.transform = document.body.classList.contains('sidebar-collapsed')
+        ? 'rotate(180deg)'
+        : 'rotate(0deg)';
+    }
+
+    function toggleMobileSidebar(open) {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('mobileOverlay');
+      if (open) {
+        sb.classList.remove('-translate-x-full');
+        ov.classList.remove('hidden');
+      } else {
+        sb.classList.add('-translate-x-full');
+        ov.classList.add('hidden');
+      }
+    }
+
+    const ALPHA_SUBPAGES = {
+      'Asset Allocation': {
+        badge: '5 Asset Classes · Policy Matrix',
+        title: 'Strategic Asset Allocation & Drift',
+        subtitle: 'Mean-variance policy weights, corridor drift tolerance bands, and factor beta exposure.',
+        cta: 'Auto-Rebalance Drift',
+        ctaFn: "autoRebalanceDrift()",
+        kpis: [
+          { label: 'Portfolio Beta', val: '0.89', sub: 'vs S&P 500 Benchmark', tone: 'text-emerald-400' },
+          { label: 'Sharpe Efficiency', val: '2.18', sub: 'Top Decile Risk-Adj', tone: 'text-sky-400' },
+          { label: 'Max Drift Band', val: '1.8%', sub: '3.0% Tolerance Cap', tone: 'text-amber-400' },
+          { label: 'Deployed Capital', val: '$1.28M', sub: '100% Working Assets', tone: 'text-emerald-400' }
+        ],
+        chartTitle: 'Policy Weight vs Live Allocation',
+        chartSub: 'Continuous Bayesian drift tracking across core institutional sleeves',
+        bars: [
+          { label: 'US Growth Equities (Target 45%)', pct: 46, val: '46.0% · $591k', color: '#10B981' },
+          { label: 'US Treasury Bills 5.3% (Target 23%)', pct: 22, val: '22.0% · $283k', color: '#38BDF8' },
+          { label: 'Global Index ETFs (Target 18%)', pct: 18, val: '18.0% · $231k', color: '#818CF8' }
+        ],
+        cols: ['Asset Sleeve', 'Policy Target', 'Current Value', 'Drift', 'Action'],
+        rows: [
+          { c1: 'US Large-Cap Growth Equities', sub: 'NVDA · MSFT · AAPL', c2: '45.0% Target', c3: '$591,077', status: '+1.0% Over', act: 'Trim to Target' },
+          { c1: 'Short-Duration Sovereign T-Bills', sub: 'SGOV · 3M–6M Ladder', c2: '23.0% Target', c3: '$282,689', status: '-1.0% Under', act: 'Top Up' },
+          { c1: 'Developed Global Index ETFs', sub: 'VOO · VXUS Core', c2: '18.0% Target', c3: '$231,291', status: '0.0% Aligned', act: 'Lock Band' },
+          { c1: 'Digital & Alternative Alpha', sub: 'Spot BTC Cold Custody', c2: '8.0% Target', c3: '$115,645', status: '+1.0% Over', act: 'Trim to Target' },
+          { c1: 'High-Yield Cash Sweep (SIPC)', sub: 'Overnight Repo 5.15%', c2: '6.0% Target', c3: '$64,248', status: '-1.0% Under', act: 'Sweep Cash' }
+        ]
+      },
+      'Holdings & Equities': {
+        badge: 'Direct Indexing & Tax Lots',
+        title: 'Institutional Equity Lot Ledger',
+        subtitle: 'Unrealized capital gains, FIFO/HIFO tax-lot selection, and single-stock alpha contribution.',
+        cta: 'Export Position Blotter',
+        ctaFn: "showAlphaToast('Exported institutional tax-lot blotter (CSV & FIX report)')",
+        kpis: [
+          { label: 'Equity Sleeve Value', val: '$822,368', sub: '+21.4% Time-Weighted', tone: 'text-emerald-400' },
+          { label: 'Unrealized Alpha', val: '+$142.3k', sub: 'Long-Term Gains 84%', tone: 'text-emerald-400' },
+          { label: 'Active Tax Lots', val: '34 Lots', sub: 'HIFO Optimization ON', tone: 'text-sky-400' },
+          { label: 'Weighted P/E', val: '26.4x', sub: '28.9% Forward ROE', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'Single-Name Alpha Attribution',
+        chartSub: 'Basis-point contribution to YTD outperformance (+420 bps vs SPX)',
+        bars: [
+          { label: 'NVDA · Semiconductor Compute', pct: 88, val: '+245 bps Alpha', color: '#10B981' },
+          { label: 'MSFT · Enterprise AI Cloud', pct: 68, val: '+118 bps Alpha', color: '#38BDF8' },
+          { label: 'VOO · Core S&P 500 Anchor', pct: 54, val: '+57 bps Alpha', color: '#818CF8' }
+        ],
+        cols: ['Security / Lot', 'Cost Basis', 'Market Value', 'Unrealized P&L', 'Action'],
+        rows: [
+          { c1: 'NVDA · Lot #2024-A (Long-Term)', sub: '1,925 sh @ $107.25 avg', c2: '$206,470', c3: '$274,890', status: '+$68,420', act: 'Trade Ticket' },
+          { c1: 'MSFT · Lot #2024-C (Long-Term)', sub: '456 sh @ $360.00 avg', c2: '$164,156', c3: '$195,396', status: '+$31,240', act: 'Trade Ticket' },
+          { c1: 'VOO · Lot #2023-B (Core Index)', sub: '422 sh @ $482.10 avg', c2: '$203,446', c3: '$231,340', status: '+$27,894', act: 'Trade Ticket' },
+          { c1: 'AAPL · Lot #2025-A (Core Tech)', sub: '530 sh @ $208.40 avg', c2: '$110,452', c3: '$120,946', status: '+$10,494', act: 'Trade Ticket' },
+          { c1: 'BTC · Prime Custody Cold Vault', sub: '1.26 BTC @ $73,500 avg', c2: '$92,610', c3: '$115,645', status: '+$23,035', act: 'Trade Ticket' }
+        ]
+      },
+      'Fixed Income & T-Bills': {
+        badge: '5.32% Sovereign Yield',
+        title: 'US Treasury Ladder & Fixed Income',
+        subtitle: 'State-tax-exempt sovereign US T-Bills, automated maturity rollovers, and duration telemetry.',
+        cta: 'Roll Maturing T-Bill',
+        ctaFn: "showAlphaToast('Auto-rollover enabled at TreasuryDirect auction midpoint (5.32% YTM)')",
+        kpis: [
+          { label: 'Sovereign Allocation', val: '$282,689', sub: '100% US Treasury Backed', tone: 'text-sky-400' },
+          { label: 'Blended Yield (YTM)', val: '5.32%', sub: 'State & Local Tax Exempt', tone: 'text-emerald-400' },
+          { label: 'Effective Duration', val: '0.38 Yrs', sub: 'Ultra-Low Rate Risk', tone: 'text-sky-400' },
+          { label: 'Annual Coupon Run', val: '+$15,039', sub: 'Paid Monthly T+1', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'Treasury Maturity Ladder',
+        chartSub: 'Staggered 30 / 60 / 90 / 180-day liquidity rungs',
+        bars: [
+          { label: '3-Month US T-Bill Rung (5.36%)', pct: 86, val: '$120,000', color: '#38BDF8' },
+          { label: '6-Month US T-Bill Rung (5.30%)', pct: 68, val: '$95,000', color: '#10B981' },
+          { label: 'SGOV Ultra-Short ETF (5.26%)', pct: 48, val: '$67,689', color: '#818CF8' }
+        ],
+        cols: ['CUSIP / Instrument', 'Maturity', 'Par / Market Value', 'YTM', 'Action'],
+        rows: [
+          { c1: 'US Treasury Bill · 912797-KQ', sub: 'Zero-coupon sovereign', c2: 'Dec 18, 2026', c3: '$80,000.00', status: '5.36% YTM', act: 'Auto-Roll' },
+          { c1: 'US Treasury Bill · 912797-LM', sub: 'Zero-coupon sovereign', c2: 'Jan 22, 2027', c3: '$65,000.00', status: '5.34% YTM', act: 'Auto-Roll' },
+          { c1: 'US Treasury Bill · 912797-NP', sub: 'Zero-coupon sovereign', c2: 'Mar 19, 2027', c3: '$70,000.00', status: '5.29% YTM', act: 'Auto-Roll' },
+          { c1: 'SGOV · iShares 0-3M Treasury', sub: 'T+0 intraday liquidity', c2: 'Open-Ended', c3: '$67,689.00', status: '5.26% SEC', act: 'Reinvest' },
+          { c1: 'Overnight Fed Repo Sweep', sub: 'Prime custody cash buffer', c2: 'Daily T+0', c3: '$64,248.00', status: '5.15% APY', act: 'Sweep' }
+        ]
+      },
+      'Dividends & Tax': {
+        badge: 'Tax Alpha +$4,820',
+        title: 'Dividend Schedule & Tax-Loss Harvesting',
+        subtitle: 'Projected 12-month cash distributions, wash-sale guardrails (31-day IRS rule), and 1099 preview.',
+        cta: 'Open Tax Optimizer',
+        ctaFn: "openDividendModal()",
+        kpis: [
+          { label: 'Annual Cash Yield', val: '+$41,632', sub: '3.24% Portfolio Yield', tone: 'text-emerald-400' },
+          { label: 'Harvestable Offset', val: '$4,820', sub: 'Zero Wash-Sale Conflict', tone: 'text-amber-400' },
+          { label: 'Qualified Div Ratio', val: '91.4%', sub: 'Preferential Tax Rate', tone: 'text-sky-400' },
+          { label: 'DRIP Auto-Invest', val: 'Enabled', sub: 'Fractional Zero-Fee', tone: 'text-emerald-400' }
+        ],
+        chartTitle: 'Quarterly Cash Distribution Curve',
+        chartSub: 'Compounding dividend + sovereign T-Bill coupon inflows',
+        bars: [
+          { label: 'Q4 Projected Distributions', pct: 92, val: '+$11,480', color: '#10B981' },
+          { label: 'Q3 Settled Distributions', pct: 81, val: '+$10,290', color: '#38BDF8' },
+          { label: 'Automated Tax-Alpha Saved YTD', pct: 64, val: '+$6,140', color: '#F59E0B' }
+        ],
+        cols: ['Payer / Security', 'Ex-Div / Pay Date', 'Payout Est.', 'Tax Treatment', 'Action'],
+        rows: [
+          { c1: 'SGOV · Monthly Treasury Coupon', sub: '672 shares held', c2: 'Pay Dec 04', c3: '+$1,248.50', status: 'State Exempt', act: 'Toggle DRIP' },
+          { c1: 'VOO · Vanguard S&P 500 Dividend', sub: '422 shares held', c2: 'Pay Dec 22', c3: '+$1,890.40', status: 'Qualified', act: 'Toggle DRIP' },
+          { c1: 'MSFT · Quarterly Cash Dividend', sub: '456 shares held', c2: 'Pay Dec 12', c3: '+$378.48', status: 'Qualified', act: 'Toggle DRIP' },
+          { c1: 'Tax-Loss Pair: QQQ -> QQQM', sub: '31-day wash-sale safe swap', c2: 'Ready Now', c3: '$3,410 Offset', status: 'Harvestable', act: 'Harvest Lot' },
+          { c1: 'Tax-Loss Pair: IWM -> VTWO', sub: 'Correlated small-cap replacement', c2: 'Ready Now', c3: '$1,410 Offset', status: 'Harvestable', act: 'Harvest Lot' }
+        ]
+      },
+      'Trade Execution': {
+        badge: 'IEX · Dark Pool SOR',
+        title: 'Institutional EMS & Execution Blotter',
+        subtitle: 'Smart Order Router (SOR) venue fill quality, NBBO midpoint price improvement, and FIX fills.',
+        cta: 'Dispatch Alpha Sweep',
+        ctaFn: "triggerAlphaOrderBurst(false)",
+        kpis: [
+          { label: 'Price Improvement', val: '+14.2 bps', sub: 'vs National Best Bid/Offer', tone: 'text-emerald-400' },
+          { label: 'Median Fill Speed', val: '0.8 ms', sub: 'Co-Located NY4 Engine', tone: 'text-sky-400' },
+          { label: 'Buying Power', val: '$64,248', sub: 'T+0 Instant Settlement', tone: 'text-emerald-400' },
+          { label: 'Dark Pool Fill %', val: '62.4%', sub: 'Zero Information Leakage', tone: 'text-amber-400' }
+        ],
+        chartTitle: 'Venue Routing & Liquidity Split',
+        chartSub: 'Execution allocation across lit exchanges and midpoint dark pools',
+        bars: [
+          { label: 'IEX Speed-Bump MidpointPeg', pct: 48, val: '48% Volume', color: '#10B981' },
+          { label: 'Institutional Dark Pools (VWAP)', pct: 34, val: '34% Volume', color: '#38BDF8' },
+          { label: 'NASDAQ / NYSE Direct Lit', pct: 18, val: '18% Volume', color: '#818CF8' }
+        ],
+        cols: ['Order ID / Security', 'Venue / Algo', 'Fill Price', 'Edge Saved', 'Action'],
+        rows: [
+          { c1: '#FIX-9084 · BUY 50 NVDA', sub: 'Filled 14:22:09.104 EST', c2: 'IEX Midpoint', c3: '$142.68', status: '+16.4 bps', act: 'Repeat Order' },
+          { c1: '#FIX-9081 · BUY 25 MSFT', sub: 'Filled 11:05:41.882 EST', c2: 'VWAP Dark Pool', c3: '$428.10', status: '+12.8 bps', act: 'Repeat Order' },
+          { c1: '#FIX-9076 · BUY 120 SGOV', sub: 'Filled Nov 15 · Cash Sweep', c2: 'NYSE Arca NBBO', c3: '$100.42', status: '+4.0 bps', act: 'Repeat Order' },
+          { c1: '#FIX-9070 · SELL 15 AAPL', sub: 'Filled Nov 14 · Rebalance', c2: 'IEX Midpoint', c3: '$228.45', status: '+15.1 bps', act: 'Audit TCA' },
+          { c1: '#FIX-9064 · BUY 0.25 BTC', sub: 'Filled Nov 12 · Cold Custody', c2: 'Prime OTCRFQ', c3: '$91,620.00', status: '+18.5 bps', act: 'Audit TCA' }
+        ]
+      }
+    };
+
+    function renderAlphaSubpage(title) {
+      const cfg = ALPHA_SUBPAGES[title];
+      const container = document.getElementById('tabSubpageView');
+      if (!cfg || !container) return;
+
+      const kpiHtml = cfg.kpis.map(k => `
+        <div class="glass-panel rounded-2xl p-5 flex flex-col justify-between gap-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">${k.label}</span>
+            <span class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+          </div>
+          <div class="font-display font-bold text-2xl text-white tracking-tight tabular-nums">${k.val}</div>
+          <p class="text-xs font-mono font-semibold ${k.tone}">${k.sub}</p>
+        </div>
+      `).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div>
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-medium text-slate-300">${b.label}</span>
+            <span class="font-mono font-semibold text-white tabular-nums">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+            <div class="h-full rounded-full" style="width:${b.pct}%; background:${b.color}"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-white/5 transition-colors">
+          <td class="py-3.5 pl-6 pr-3">
+            <div class="font-semibold text-sm text-white">${r.c1}</div>
+            <div class="text-xs text-slate-400 font-mono">${r.sub}</div>
+          </td>
+          <td class="py-3.5 px-3 text-xs font-mono text-slate-300 whitespace-nowrap">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono text-sm font-bold text-white tabular-nums whitespace-nowrap">${r.c3}</td>
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            <span class="alpha-row-pill inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${r.status}</span>
+          </td>
+          <td class="py-3.5 pl-3 pr-6 text-right whitespace-nowrap">
+            <button type="button" onclick="handleAlphaSubAction(this, '${r.c1}', '${r.act}')" class="h-8 px-3 rounded-xl bg-white/5 hover:bg-emerald-500 hover:text-slate-950 border border-white/10 hover:border-emerald-400 text-xs font-semibold text-slate-200 transition-all">
+              ${r.act}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5 mb-2">
+              <button type="button" onclick="selectWealthNav(null, 'Portfolio Overview')" class="h-8 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 inline-flex items-center gap-1.5 transition-colors">
+                <span>&larr; Overview</span>
+              </button>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${cfg.badge}</span>
+            </div>
+            <h2 class="font-display font-bold text-xl sm:text-2xl text-white tracking-tight">${cfg.title}</h2>
+            <p class="text-sm text-slate-400 mt-1">${cfg.subtitle}</p>
+          </div>
+          <button type="button" onclick="${cfg.ctaFn}" class="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-sm font-bold inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <span>${cfg.cta}</span>
+          </button>
+        </div>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          ${kpiHtml}
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 glass-panel rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-5">
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-white">${cfg.chartTitle}</h3>
+              <p class="text-xs text-slate-400 mt-0.5">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl bg-slate-950/70 border border-white/10 p-4">
+              <svg viewBox="0 0 360 130" class="w-full h-32 overflow-visible" fill="none">
+                <line x1="16" y1="24" x2="344" y2="24" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4 4" />
+                <line x1="16" y1="68" x2="344" y2="68" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4 4" />
+                <line x1="16" y1="110" x2="344" y2="110" stroke="rgba(255,255,255,0.14)" />
+                <path d="M 20 98 C 82 88, 140 62, 200 54 C 258 46, 302 28, 340 18 L 340 110 L 20 110 Z" fill="rgba(16, 185, 129, 0.18)" />
+                <path d="M 20 102 C 82 94, 140 78, 200 72 C 258 66, 302 52, 340 44" stroke="#38BDF8" stroke-width="2" stroke-dasharray="5 5" />
+                <path d="M 20 98 C 82 88, 140 62, 200 54 C 258 46, 302 28, 340 18" stroke="#10B981" stroke-width="3" stroke-linecap="round" class="alpha-line-draw" />
+                <circle cx="340" cy="18" r="4.5" fill="#090D16" stroke="#10B981" stroke-width="2.5" />
+                <g fill="#94A3B8" font-size="12" font-family="JetBrains Mono, monospace">
+                  <text x="20" y="126">Q1</text>
+                  <text x="122" y="126">Q2</text>
+                  <text x="224" y="126">Q3</text>
+                  <text x="316" y="126">YTD</text>
+                </g>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 glass-panel rounded-2xl overflow-hidden flex flex-col justify-between">
+            <div class="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between gap-3">
+              <div>
+                <h3 class="font-display font-bold text-base sm:text-lg text-white">${title} Blotter</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Prime custody telemetry &amp; direct execution controls</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-white/5 border border-white/10 text-slate-300">5 Positions</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-white/10 bg-slate-950/60 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <th class="py-3.5 pl-6 pr-3">${cfg.cols[0]}</th>
+                    <th class="py-3.5 px-3">${cfg.cols[1]}</th>
+                    <th class="py-3.5 px-3">${cfg.cols[2]}</th>
+                    <th class="py-3.5 px-3">${cfg.cols[3]}</th>
+                    <th class="py-3.5 pl-3 pr-6 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function handleAlphaSubAction(btn, rowLabel, actionLabel) {
+      if (actionLabel === 'Trade Ticket') {
+        const ticker = rowLabel.split(' ')[0];
+        selectWealthNav(null, 'Portfolio Overview');
+        loadTickerIntoTicket(ticker);
+        document.getElementById('orderTicketSection').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      btn.textContent = 'Executed';
+      btn.className = 'h-8 px-3 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold transition-all';
+      showAlphaToast(`${actionLabel} executed for ${rowLabel}`);
+    }
+
+    function selectWealthNav(btn, title, sectionId) {
+      document.querySelectorAll('#wealthNav .sidebar-nav-item').forEach(el => {
+        const isMatch = btn ? (el === btn) : (el.dataset.nav === title);
+        if (isMatch) {
+          el.className = 'sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between gap-2 text-sm font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 transition-all';
+        } else {
+          el.className = 'sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between gap-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all';
+        }
+      });
+      document.getElementById('topbarTitle').textContent = title;
+      toggleMobileSidebar(false);
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (title === 'Portfolio Overview') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderAlphaSubpage(title);
+      }
+    }
+
+    function filterToFixedIncome(btn) {
+      selectWealthNav(btn, 'Fixed Income & T-Bills');
+    }
+
+    // --- Hero Performance Dual-Line Chart ---
+    function setPerformanceRange(tf) {
+      activeTimeframe = tf;
+      document.querySelectorAll('#timeframeGroup .tf-btn').forEach(btn => {
+        if (btn.dataset.tf === tf) {
+          btn.className = 'tf-btn min-h-[38px] px-3 rounded-lg text-sm font-semibold bg-emerald-500 text-slate-950 shadow-sm transition-all';
+        } else {
+          btn.className = 'tf-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all';
+        }
+      });
+      document.getElementById('alphaSpreadBadge').textContent = performanceRanges[tf].alphaBadge;
+      renderPerformanceChart();
+    }
+
+    function renderPerformanceChart() {
+      const svg = document.getElementById('performanceSvg');
+      const ds = performanceRanges[activeTimeframe];
+      const W = 760;
+      const H = 250;
+      const padL = 48;
+      const padR = 20;
+      const padT = 18;
+      const padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const maxVal = Math.max(...ds.portfolio, ...ds.benchmark) * 1.15 || 1;
+
+      let html = `
+        <defs>
+          <linearGradient id="alphaAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#10B981" stop-opacity="0.36" />
+            <stop offset="100%" stop-color="#10B981" stop-opacity="0.0" />
+          </linearGradient>
+          <filter id="emeraldGlow" x="-15%" y="-20%" width="130%" height="140%">
+            <feGaussianBlur stdDeviation="3.4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="skyGlow" x="-15%" y="-20%" width="130%" height="140%">
+            <feGaussianBlur stdDeviation="2.4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <clipPath id="benchRevealClip">
+            <rect x="0" y="0" width="760" height="250">
+              <animate attributeName="width" from="0" to="760" dur="1.1s" fill="freeze" />
+            </rect>
+          </clipPath>
+        </defs>
+      `;
+
+      // Grid lines
+      for (let i = 0; i <= 4; i++) {
+        const val = (maxVal / 4) * i;
+        const y = padT + plotH - (val / maxVal) * plotH;
+        html += `
+          <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="4 4" />
+          <text x="${padL - 10}" y="${y + 4}" text-anchor="end" fill="#64748B" font-size="12" font-family="JetBrains Mono, monospace">+${val.toFixed(1)}%</text>
+        `;
+      }
+
+      const count = ds.labels.length;
+      const portPts = ds.portfolio.map((v, idx) => ({
+        x: padL + (plotW * idx) / (count - 1),
+        y: padT + plotH - (v / maxVal) * plotH,
+        v,
+        b: ds.benchmark[idx],
+        label: ds.labels[idx]
+      }));
+      const benchPts = ds.benchmark.map((v, idx) => ({
+        x: padL + (plotW * idx) / (count - 1),
+        y: padT + plotH - (v / maxVal) * plotH
+      }));
+
+      // Smooth cubic Bezier curve interpolation
+      const buildSmooth = (pts) => pts.map((p, i) => {
+        if (i === 0) return `M ${p.x} ${p.y}`;
+        const prev = pts[i - 1];
+        const midX = ((prev.x + p.x) / 2).toFixed(1);
+        return `C ${midX} ${prev.y}, ${midX} ${p.y}, ${p.x} ${p.y}`;
+      }).join(' ');
+
+      const portLine = buildSmooth(portPts);
+      const portArea = `${portLine} L ${portPts[portPts.length - 1].x} ${padT + plotH} L ${portPts[0].x} ${padT + plotH} Z`;
+      const benchLine = buildSmooth(benchPts);
+
+      html += `<path d="${portArea}" fill="url(#alphaAreaGrad)" class="alpha-area-fade" />`;
+      html += `<path d="${benchLine}" clip-path="url(#benchRevealClip)" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-dasharray="6 5" stroke-linecap="round" filter="url(#skyGlow)" />`;
+      html += `<path id="alphaHeroMotionPath" d="${portLine}" pathLength="1000" fill="none" stroke="#10B981" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" filter="url(#emeraldGlow)" class="alpha-line-draw" />`;
+
+      // Animated Glowing Alpha Packet Gliding Along Portfolio Curve
+      html += `
+        <circle r="4.5" fill="#34D399" filter="url(#emeraldGlow)" pointer-events="none">
+          <animateMotion dur="4.4s" repeatCount="indefinite">
+            <mpath href="#alphaHeroMotionPath" />
+          </animateMotion>
+        </circle>
+      `;
+
+      portPts.forEach((p, idx) => {
+        const isPeak = idx === portPts.length - 1;
+        html += `
+          <text x="${p.x}" y="${H - 8}" text-anchor="middle" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">${p.label}</text>
+          <g class="cursor-pointer" onmouseenter="hoverPerformanceNode('${p.label}', ${p.v}, ${p.b})">
+            ${isPeak ? `<circle cx="${p.x}" cy="${p.y}" r="9" fill="rgba(16,185,129,0.28)" class="alpha-sonar-ring" />` : ''}
+            <circle cx="${p.x}" cy="${benchPts[idx].y}" r="3.5" fill="#090D16" stroke="#38BDF8" stroke-width="2" />
+            <circle cx="${p.x}" cy="${p.y}" r="${isPeak ? 5.2 : 4.5}" fill="#090D16" stroke="#10B981" stroke-width="2.5" />
+            <rect x="${p.x - 24}" y="${padT}" width="48" height="${plotH}" fill="transparent" />
+          </g>
+        `;
+      });
+
+      const last = portPts[portPts.length - 1];
+      hoverPerformanceNode(last.label, last.v, last.b);
+      svg.innerHTML = html;
+    }
+
+    function hoverPerformanceNode(label, portVal, benchVal) {
+      document.getElementById('perfHoverReadout').innerHTML =
+        `${label}: <span class="text-emerald-400 font-semibold">Portfolio +${portVal.toFixed(2)}%</span> vs <span class="text-sky-400 font-semibold">S&amp;P +${benchVal.toFixed(2)}%</span>`;
+    }
+
+    // --- Interactive Asset Allocation Donut & Drift ---
+    function renderAllocationDonut() {
+      const svg = document.getElementById('allocationDonutSvg');
+      const list = document.getElementById('allocationList');
+      const r = 78;
+      const circumference = 2 * Math.PI * r;
+      let cumulativePct = 0;
+
+      svg.innerHTML = assetClasses.map(seg => {
+        const segLen = (seg.pct / 100) * circumference;
+        const gap = 3.5;
+        const dash = Math.max(0, segLen - gap);
+        const offset = -(cumulativePct / 100) * circumference;
+        cumulativePct += seg.pct;
+
+        const isSelected = selectedAllocationId === seg.id;
+        const dimmed = selectedAllocationId && !isSelected;
+        const strokeW = isSelected ? 24 : 19;
+        const opacity = dimmed ? 0.35 : 1;
+
+        return `
+          <circle
+            cx="105" cy="105" r="${r}"
+            fill="transparent"
+            stroke="${seg.color}"
+            stroke-width="${strokeW}"
+            stroke-dasharray="${dash} ${circumference}"
+            stroke-dashoffset="${offset}"
+            style="opacity: ${opacity}"
+            class="donut-segment"
+            onclick="selectAllocationSegment('${seg.id}')"
+          />
+        `;
+      }).join('');
+
+      list.innerHTML = assetClasses.map(seg => {
+        const isSelected = selectedAllocationId === seg.id;
+        const rowClass = isSelected
+          ? 'bg-white/10 border-emerald-400/50'
+          : 'bg-white/5 border-white/5 hover:bg-white/10';
+        return `
+          <button type="button" onclick="selectAllocationSegment('${seg.id}')" class="w-full min-h-[42px] px-3 py-2 rounded-xl border ${rowClass} flex items-center justify-between gap-2 text-left transition-all">
+            <span class="flex items-center gap-2.5 min-w-0">
+              <span class="w-3 h-3 rounded-full shrink-0" style="background:${seg.color}"></span>
+              <span class="text-sm font-medium text-slate-200 truncate">${seg.name}</span>
+            </span>
+            <span class="flex items-center gap-2 shrink-0 font-mono text-xs tabular-nums">
+              <span class="text-slate-400">$${seg.value.toLocaleString('en-US')}</span>
+              <span class="font-bold text-white px-1.5 py-0.5 rounded bg-white/10">${seg.pct}%</span>
+            </span>
+          </button>
+        `;
+      }).join('');
+
+      const activeSeg = assetClasses.find(s => s.id === selectedAllocationId);
+      const resetBtn = document.getElementById('clearClassFilterBtn');
+      if (activeSeg) {
+        document.getElementById('donutCenterLabel').textContent = activeSeg.name;
+        document.getElementById('donutCenterValue').textContent = '$' + Math.round(activeSeg.value / 1000) + 'k';
+        document.getElementById('donutCenterSub').textContent = `${activeSeg.pct}% · Drift ${activeSeg.drift}`;
+        resetBtn.classList.remove('hidden');
+      } else {
+        document.getElementById('donutCenterLabel').textContent = 'Total Capital';
+        document.getElementById('donutCenterValue').textContent = '$1.28M';
+        document.getElementById('donutCenterSub').textContent = '100% Deployed';
+        resetBtn.classList.add('hidden');
+      }
+    }
+
+    function selectAllocationSegment(id) {
+      selectedAllocationId = selectedAllocationId === id ? null : id;
+      renderAllocationDonut();
+      renderHoldingsTable();
+    }
+
+    function autoRebalanceDrift() {
+      assetClasses.forEach(seg => {
+        seg.pct = seg.targetPct;
+        seg.value = Math.round((seg.pct / 100) * totalNetWorth);
+        seg.drift = '0.0%';
+      });
+      const badge = document.getElementById('driftStatusBadge');
+      badge.textContent = '0.0% On Target';
+      badge.className = 'px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      document.getElementById('rebalanceBtnText').textContent = 'Portfolio Rebalanced';
+      renderAllocationDonut();
+      triggerAlphaOrderBurst(true);
+      showAlphaToast('Smart Rebalance executed across 5 asset classes — portfolio drift is now 0.0%');
+    }
+
+    // --- Holdings Table with Animated SVG 7D Sparklines + Glowing Live Tip ---
+    function setHoldingTab(tab) {
+      activeHoldingTab = tab;
+      document.querySelectorAll('.holding-tab').forEach(btn => {
+        if (btn.dataset.htab === tab) {
+          btn.className = 'holding-tab h-10 px-3.5 rounded-xl text-sm font-semibold bg-emerald-500 text-slate-950 shrink-0 transition-all';
+        } else {
+          btn.className = 'holding-tab h-10 px-3.5 rounded-xl text-sm font-medium bg-white/5 text-slate-300 hover:text-white shrink-0 transition-all';
+        }
+      });
+      renderHoldingsTable();
+    }
+
+    function buildSparklineSvg(values, isUp, uid) {
+      const w = 104;
+      const h = 32;
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const span = max - min || 1;
+      const coords = values.map((v, i) => {
+        const x = (i / (values.length - 1)) * (w - 10) + 5;
+        const y = h - 5 - ((v - min) / span) * (h - 10);
+        return { x: parseFloat(x.toFixed(1)), y: parseFloat(y.toFixed(1)) };
+      });
+      const pathD = coords.map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`)).join(' ');
+      const areaD = `${pathD} L ${coords[coords.length - 1].x} ${h - 2} L ${coords[0].x} ${h - 2} Z`;
+      const lastPt = coords[coords.length - 1];
+      const stroke = isUp ? '#10B981' : '#F43F5E';
+      const gradId = `spkGrad_${uid}`;
+      return `
+        <svg viewBox="0 0 ${w} ${h}" class="w-[104px] h-8 mx-auto overflow-visible">
+          <defs>
+            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${stroke}" stop-opacity="0.28" />
+              <stop offset="100%" stop-color="${stroke}" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+          <path d="${areaD}" fill="url(#${gradId})" />
+          <path d="${pathD}" pathLength="1000" fill="none" stroke="${stroke}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" class="alpha-line-draw" />
+          <circle cx="${lastPt.x}" cy="${lastPt.y}" r="4.5" fill="${stroke}" fill-opacity="0.28" class="alpha-sonar-ring" />
+          <circle cx="${lastPt.x}" cy="${lastPt.y}" r="2.6" fill="${stroke}" />
+        </svg>
+      `;
+    }
+
+    function renderHoldingsTable() {
+      const q = document.getElementById('tickerSearchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('holdingsTableBody');
+
+      const filtered = holdings.filter(h => {
+        const tabMatch = activeHoldingTab === 'All Assets' || h.category === activeHoldingTab;
+        const allocMatch = !selectedAllocationId || selectedAllocationId === 'cash' || h.allocClass === selectedAllocationId;
+        const searchMatch = !q || h.ticker.toLowerCase().includes(q) || h.name.toLowerCase().includes(q);
+        return tabMatch && allocMatch && searchMatch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-12 text-center text-sm text-slate-400">
+              No matching positions found in this view.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(h => {
+        const isUp = h.change24h >= 0;
+        const changeSign = isUp ? '+' : '';
+        const changeStyle = isUp
+          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+          : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        const flash = h.justUpdated ? 'holding-flash' : '';
+        if (h.justUpdated) setTimeout(() => { h.justUpdated = false; }, 1900);
+
+        return `
+          <tr onclick="loadTickerIntoTicket('${h.ticker}')" class="hover:bg-white/5 cursor-pointer transition-colors ${flash}">
+            <td class="py-4 pl-6 pr-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl border ${h.badgeColor} font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                  ${h.ticker}
+                </div>
+                <div>
+                  <div class="font-semibold text-white text-sm">${h.ticker} &middot; ${h.name}</div>
+                  <div class="text-xs text-slate-400 tabular-nums">${h.shares.toLocaleString('en-US')} units &middot; ${h.category}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 px-3 text-right font-mono font-semibold text-sm text-white tabular-nums">
+              ${fmtCurrency(h.price)}
+            </td>
+            <td class="py-4 px-3 text-right whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-semibold border ${changeStyle} tabular-nums">
+                ${changeSign}${h.change24h.toFixed(2)}%
+              </span>
+            </td>
+            <td class="py-4 px-3 text-center">
+              ${buildSparklineSvg(h.spark, isUp, h.ticker)}
+            </td>
+            <td class="py-4 px-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-20 h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div class="h-full rounded-full bg-emerald-400" style="width: ${Math.min(100, h.weight * 3.5)}%"></div>
+                </div>
+                <span class="font-mono text-xs font-semibold text-slate-300 tabular-nums">${h.weight.toFixed(1)}%</span>
+              </div>
+            </td>
+            <td class="py-4 pl-3 pr-6 text-right whitespace-nowrap">
+              <div class="font-mono font-bold text-[15px] text-white tabular-nums">${fmtCurrency(h.marketValue)}</div>
+              <div class="font-mono text-xs text-emerald-400 tabular-nums">+${fmtCurrency(h.totalPnl, 0)} P&amp;L</div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- Instant Order Execution Ticket ---
+    function loadTickerIntoTicket(ticker) {
+      const sel = document.getElementById('orderTickerSelect');
+      sel.value = ticker;
+      onOrderTickerChange();
+      showAlphaToast(`Loaded ${ticker} into institutional order ticket`);
+    }
+
+    function setOrderSide(side) {
+      orderSide = side;
+      const buyBtn = document.getElementById('sideBuyBtn');
+      const sellBtn = document.getElementById('sideSellBtn');
+      const submitBtn = document.getElementById('submitOrderBtn');
+      const submitLbl = document.getElementById('submitOrderBtnLabel');
+
+      if (side === 'BUY') {
+        buyBtn.className = 'h-10 rounded-lg text-sm font-bold bg-emerald-500 text-slate-950 shadow-sm transition-all';
+        sellBtn.className = 'h-10 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition-all';
+        submitBtn.className = 'w-full h-11 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all';
+        submitLbl.textContent = 'Place Institutional Buy Order';
+      } else {
+        sellBtn.className = 'h-10 rounded-lg text-sm font-bold bg-rose-500 text-white shadow-sm transition-all';
+        buyBtn.className = 'h-10 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition-all';
+        submitBtn.className = 'w-full h-11 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-display font-bold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 transition-all';
+        submitLbl.textContent = 'Place Institutional Sell Order';
+      }
+      updateOrderEstimate();
+    }
+
+    function setOrderType(type) {
+      orderType = type;
+      const limBtn = document.getElementById('typeLimitBtn');
+      const mktBtn = document.getElementById('typeMarketBtn');
+      const priceInput = document.getElementById('orderLimitPriceInput');
+
+      if (type === 'Limit') {
+        limBtn.className = 'h-10 rounded-xl text-sm font-semibold bg-white/10 text-white border border-emerald-400/50 transition-all';
+        mktBtn.className = 'h-10 rounded-xl text-sm font-medium bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all';
+        priceInput.readOnly = false;
+        priceInput.classList.remove('opacity-80');
+      } else {
+        mktBtn.className = 'h-10 rounded-xl text-sm font-semibold bg-white/10 text-white border border-emerald-400/50 transition-all';
+        limBtn.className = 'h-10 rounded-xl text-sm font-medium bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all';
+        onOrderTickerChange();
+        priceInput.readOnly = true;
+        priceInput.classList.add('opacity-80');
+      }
+    }
+
+    function onOrderTickerChange() {
+      const ticker = document.getElementById('orderTickerSelect').value;
+      const pos = holdings.find(h => h.ticker === ticker);
+      if (pos) {
+        document.getElementById('orderLimitPriceInput').value = pos.price.toFixed(2);
+        document.getElementById('liveBidAskSpread').textContent = `Spot: ${fmtCurrency(pos.price)}`;
+        if (ticker === 'BTC') {
+          document.getElementById('orderSharesInput').value = '0.10';
+        } else if (parseFloat(document.getElementById('orderSharesInput').value) < 1) {
+          document.getElementById('orderSharesInput').value = '15';
+        }
+      }
+      updateOrderEstimate();
+    }
+
+    function updateOrderEstimate() {
+      const qty = parseFloat(document.getElementById('orderSharesInput').value) || 0;
+      const price = parseFloat(document.getElementById('orderLimitPriceInput').value) || 0;
+      const est = qty * price;
+      document.getElementById('estimatedOrderTotal').textContent = fmtCurrency(est);
+    }
+
+    function placeInstitutionalOrder() {
+      const ticker = document.getElementById('orderTickerSelect').value;
+      const qty = parseFloat(document.getElementById('orderSharesInput').value);
+      const price = parseFloat(document.getElementById('orderLimitPriceInput').value);
+
+      if (isNaN(qty) || qty <= 0 || isNaN(price) || price <= 0) {
+        showAlphaToast('Enter a valid quantity and execution price');
+        return;
+      }
+
+      const total = qty * price;
+      const pos = holdings.find(h => h.ticker === ticker);
+
+      if (orderSide === 'BUY') {
+        if (total > buyingPower) {
+          showAlphaToast(`Order exceeds available Buying Power (${fmtCurrency(buyingPower)})`);
+          return;
+        }
+        buyingPower -= total;
+        if (pos) {
+          pos.shares = parseFloat((pos.shares + qty).toFixed(4));
+          pos.marketValue += total;
+          pos.justUpdated = true;
+        }
+      } else {
+        if (pos && qty > pos.shares) {
+          showAlphaToast(`Cannot sell more than held (${pos.shares} ${ticker})`);
+          return;
+        }
+        buyingPower += total;
+        if (pos) {
+          pos.shares = parseFloat((pos.shares - qty).toFixed(4));
+          pos.marketValue = Math.max(0, pos.marketValue - total);
+          pos.justUpdated = true;
+        }
+      }
+
+      document.getElementById('buyingPowerReadout').textContent = fmtCurrency(buyingPower);
+      renderHoldingsTable();
+      triggerAlphaOrderBurst(true);
+      showAlphaToast(`${orderSide} ${qty} ${ticker} @ ${fmtCurrency(price)} (${orderType}) filled via IEX NBBO`);
+    }
+
+    // --- Autonomous Alpha Stream Stage Inspector & Particle Burst ---
+    const alphaStageData = [
+      {
+        title: 'Node 1 — FIX / ITCH Level-2 Market Feed',
+        caption: '<strong class="text-sky-400 font-semibold">0.3ms Co-Located Feed</strong> &middot; Full order-book depth across NYSE, NASDAQ, CME &amp; institutional crypto venues'
+      },
+      {
+        title: 'Node 2 — Autonomous Alpha Factor Engine',
+        caption: '<strong class="text-emerald-400 font-semibold">+4.20% Net Alpha</strong> &middot; Continuous Sharpe optimization, drift detection &amp; tax-lot selection'
+      },
+      {
+        title: 'Node 3 — Smart Dark-Pool Order Router (SOR)',
+        caption: '<strong class="text-indigo-400 font-semibold">+14.2 bps Price Improvement</strong> &middot; Midpoint VWAP slicing across IEX &amp; institutional liquidity pools'
+      },
+      {
+        title: 'Node 4 — SIPC Prime Custody Settlement',
+        caption: '<strong class="text-amber-400 font-semibold">T+0 Atomic Clearing</strong> &middot; Segregated institutional custody &amp; automated treasury cash sweep'
+      }
+    ];
+
+    function inspectAlphaStage(idx) {
+      [0, 1, 2, 3].forEach(i => {
+        const box = document.getElementById('alphaNode' + i);
+        if (!box) return;
+        if (i === idx) {
+          box.setAttribute('stroke', i === 0 ? '#38BDF8' : '#10B981');
+          box.setAttribute('stroke-width', '2.4');
+        } else {
+          box.setAttribute('stroke', i === 3 ? '#10B981' : 'rgba(255,255,255,0.14)');
+          box.setAttribute('stroke-width', '1.5');
+        }
+      });
+      const item = alphaStageData[idx];
+      document.getElementById('alphaStageCaption').innerHTML = `${item.title}: ${item.caption}`;
+    }
+
+    function triggerAlphaOrderBurst(silent) {
+      const layer = document.getElementById('alphaBurstLayer');
+      if (!layer) return;
+      const lanes = ['alphaLane1A', 'alphaLane1B', 'alphaLane2A', 'alphaLane2B', 'alphaLane3A', 'alphaLane3B'];
+      let svgMarkup = '';
+      lanes.forEach((laneId, i) => {
+        const colors = ['#10B981', '#38BDF8', '#F59E0B'];
+        const fill = colors[i % colors.length];
+        svgMarkup += `
+          <circle r="6" fill="${fill}" filter="url(#alphaPacketEmerald)">
+            <animateMotion dur="0.85s" begin="${(i * 0.07).toFixed(2)}s" repeatCount="2">
+              <mpath href="#${laneId}" />
+            </animateMotion>
+          </circle>
+        `;
+      });
+      layer.innerHTML = svgMarkup;
+      document.getElementById('alphaMsgRateReadout').textContent = '84,900 msg/s';
+      setTimeout(() => {
+        layer.innerHTML = '';
+        document.getElementById('alphaMsgRateReadout').textContent = '48,200 msg/s';
+      }, 1900);
+      if (!silent) {
+        showAlphaToast('Dispatched multi-venue alpha execution sweep across IEX & Dark Pools');
+      }
+    }
+
+    // --- Live Pulsing Institutional Ticker Tape & Live Market Feed Engine ---
+    let liveMarketFeedEnabled = true;
+    let dailyPnlValue = 8412.60;
+
+    function renderTickerTape() {
+      const track = document.getElementById('tickerTapeTrack');
+      if (!track) return;
+      const tapeItems = [
+        ...holdings.map(h => ({ sym: h.ticker, price: h.price, chg: h.change24h })),
+        { sym: 'SPX', price: 5984.20, chg: 0.48 },
+        { sym: 'NDX', price: 21140.80, chg: 0.79 },
+        { sym: 'US10Y', price: 4.28, chg: -0.02, isYield: true }
+      ];
+
+      const renderPass = () => tapeItems.map(item => {
+        const up = item.chg >= 0;
+        const sign = up ? '+' : '';
+        const clr = up ? 'text-emerald-400' : 'text-rose-400';
+        const valTxt = item.isYield ? `${item.price.toFixed(2)}%` : fmtCurrency(item.price);
+        return `
+          <span class="inline-flex items-center gap-2 shrink-0 py-0.5">
+            <span class="font-bold text-white">${item.sym}</span>
+            <span class="text-slate-300">${valTxt}</span>
+            <span class="${clr} font-semibold">${sign}${item.chg.toFixed(2)}%</span>
+          </span>
+        `;
+      }).join('');
+
+      // Duplicate pass for seamless 50% marquee loop
+      track.innerHTML = renderPass() + renderPass();
+    }
+
+    function toggleLiveMarketFeed() {
+      liveMarketFeedEnabled = !liveMarketFeedEnabled;
+      const btn = document.getElementById('liveFeedToggleBtn');
+      const dot = document.getElementById('liveFeedDot');
+      const lbl = document.getElementById('liveFeedLabel');
+      const particleBase = document.getElementById('alphaParticlesBase');
+
+      if (liveMarketFeedEnabled) {
+        btn.className = 'h-10 px-3.5 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-300 text-sm font-semibold inline-flex items-center gap-2 transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-ping';
+        lbl.textContent = 'Live Market Feed: ON';
+        if (particleBase) particleBase.style.opacity = '1';
+        showAlphaToast('Live Market Feed resumed — real-time NBBO quote pulses active');
+      } else {
+        btn.className = 'h-10 px-3.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 text-sm font-medium inline-flex items-center gap-2 transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+        lbl.textContent = 'Live Market Feed: PAUSED';
+        if (particleBase) particleBase.style.opacity = '0.25';
+        showAlphaToast('Live Market Feed paused — static snapshot locked');
+      }
+    }
+
+    setInterval(() => {
+      if (!liveMarketFeedEnabled) return;
+
+      // Pick 1 random holding to tick gently
+      const idx = Math.floor(Math.random() * holdings.length);
+      const pos = holdings[idx];
+      const deltaPct = (Math.random() - 0.44) * 0.0032; // slight upward alpha drift
+      const oldPrice = pos.price;
+      pos.price = Math.max(1, parseFloat((pos.price * (1 + deltaPct)).toFixed(2)));
+      pos.change24h = parseFloat((pos.change24h + deltaPct * 100).toFixed(2));
+      pos.spark = [...pos.spark.slice(1), pos.price];
+
+      const valueDiff = (pos.price - oldPrice) * pos.shares;
+      pos.marketValue = Math.max(0, pos.marketValue + valueDiff);
+      totalNetWorth += valueDiff;
+      dailyPnlValue += valueDiff;
+
+      // Update Hero Net Worth + Daily P&L with subtle directional flash
+      const nwEl = document.getElementById('netWorthReadout');
+      const pnlEl = document.getElementById('dailyPnlReadout');
+      if (nwEl) {
+        nwEl.textContent = fmtCurrency(totalNetWorth);
+        nwEl.classList.remove('tick-up', 'tick-down');
+        void nwEl.offsetWidth;
+        nwEl.classList.add(valueDiff >= 0 ? 'tick-up' : 'tick-down');
+      }
+      if (pnlEl) {
+        const dayPct = ((dailyPnlValue / totalNetWorth) * 100).toFixed(2);
+        const sign = dailyPnlValue >= 0 ? '+' : '-';
+        pnlEl.textContent = `${sign}${fmtCurrency(Math.abs(dailyPnlValue))} (${sign}${Math.abs(dayPct)}% Today)`;
+      }
+
+      // Update msg/s telemetry
+      const msgEl = document.getElementById('alphaMsgRateReadout');
+      if (msgEl && !msgEl.textContent.startsWith('84,900')) {
+        const rate = 46800 + Math.floor(Math.random() * 3600);
+        msgEl.textContent = `${rate.toLocaleString('en-US')} msg/s`;
+      }
+
+      renderTickerTape();
+      renderHoldingsTable();
+    }, 3200);
+
+    // --- Modal ---
+    function openDividendModal() {
+      const m = document.getElementById('dividendModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeDividendModal() {
+      const m = document.getElementById('dividendModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    // Initialize Terminal
+    renderTickerTape();
+    renderPerformanceChart();
+    renderAllocationDonut();
+    renderHoldingsTable();
+    updateOrderEstimate();
+  </script>
+</body>
+</html>

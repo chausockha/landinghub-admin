@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="arch27" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="50%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="amber27" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FDE047"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="#E9EFF8"/>
+  <rect x="20" y="16" width="760" height="418" rx="26" fill="#F6F8FD" stroke="#FFFFFF" stroke-width="2"/>
+
+  <!-- Top Right Header Bar (Leaves Top-Left Clear for Status/Premium Badges) -->
+  <rect x="330" y="32" width="430" height="46" rx="14" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <rect x="348" y="47" width="70" height="16" rx="8" fill="#15173D"/>
+  <rect x="428" y="51" width="54" height="8" rx="4" fill="#CBD5E1"/>
+  <rect x="492" y="51" width="54" height="8" rx="4" fill="#CBD5E1"/>
+  <rect x="676" y="45" width="68" height="20" rx="10" fill="#FEF3C7"/>
+
+  <!-- Left Tall Sunset Arch Card -->
+  <rect x="40" y="92" width="174" height="212" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <path d="M 74 192 A 53 53 0 1 1 180 192" fill="none" stroke="url(#arch27)" stroke-width="15" stroke-linecap="round"/>
+  <rect x="90" y="152" width="74" height="44" rx="22" fill="#15173D"/>
+  <text x="127" y="179" text-anchor="middle" fill="#FBBF24" font-family="monospace" font-size="12" font-weight="700">94.8%</text>
+  <rect x="58" y="226" width="138" height="6" rx="3" fill="#E2E8F0"/>
+  <rect x="58" y="226" width="110" height="6" rx="3" fill="#25295C"/>
+  <text x="64" y="274" font-family="system-ui,sans-serif" font-size="16" font-weight="800" fill="#15173D">2,115</text>
+  <text x="134" y="274" font-family="system-ui,sans-serif" font-size="16" font-weight="800" fill="#15173D">78.3%</text>
+
+  <!-- Center Top Skyline Histogram Card -->
+  <rect x="228" y="92" width="286" height="100" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <rect x="248" y="140" width="20" height="38" rx="2" fill="#3B4278"/>
+  <rect x="268" y="124" width="32" height="54" rx="2" fill="#1E224D"/>
+  <rect x="300" y="134" width="24" height="44" rx="2" fill="#6C75B5"/>
+  <rect x="324" y="128" width="24" height="50" rx="2" fill="#3B4278"/>
+  <rect x="372" y="132" width="12" height="46" rx="3" fill="#6C75B5"/>
+  <rect x="394" y="128" width="12" height="50" rx="3" fill="#8E97CC"/>
+  <rect x="416" y="136" width="12" height="42" rx="3" fill="#7C86C4"/>
+  <rect x="438" y="142" width="12" height="36" rx="3" fill="#A5B4FC"/>
+  <rect x="462" y="114" width="16" height="64" rx="3" fill="#15173D"/>
+
+  <!-- Center Bottom Mountain Wave Card -->
+  <rect x="228" y="204" width="286" height="100" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <path d="M 246 268 Q 276 282, 304 264 T 364 252 T 424 244 L 424 286 L 246 286 Z" fill="#6C75B5" fill-opacity="0.45"/>
+  <rect x="318" y="224" width="54" height="18" rx="9" fill="#15173D"/>
+  <rect x="450" y="226" width="16" height="10" rx="2" fill="#FBBF24"/><rect x="472" y="226" width="16" height="10" rx="2" fill="#15173D"/>
+  <rect x="450" y="242" width="16" height="10" rx="2" fill="#F97316"/><rect x="472" y="242" width="16" height="10" rx="2" fill="#25295C"/>
+
+  <!-- Right Signature Deep Midnight Card (#15173D) -->
+  <rect x="528" y="92" width="232" height="196" rx="20" fill="#15173D"/>
+  <text x="644" y="118" text-anchor="middle" fill="#E2E8F0" font-family="system-ui,sans-serif" font-size="13" font-weight="700">Scope Spectrum</text>
+  <line x1="552" y1="150" x2="736" y2="150" stroke="rgba(255,255,255,0.12)"/>
+  <line x1="552" y1="190" x2="736" y2="190" stroke="rgba(255,255,255,0.12)"/>
+  <line x1="552" y1="230" x2="736" y2="230" stroke="rgba(255,255,255,0.12)"/>
+  <path d="M 560 242 L 592 214 L 626 232 L 664 192 L 698 212 L 732 142" fill="none" stroke="#EC4899" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M 562 204 L 594 228 L 638 176 L 676 134 L 704 172 L 734 122" fill="none" stroke="url(#amber27)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="562" cy="204" r="7" fill="#F59E0B"/><circle cx="676" cy="134" r="7.5" fill="#FBBF24"/><circle cx="734" cy="122" r="8" fill="#FDE047"/>
+
+  <!-- Bottom Row Sub-Bento Cards -->
+  <rect x="40" y="316" width="148" height="100" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <rect x="58" y="340" width="96" height="6" rx="3" fill="#CBD5E1"/>
+  <rect x="58" y="356" width="80" height="6" rx="3" fill="#CBD5E1"/>
+  <circle cx="160" cy="390" r="11" fill="#E8EEF9"/>
+
+  <rect x="200" y="316" width="150" height="100" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <rect x="232" y="366" width="7" height="32" rx="3.5" fill="#15173D"/>
+  <rect x="252" y="354" width="7" height="44" rx="3.5" fill="#FBBF24"/>
+  <rect x="272" y="338" width="7" height="26" rx="3.5" fill="#F97316"/>
+  <rect x="292" y="358" width="7" height="22" rx="3.5" fill="#8E97CC"/>
+  <rect x="312" y="334" width="7" height="30" rx="3.5" fill="#15173D"/>
+
+  <rect x="362" y="316" width="152" height="100" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <path d="M 380 364 L 410 356 L 440 368 L 470 346 L 496 358" fill="none" stroke="#15173D" stroke-width="2.2"/>
+  <rect x="378" y="384" width="120" height="20" rx="10" fill="#15173D"/>
+
+  <rect x="528" y="300" width="232" height="116" rx="18" fill="#FFFFFF" stroke="#E2E8F5"/>
+  <rect x="546" y="324" width="196" height="54" rx="12" fill="#EEF2FA"/>
+  <path d="M 560 356 C 590 334, 625 338, 660 362 C 690 366, 705 338, 728 346" fill="none" stroke="url(#arch27)" stroke-width="3"/>
+</svg>

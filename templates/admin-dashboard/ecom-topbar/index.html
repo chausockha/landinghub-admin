@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CARTFLOW PULSE — Omnichannel E-Commerce GMV & Live Checkout Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Plus Jakarta Sans', 'Space Grotesk', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            coral: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              500: '#F97316',
+              600: '#EA580C'
+            },
+            royal: {
+              50: '#EFF6FF',
+              500: '#2563EB',
+              600: '#1D4ED8'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      font-family: 'Inter', sans-serif;
+    }
+    @keyframes drawStroke {
+      from {
+        stroke-dashoffset: 1400;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    .svg-draw-line {
+      stroke-dasharray: 1400;
+      stroke-dashoffset: 1400;
+      animation: drawStroke 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes drawSpark {
+      from {
+        stroke-dashoffset: 260;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    .spark-draw {
+      stroke-dasharray: 260;
+      stroke-dashoffset: 260;
+      animation: drawSpark 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes softPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+      50% {
+        transform: scale(1.35);
+        opacity: 0.35;
+      }
+    }
+    .pulse-ring {
+      animation: softPulse 2s infinite ease-in-out;
+      transform-origin: center;
+    }
+    .funnel-ribbon {
+      transition: opacity 0.25s ease, filter 0.25s ease;
+    }
+    .funnel-ribbon:hover {
+      opacity: 0.95;
+      filter: drop-shadow(0 6px 12px rgba(249, 115, 22, 0.22));
+    }
+    .bar-smooth {
+      transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1), height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .card-elevated {
+      background: #FFFFFF;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.06);
+    }
+    .telemetry-paused animateMotion {
+      display: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-coral-500/20 selection:text-coral-600">
+
+  <!-- FLOATING TOOLTIP -->
+  <div id="chartTooltip" class="pointer-events-none fixed z-50 hidden rounded-xl border border-slate-200 bg-slate-900/95 px-3.5 py-2.5 text-white shadow-xl backdrop-blur-md transition-opacity duration-150">
+    <div id="tooltipTitle" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Metric</div>
+    <div id="tooltipValue" class="mt-0.5 font-mono text-sm font-bold text-white">$0</div>
+    <div id="tooltipSub" class="mt-0.5 text-xs text-emerald-400">+0.0% vs benchmark</div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastBanner" class="fixed bottom-6 right-6 z-50 hidden items-center gap-3 rounded-xl border border-emerald-500/20 bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
+    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </span>
+    <span id="toastText">Purchase order dispatched to warehouse.</span>
+  </div>
+
+  <!-- STICKY 2-TIER HORIZONTAL TOPBAR (ZERO LEFT SIDEBAR) -->
+  <header class="sticky top-0 z-40 border-b border-slate-200/90 bg-white/95 backdrop-blur-md">
+    <!-- Tier 1: Brand + Store Switcher + Search + Live GMV Ticker + Telemetry Toggle + Storefront CTA -->
+    <div class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3 lg:px-8">
+      <div class="flex flex-wrap items-center gap-4">
+        <!-- Brand -->
+        <a href="#" class="flex items-center gap-2.5">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-coral-500 to-coral-600 text-white shadow-md shadow-coral-500/20">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M10 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display text-base font-extrabold tracking-tight text-slate-900">CARTFLOW PULSE</span>
+              <span class="rounded-full bg-coral-50 px-2 py-0.5 text-xs font-semibold text-coral-600">v4.2</span>
+            </div>
+            <p class="text-xs text-slate-500">Omnichannel GMV & Checkout Command</p>
+          </div>
+        </a>
+
+        <div class="hidden h-6 w-px bg-slate-200 md:block"></div>
+
+        <!-- Store Switcher -->
+        <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1" role="group" aria-label="Store Switcher">
+          <button type="button" data-store="global" class="store-btn rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm transition">
+            Global Flagship
+          </button>
+          <button type="button" data-store="eu" class="store-btn rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition">
+            EU Store
+          </button>
+          <button type="button" data-store="tiktok" class="store-btn rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition">
+            US TikTok Shop
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Cluster: Command Search + Live GMV Ticker + Pulse Toggle + CTA -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Command Search -->
+        <div class="relative hidden xl:block">
+          <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input id="skuSearchInput" type="text" placeholder="Filter SKU, channel, campaign..." class="w-64 rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-12 text-sm text-slate-800 placeholder-slate-400 transition focus:border-coral-500 focus:bg-white focus:outline-none" />
+          <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-xs text-slate-500">/</span>
+        </div>
+
+        <!-- Live GMV Ticker Pill -->
+        <div class="flex items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-50/80 px-3.5 py-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span id="livePingDot" class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-80"></span>
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+          </span>
+          <span class="text-xs font-semibold uppercase tracking-wide text-emerald-800">GMV Today</span>
+          <span id="headerGmvTicker" class="font-mono text-sm font-bold text-slate-900">$142,890</span>
+        </div>
+
+        <!-- Live Telemetry Pulse Toggle -->
+        <button id="telemetryToggleBtn" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+          <svg class="h-4 w-4 text-coral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          <span id="telemetryToggleLabel">Live Pulse: ON</span>
+        </button>
+
+        <!-- Storefront CTA -->
+        <a href="#sku-inventory-section" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800">
+          <span>Storefront Live</span>
+          <svg class="h-4 w-4 text-coral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tier 2: Horizontal Pill / Underline Navigation -->
+    <div class="border-t border-slate-100 bg-white">
+      <div class="mx-auto flex max-w-[1440px] items-center justify-between overflow-x-auto px-4 lg:px-8">
+        <nav class="flex items-center gap-1 py-1.5" aria-label="Primary Topbar Navigation">
+          <button type="button" data-nav="overview" class="topbar-nav-btn relative flex items-center gap-2 rounded-lg bg-coral-50 px-3.5 py-2 text-sm font-semibold text-coral-600 transition">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span>Live Overview</span>
+          </button>
+          <button type="button" data-nav="funnel" class="topbar-nav-btn relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18l-7 8v6l-4 2v-8L3 4z"/></svg>
+            <span>Conversion Funnel</span>
+          </button>
+          <button type="button" data-nav="inventory" class="topbar-nav-btn relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span>SKU Inventory</span>
+            <span id="lowStockBadge" class="rounded-full bg-coral-500/10 px-2 py-0.5 text-xs font-semibold text-coral-600">2 Low</span>
+          </button>
+          <button type="button" data-nav="roas" class="topbar-nav-btn relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            <span>Ad ROAS</span>
+          </button>
+          <button type="button" data-nav="fulfillment" class="topbar-nav-btn relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10h2m8 0H9m4 0h2m4 0h1a1 1 0 001-1v-4.586a1 1 0 00-.293-.707l-2.414-2.414A1 1 0 0017.586 8H14"/></svg>
+            <span>Fulfillment</span>
+          </button>
+        </nav>
+
+        <!-- Sub-bar Channel Status -->
+        <div class="hidden items-center gap-4 text-xs font-medium text-slate-500 lg:flex">
+          <span class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            Shopify Checkout 99.98%
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-full bg-royal-500"></span>
+            Meta CAPI Synced (14ms)
+          </span>
+          <span id="activeStoreTag" class="rounded-md bg-slate-100 px-2.5 py-1 font-mono text-xs font-semibold text-slate-700">STORE: GLOBAL FLAGSHIP</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT WORKSPACE (FULL HORIZONTAL FLOW - NO SIDEBAR) -->
+  <main id="workspaceRoot" class="mx-auto max-w-[1440px] px-4 py-6 lg:px-8">
+    <div id="defaultDashboardView" class="space-y-6">
+
+    <!-- 1. 4 TOPBAR KPI STRIP CARDS WITH MINI ANIMATED SPARKLINES -->
+    <section id="overview-section" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <!-- KPI 1: Live GMV -->
+      <article class="card-elevated group rounded-2xl p-5 transition hover:border-coral-500/50">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Live Gross Merchandise Value</span>
+            <div id="kpiGmv" class="mt-1.5 font-display text-3xl font-extrabold tracking-tight text-slate-900">$142,890</div>
+          </div>
+          <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600">
+            +24.6% YoY
+          </span>
+        </div>
+        <div class="mt-4 flex items-end justify-between gap-3">
+          <div class="text-sm text-slate-600">
+            AOV <span id="kpiAov" class="font-mono font-semibold text-slate-900">$118.40</span>
+          </div>
+          <svg class="h-11 w-32 overflow-visible" viewBox="0 0 130 42">
+            <defs>
+              <linearGradient id="sparkCoral" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F97316" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="#F97316" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M2,35 C22,32 34,24 52,26 C70,28 84,14 104,12 C114,10 122,6 128,4 L128,40 L2,40 Z" fill="url(#sparkCoral)"/>
+            <path id="sparkPath1" class="spark-draw" d="M2,35 C22,32 34,24 52,26 C70,28 84,14 104,12 C114,10 122,6 128,4" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+            <circle r="3.5" fill="#F97316">
+              <animateMotion dur="3.4s" repeatCount="indefinite" path="M2,35 C22,32 34,24 52,26 C70,28 84,14 104,12 C114,10 122,6 128,4"/>
+            </circle>
+          </svg>
+        </div>
+      </article>
+
+      <!-- KPI 2: Active Carts Right Now -->
+      <article class="card-elevated group rounded-2xl p-5 transition hover:border-royal-500/50">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Carts Right Now</span>
+            <div class="mt-1.5 flex items-center gap-2.5">
+              <span id="kpiActiveCarts" class="font-display text-3xl font-extrabold tracking-tight text-slate-900">1,284</span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-royal-50 px-2.5 py-0.5 text-xs font-semibold text-royal-600">
+                <span class="h-2 w-2 rounded-full bg-royal-500"></span>
+                Live
+              </span>
+            </div>
+          </div>
+          <span class="inline-flex items-center gap-1 rounded-full bg-royal-500/10 px-2.5 py-1 text-xs font-semibold text-royal-600">
+            $94.2k in bag
+          </span>
+        </div>
+        <div class="mt-4 flex items-end justify-between gap-3">
+          <div class="text-sm text-slate-600">
+            Express Pay <span class="font-mono font-semibold text-slate-900">68%</span>
+          </div>
+          <svg class="h-11 w-32 overflow-visible" viewBox="0 0 130 42">
+            <path id="sparkPath2" class="spark-draw" d="M2,30 C18,22 36,29 54,18 C72,8 90,20 108,11 C118,7 123,8 128,5" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+            <circle r="3.5" fill="#2563EB">
+              <animateMotion dur="2.9s" repeatCount="indefinite" path="M2,30 C18,22 36,29 54,18 C72,8 90,20 108,11 C118,7 123,8 128,5"/>
+            </circle>
+          </svg>
+        </div>
+      </article>
+
+      <!-- KPI 3: Checkout Conversion -->
+      <article class="card-elevated group rounded-2xl p-5 transition hover:border-emerald-500/50">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Checkout Conversion</span>
+            <div id="kpiConvRate" class="mt-1.5 font-display text-3xl font-extrabold tracking-tight text-slate-900">4.82%</div>
+          </div>
+          <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600">
+            +0.64 pts
+          </span>
+        </div>
+        <div class="mt-4 flex items-end justify-between gap-3">
+          <div class="text-sm text-slate-600">
+            1-Click ShopPay <span class="font-mono font-semibold text-emerald-600">+19%</span>
+          </div>
+          <svg class="h-11 w-32 overflow-visible" viewBox="0 0 130 42">
+            <path class="spark-draw" d="M2,34 C26,33 42,27 64,22 C86,17 104,14 128,7" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+            <circle r="3.5" fill="#10B981">
+              <animateMotion dur="3.8s" repeatCount="indefinite" path="M2,34 C26,33 42,27 64,22 C86,17 104,14 128,7"/>
+            </circle>
+          </svg>
+        </div>
+      </article>
+
+      <!-- KPI 4: Blended Ad ROAS -->
+      <article id="roas-card" class="card-elevated group rounded-2xl p-5 transition hover:border-coral-500/50">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Blended Ad ROAS (MER)</span>
+            <div id="kpiRoas" class="mt-1.5 font-display text-3xl font-extrabold tracking-tight text-slate-900">4.6x</div>
+          </div>
+          <span class="inline-flex items-center gap-1 rounded-full bg-coral-500/10 px-2.5 py-1 text-xs font-semibold text-coral-600">
+            CAC $24.10
+          </span>
+        </div>
+        <div class="mt-4 flex items-end justify-between gap-3">
+          <div class="text-sm text-slate-600">
+            Ad Spend <span id="kpiSpend" class="font-mono font-semibold text-slate-900">$31,060</span>
+          </div>
+          <svg class="h-11 w-32 overflow-visible" viewBox="0 0 130 42">
+            <path class="spark-draw" d="M2,28 C20,31 40,19 60,21 C80,23 98,11 128,9" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+            <circle r="3.5" fill="#F97316">
+              <animateMotion dur="3.2s" repeatCount="indefinite" path="M2,28 C20,31 40,19 60,21 C80,23 98,11 128,9"/>
+            </circle>
+          </svg>
+        </div>
+      </article>
+    </section>
+
+    <!-- 2. INTERACTIVE LIVE CHECKOUT CONVERSION FUNNEL SVG FLOW -->
+    <section id="funnel-section" class="card-elevated rounded-2xl p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h2 class="font-display text-lg font-bold text-slate-900">Live Omnichannel Checkout Conversion Funnel</h2>
+            <span class="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600">Real-Time Session Stream</span>
+          </div>
+          <p class="mt-1 text-sm text-slate-500">Hover any funnel stage or flow ribbon to inspect step retention, cart abandonment recovery, and payment latency.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
+            <span class="h-2.5 w-2.5 rounded-full bg-coral-500"></span> High-Intent Shoppers
+          </div>
+          <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Completed Checkout
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage Summary Metric Strip -->
+      <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div data-stage="0" class="funnel-stage-card cursor-pointer rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 transition hover:border-coral-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">1. Store Visits</span>
+            <span class="rounded bg-slate-200/80 px-1.5 py-0.5 font-mono text-xs font-semibold text-slate-700">100%</span>
+          </div>
+          <div id="fStage0" class="mt-1.5 font-display text-2xl font-bold text-slate-900">84.2k</div>
+          <div class="mt-1 text-xs text-slate-500"> Paid Social + Direct</div>
+        </div>
+
+        <div data-stage="1" class="funnel-stage-card cursor-pointer rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 transition hover:border-coral-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">2. Product Views</span>
+            <span class="rounded bg-royal-50 px-1.5 py-0.5 font-mono text-xs font-semibold text-royal-600">49.6%</span>
+          </div>
+          <div id="fStage1" class="mt-1.5 font-display text-2xl font-bold text-slate-900">41.8k</div>
+          <div class="mt-1 text-xs text-slate-500">PDP Dwell 46s avg</div>
+        </div>
+
+        <div data-stage="2" class="funnel-stage-card cursor-pointer rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 transition hover:border-coral-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">3. Added to Cart</span>
+            <span class="rounded bg-coral-50 px-1.5 py-0.5 font-mono text-xs font-semibold text-coral-600">14.7%</span>
+          </div>
+          <div id="fStage2" class="mt-1.5 font-display text-2xl font-bold text-slate-900">12.4k</div>
+          <div class="mt-1 text-xs text-slate-500">Avg 2.1 units/bag</div>
+        </div>
+
+        <div data-stage="3" class="funnel-stage-card cursor-pointer rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 transition hover:border-coral-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">4. Checkout Init</span>
+            <span class="rounded bg-coral-50 px-1.5 py-0.5 font-mono text-xs font-semibold text-coral-600">7.24%</span>
+          </div>
+          <div id="fStage3" class="mt-1.5 font-display text-2xl font-bold text-slate-900">6.1k</div>
+          <div class="mt-1 text-xs text-slate-500">Klaviyo SMS +8.4%</div>
+        </div>
+
+        <div data-stage="4" class="funnel-stage-card cursor-pointer rounded-xl border border-emerald-500/20 bg-emerald-50/50 p-3.5 transition hover:border-emerald-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-800">5. Paid Orders</span>
+            <span id="fStageConvPill" class="rounded bg-emerald-500/20 px-1.5 py-0.5 font-mono text-xs font-bold text-emerald-800">4.82%</span>
+          </div>
+          <div id="fStage4" class="mt-1.5 font-display text-2xl font-bold text-emerald-700">4,058</div>
+          <div class="mt-1 text-xs text-emerald-700">Auth Rate 98.7%</div>
+        </div>
+      </div>
+
+      <!-- Animated SVG Ribbon Flow with <animateMotion> Customer Packets -->
+      <div class="mt-5 overflow-x-auto">
+        <svg id="funnelSvg" class="h-56 min-w-[860px] w-full" viewBox="0 0 1100 210" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="ribbonGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#2563EB" stop-opacity="0.26"/>
+              <stop offset="55%" stop-color="#F97316" stop-opacity="0.28"/>
+              <stop offset="100%" stop-color="#10B981" stop-opacity="0.38"/>
+            </linearGradient>
+            <linearGradient id="streamStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#2563EB"/>
+              <stop offset="50%" stop-color="#F97316"/>
+              <stop offset="100%" stop-color="#10B981"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Vertical Stage Guides -->
+          <g stroke="#E2E8F0" stroke-dasharray="4 4" stroke-width="1">
+            <line x1="60" y1="12" x2="60" y2="198"/>
+            <line x1="310" y1="12" x2="310" y2="198"/>
+            <line x1="560" y1="12" x2="560" y2="198"/>
+            <line x1="810" y1="12" x2="810" y2="198"/>
+            <line x1="1040" y1="12" x2="1040" y2="198"/>
+          </g>
+
+          <!-- Smooth Proportional Funnel Polygon Ribbon -->
+          <path class="funnel-ribbon"
+                data-tip-title="Omnichannel Funnel Flow"
+                data-tip-val="84,200 Visits to 4,058 Paid Orders"
+                data-tip-sub="Net Checkout Velocity: 38.4 orders/min"
+                d="M 60,18
+                   C 185,18 185,46 310,46
+                   C 435,46 435,72 560,72
+                   C 685,72 685,84 810,84
+                   C 925,84 925,90 1040,90
+                   L 1040,120
+                   C 925,120 925,126 810,126
+                   C 685,126 685,138 560,138
+                   C 435,138 435,164 310,164
+                   C 185,164 185,192 60,192 Z"
+                fill="url(#ribbonGrad1)" stroke="rgba(249,115,22,0.35)" stroke-width="1.5"/>
+
+          <!-- Center Spine Curve for Animated Shopper Packets -->
+          <path id="funnelSpineUpper" class="svg-draw-line"
+                d="M 60,65 C 185,65 185,82 310,82 C 435,82 435,96 560,96 C 685,96 685,101 810,101 C 925,101 925,103 1040,103"
+                fill="none" stroke="url(#streamStroke)" stroke-width="2.5"/>
+          <path id="funnelSpineLower" class="svg-draw-line"
+                d="M 60,145 C 185,145 185,128 310,128 C 435,128 435,114 560,114 C 685,114 685,109 810,109 C 925,109 925,107 1040,107"
+                fill="none" stroke="url(#streamStroke)" stroke-width="2" stroke-opacity="0.7"/>
+
+          <!-- Animated Customer Packets Flowing Left-to-Right -->
+          <circle r="5" fill="#2563EB">
+            <animateMotion dur="4.2s" repeatCount="indefinite" path="M 60,65 C 185,65 185,82 310,82 C 435,82 435,96 560,96 C 685,96 685,101 810,101 C 925,101 925,103 1040,103"/>
+          </circle>
+          <circle r="5.5" fill="#F97316">
+            <animateMotion dur="4.2s" begin="1.4s" repeatCount="indefinite" path="M 60,65 C 185,65 185,82 310,82 C 435,82 435,96 560,96 C 685,96 685,101 810,101 C 925,101 925,103 1040,103"/>
+          </circle>
+          <circle r="6" fill="#10B981">
+            <animateMotion dur="4.2s" begin="2.8s" repeatCount="indefinite" path="M 60,145 C 185,145 185,128 310,128 C 435,128 435,114 560,114 C 685,114 685,109 810,109 C 925,109 925,107 1040,107"/>
+          </circle>
+
+          <!-- Stage Gate Bars -->
+          <rect x="54" y="18" width="12" height="174" rx="6" fill="#2563EB"/>
+          <rect x="304" y="46" width="12" height="118" rx="6" fill="#3B82F6"/>
+          <rect x="554" y="72" width="12" height="66" rx="6" fill="#F97316"/>
+          <rect x="804" y="84" width="12" height="42" rx="6" fill="#EA580C"/>
+          <rect x="1034" y="88" width="14" height="34" rx="7" fill="#10B981"/>
+
+          <!-- Stage Drop-off Labels (Minimum 12px SVG font-size!) -->
+          <g font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">
+            <text x="185" y="34" text-anchor="middle">49.6% PDP Click</text>
+            <text x="435" y="58" text-anchor="middle">29.7% Add-to-Bag</text>
+            <text x="685" y="74" text-anchor="middle">49.2% Start Pay</text>
+            <text x="925" y="78" text-anchor="middle" fill="#059669">66.5% Paid Order</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 3. DUAL-CURVE HOURLY GMV CHART + TOP PERFORMING SKUS INVENTORY TABLE -->
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+
+      <!-- Left 7 Cols: Hourly Flash-Sale GMV vs Last Week Dual-Curve SVG Chart -->
+      <div class="card-elevated rounded-2xl p-6 lg:col-span-7">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="font-display text-lg font-bold text-slate-900">Hourly Flash-Sale GMV vs Benchmark</h2>
+            <p class="mt-0.5 text-sm text-slate-500">Cumulative revenue pacing with campaign drop markers</p>
+          </div>
+          <!-- Timeframe Switcher: Today | BFCM Peak | 30D -->
+          <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button type="button" data-range="today" class="range-btn rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition">Today</button>
+            <button type="button" data-range="bfcm" class="range-btn rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">BFCM Peak</button>
+            <button type="button" data-range="30d" class="range-btn rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">30D</button>
+          </div>
+        </div>
+
+        <!-- Legend & Summary -->
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3">
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <span class="h-3 w-3 rounded-full bg-coral-500"></span>
+              <span>Current Period: <strong id="chartCurrentTotal" class="font-mono text-slate-900">$142,890</strong></span>
+            </div>
+            <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
+              <span class="h-0.5 w-4 border-t-2 border-dashed border-slate-400"></span>
+              <span>Prior Benchmark: <strong id="chartPrevTotal" class="font-mono text-slate-700">$114,680</strong></span>
+            </div>
+          </div>
+          <span id="chartDeltaBadge" class="rounded-full bg-emerald-500/10 px-2.5 py-1 font-mono text-xs font-semibold text-emerald-700">+24.6% Outperforming</span>
+        </div>
+
+        <!-- Dual-Curve Interactive SVG Chart -->
+        <div class="relative mt-5">
+          <svg id="gmvChartSvg" class="h-72 w-full overflow-visible" viewBox="0 0 680 260">
+            <defs>
+              <linearGradient id="gmvAreaFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F97316" stop-opacity="0.24"/>
+                <stop offset="100%" stop-color="#F97316" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Horizontal Gridlines + Y Axis Labels (12px) -->
+            <g stroke="#E2E8F0" stroke-width="1">
+              <line x1="48" y1="24" x2="664" y2="24"/>
+              <line x1="48" y1="76" x2="664" y2="76"/>
+              <line x1="48" y1="128" x2="664" y2="128"/>
+              <line x1="48" y1="180" x2="664" y2="180"/>
+              <line x1="48" y1="228" x2="664" y2="228"/>
+            </g>
+            <g font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B">
+              <text x="4" y="28" id="yMaxLabel">$160k</text>
+              <text x="4" y="80" id="yMidHighLabel">$120k</text>
+              <text x="4" y="132" id="yMidLabel">$80k</text>
+              <text x="4" y="184" id="yLowLabel">$40k</text>
+              <text x="16" y="232">$0</text>
+            </g>
+
+            <!-- Prior Week Dashed Curve -->
+            <path id="prevCurvePath"
+                  d="M 54,212 C 130,202 200,185 280,164 C 360,142 440,126 530,96 C 590,78 630,68 660,58"
+                  fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 6"/>
+
+            <!-- Current Area Fill -->
+            <path id="currAreaPath"
+                  d="M 54,205 C 130,190 200,158 280,136 C 360,114 440,78 530,54 C 590,38 630,30 660,22 L 660,228 L 54,228 Z"
+                  fill="url(#gmvAreaFill)"/>
+
+            <!-- Current Animated Primary Curve -->
+            <path id="currCurvePath" class="svg-draw-line"
+                  d="M 54,205 C 130,190 200,158 280,136 C 360,114 440,78 530,54 C 590,38 630,30 660,22"
+                  fill="none" stroke="#F97316" stroke-width="3.2" stroke-linecap="round"/>
+
+            <!-- Glowing Packet Traveling Along Current Curve -->
+            <circle r="5" fill="#F97316">
+              <animateMotion id="gmvPacketMotion" dur="4.5s" repeatCount="indefinite"
+                             path="M 54,205 C 130,190 200,158 280,136 C 360,114 440,78 530,54 C 590,38 630,30 660,22"/>
+            </circle>
+
+            <!-- Interactive Data Points -->
+            <g id="gmvPointsGroup">
+              <circle class="chart-dot cursor-pointer" cx="54" cy="205" r="5" fill="#FFFFFF" stroke="#F97316" stroke-width="2.5" data-tip-title="00:00 - 04:00" data-tip-val="$18,420" data-tip-sub="+16.2% vs Last Week"/>
+              <circle class="chart-dot cursor-pointer" cx="175" cy="170" r="5" fill="#FFFFFF" stroke="#F97316" stroke-width="2.5" data-tip-title="08:00 Drop" data-tip-val="$46,910" data-tip-sub="VIP SMS Blast Live"/>
+              <circle class="chart-dot cursor-pointer" cx="296" cy="132" r="5" fill="#FFFFFF" stroke="#F97316" stroke-width="2.5" data-tip-title="12:00 Noon" data-tip-val="$79,340" data-tip-sub="+22.8% vs Last Week"/>
+              <circle class="chart-dot cursor-pointer" cx="418" cy="92" r="5" fill="#FFFFFF" stroke="#F97316" stroke-width="2.5" data-tip-title="16:00 Creator Live" data-tip-val="$108,520" data-tip-sub="TikTok Live Surge"/>
+              <circle class="chart-dot cursor-pointer" cx="538" cy="52" r="5" fill="#FFFFFF" stroke="#F97316" stroke-width="2.5" data-tip-title="20:00 Prime" data-tip-val="$131,400" data-tip-sub="+25.1% vs Last Week"/>
+              <circle class="chart-dot cursor-pointer" cx="660" cy="22" r="6" fill="#F97316" stroke="#FFFFFF" stroke-width="2" data-tip-title="Current Live Pace" data-tip-val="$142,890" data-tip-sub="+24.6% Ahead of Plan"/>
+            </g>
+
+            <!-- X Axis Labels (12px) -->
+            <g font-family="Inter, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">
+              <text x="54" y="250">00:00</text>
+              <text x="175" y="250">08:00</text>
+              <text x="296" y="250">12:00</text>
+              <text x="418" y="250">16:00</text>
+              <text x="538" y="250">20:00</text>
+              <text x="650" y="250">Now</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right 5 Cols: Top Performing SKUs & Live Stock Replenishment -->
+      <div id="sku-inventory-section" class="card-elevated flex flex-col justify-between rounded-2xl p-6 lg:col-span-5">
+        <div>
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="font-display text-lg font-bold text-slate-900">Top Performing SKUs</h2>
+              <p class="mt-0.5 text-sm text-slate-500">Live sell-through velocity & 1-click warehouse restock</p>
+            </div>
+            <span class="rounded-full bg-slate-100 px-2.5 py-1 font-mono text-xs font-semibold text-slate-700">3PL Synced</span>
+          </div>
+
+          <div id="skuListContainer" class="mt-5 space-y-3.5">
+            <!-- Populated and interactive via JS -->
+          </div>
+        </div>
+
+        <!-- Fulfillment SLA Footer Strip -->
+        <div id="fulfillment-strip" class="mt-5 flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50 px-4 py-3">
+          <div class="flex items-center gap-2.5">
+            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-royal-500/10 text-royal-600">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </span>
+            <div>
+              <div class="text-sm font-semibold text-slate-900">Same-Day 3PL Dispatch SLA</div>
+              <div class="text-xs text-slate-500">99.4% shipped under 4h · Newark & Rotterdam</div>
+            </div>
+          </div>
+          <span class="font-mono text-sm font-bold text-emerald-600">ON TRACK</span>
+        </div>
+      </div>
+
+    </section>
+    </div>
+
+    <!-- DEDICATED SUB-PAGE VIEW FOR TOPBAR TABS -->
+    <div id="tabSubpageView" class="hidden space-y-6"></div>
+  </main>
+
+  <script>
+    (function () {
+      const storeDatasets = {
+        global: {
+          tag: 'STORE: GLOBAL FLAGSHIP',
+          gmv: 142890,
+          aov: '$118.40',
+          carts: 1284,
+          conv: '4.82%',
+          roas: '4.6x',
+          spend: '$31,060',
+          funnel: ['84.2k', '41.8k', '12.4k', '6.1k', '4,058'],
+          convPill: '4.82%'
+        },
+        eu: {
+          tag: 'STORE: EU AMSTERDAM HUB',
+          gmv: 64320,
+          aov: '$132.10',
+          carts: 542,
+          conv: '5.14%',
+          roas: '4.9x',
+          spend: '$13,126',
+          funnel: ['36.4k', '19.1k', '5.8k', '2.9k', '1,871'],
+          convPill: '5.14%'
+        },
+        tiktok: {
+          tag: 'STORE: US TIKTOK SHOP',
+          gmv: 51940,
+          aov: '$74.80',
+          carts: 918,
+          conv: '6.35%',
+          roas: '5.4x',
+          spend: '$9,618',
+          funnel: ['48.9k', '27.4k', '9.2k', '4.4k', '3,105'],
+          convPill: '6.35%'
+        }
+      };
+
+      const chartRanges = {
+        today: {
+          currTotal: '$142,890',
+          prevTotal: '$114,680',
+          delta: '+24.6% Outperforming',
+          yLabels: ['$160k', '$120k', '$80k', '$40k'],
+          currPath: 'M 54,205 C 130,190 200,158 280,136 C 360,114 440,78 530,54 C 590,38 630,30 660,22',
+          prevPath: 'M 54,212 C 130,202 200,185 280,164 C 360,142 440,126 530,96 C 590,78 630,68 660,58'
+        },
+        bfcm: {
+          currTotal: '$618,450',
+          prevTotal: '$442,100',
+          delta: '+39.9% BFCM Surge',
+          yLabels: ['$700k', '$525k', '$350k', '$175k'],
+          currPath: 'M 54,198 C 130,168 200,124 280,98 C 360,72 440,48 530,34 C 590,26 630,20 660,16',
+          prevPath: 'M 54,214 C 130,196 200,172 280,148 C 360,128 440,104 530,84 C 590,72 630,64 660,54'
+        },
+        '30d': {
+          currTotal: '$3,842,900',
+          prevTotal: '$3,290,400',
+          delta: '+16.8% 30D Pace',
+          yLabels: ['$4.2M', '$3.1M', '$2.1M', '$1.0M'],
+          currPath: 'M 54,210 C 130,194 200,176 280,150 C 360,124 440,98 530,70 C 590,52 630,42 660,32',
+          prevPath: 'M 54,216 C 130,205 200,190 280,170 C 360,152 440,130 530,108 C 590,92 630,80 660,70'
+        }
+      };
+
+      const skus = [
+        { id: 'CF-901', name: 'AeroKnit Runner Pro V3', channel: 'Global + TikTok', rev: '$38,420', units: 298, stockPct: 18, maxUnits: 1600, low: true },
+        { id: 'CF-412', name: 'ThermoFlask Titanium 32oz', channel: 'Shopify Express', rev: '$29,180', units: 742, stockPct: 68, maxUnits: 1100, low: false },
+        { id: 'CF-778', name: 'CloudLoom Merino Hoodie', channel: 'EU + Global', rev: '$24,950', units: 164, stockPct: 14, maxUnits: 1200, low: true },
+        { id: 'CF-205', name: 'PulseFit MagSafe Travel Kit', channel: 'Omnichannel', rev: '$19,640', units: 890, stockPct: 82, maxUnits: 1100, low: false }
+      ];
+
+      let activeStore = 'global';
+      let liveGmv = storeDatasets.global.gmv;
+      let liveCarts = storeDatasets.global.carts;
+      let telemetryOn = true;
+
+      const formatUSD = (n) => '$' + Math.round(n).toLocaleString('en-US');
+
+      function renderSkus(filterText = '') {
+        const container = document.getElementById('skuListContainer');
+        const q = filterText.trim().toLowerCase();
+        const filtered = skus.filter(s =>
+          s.name.toLowerCase().includes(q) ||
+          s.id.toLowerCase().includes(q) ||
+          s.channel.toLowerCase().includes(q)
+        );
+
+        const lowCount = skus.filter(s => s.stockPct < 25).length;
+        const lowBadge = document.getElementById('lowStockBadge');
+        lowBadge.textContent = lowCount > 0 ? `${lowCount} Low` : 'All Healthy';
+        lowBadge.className = lowCount > 0
+          ? 'rounded-full bg-coral-500/10 px-2 py-0.5 text-xs font-semibold text-coral-600'
+          : 'rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-600';
+
+        container.innerHTML = filtered.map(sku => {
+          const barColor = sku.stockPct < 25 ? 'bg-coral-500' : 'bg-emerald-500';
+          const pillClass = sku.stockPct < 25
+            ? 'bg-coral-50 text-coral-600'
+            : 'bg-emerald-50 text-emerald-600';
+          const statusLabel = sku.stockPct < 25 ? `${sku.units} left (Low)` : `${sku.units} in stock`;
+
+          return `
+            <div class="rounded-xl border border-slate-200/80 bg-white p-3.5 transition hover:border-slate-300">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-xs font-semibold text-slate-500">${sku.id}</span>
+                    <span class="text-sm font-semibold text-slate-900">${sku.name}</span>
+                  </div>
+                  <div class="mt-0.5 text-xs text-slate-500">${sku.channel} · Revenue <strong class="font-mono text-slate-800">${sku.rev}</strong></div>
+                </div>
+                <button type="button" data-restock="${sku.id}" class="restock-btn shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-semibold text-slate-800 transition hover:border-coral-500 hover:bg-coral-500 hover:text-white">
+                  Restock
+                </button>
+              </div>
+              <div class="mt-3">
+                <div class="mb-1 flex items-center justify-between text-xs">
+                  <span class="rounded px-1.5 py-0.5 font-medium ${pillClass}">${statusLabel}</span>
+                  <span class="font-mono font-semibold text-slate-600">${sku.stockPct}% capacity</span>
+                </div>
+                <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div class="bar-smooth h-full rounded-full ${barColor}" style="width: ${sku.stockPct}%"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.querySelectorAll('.restock-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-restock');
+            const target = skus.find(item => item.id === id);
+            if (target) {
+              target.units = Math.min(target.maxUnits, target.units + 450);
+              target.stockPct = Math.min(96, Math.round((target.units / target.maxUnits) * 100));
+              renderSkus(document.getElementById('skuSearchInput').value);
+              showToast(`PO dispatched: +450 units added to ${target.name}`);
+            }
+          });
+        });
+      }
+
+      function showToast(msg) {
+        const toast = document.getElementById('toastBanner');
+        document.getElementById('toastText').textContent = msg;
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+        clearTimeout(window.__cartToastTimer);
+        window.__cartToastTimer = setTimeout(() => {
+          toast.classList.add('hidden');
+          toast.classList.remove('flex');
+        }, 3200);
+      }
+
+      // Store Switcher
+      document.querySelectorAll('.store-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.store-btn').forEach(b => {
+            b.className = 'store-btn rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition';
+          });
+          btn.className = 'store-btn rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm transition';
+
+          activeStore = btn.getAttribute('data-store');
+          const d = storeDatasets[activeStore];
+          liveGmv = d.gmv;
+          liveCarts = d.carts;
+
+          document.getElementById('activeStoreTag').textContent = d.tag;
+          document.getElementById('headerGmvTicker').textContent = formatUSD(liveGmv);
+          document.getElementById('kpiGmv').textContent = formatUSD(liveGmv);
+          document.getElementById('kpiAov').textContent = d.aov;
+          document.getElementById('kpiActiveCarts').textContent = liveCarts.toLocaleString();
+          document.getElementById('kpiConvRate').textContent = d.conv;
+          document.getElementById('kpiRoas').textContent = d.roas;
+          document.getElementById('kpiSpend').textContent = d.spend;
+          d.funnel.forEach((val, idx) => {
+            document.getElementById('fStage' + idx).textContent = val;
+          });
+          document.getElementById('fStageConvPill').textContent = d.convPill;
+        });
+      });
+
+      // Topbar Tier 2 Navigation & Sub-Page View Switcher
+      const subpageDatasets = {
+        funnel: {
+          badge: 'FUNNEL TELEMETRY',
+          title: 'Checkout Conversion & Cart Recovery Studio',
+          subtitle: 'Step-by-step session progression, express wallet attach rates, and automated SMS/email cart recovery flows.',
+          kpis: [
+            { label: 'Overall Storefront CVR', val: '4.82%', delta: '+0.64 pts YoY', tone: 'emerald', sub: 'Benchmark: 3.40%' },
+            { label: 'Cart-to-Checkout Rate', val: '49.2%', delta: '+4.1% Express', tone: 'royal', sub: 'ShopPay + Apple Pay' },
+            { label: 'Abandoned Cart Recovery', val: '18.6%', delta: '$28,410 Saved', tone: 'coral', sub: 'Klaviyo + Attentive SMS' },
+            { label: 'Payment Auth Success', val: '98.7%', delta: '14ms Stripe Smart', tone: 'emerald', sub: 'Multi-PSP Failover ON' }
+          ],
+          visualTitle: 'Checkout Step Retention & Wallet Share',
+          visualSub: 'Conversion velocity across payment gateways (Last 24h)',
+          bars: [
+            { name: 'ShopPay 1-Click Accelerated', pct: 84, metric: '6.9% CVR · 1.2s checkout', color: 'bg-coral-500' },
+            { name: 'Apple Pay / Google Pay Biometric', pct: 76, metric: '6.1% CVR · Mobile iOS lead', color: 'bg-royal-500' },
+            { name: 'Klarna Pay-in-4 Financing', pct: 62, metric: '$186 AOV · +31% basket lift', color: 'bg-emerald-500' },
+            { name: 'Standard Card Entry (3DS2)', pct: 48, metric: '3.8% CVR · Smart retry active', color: 'bg-slate-600' }
+          ],
+          svgCurve: 'M 12,102 C 75,96 130,72 195,68 C 260,64 315,38 388,20',
+          tableTitle: 'Active Cart Recovery & Checkout Experiments',
+          actionCol: 'Trigger Flow',
+          rows: [
+            { id: 'EXP-01', col1: '15-Min Abandoned Bag SMS', col2: 'Klaviyo High-Intent', col3: '21.4% Recovery', status: 'Running', doneStatus: 'Boosted +10%', btnLabel: 'Boost Incentive', toast: 'SMS recovery incentive boosted with dynamic free-shipping code.' },
+            { id: 'EXP-02', col1: 'Sticky Mobile Express Drawer', col2: 'iOS Safari / TikTok', col3: '+0.48% Checkout', status: 'Winner', doneStatus: 'Rolled Out 100%', btnLabel: 'Promote 100%', toast: 'Sticky Mobile Express Drawer promoted to 100% storefront traffic.' },
+            { id: 'EXP-03', col1: 'Free Shipping Threshold Bar ($95)', col2: 'Global Flagship', col3: '+$14.20 AOV', status: 'Running', doneStatus: 'Synced All Geo', btnLabel: 'Sync EU/US', toast: 'Threshold progress bar synchronized across EU and US storefronts.' },
+            { id: 'EXP-04', col1: 'Post-Purchase 1-Click Upsell', col2: 'Order Thank-You', col3: '11.8% Take Rate', status: 'Active', doneStatus: 'Refreshed Bundle', btnLabel: 'Rotate SKU', toast: 'Post-purchase upsell rotated to high-margin Travel Kit bundle.' },
+            { id: 'EXP-05', col1: 'Smart PSP Decline Retry', col2: 'Adyen -> Stripe', col3: '$6,920 Rescued', status: 'Protected', doneStatus: 'Diagnostic OK', btnLabel: 'Verify Route', toast: 'PSP failover routing verified at 99.98% authorization uptime.' }
+          ]
+        },
+        inventory: {
+          badge: 'WAREHOUSE & 3PL STOCK',
+          title: 'Omnichannel SKU Inventory & Replenishment Hub',
+          subtitle: 'Real-time safety stock coverage, regional 3PL allocation, and automated purchase order dispatch.',
+          kpis: [
+            { label: 'Total Sellable Units', val: '42,890', delta: '98.4% Synced', tone: 'royal', sub: 'Across 4 fulfillment nodes' },
+            { label: 'Days of Inventory Cover', val: '31.4 Days', delta: 'Optimal Window', tone: 'emerald', sub: 'Target: 28–40 days' },
+            { label: 'Low-Stock Velocity Alerts', val: '2 SKUs', delta: 'Action Needed', tone: 'coral', sub: 'Under 25% safety buffer' },
+            { label: 'In-Transit Freight Units', val: '8,400', delta: 'ETA 48 Hours', tone: 'emerald', sub: 'Newark & Rotterdam ports' }
+          ],
+          visualTitle: 'Regional Warehouse Utilization & Allocation',
+          visualSub: 'Live bin occupancy and pick-pack throughput by hub',
+          bars: [
+            { name: 'Newark East Coast 3PL Hub', pct: 86, metric: '18,400 units · 410 picks/hr', color: 'bg-royal-500' },
+            { name: 'Ontario West Coast Express', pct: 74, metric: '12,950 units · 340 picks/hr', color: 'bg-emerald-500' },
+            { name: 'Rotterdam EU Bonded Center', pct: 68, metric: '7,840 units · 225 picks/hr', color: 'bg-coral-500' },
+            { name: 'TikTok Shop FBT Reserve', pct: 91, metric: '3,700 units · Viral surge lock', color: 'bg-coral-600' }
+          ],
+          svgCurve: 'M 12,88 C 80,84 140,62 210,58 C 275,54 330,34 388,24',
+          tableTitle: 'SKU Replenishment & Safety Buffer Queue',
+          actionCol: 'Purchase Order',
+          rows: [
+            { id: 'CF-901', col1: 'AeroKnit Runner Pro V3', col2: 'Newark + FBT', col3: '298 units (18%)', status: 'Low Stock', doneStatus: 'PO +600 Sent', btnLabel: 'Dispatch PO', toast: 'Expedited PO for +600 AeroKnit Runner Pro V3 dispatched to Newark.' },
+            { id: 'CF-778', col1: 'CloudLoom Merino Hoodie', col2: 'Rotterdam EU', col3: '164 units (14%)', status: 'Critical', doneStatus: 'PO +500 Sent', btnLabel: 'Dispatch PO', toast: 'Air-freight PO for +500 CloudLoom Merino Hoodie confirmed.' },
+            { id: 'CF-412', col1: 'ThermoFlask Titanium 32oz', col2: 'Shopify Express', col3: '742 units (68%)', status: 'Healthy', doneStatus: 'Rebalanced', btnLabel: 'Rebalance', toast: 'Transferred 120 units of ThermoFlask Titanium to West Coast hub.' },
+            { id: 'CF-205', col1: 'PulseFit MagSafe Travel Kit', col2: 'Omnichannel', col3: '890 units (82%)', status: 'Healthy', doneStatus: 'Locked FBT', btnLabel: 'Reserve FBT', toast: 'Reserved 200 units of PulseFit Travel Kit for TikTok Live drop.' },
+            { id: 'CF-630', col1: 'CarbonLite Weekender Duffel', col2: 'Global Flagship', col3: '510 units (56%)', status: 'Healthy', doneStatus: 'Audited OK', btnLabel: 'Cycle Count', toast: 'RFID bin cycle count verified 100% match (510 sellable units).' }
+          ]
+        },
+        roas: {
+          badge: 'PAID ACQUISITION & MER',
+          title: 'Omnichannel Ad ROAS & Attribution Command',
+          subtitle: 'Server-side CAPI attribution, blended Marketing Efficiency Ratio (MER), and automated campaign bid scaling.',
+          kpis: [
+            { label: 'Blended MER (ROAS)', val: '4.62x', delta: '+0.42x vs Plan', tone: 'coral', sub: '$142.8k rev / $31.0k spend' },
+            { label: 'Net New Customer CAC', val: '$24.10', delta: '-11.4% WoW', tone: 'emerald', sub: 'First-order profitable' },
+            { label: 'Meta + TikTok CAPI Match', val: '9.4 / 10', delta: 'Server-Side Dedupe', tone: 'royal', sub: '14ms event stream latency' },
+            { label: '60-Day LTV : CAC Ratio', val: '3.8x', delta: '+18% Repeat Rate', tone: 'emerald', sub: 'Subscription attach 24%' }
+          ],
+          visualTitle: 'Channel ROAS & Daily Spend Pacing',
+          visualSub: 'Multi-touch attributed return vs daily budget cap',
+          bars: [
+            { name: 'TikTok Shop Creator Whitelisting', pct: 92, metric: '5.4x ROAS · $9,620 spend', color: 'bg-coral-500' },
+            { name: 'Meta Advantage+ Shopping (ASC)', pct: 81, metric: '4.5x ROAS · $13,400 spend', color: 'bg-royal-500' },
+            { name: 'Google PMax Branded + Shopping', pct: 78, metric: '4.8x ROAS · $5,840 spend', color: 'bg-emerald-500' },
+            { name: 'YouTube Shorts Demand Gen', pct: 59, metric: '3.2x ROAS · $2,200 spend', color: 'bg-slate-600' }
+          ],
+          svgCurve: 'M 12,96 C 70,88 135,76 205,52 C 270,36 330,28 388,16',
+          tableTitle: 'Live Paid Campaigns & Bid Guardrails',
+          actionCol: 'Budget Action',
+          rows: [
+            { id: 'CMP-11', col1: 'TikTok Creator Spark Ads Q4', col2: 'TikTok Shop US', col3: '5.6x ROAS', status: 'Scaling', doneStatus: 'Budget +15%', btnLabel: 'Scale +15%', toast: 'Scaled TikTok Creator Spark Ads daily cap by +15%.' },
+            { id: 'CMP-18', col1: 'Meta ASC Hero Footwear', col2: 'Global + EU', col3: '4.7x ROAS', status: 'Optimal', doneStatus: 'Budget +10%', btnLabel: 'Scale +10%', toast: 'Increased Meta Advantage+ Hero Footwear budget by +10%.' },
+            { id: 'CMP-24', col1: 'Google High-Intent Non-Brand', col2: 'Search + PLA', col3: '4.4x ROAS', status: 'Optimal', doneStatus: 'tROAS Locked', btnLabel: 'Lock tROAS', toast: 'Target ROAS floor locked at 4.2x on Google Shopping.' },
+            { id: 'CMP-31', col1: 'Dynamic Prospecting Carousel', col2: 'Instagram Reels', col3: '3.1x ROAS', status: 'Watch', doneStatus: 'Creative Swapped', btnLabel: 'Rotate Hook', toast: 'Swapped top-of-funnel UGC video hook to combat creative fatigue.' },
+            { id: 'CMP-39', col1: 'VIP Winback 90-Day Lapsed', col2: 'Meta + Klaviyo', col3: '6.8x ROAS', status: 'High Yield', doneStatus: 'Audience Synced', btnLabel: 'Refresh Seed', toast: 'Synced 14,200 high-LTV profiles to Meta CAPI custom audience.' }
+          ]
+        },
+        fulfillment: {
+          badge: '3PL LOGISTICS & SLA',
+          title: 'Global Fulfillment, Carrier SLA & Returns Desk',
+          subtitle: 'Live warehouse pick-pack queues, carrier transit telemetry, and automated instant-exchange return portals.',
+          kpis: [
+            { label: 'Same-Day Dispatch SLA', val: '99.4%', delta: 'Under 3.8h Avg', tone: 'emerald', sub: 'Cutoff: 16:00 local hub' },
+            { label: 'Orders In Pick/Pack', val: '418', delta: 'Zero Backlog', tone: 'royal', sub: 'Auto-wave batching active' },
+            { label: 'On-Time Carrier Delivery', val: '97.8%', delta: '+1.9% vs Last Mo', tone: 'emerald', sub: 'DHL Express · UPS · FedEx' },
+            { label: 'Return-to-Exchange Retained', val: '64.2%', delta: '$11,280 Saved', tone: 'coral', sub: 'Instant bonus credit portal' }
+          ],
+          visualTitle: 'Carrier Lane Transit Speed & SLA Compliance',
+          visualSub: 'Percentage of parcels scanned & delivered ahead of promised window',
+          bars: [
+            { name: 'DHL Express Air (EU & UK Next-Day)', pct: 98, metric: '99.1% On-Time · 1.4d avg', color: 'bg-emerald-500' },
+            { name: 'UPS Ground Saver (US East/Midwest)', pct: 94, metric: '97.6% On-Time · 2.1d avg', color: 'bg-royal-500' },
+            { name: 'OnTrac / LaserShip Last-Mile', pct: 89, metric: '95.8% On-Time · 1.8d avg', color: 'bg-coral-500' },
+            { name: 'Loop Instant Exchange Reverse Flow', pct: 82, metric: '64.2% Revenue Retained', color: 'bg-slate-700' }
+          ],
+          svgCurve: 'M 12,92 C 85,78 150,68 215,48 C 280,34 335,26 388,18',
+          tableTitle: 'Active Outbound Manifests & Carrier Waves',
+          actionCol: 'Wave Control',
+          rows: [
+            { id: 'WAV-801', col1: 'Newark Wave #14 (Express Air)', col2: '184 Parcels · DHL', col3: '99.8% Scanned', status: 'Ready', doneStatus: 'Manifest Released', btnLabel: 'Release Wave', toast: 'Newark Wave #14 manifest released to DHL Express dock.' },
+            { id: 'WAV-802', col1: 'Rotterdam EU Cross-Border #09', col2: '112 Parcels · DPD', col3: 'Customs Cleared', status: 'In Transit', doneStatus: 'Priority Tracked', btnLabel: 'Ping Hub', toast: 'Rotterdam DPD linehaul telemetry verified on schedule.' },
+            { id: 'WAV-803', col1: 'Ontario West Coast TikTok FBT', col2: '246 Parcels · USPS', col3: '2h Ahead SLA', status: 'Packing', doneStatus: 'Expedited Lane', btnLabel: 'Expedite', toast: 'Allocated +2 automated packing stations to West Coast FBT wave.' },
+            { id: 'WAV-804', col1: 'VIP Split-Shipment Consolidation', col2: '38 Orders · UPS', col3: 'Saves $4.20/box', status: 'Merged', doneStatus: 'Labels Printed', btnLabel: 'Print Batch', toast: 'Batch thermal labels queued for 38 consolidated VIP orders.' },
+            { id: 'WAV-805', col1: 'Instant Size-Exchange Portal Queue', col2: '24 Exchanges', col3: '100% Auto-Credit', status: 'Active', doneStatus: 'Approved All', btnLabel: 'Approve Batch', toast: '24 instant size-exchange shipments approved with zero restock fee.' }
+          ]
+        }
+      };
+
+      function renderSubpage(navKey) {
+        const cfg = subpageDatasets[navKey];
+        const subView = document.getElementById('tabSubpageView');
+        if (!cfg || !subView) return;
+
+        const toneMap = {
+          coral: 'bg-coral-500/10 text-coral-600',
+          royal: 'bg-royal-500/10 text-royal-600',
+          emerald: 'bg-emerald-500/10 text-emerald-600'
+        };
+
+        subView.innerHTML = `
+          <!-- Sub-page Header -->
+          <section class="card-elevated rounded-2xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <span class="rounded-full bg-coral-50 px-3 py-1 font-mono text-xs font-semibold text-coral-600">${cfg.badge}</span>
+                  <span class="font-mono text-xs text-slate-500">${storeDatasets[activeStore].tag}</span>
+                </div>
+                <h1 class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">${cfg.title}</h1>
+                <p class="mt-1 text-sm text-slate-500">${cfg.subtitle}</p>
+              </div>
+              <button type="button" id="backToOverviewBtn" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-coral-500 hover:text-coral-600">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg>
+                <span>&larr; Overview</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 4 Specific KPI Cards -->
+          <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            ${cfg.kpis.map(k => `
+              <article class="card-elevated rounded-2xl p-5 transition hover:border-coral-500/50">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">${k.label}</span>
+                  <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ${toneMap[k.tone] || toneMap.emerald}">${k.delta}</span>
+                </div>
+                <div class="mt-2 font-display text-3xl font-extrabold tracking-tight text-slate-900">${k.val}</div>
+                <div class="mt-2 text-xs text-slate-500">${k.sub}</div>
+              </article>
+            `).join('')}
+          </section>
+
+          <!-- Visual Block + Interactive 5-Row Table -->
+          <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            <!-- Left 5 Cols: SVG Trend + Progress Breakdown -->
+            <div class="card-elevated flex flex-col justify-between rounded-2xl p-6 lg:col-span-5">
+              <div>
+                <h2 class="font-display text-lg font-bold text-slate-900">${cfg.visualTitle}</h2>
+                <p class="mt-0.5 text-sm text-slate-500">${cfg.visualSub}</p>
+
+                <div class="mt-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4">
+                  <div class="mb-2 flex items-center justify-between text-xs font-semibold text-slate-600">
+                    <span>LIVE TELEMETRY VELOCITY</span>
+                    <span class="font-mono text-emerald-600">REAL-TIME SYNC</span>
+                  </div>
+                  <svg class="h-28 w-full overflow-visible" viewBox="0 0 400 115">
+                    <defs>
+                      <linearGradient id="subGradCoral" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#F97316" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#F97316" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <line x1="12" y1="25" x2="388" y2="25" stroke="#E2E8F0" stroke-dasharray="4 4"/>
+                    <line x1="12" y1="65" x2="388" y2="65" stroke="#E2E8F0" stroke-dasharray="4 4"/>
+                    <line x1="12" y1="105" x2="388" y2="105" stroke="#CBD5E1"/>
+                    <path d="${cfg.svgCurve} L 388,105 L 12,105 Z" fill="url(#subGradCoral)"/>
+                    <path class="svg-draw-line" d="${cfg.svgCurve}" fill="none" stroke="#F97316" stroke-width="3" stroke-linecap="round"/>
+                    <circle r="4.5" fill="#2563EB">
+                      <animateMotion dur="3.6s" repeatCount="indefinite" path="${cfg.svgCurve}"/>
+                    </circle>
+                  </svg>
+                </div>
+
+                <div class="mt-5 space-y-3.5">
+                  ${cfg.bars.map(b => `
+                    <div>
+                      <div class="mb-1 flex items-center justify-between text-xs">
+                        <span class="font-semibold text-slate-800">${b.name}</span>
+                        <span class="font-mono text-slate-500">${b.metric}</span>
+                      </div>
+                      <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                        <div class="bar-smooth h-full rounded-full ${b.color}" style="width: ${b.pct}%"></div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 7 Cols: Interactive 5-Row Action Table -->
+            <div class="card-elevated rounded-2xl p-6 lg:col-span-7">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 class="font-display text-lg font-bold text-slate-900">${cfg.tableTitle}</h2>
+                  <p class="mt-0.5 text-sm text-slate-500">Execute 1-click operational actions with instant telemetry confirmation</p>
+                </div>
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-semibold text-emerald-700">5 Active Streams</span>
+              </div>
+
+              <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left text-sm">
+                  <thead class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <tr>
+                      <th class="px-4 py-3">Item / Stream</th>
+                      <th class="px-4 py-3">Segment</th>
+                      <th class="px-4 py-3">Telemetry</th>
+                      <th class="px-4 py-3">Status</th>
+                      <th class="px-4 py-3 text-right">${cfg.actionCol}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200 bg-white">
+                    ${cfg.rows.map((r, idx) => `
+                      <tr class="hover:bg-slate-50/80 transition">
+                        <td class="px-4 py-3.5">
+                          <div class="font-semibold text-slate-900">${r.col1}</div>
+                          <div class="font-mono text-xs text-slate-500">${r.id}</div>
+                        </td>
+                        <td class="px-4 py-3.5 text-xs font-medium text-slate-600">${r.col2}</td>
+                        <td class="px-4 py-3.5 font-mono text-xs font-semibold text-slate-900">${r.col3}</td>
+                        <td class="px-4 py-3.5">
+                          <span id="subRowStatus-${idx}" class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 font-mono text-xs font-semibold text-slate-700">${r.status}</span>
+                        </td>
+                        <td class="px-4 py-3.5 text-right">
+                          <button type="button" data-sub-row="${idx}" class="sub-action-btn rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-800 transition hover:border-coral-500 hover:bg-coral-500 hover:text-white">
+                            ${r.btnLabel}
+                          </button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        `;
+
+        document.getElementById('backToOverviewBtn').addEventListener('click', () => switchTopbarTab('overview'));
+
+        subView.querySelectorAll('.sub-action-btn').forEach(actionBtn => {
+          actionBtn.addEventListener('click', () => {
+            const idx = parseInt(actionBtn.getAttribute('data-sub-row'), 10);
+            const rowData = cfg.rows[idx];
+            const badgeEl = document.getElementById('subRowStatus-' + idx);
+            if (badgeEl && rowData) {
+              badgeEl.textContent = rowData.doneStatus;
+              badgeEl.className = 'inline-flex rounded-full bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-emerald-700';
+              actionBtn.textContent = 'Synced';
+              actionBtn.className = 'sub-action-btn rounded-lg border border-emerald-500/20 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700';
+              showToast(rowData.toast);
+            }
+          });
+        });
+      }
+
+      function switchTopbarTab(navKey) {
+        document.querySelectorAll('.topbar-nav-btn').forEach(b => {
+          const isMatch = b.getAttribute('data-nav') === navKey;
+          b.className = isMatch
+            ? 'topbar-nav-btn relative flex items-center gap-2 rounded-lg bg-coral-50 px-3.5 py-2 text-sm font-semibold text-coral-600 transition'
+            : 'topbar-nav-btn relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition';
+        });
+
+        const defView = document.getElementById('defaultDashboardView');
+        const subView = document.getElementById('tabSubpageView');
+
+        if (navKey === 'overview' || !subpageDatasets[navKey]) {
+          subView.classList.add('hidden');
+          defView.classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          defView.classList.add('hidden');
+          subView.classList.remove('hidden');
+          renderSubpage(navKey);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      document.querySelectorAll('.topbar-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchTopbarTab(btn.getAttribute('data-nav'));
+        });
+      });
+
+      // Chart Range Switcher
+      document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.range-btn').forEach(b => {
+            b.className = 'range-btn rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+          });
+          btn.className = 'range-btn rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition';
+
+          const r = chartRanges[btn.getAttribute('data-range')];
+          document.getElementById('chartCurrentTotal').textContent = r.currTotal;
+          document.getElementById('chartPrevTotal').textContent = r.prevTotal;
+          document.getElementById('chartDeltaBadge').textContent = r.delta;
+          document.getElementById('yMaxLabel').textContent = r.yLabels[0];
+          document.getElementById('yMidHighLabel').textContent = r.yLabels[1];
+          document.getElementById('yMidLabel').textContent = r.yLabels[2];
+          document.getElementById('yLowLabel').textContent = r.yLabels[3];
+
+          const currCurve = document.getElementById('currCurvePath');
+          currCurve.setAttribute('d', r.currPath);
+          document.getElementById('prevCurvePath').setAttribute('d', r.prevPath);
+          document.getElementById('currAreaPath').setAttribute('d', r.currPath + ' L 660,228 L 54,228 Z');
+          document.getElementById('gmvPacketMotion').setAttribute('path', r.currPath);
+
+          currCurve.classList.remove('svg-draw-line');
+          void currCurve.offsetWidth;
+          currCurve.classList.add('svg-draw-line');
+        });
+      });
+
+      // Tooltip Handling
+      const tooltip = document.getElementById('chartTooltip');
+      function bindTooltips(selector) {
+        document.querySelectorAll(selector).forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            document.getElementById('tooltipTitle').textContent = el.getAttribute('data-tip-title') || '';
+            document.getElementById('tooltipValue').textContent = el.getAttribute('data-tip-val') || '';
+            document.getElementById('tooltipSub').textContent = el.getAttribute('data-tip-sub') || '';
+            tooltip.classList.remove('hidden');
+          });
+          el.addEventListener('mousemove', (e) => {
+            tooltip.style.left = (e.clientX + 14) + 'px';
+            tooltip.style.top = (e.clientY - 28) + 'px';
+          });
+          el.addEventListener('mouseleave', () => {
+            tooltip.classList.add('hidden');
+          });
+        });
+      }
+      bindTooltips('.chart-dot, .funnel-ribbon');
+
+      // Search Input Filter + '/' shortcut
+      const searchInput = document.getElementById('skuSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => renderSkus(e.target.value));
+        window.addEventListener('keydown', (e) => {
+          if (e.key === '/' && document.activeElement !== searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+          }
+        });
+      }
+
+      // Telemetry Pulse Toggle + Interval
+      const toggleBtn = document.getElementById('telemetryToggleBtn');
+      toggleBtn.addEventListener('click', () => {
+        telemetryOn = !telemetryOn;
+        document.getElementById('telemetryToggleLabel').textContent = telemetryOn ? 'Live Pulse: ON' : 'Live Pulse: PAUSED';
+        document.getElementById('livePingDot').style.display = telemetryOn ? 'inline-flex' : 'none';
+        document.body.classList.toggle('telemetry-paused', !telemetryOn);
+      });
+
+      setInterval(() => {
+        if (!telemetryOn) return;
+        const deltaGmv = Math.floor(Math.random() * 240) + 65;
+        const deltaCart = Math.floor(Math.random() * 9) - 4;
+        liveGmv += deltaGmv;
+        liveCarts = Math.max(120, liveCarts + deltaCart);
+        document.getElementById('headerGmvTicker').textContent = formatUSD(liveGmv);
+        document.getElementById('kpiGmv').textContent = formatUSD(liveGmv);
+        document.getElementById('kpiActiveCarts').textContent = liveCarts.toLocaleString();
+      }, 2400);
+
+      renderSkus();
+    })();
+  </script>
+</body>
+</html>

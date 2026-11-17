@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUMINA STUDIO — Adaptive AI Learning, Cohort Analytics &amp; Skill Intelligence OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            cloud: '#F6F7FC',
+            ink: '#0F172A',
+            iris: '#4F46E5',
+            skyAccent: '#0284C7',
+            emeraldAccent: '#059669',
+            amberAccent: '#D97706',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-cloud: #F6F7FC;
+      --ink-deep: #0F172A;
+      --iris-indigo: #4F46E5;
+      --sky-blue: #0284C7;
+      --emerald-ok: #059669;
+      --warm-amber: #D97706;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-cloud);
+      color: var(--ink-deep);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 14% 8%, rgba(79, 70, 229, 0.085) 0%, transparent 42%),
+        radial-gradient(circle at 88% 14%, rgba(14, 165, 233, 0.075) 0%, transparent 40%),
+        radial-gradient(circle at 65% 88%, rgba(79, 70, 229, 0.055) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Pillowy Cloud-Glass Bento Cards */
+    .cloud-glass {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(24px) saturate(170%);
+      -webkit-backdrop-filter: blur(24px) saturate(170%);
+      border: 1px solid rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 20px 44px -12px rgba(79, 70, 229, 0.09),
+        0 3px 10px rgba(15, 23, 42, 0.03),
+        inset 0 1px 0 #FFFFFF;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.28s ease;
+    }
+
+    .cloud-glass-hover:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 26px 52px -12px rgba(79, 70, 229, 0.13),
+        0 6px 16px rgba(15, 23, 42, 0.04),
+        inset 0 1px 0 #FFFFFF;
+      border-color: rgba(79, 70, 229, 0.22);
+    }
+
+    /* Soft Tactile Pill Controls */
+    .tactile-well {
+      background: rgba(241, 244, 252, 0.88);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.045), 0 1px 0 #FFFFFF;
+    }
+
+    .tactile-pill-active {
+      background: #FFFFFF;
+      color: #4F46E5;
+      border: 1px solid rgba(255, 255, 255, 0.98);
+      box-shadow:
+        0 6px 16px -4px rgba(79, 70, 229, 0.18),
+        0 2px 4px rgba(15, 23, 42, 0.04),
+        inset 0 1px 0 #FFFFFF;
+    }
+
+    .tactile-btn-primary {
+      background: linear-gradient(135deg, #4F46E5 0%, #4338CA 55%, #0284C7 100%);
+      color: #FFFFFF;
+      box-shadow:
+        0 12px 24px -6px rgba(79, 70, 229, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .tactile-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 16px 30px -6px rgba(79, 70, 229, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .tactile-btn-primary:active {
+      transform: translateY(0.5px);
+    }
+
+    /* Collapsible Sidebar */
+    #sidebar {
+      width: 268px;
+      transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #sidebar.collapsed {
+      width: 84px;
+    }
+
+    #sidebar.collapsed .sidebar-label,
+    #sidebar.collapsed .sidebar-badge,
+    #sidebar.collapsed .sidebar-card-expanded {
+      display: none;
+    }
+
+    #sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .brand-wrap {
+      justify-content: center;
+    }
+
+    /* Interactive 3D Hero Tilt Frame */
+    .hero-tilt-stage {
+      perspective: 1200px;
+    }
+
+    .hero-tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out, box-shadow 0.28s ease;
+      will-change: transform;
+    }
+
+    .hero-glare {
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 62%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Animated SVG Data Flow */
+    @keyframes packetFlow {
+      from {
+        stroke-dashoffset: 180;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .flow-stream {
+      stroke-dasharray: 10 14;
+      animation: packetFlow 3.4s linear infinite;
+    }
+
+    .flow-stream-fast {
+      stroke-dasharray: 8 18;
+      animation: packetFlow 2.5s linear infinite;
+    }
+
+    .pipeline-paused .flow-stream,
+    .pipeline-paused .flow-stream-fast {
+      animation-play-state: paused;
+    }
+
+    @keyframes pulseHalo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.45;
+      }
+      50% {
+        transform: scale(1.18);
+        opacity: 0.14;
+      }
+    }
+
+    .pulse-ring {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: pulseHalo 2.6s ease-in-out infinite;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(79, 70, 229, 0.18);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(79, 70, 229, 0.34);
+    }
+
+    /* Radar polygon smooth morph */
+    #radarCohortPoly, #radarTargetPoly {
+      transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900 selection:bg-indigo-500/15 selection:text-indigo-700">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 z-40 bg-slate-900/25 backdrop-blur-sm hidden lg:hidden" onclick="toggleMobileSidebar(false)"></div>
+
+  <div class="flex min-h-screen relative">
+    <!-- COLLAPSIBLE CLOUD-GLASS SIDEBAR -->
+    <aside id="sidebar" class="cloud-glass fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 lg:h-screen flex flex-col justify-between border-r border-white/95 -translate-x-full lg:translate-x-0 shrink-0 select-none">
+      <!-- Top Brand + Nav -->
+      <div class="p-4 flex flex-col gap-6">
+        <!-- Brand Header -->
+        <div class="brand-wrap flex items-center justify-between px-1.5 pt-1">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl tactile-btn-primary flex items-center justify-center shrink-0 relative">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L3 7l9 5 9-5-9-5z" />
+                <path d="M3 17l9 5 9-5" />
+                <path d="M3 12l9 5 9-5" />
+              </svg>
+              <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-sky-400 ring-2 ring-white"></span>
+            </div>
+            <div class="sidebar-label leading-tight">
+              <div class="font-display font-extrabold text-[15px] tracking-tight text-slate-900 flex items-center gap-1.5">
+                LUMINA <span class="text-indigo-600">STUDIO</span>
+              </div>
+              <div class="text-[12.5px] font-medium text-slate-500">Adaptive Skill OS v4.2</div>
+            </div>
+          </div>
+          <button onclick="toggleSidebarCollapse()" title="Collapse or expand sidebar" class="sidebar-label hidden lg:flex w-8 h-8 rounded-xl tactile-well items-center justify-center text-slate-500 hover:text-indigo-600 transition-colors">
+            <svg id="collapseChevron" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="space-y-1.5" aria-label="Main Navigation">
+          <div class="sidebar-label px-3 pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Learning Intelligence</div>
+
+          <button data-nav="Academy Pulse" onclick="selectNav(this, 'Academy Pulse')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl tactile-pill-active font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="sidebar-label">Academy Pulse</span>
+            </span>
+            <span class="sidebar-badge font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">LIVE</span>
+          </button>
+
+          <button data-nav="Adaptive AI Paths" onclick="selectNav(this, 'Adaptive AI Paths')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="6" cy="6" r="3"/>
+                <circle cx="18" cy="6" r="3"/>
+                <circle cx="12" cy="18" r="3"/>
+                <path d="M8.5 7.5L11 15.2M15.5 7.5L13 15.2" stroke-linecap="round"/>
+              </svg>
+              <span class="sidebar-label">Adaptive AI Paths</span>
+            </span>
+            <span class="sidebar-badge font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100">14</span>
+          </button>
+
+          <button data-nav="Live Cohorts" onclick="selectNav(this, 'Live Cohorts')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span class="sidebar-label">Live Cohorts</span>
+            </span>
+            <span class="sidebar-badge font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">08</span>
+          </button>
+
+          <button data-nav="Skill Matrix" onclick="selectNav(this, 'Skill Matrix')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                <line x1="12" y1="22" x2="12" y2="15.5"/>
+                <polyline points="22 8.5 12 15.5 2 8.5"/>
+              </svg>
+              <span class="sidebar-label">Skill Matrix</span>
+            </span>
+          </button>
+
+          <button data-nav="Mentorship" onclick="selectNav(this, 'Mentorship')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span class="sidebar-label">Mentorship</span>
+            </span>
+            <span class="sidebar-badge w-2 h-2 rounded-full bg-amber-500"></span>
+          </button>
+
+          <button data-nav="Certifications" onclick="selectNav(this, 'Certifications')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="6"/>
+                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+              </svg>
+              <span class="sidebar-label">Certifications</span>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Socratic AI Engine Status + Dean Profile -->
+      <div class="p-4 space-y-3">
+        <div class="sidebar-card-expanded rounded-2xl p-3.5 bg-gradient-to-br from-indigo-50/90 via-white/95 to-sky-50/85 border border-indigo-100/80 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[12.5px] font-semibold text-indigo-950 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Socratic Tutor Cluster
+            </span>
+            <span class="font-mono text-[12.5px] font-semibold text-indigo-600">38ms</span>
+          </div>
+          <p class="text-[12.5px] text-slate-600 leading-relaxed mb-2.5">
+            Synthesizing real-time lab hints across <span class="font-mono font-semibold text-slate-800">2,840</span> active sessions.
+          </p>
+          <div class="w-full h-1.5 rounded-full bg-indigo-100 overflow-hidden">
+            <div class="h-full w-[84%] rounded-full bg-gradient-to-r from-indigo-600 to-sky-500"></div>
+          </div>
+          <div class="flex justify-between mt-1.5 text-xs font-mono text-slate-500">
+            <span>GPU Capacity</span>
+            <span>84.2% Optimal</span>
+          </div>
+        </div>
+
+        <!-- Expand button shown only when collapsed -->
+        <button id="collapsedExpandBtn" onclick="toggleSidebarCollapse()" title="Expand sidebar" class="hidden w-full py-2.5 rounded-2xl tactile-well items-center justify-center text-indigo-600 hover:bg-white transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-3 px-2 py-2 rounded-2xl bg-white/70 border border-white">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-500 text-white font-display font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+            EV
+          </div>
+          <div class="sidebar-label min-w-0 flex-1">
+            <div class="text-xs font-semibold text-slate-900 truncate">Dr. Elena Vance</div>
+            <div class="text-[12.5px] text-slate-500 truncate">VP Learning Architecture</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="flex-1 min-w-0 flex flex-col">
+      <!-- STICKY CLOUD-GLASS TOPBAR -->
+      <header class="sticky top-0 z-30 px-4 sm:px-7 py-3.5 bg-[#F6F7FC]/80 backdrop-blur-xl border-b border-white/90">
+        <div class="max-w-[1540px] mx-auto flex flex-wrap items-center justify-between gap-3">
+          <!-- Left: Mobile Menu + Context Breadcrumb & Program Switcher -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="toggleMobileSidebar(true)" class="lg:hidden w-10 h-10 rounded-2xl cloud-glass flex items-center justify-center text-slate-700" aria-label="Open menu">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>
+              </svg>
+            </button>
+
+            <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-slate-500 pr-2 border-r border-slate-200/80">
+              <span>Enterprise Academy</span>
+              <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              <span id="activeNavBreadcrumb" class="font-semibold text-slate-800">Academy Pulse</span>
+            </div>
+
+            <!-- Interactive Program Switcher -->
+            <div class="tactile-well p-1 rounded-2xl flex items-center gap-1 overflow-x-auto max-w-full" role="tablist" aria-label="Program Switcher">
+              <button onclick="switchProgram('ai-eng')" data-program="ai-eng" class="program-tab tactile-pill-active px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                AI Engineering Track
+              </button>
+              <button onclick="switchProgram('design-sys')" data-program="design-sys" class="program-tab px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap transition-all flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 opacity-60"></span>
+                Product Design Systems
+              </button>
+              <button onclick="switchProgram('quant-fin')" data-program="quant-fin" class="program-tab px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap transition-all flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-60"></span>
+                Quantitative Finance
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Learner Search + Actions -->
+          <div class="flex items-center gap-2.5 ml-auto">
+            <div class="relative w-52 sm:w-64">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                id="learnerSearchInput"
+                type="text"
+                oninput="filterLearners()"
+                placeholder="Search learner, skill, cohort..."
+                class="w-full pl-9 pr-10 py-2 rounded-2xl cloud-glass text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+              />
+              <kbd class="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs font-mono text-slate-400 bg-slate-100/90 rounded border border-slate-200/80">/</kbd>
+            </div>
+
+            <button onclick="triggerToast('Adaptive curriculum telemetry synced across 14 enterprise cohorts.')" class="tactile-btn-primary px-3.5 py-2 rounded-2xl text-xs font-semibold flex items-center gap-2 shrink-0">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span class="hidden md:inline">Calibrate AI Graph</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN BENTO CONTENT -->
+      <main class="flex-1 px-4 sm:px-7 py-6 max-w-[1540px] w-full mx-auto space-y-6">
+
+        <div id="defaultDashboardView" class="space-y-6">
+        <!-- 1. HERO VISUAL BANNER & LIVE COHORT SPOTLIGHT -->
+        <section class="cloud-glass rounded-[28px] p-5 sm:p-7 relative overflow-hidden">
+          <!-- Subtle mesh ambient accents -->
+          <div class="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-24 left-1/3 w-72 h-72 rounded-full bg-sky-400/10 blur-3xl pointer-events-none"></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+            <!-- Left 7 Cols: Cohort Intelligence Narrative -->
+            <div class="lg:col-span-7 space-y-4">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 font-mono text-xs font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 -ml-4"></span>
+                  <span id="liveOnlineCounter">2,840</span> Online Now
+                </span>
+                <span id="heroProgramBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/15 text-indigo-700 text-xs font-semibold">
+                  Spring Q2 Flagship · AI Engineering Track
+                </span>
+              </div>
+
+              <div class="space-y-2">
+                <h1 id="heroHeadline" class="font-display font-extrabold text-2xl sm:text-[30px] text-slate-900 leading-[1.18]">
+                  94.8% Course Completion <span class="bg-gradient-to-r from-indigo-600 to-sky-600 bg-clip-text text-transparent">(3.2x Industry Avg)</span>
+                </h1>
+                <p id="heroSubcopy" class="text-sm text-slate-600 max-w-2xl leading-relaxed">
+                  Lumina’s Socratic AI Lab dynamically re-sequences micro-modules the moment conceptual friction appears—compressing time-to-competency across enterprise engineering teams.
+                </p>
+              </div>
+
+              <!-- Micro Metrics Strip -->
+              <div class="grid grid-cols-3 gap-3 pt-1 max-w-xl">
+                <div class="rounded-2xl bg-white/75 border border-white p-3 shadow-sm">
+                  <div class="text-[12.5px] font-medium text-slate-500">Retention Lift</div>
+                  <div id="heroMetric1" class="font-mono font-bold text-base sm:text-lg text-indigo-600 mt-0.5">+38.4%</div>
+                  <div class="text-xs text-slate-400">30-day recall check</div>
+                </div>
+                <div class="rounded-2xl bg-white/75 border border-white p-3 shadow-sm">
+                  <div class="text-[12.5px] font-medium text-slate-500">Lab Pass First-Try</div>
+                  <div id="heroMetric2" class="font-mono font-bold text-base sm:text-lg text-sky-600 mt-0.5">91.6%</div>
+                  <div class="text-xs text-slate-400">Socratic guided</div>
+                </div>
+                <div class="rounded-2xl bg-white/75 border border-white p-3 shadow-sm">
+                  <div class="text-[12.5px] font-medium text-slate-500">Weekly XP Pace</div>
+                  <div id="heroMetric3" class="font-mono font-bold text-base sm:text-lg text-emerald-600 mt-0.5">1,420 XP</div>
+                  <div class="text-xs text-slate-400">+22% vs target</div>
+                </div>
+              </div>
+
+              <!-- Action Controls -->
+              <div class="flex flex-wrap items-center gap-3 pt-1">
+                <button onclick="triggerToast('Launching Live Cohort Socratic Sandbox view...')" class="tactile-btn-primary px-4 py-2.5 rounded-2xl text-xs font-semibold inline-flex items-center gap-2">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  Inspect Live Socratic Lab
+                </button>
+                <button onclick="exportAcademyBrief()" class="px-4 py-2.5 rounded-2xl bg-white/90 hover:bg-white text-slate-700 hover:text-indigo-600 border border-slate-200/80 shadow-sm text-xs font-semibold inline-flex items-center gap-2 transition">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Export Executive Skill Report
+                </button>
+              </div>
+            </div>
+
+            <!-- Right 5 Cols: Interactive 3D Hover-Tilt Refractive Visual Card -->
+            <div class="lg:col-span-5 hero-tilt-stage">
+              <div
+                id="heroTiltCard"
+                class="hero-tilt-card relative rounded-[24px] p-2.5 bg-white/85 border border-white shadow-[0_24px_48px_-12px_rgba(79,70,229,0.18)] overflow-hidden cursor-pointer"
+              >
+                <div class="relative h-[238px] sm:h-[256px] rounded-[18px] overflow-hidden bg-gradient-to-br from-indigo-100 via-sky-50 to-indigo-200">
+                  <img
+                    src="/templates/assets/medglass-visual.jpg"
+                    onerror="this.onerror=null; this.src='../../assets/medglass-visual.jpg';"
+                    alt="Refractive Crystal Knowledge Graph Visual"
+                    class="w-full h-full object-cover object-center scale-[1.03] transition-transform duration-500"
+                  />
+                  <!-- Soft atmospheric gradient veil for legibility -->
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/15 to-transparent"></div>
+                  <!-- Dynamic Specular Glare Overlay -->
+                  <div id="heroGlare" class="hero-glare absolute inset-0"></div>
+
+                  <!-- Top Floating Frosted Pill -->
+                  <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
+                    <span class="px-3 py-1 rounded-full bg-white/85 backdrop-blur-md text-[12.5px] font-semibold text-slate-900 shadow-sm flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+                      </svg>
+                      Neural Skill Graph v4
+                    </span>
+                    <span class="px-2.5 py-1 rounded-full bg-slate-900/65 backdrop-blur-md font-mono text-xs text-white border border-white/20">
+                      3D TILT INTERACTIVE
+                    </span>
+                  </div>
+
+                  <!-- Bottom Floating Telemetry Overlay -->
+                  <div class="absolute bottom-3.5 left-3.5 right-3.5 p-3.5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/95 shadow-lg">
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                      <span class="font-display font-bold text-slate-900" id="spotlightCohortName">Cohort #19 · LLM Systems Architecture</span>
+                      <span class="font-mono font-bold text-indigo-600" id="spotlightProgressPct">88.4%</span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-slate-200/80 overflow-hidden">
+                      <div id="spotlightProgressBar" class="h-full rounded-full bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 transition-all duration-500" style="width: 88.4%"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-2 text-[12.5px] text-slate-600">
+                      <span> Capstone Verification Window: <strong class="font-mono text-slate-800">4d 11h</strong></span>
+                      <span class="font-mono text-emerald-600 font-semibold">+14.2% velocity</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 4 SOFT-UI KPI CARDS WITH SPARKLINES -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5" aria-label="Key Performance Metrics">
+          <!-- KPI 1 -->
+          <article class="cloud-glass cloud-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-slate-500">Active Cohort Learners</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiLearners" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-slate-900">12,480</span>
+                  <span id="kpiLearnersDelta" class="font-mono text-[12.5px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">+19.4%</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 text-indigo-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-slate-500">92.4% weekly active streak</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 26 C18 24, 26 19, 38 20 C52 21, 62 11, 76 9 C84 8, 90 4, 94 3" stroke="#4F46E5" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="94" cy="3" r="3" fill="#4F46E5"/>
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 2 -->
+          <article class="cloud-glass cloud-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-slate-500">AI Tutor Resolution</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiResolution" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-slate-900">96.2%</span>
+                  <span id="kpiResolutionDelta" class="font-mono text-[12.5px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-700 border border-sky-500/20">+4.1%</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/15 text-sky-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
+                  <path d="M6 10v2a6 6 0 0 0 12 0v-2"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-slate-500">Zero-spoiler Socratic hints</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 22 C20 20, 32 16, 46 15 C60 14, 72 8, 94 5" stroke="#0284C7" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="94" cy="5" r="3" fill="#0284C7"/>
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 3 -->
+          <article class="cloud-glass cloud-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-slate-500">Avg Skill Mastery Velocity</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiVelocity" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-indigo-600">+42% faster</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/15 text-emerald-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-slate-500">vs static linear video LMS</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 28 C16 26, 28 24, 42 17 C56 10, 74 11, 94 4" stroke="#059669" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="94" cy="4" r="3" fill="#059669"/>
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 4 -->
+          <article class="cloud-glass cloud-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-slate-500">Verified Credentials Issued</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiCredentials" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-slate-900">4,910</span>
+                  <span id="kpiCredentialsDelta" class="font-mono text-[12.5px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20">+28.6%</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/15 text-amber-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-slate-500">Cryptographically signed</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 25 C18 25, 30 20, 48 18 C64 16, 78 9, 94 6" stroke="#D97706" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="94" cy="6" r="3" fill="#D97706"/>
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <!-- 3. ADAPTIVE AI LEARNING ENGINE DATA FLOW PIPELINE -->
+        <section id="pipelineSection" class="cloud-glass rounded-[28px] p-5 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 font-mono text-xs font-semibold uppercase tracking-wider">Real-Time Pedagogical Telemetry</span>
+                <span class="text-xs text-slate-400 font-mono">Click any stage node to inspect retention lift &amp; latency</span>
+              </div>
+              <h2 class="font-display font-bold text-lg sm:text-xl text-slate-900 mt-1">Adaptive AI Learning Engine Pipeline</h2>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+              <button id="flowToggleBtn" onclick="togglePipelineAnimation()" class="px-3.5 py-1.5 rounded-xl tactile-well text-xs font-semibold text-slate-700 hover:text-indigo-600 flex items-center gap-2 transition">
+                <span id="flowStatusDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span id="flowToggleText">Live Stream Active</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Animated SVG Pipeline Graphic -->
+          <div class="w-full overflow-x-auto pb-2">
+            <div class="min-w-[820px]">
+              <svg id="pipelineSvg" class="w-full h-[132px]" viewBox="0 0 1120 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="pipeGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#4F46E5"/>
+                    <stop offset="50%" stop-color="#0284C7"/>
+                    <stop offset="100%" stop-color="#059669"/>
+                  </linearGradient>
+                  <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#4F46E5" flood-opacity="0.16"/>
+                  </filter>
+                </defs>
+
+                <!-- Base Conduit Track -->
+                <path d="M 130 66 C 240 66, 290 66, 420 66 C 550 66, 600 66, 700 66 C 820 66, 880 66, 990 66" stroke="#E2E8F0" stroke-width="8" stroke-linecap="round"/>
+                <!-- Secondary Curved Bypass Arcs -->
+                <path d="M 130 66 C 225 22, 325 22, 420 66" stroke="#E0E7FF" stroke-width="2.5" fill="none"/>
+                <path d="M 420 66 C 515 110, 605 110, 700 66" stroke="#E0F2FE" stroke-width="2.5" fill="none"/>
+                <path d="M 700 66 C 795 22, 895 22, 990 66" stroke="#D1FAE5" stroke-width="2.5" fill="none"/>
+
+                <!-- Animated Indigo/Sky Packet Stream -->
+                <path class="flow-stream" d="M 130 66 L 990 66" stroke="url(#pipeGrad1)" stroke-width="4" stroke-linecap="round"/>
+                <path class="flow-stream-fast" d="M 130 66 C 225 22, 325 22, 420 66 C 515 110, 605 110, 700 66 C 795 22, 895 22, 990 66" stroke="url(#pipeGrad1)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+                <!-- Traveling Glowing Data Orbs -->
+                <circle r="5" fill="#4F46E5">
+                  <animateMotion dur="4.2s" repeatCount="indefinite" path="M 130 66 L 990 66"/>
+                </circle>
+                <circle r="4.5" fill="#0284C7">
+                  <animateMotion dur="5.2s" begin="1.4s" repeatCount="indefinite" path="M 130 66 C 225 22, 325 22, 420 66 C 515 110, 605 110, 700 66 C 795 22, 895 22, 990 66"/>
+                </circle>
+
+                <!-- NODE 01 -->
+                <g onclick="inspectStage(0)" class="cursor-pointer">
+                  <circle id="svgHalo0" cx="130" cy="66" r="34" fill="#4F46E5" opacity="0.18" class="pulse-ring"/>
+                  <circle id="svgNode0" cx="130" cy="66" r="26" fill="#4F46E5" stroke="#FFFFFF" stroke-width="3" filter="url(#softGlow)"/>
+                  <text x="130" y="71" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">01</text>
+                </g>
+
+                <!-- NODE 02 -->
+                <g onclick="inspectStage(1)" class="cursor-pointer">
+                  <circle id="svgHalo1" cx="420" cy="66" r="34" fill="#0284C7" opacity="0"/>
+                  <circle id="svgNode1" cx="420" cy="66" r="26" fill="#FFFFFF" stroke="#0284C7" stroke-width="3" filter="url(#softGlow)"/>
+                  <text id="svgText1" x="420" y="71" text-anchor="middle" fill="#0284C7" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">02</text>
+                </g>
+
+                <!-- NODE 03 -->
+                <g onclick="inspectStage(2)" class="cursor-pointer">
+                  <circle id="svgHalo2" cx="700" cy="66" r="34" fill="#4F46E5" opacity="0"/>
+                  <circle id="svgNode2" cx="700" cy="66" r="26" fill="#FFFFFF" stroke="#4F46E5" stroke-width="3" filter="url(#softGlow)"/>
+                  <text id="svgText2" x="700" y="71" text-anchor="middle" fill="#4F46E5" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">03</text>
+                </g>
+
+                <!-- NODE 04 -->
+                <g onclick="inspectStage(3)" class="cursor-pointer">
+                  <circle id="svgHalo3" cx="990" cy="66" r="34" fill="#059669" opacity="0"/>
+                  <circle id="svgNode3" cx="990" cy="66" r="26" fill="#FFFFFF" stroke="#059669" stroke-width="3" filter="url(#softGlow)"/>
+                  <text id="svgText3" x="990" y="71" text-anchor="middle" fill="#059669" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">04</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 4 Clickable Stage Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3.5 mt-2">
+            <button onclick="inspectStage(0)" id="stageCard0" class="stage-card text-left p-4 rounded-2xl bg-white border-2 border-indigo-500 shadow-md transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-indigo-600">STAGE 01</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700">18ms</span>
+              </div>
+              <div class="font-display font-bold text-sm text-slate-900">Diagnostic Skill Graph</div>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Maps 140+ granular sub-skills via Bayesian knowledge tracing.</p>
+            </button>
+
+            <button onclick="inspectStage(1)" id="stageCard1" class="stage-card text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-slate-200/80 transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-sky-600">STAGE 02</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700">42ms</span>
+              </div>
+              <div class="font-display font-bold text-sm text-slate-900">Personalized Curriculum Synthesizer</div>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Generates bespoke lab modules skipping mastered prerequisites.</p>
+            </button>
+
+            <button onclick="inspectStage(2)" id="stageCard2" class="stage-card text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-slate-200/80 transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-indigo-600">STAGE 03</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700">38ms</span>
+              </div>
+              <div class="font-display font-bold text-sm text-slate-900">Real-Time Socratic AI Lab</div>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Guides learners with probing questions instead of raw code dumps.</p>
+            </button>
+
+            <button onclick="inspectStage(3)" id="stageCard3" class="stage-card text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-slate-200/80 transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-emerald-600">STAGE 04</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700">12ms</span>
+              </div>
+              <div class="font-display font-bold text-sm text-slate-900">Capstone &amp; Verified Credential</div>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Automated rubric grading + W3C OpenBadge skill attestation.</p>
+            </button>
+          </div>
+
+          <!-- Interactive Stage Telemetry Inspector Readout -->
+          <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-indigo-50/75 via-white/95 to-sky-50/75 border border-indigo-100/90 flex flex-wrap items-center justify-between gap-4">
+            <div class="space-y-0.5 max-w-2xl">
+              <div class="flex items-center gap-2">
+                <span id="inspectorBadge" class="font-mono text-[12.5px] font-bold text-indigo-600 uppercase">INSPECTING · 01 DIAGNOSTIC SKILL GRAPH</span>
+              </div>
+              <p id="inspectorDesc" class="text-xs sm:text-[13px] text-slate-700">
+                Calibrates prior engineering mastery in 6 adaptive questions—eliminating an average of <strong>6.4 redundant hours</strong> per learner before module 1 begins.
+              </p>
+            </div>
+            <div class="flex items-center gap-5 sm:gap-7">
+              <div>
+                <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Retention Lift</div>
+                <div id="inspectorRetention" class="font-mono font-bold text-base text-emerald-600">+31.8%</div>
+              </div>
+              <div>
+                <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">P95 Latency</div>
+                <div id="inspectorLatency" class="font-mono font-bold text-base text-indigo-600">18.4 ms</div>
+              </div>
+              <div>
+                <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Throughput</div>
+                <div id="inspectorThroughput" class="font-mono font-bold text-base text-slate-900">1,940 req/s</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. DUAL ANALYTICS BENTO ROW -->
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <!-- LEFT (7 COLS): Interactive Cohort Engagement & Skill Mastery Trajectory SVG Area Chart -->
+          <div class="xl:col-span-7 cloud-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-5">
+                <div>
+                  <h2 class="font-display font-bold text-lg text-slate-900">Cohort Engagement &amp; Skill Mastery Trajectory</h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Verified competency progression vs active Socratic lab engagement index</p>
+                </div>
+
+                <!-- Timeframe Switcher -->
+                <div class="tactile-well p-1 rounded-xl flex items-center gap-1">
+                  <button onclick="switchTimeframe('weekly')" data-tf="weekly" class="tf-tab tactile-pill-active px-3 py-1 rounded-lg text-xs font-semibold transition">Weekly</button>
+                  <button onclick="switchTimeframe('monthly')" data-tf="monthly" class="tf-tab px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Monthly</button>
+                  <button onclick="switchTimeframe('quarterly')" data-tf="quarterly" class="tf-tab px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Quarterly</button>
+                </div>
+              </div>
+
+              <!-- Legend + Live Hover Readout -->
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4 px-3.5 py-2.5 rounded-2xl bg-slate-50/80 border border-slate-200/60">
+                <div class="flex items-center gap-5 text-xs">
+                  <span class="flex items-center gap-2 font-medium text-slate-700">
+                    <span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span>
+                    Skill Mastery Index: <strong id="chartReadoutMastery" class="font-mono text-indigo-600">94.2%</strong>
+                  </span>
+                  <span class="flex items-center gap-2 font-medium text-slate-700">
+                    <span class="w-3 h-3 rounded-full bg-sky-500 inline-block"></span>
+                    Lab Engagement: <strong id="chartReadoutEngage" class="font-mono text-sky-600">89.6%</strong>
+                  </span>
+                </div>
+                <span id="chartReadoutPeriod" class="font-mono text-[12.5px] font-semibold text-slate-500">Period: Wk 08 (Current)</span>
+              </div>
+
+              <!-- Interactive SVG Area Chart -->
+              <div class="relative w-full">
+                <svg id="trajectoryChart" class="w-full h-[270px] overflow-visible select-none" viewBox="0 0 680 260" fill="none">
+                  <defs>
+                    <linearGradient id="masteryAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.28"/>
+                      <stop offset="100%" stop-color="#4F46E5" stop-opacity="0.0"/>
+                    </linearGradient>
+                    <linearGradient id="engageAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.18"/>
+                      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+
+                  <!-- Horizontal Gridlines -->
+                  <g stroke="#E2E8F0" stroke-dasharray="4 4" stroke-width="1">
+                    <line x1="44" y1="28" x2="656" y2="28"/>
+                    <line x1="44" y1="78" x2="656" y2="78"/>
+                    <line x1="44" y1="128" x2="656" y2="128"/>
+                    <line x1="44" y1="178" x2="656" y2="178"/>
+                    <line x1="44" y1="224" x2="656" y2="224" stroke-dasharray="0"/>
+                  </g>
+
+                  <!-- Y-Axis Labels -->
+                  <g fill="#94A3B8" font-family="JetBrains Mono, monospace" font-size="10.5">
+                    <text x="8" y="32">100%</text>
+                    <text x="14" y="82">80%</text>
+                    <text x="14" y="132">60%</text>
+                    <text x="14" y="182">40%</text>
+                    <text x="14" y="228">20%</text>
+                  </g>
+
+                  <!-- Dynamic Area & Line Paths populated by JS -->
+                  <path id="engageAreaPath" fill="url(#engageAreaGrad)" d=""/>
+                  <path id="masteryAreaPath" fill="url(#masteryAreaGrad)" d=""/>
+                  <path id="engageLinePath" stroke="#0284C7" stroke-width="2.6" stroke-linecap="round" fill="none" d=""/>
+                  <path id="masteryLinePath" stroke="#4F46E5" stroke-width="3.2" stroke-linecap="round" fill="none" d=""/>
+
+                  <!-- Interactive Vertical Guide Line -->
+                  <line id="chartHoverGuide" x1="656" y1="24" x2="656" y2="224" stroke="#4F46E5" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.55"/>
+
+                  <!-- Data Points & Hit Columns Group -->
+                  <g id="chartPointsGroup"></g>
+                  <g id="chartXLabelsGroup" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10.5"></g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Bottom Summary Strip -->
+            <div class="grid grid-cols-3 gap-3 pt-4 mt-2 border-t border-slate-200/70">
+              <div>
+                <span class="text-[12.5px] text-slate-500">Avg Weekly Lab Hours</span>
+                <div id="summaryHours" class="font-mono font-bold text-sm sm:text-base text-slate-900 mt-0.5">6.8 hrs / learner</div>
+              </div>
+              <div>
+                <span class="text-[12.5px] text-slate-500">Concept Struggle Recovery</span>
+                <div id="summaryRecovery" class="font-mono font-bold text-sm sm:text-base text-emerald-600 mt-0.5">4.2 mins avg</div>
+              </div>
+              <div>
+                <span class="text-[12.5px] text-slate-500">Peer Code Reviews</span>
+                <div id="summaryReviews" class="font-mono font-bold text-sm sm:text-base text-indigo-600 mt-0.5">3,490 merged</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT (5 COLS): Domain Competency SVG Pentagon Radar + Top Active Tracks -->
+          <div class="xl:col-span-5 cloud-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between gap-5">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <div>
+                  <h2 class="font-display font-bold text-lg text-slate-900">Domain Competency Matrix</h2>
+                  <p class="text-xs text-slate-500">Cohort mastery vs enterprise role target</p>
+                </div>
+                <span id="radarAvgBadge" class="font-mono text-xs font-bold px-2.5 py-1 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100">90.4% Avg</span>
+              </div>
+
+              <!-- Pentagon Radar SVG -->
+              <div class="flex items-center justify-center my-1">
+                <svg class="w-full max-w-[300px] h-[225px] overflow-visible" viewBox="0 0 280 230">
+                  <!-- Concentric Pentagon Rings (center 140, 118, R=82) -->
+                  <g fill="none" stroke="#E2E8F0" stroke-width="1">
+                    <polygon points="140,36 217.9,92.7 188.2,184.3 91.8,184.3 62.1,92.7"/>
+                    <polygon points="140,56.5 198.5,99 176.1,167.8 103.9,167.8 81.5,99"/>
+                    <polygon points="140,77 179,105.3 164.1,151.2 115.9,151.2 101,105.3"/>
+                    <polygon points="140,97.5 159.5,111.7 152,134.6 128,134.6 120.5,111.7"/>
+                    <!-- Spokes -->
+                    <line x1="140" y1="118" x2="140" y2="36"/>
+                    <line x1="140" y1="118" x2="217.9" y2="92.7"/>
+                    <line x1="140" y1="118" x2="188.2" y2="184.3"/>
+                    <line x1="140" y1="118" x2="91.8" y2="184.3"/>
+                    <line x1="140" y1="118" x2="62.1" y2="92.7"/>
+                  </g>
+
+                  <!-- Target Benchmark Polygon -->
+                  <polygon id="radarTargetPoly" points="140,48 206,96 181,174 99,174 74,96" fill="rgba(2, 132, 199, 0.08)" stroke="#0284C7" stroke-width="1.6" stroke-dasharray="4 3"/>
+
+                  <!-- Cohort Mastery Polygon -->
+                  <polygon id="radarCohortPoly" points="140,41 213,94 183,178 97,177 69,95" fill="rgba(79, 70, 229, 0.22)" stroke="#4F46E5" stroke-width="2.4"/>
+
+                  <!-- Vertex Labels -->
+                  <g font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="10.5" fill="#1E293B">
+                    <text x="140" y="23" text-anchor="middle">Systems <tspan id="radVal0" font-family="JetBrains Mono" fill="#4F46E5">94%</tspan></text>
+                    <text x="226" y="95" text-anchor="start">AI Prompting <tspan id="radVal1" font-family="JetBrains Mono" fill="#4F46E5">92%</tspan></text>
+                    <text x="195" y="201" text-anchor="middle">Architecture <tspan id="radVal2" font-family="JetBrains Mono" fill="#4F46E5">89%</tspan></text>
+                    <text x="85" y="201" text-anchor="middle">Security <tspan id="radVal3" font-family="JetBrains Mono" fill="#4F46E5">86%</tspan></text>
+                    <text x="54" y="95" text-anchor="end">Testing <tspan id="radVal4" font-family="JetBrains Mono" fill="#4F46E5">91%</tspan></text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Top Active Tracks Progress Cards -->
+            <div class="space-y-2.5 pt-3 border-t border-slate-200/70">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                <span>Top Active Curriculum Tracks</span>
+                <span class="font-mono text-[12.5px] text-slate-400">Mastery Rate</span>
+              </div>
+              <div id="activeTracksContainer" class="space-y-2.5"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. LEARNER INTERVENTION & SOCRATIC TELEMETRY TABLE -->
+        <section class="cloud-glass rounded-[28px] p-5 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <h2 class="font-display font-bold text-lg text-slate-900">Learner Velocity &amp; AI Intervention Queue</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Proactive Socratic nudges surface learners before cohort sprint slippage occurs</p>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="tactile-well p-1 rounded-xl flex flex-wrap items-center gap-1">
+              <button onclick="setLearnerFilter('all', this)" class="learner-filter-btn tactile-pill-active px-3 py-1 rounded-lg text-xs font-semibold transition">All Learners</button>
+              <button onclick="setLearnerFilter('Accelerating', this)" class="learner-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Accelerating</button>
+              <button onclick="setLearnerFilter('Needs AI Nudge', this)" class="learner-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Needs AI Nudge</button>
+              <button onclick="setLearnerFilter('Credential Ready', this)" class="learner-filter-btn px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Credential Ready</button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[760px]">
+              <thead>
+                <tr class="border-b border-slate-200/80 text-[12.5px] font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="pb-3 pl-2">Learner &amp; Role</th>
+                  <th class="pb-3">Active Module</th>
+                  <th class="pb-3">Mastery Score</th>
+                  <th class="pb-3">XP Velocity</th>
+                  <th class="pb-3">AI Signal Status</th>
+                  <th class="pb-3 text-right pr-2">Adaptive Action</th>
+                </tr>
+              </thead>
+              <tbody id="learnerTableBody" class="divide-y divide-slate-200/60 text-xs"></tbody>
+            </table>
+          </div>
+        </section>
+        </div>
+
+        <div id="tabSubpageView" class="hidden space-y-6"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Tactile Glass Toast Notification -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-3">
+    <div class="cloud-glass px-4 py-3 rounded-2xl flex items-center gap-3 shadow-xl border border-indigo-200/80 max-w-sm">
+      <div class="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <p id="toastMessage" class="text-xs font-medium text-slate-800"></p>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // PROGRAM DATASETS (AI Engineering, Product Design Systems, Quant Finance)
+    // =========================================================================
+    const PROGRAMS = {
+      'ai-eng': {
+        badge: 'Spring Q2 Flagship · AI Engineering Track',
+        headline: '94.8% Course Completion <span class="bg-gradient-to-r from-indigo-600 to-sky-600 bg-clip-text text-transparent">(3.2x Industry Avg)</span>',
+        subcopy: 'Lumina’s Socratic AI Lab dynamically re-sequences micro-modules the moment conceptual friction appears—compressing time-to-competency across enterprise engineering teams.',
+        online: '2,840',
+        heroMetrics: ['+38.4%', '91.6%', '1,420 XP'],
+        spotlightCohort: 'Cohort #19 · LLM Systems Architecture',
+        spotlightPct: 88.4,
+        kpis: {
+          learners: '12,480', learnersDelta: '+19.4%',
+          resolution: '96.2%', resolutionDelta: '+4.1%',
+          velocity: '+42% faster',
+          credentials: '4,910', credentialsDelta: '+28.6%'
+        },
+        summary: ['6.8 hrs / learner', '4.2 mins avg', '3,490 merged'],
+        radarCohort: [94, 92, 89, 86, 91],
+        radarTarget: [86, 85, 84, 82, 85],
+        tracks: [
+          { name: 'LLM Fine-Tuning, Eval & Guardrails', learners: '4,620 enrolled', pct: 93, color: 'from-indigo-600 to-sky-500' },
+          { name: 'Distributed Rust Inference Kernels', learners: '3,810 enrolled', pct: 87, color: 'from-sky-500 to-emerald-500' },
+          { name: 'Multi-Agent Orchestration Patterns', learners: '4,050 enrolled', pct: 91, color: 'from-indigo-500 to-indigo-700' }
+        ],
+        series: {
+          weekly: {
+            labels: ['Wk 01', 'Wk 02', 'Wk 03', 'Wk 04', 'Wk 05', 'Wk 06', 'Wk 07', 'Wk 08'],
+            mastery: [54, 61, 67, 74, 79, 85, 90, 94.2],
+            engage: [62, 66, 71, 73, 80, 84, 87, 89.6]
+          },
+          monthly: {
+            labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            mastery: [46, 55, 63, 70, 78, 84, 91, 95.1],
+            engage: [58, 63, 68, 74, 79, 83, 88, 91.4]
+          },
+          quarterly: {
+            labels: ['Q3 24', 'Q4 24', 'Q1 25', 'Q2 25', 'Q3 25', 'Q4 25', 'Q1 26', 'Q2 26'],
+            mastery: [38, 49, 60, 69, 77, 85, 91, 94.8],
+            engage: [50, 58, 65, 72, 78, 84, 88, 90.5]
+          }
+        },
+        learnersList: [
+          { initials: 'MK', name: 'Marcus Kwon', role: 'Staff ML Platform Eng', module: '03 · Speculative Decoding Lab', mastery: 97, xp: '1,890 XP/wk', status: 'Credential Ready', action: 'Issue W3C Badge' },
+          { initials: 'SR', name: 'Sonia Ramanathan', role: 'Senior Backend Architect', module: '02 · Vector HNSW Indexing', mastery: 93, xp: '1,640 XP/wk', status: 'Accelerating', action: 'Unlock Stretch Capstone' },
+          { initials: 'DL', name: 'Devon Lindqvist', role: 'Cloud Systems Engineer', module: '03 · CUDA Memory Coalescing', mastery: 68, xp: '790 XP/wk', status: 'Needs AI Nudge', action: 'Send Socratic Hint' },
+          { initials: 'ah', name: 'Amara Haddad', role: 'Applied AI Researcher', module: '04 · Constitutional Eval Suite', mastery: 95, xp: '1,760 XP/wk', status: 'Credential Ready', action: 'Issue W3C Badge' },
+          { initials: 'JT', name: 'Julian Thorne', role: 'Distributed Infra Lead', module: '02 · KV-Cache Quantization', mastery: 72, xp: '840 XP/wk', status: 'Needs AI Nudge', action: 'Send Socratic Hint' }
+        ]
+      },
+      'design-sys': {
+        badge: 'Enterprise Studio · Product Design Systems',
+        headline: '96.1% Design-to-Code Parity <span class="bg-gradient-to-r from-indigo-600 to-sky-600 bg-clip-text text-transparent">(3.6x Faster Ship)</span>',
+        subcopy: 'Interactive token architecture labs pair Figma variable matrices with live accessible React & Web Component sandboxes.',
+        online: '1,690',
+        heroMetrics: ['+44.1%', '94.3%', '1,580 XP'],
+        spotlightCohort: 'Cohort #11 · Multi-Brand Token Governance',
+        spotlightPct: 92.1,
+        kpis: {
+          learners: '7,940', learnersDelta: '+24.2%',
+          resolution: '97.4%', resolutionDelta: '+5.0%',
+          velocity: '+48% faster',
+          credentials: '3,280', credentialsDelta: '+33.1%'
+        },
+        summary: ['5.9 hrs / learner', '3.5 mins avg', '2,610 merged'],
+        radarCohort: [88, 95, 93, 84, 94],
+        radarTarget: [82, 86, 85, 80, 86],
+        tracks: [
+          { name: 'Semantic Design Tokens & W3C JSON', learners: '3,120 enrolled', pct: 95, color: 'from-indigo-600 to-sky-500' },
+          { name: 'WCAG AAA Tactile Accessibility Primitives', learners: '2,540 enrolled', pct: 90, color: 'from-sky-500 to-emerald-500' },
+          { name: 'Generative UI & Motion Choreography', learners: '2,280 enrolled', pct: 88, color: 'from-indigo-500 to-indigo-700' }
+        ],
+        series: {
+          weekly: {
+            labels: ['Wk 01', 'Wk 02', 'Wk 03', 'Wk 04', 'Wk 05', 'Wk 06', 'Wk 07', 'Wk 08'],
+            mastery: [58, 65, 72, 78, 83, 88, 93, 96.1],
+            engage: [66, 70, 75, 79, 83, 87, 90, 92.4]
+          },
+          monthly: {
+            labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            mastery: [50, 59, 67, 74, 81, 87, 92, 96.1],
+            engage: [60, 66, 72, 77, 82, 86, 90, 92.8]
+          },
+          quarterly: {
+            labels: ['Q3 24', 'Q4 24', 'Q1 25', 'Q2 25', 'Q3 25', 'Q4 25', 'Q1 26', 'Q2 26'],
+            mastery: [42, 53, 63, 72, 80, 87, 93, 96.1],
+            engage: [54, 62, 69, 75, 81, 86, 90, 92.4]
+          }
+        },
+        learnersList: [
+          { initials: 'CL', name: 'Clara Lin', role: 'Staff Design Technologist', module: '04 · Automated Contrast CI', mastery: 98, xp: '1,920 XP/wk', status: 'Credential Ready', action: 'Issue W3C Badge' },
+          { initials: 'NO', name: 'Nolan Okafor', role: 'Principal UI Architect', module: '03 · Headless Primitives API', mastery: 91, xp: '1,510 XP/wk', status: 'Accelerating', action: 'Unlock Stretch Capstone' },
+          { initials: 'EV', name: 'Eva Varga', role: 'Product Designer II', module: '02 · State Machine Motion', mastery: 71, xp: '810 XP/wk', status: 'Needs AI Nudge', action: 'Send Socratic Hint' },
+          { initials: 'RM', name: 'Rafael Mendes', role: 'Frontend Systems Lead', module: '04 · Cross-Platform Token Sync', mastery: 96, xp: '1,800 XP/wk', status: 'Credential Ready', action: 'Issue W3C Badge' }
+        ]
+      },
+      'quant-fin': {
+        badge: 'Institutional Desk · Quantitative Finance',
+        headline: '93.4% Stochastic Lab Mastery <span class="bg-gradient-to-r from-indigo-600 to-sky-600 bg-clip-text text-transparent">(2.9x Desk Readiness)</span>',
+        subcopy: 'Real-time Monte Carlo microstructure simulations with Socratic mathematical derivations for institutional risk & alpha teams.',
+        online: '1,120',
+        heroMetrics: ['+35.9%', '89.8%', '1,690 XP'],
+        spotlightCohort: 'Cohort #07 · Volatility Surface Modeling',
+        spotlightPct: 85.6,
+        kpis: {
+          learners: '5,320', learnersDelta: '+16.8%',
+          resolution: '95.1%', resolutionDelta: '+3.7%',
+          velocity: '+39% faster',
+          credentials: '2,190', credentialsDelta: '+22.4%'
+        },
+        summary: ['7.6 hrs / learner', '4.8 mins avg', '1,980 merged'],
+        radarCohort: [96, 87, 92, 91, 89],
+        radarTarget: [88, 82, 86, 86, 84],
+        tracks: [
+          { name: 'Stochastic Calculus & Ito Processes', learners: '2,110 enrolled', pct: 91, color: 'from-indigo-600 to-sky-500' },
+          { name: 'Low-Latency C++23 Orderbook Sim', learners: '1,740 enrolled', pct: 86, color: 'from-sky-500 to-emerald-500' },
+          { name: 'Convex Portfolio Risk Optimization', learners: '1,470 enrolled', pct: 92, color: 'from-indigo-500 to-indigo-700' }
+        ],
+        series: {
+          weekly: {
+            labels: ['Wk 01', 'Wk 02', 'Wk 03', 'Wk 04', 'Wk 05', 'Wk 06', 'Wk 07', 'Wk 08'],
+            mastery: [49, 57, 64, 71, 77, 83, 89, 93.4],
+            engage: [60, 65, 70, 74, 78, 82, 86, 88.9]
+          },
+          monthly: {
+            labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            mastery: [44, 52, 60, 68, 75, 82, 88, 93.4],
+            engage: [56, 62, 67, 72, 77, 81, 85, 88.9]
+          },
+          quarterly: {
+            labels: ['Q3 24', 'Q4 24', 'Q1 25', 'Q2 25', 'Q3 25', 'Q4 25', 'Q1 26', 'Q2 26'],
+            mastery: [36, 47, 58, 66, 74, 82, 88, 93.4],
+            engage: [49, 57, 64, 70, 76, 81, 85, 88.9]
+          }
+        },
+        learnersList: [
+          { initials: 'AK', name: 'Arjun Kapoor', role: 'Quant Researcher', module: '03 · Heston Calibration Lab', mastery: 96, xp: '2,010 XP/wk', status: 'Credential Ready', action: 'Issue W3C Badge' },
+          { initials: 'LS', name: 'Lukas Lindholm', role: 'Execution Algo Eng', module: '02 · Limit Order Queue Sim', mastery: 66, xp: '760 XP/wk', status: 'Needs AI Nudge', action: 'Send Socratic Hint' },
+          { initials: 'MC', name: 'Mei-Ling Chen', role: 'Derivatives Strategist', module: '04 · Tail-Risk VaR Stress', mastery: 92, xp: '1,730 XP/wk', status: 'Accelerating', action: 'Unlock Stretch Capstone' }
+        ]
+      }
+    };
+
+    const PIPELINE_STAGES = [
+      {
+        badge: 'INSPECTING · 01 DIAGNOSTIC SKILL GRAPH',
+        desc: 'Calibrates prior engineering mastery in 6 adaptive questions—eliminating an average of <strong>6.4 redundant hours</strong> per learner before module 1 begins.',
+        retention: '+31.8%',
+        latency: '18.4 ms',
+        throughput: '1,940 req/s',
+        color: '#4F46E5'
+      },
+      {
+        badge: 'INSPECTING · 02 PERSONALIZED CURRICULUM SYNTHESIZER',
+        desc: 'Dynamically compiles bespoke reading, interactive sandboxes, and domain examples matched to each learner’s active production codebase.',
+        retention: '+36.2%',
+        latency: '42.1 ms',
+        throughput: '1,420 req/s',
+        color: '#0284C7'
+      },
+      {
+        badge: 'INSPECTING · 03 REAL-TIME SOCRATIC AI LAB',
+        desc: 'Detects AST compilation & reasoning bottlenecks in real time—offering targeted Socratic questions that boost 30-day retention without spoiling answers.',
+        retention: '+44.6%',
+        latency: '38.0 ms',
+        throughput: '2,840 req/s',
+        color: '#4F46E5'
+      },
+      {
+        badge: 'INSPECTING · 04 CAPSTONE & VERIFIED CREDENTIAL',
+        desc: 'Executes multi-test benchmark suites against learner capstones and mints cryptographically verifiable W3C skill credentials synced to HRIS.',
+        retention: '+39.5%',
+        latency: '12.2 ms',
+        throughput: '980 req/s',
+        color: '#059669'
+      }
+    ];
+
+    let currentProgramKey = 'ai-eng';
+    let currentTimeframe = 'weekly';
+    let currentLearnerFilter = 'all';
+
+    // =========================================================================
+    // SIDEBAR & NAVIGATION
+    // =========================================================================
+    function toggleSidebarCollapse() {
+      const sb = document.getElementById('sidebar');
+      const chevron = document.getElementById('collapseChevron');
+      const expandBtn = document.getElementById('collapsedExpandBtn');
+      sb.classList.toggle('collapsed');
+      const isCollapsed = sb.classList.contains('collapsed');
+      chevron.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+      expandBtn.classList.toggle('hidden', !isCollapsed);
+      expandBtn.classList.toggle('flex', isCollapsed);
+    }
+
+    function toggleMobileSidebar(open) {
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('mobileBackdrop');
+      if (open) {
+        sb.classList.remove('-translate-x-full');
+        bd.classList.remove('hidden');
+      } else {
+        sb.classList.add('-translate-x-full');
+        bd.classList.add('hidden');
+      }
+    }
+
+    const LUMINA_SUBPAGES = {
+      'Adaptive AI Paths': {
+        tag: 'NEURAL CURRICULUM GRAPH v4.2',
+        subtitle: 'Dynamic prerequisite pruning and Socratic micro-module sequencing calibrated to each engineer’s live AST lab telemetry.',
+        ctaLabel: 'Synthesize New Track',
+        ctaToast: 'Synthesized personalized Socratic AI path across 14 enterprise knowledge nodes.',
+        kpis: [
+          { label: 'Active AI Learning Paths', val: '14 Tracks', delta: '+3 New', tone: 'indigo', sub: 'Auto-tuned to org tech stack' },
+          { label: 'Redundant Hours Pruned', val: '6.4 hrs', delta: '-38% Time', tone: 'emerald', sub: 'Per learner diagnostic skip' },
+          { label: 'Concept Friction Recovery', val: '3.9 mins', delta: '96.4% Pass', tone: 'sky', sub: 'Zero-spoiler Socratic hints' },
+          { label: 'Graph Branching Depth', val: '420 Nodes', delta: 'Live AST', tone: 'amber', sub: 'Rust, Python, TypeScript, C++' }
+        ],
+        chartTitle: 'Adaptive Path Compression vs Static Video Baseline',
+        chartSub: 'Time-to-competency reduction and retention lift across flagship AI tracks',
+        bars: [
+          { label: 'LLM Fine-Tuning, Eval & Constitutional Guardrails', pct: 94, meta: '4,620 Learners · 94% Mastery', grad: 'from-indigo-600 to-sky-500' },
+          { label: 'Distributed Rust & GPU Inference Kernels', pct: 88, meta: '3,810 Learners · 88% Mastery', grad: 'from-sky-500 to-emerald-500' },
+          { label: 'Multi-Agent Tool-Use & Memory Orchestration', pct: 91, meta: '4,050 Learners · 91% Mastery', grad: 'from-indigo-500 to-indigo-700' },
+          { label: 'Semantic Design Systems & WCAG AAA Tokens', pct: 95, meta: '3,120 Learners · 95% Mastery', grad: 'from-emerald-500 to-teal-500' }
+        ],
+        svgPts: '14,126 94,112 174,98 254,82 334,68 414,50 486,36',
+        svgColor: '#4F46E5',
+        tableTitle: 'Enterprise Adaptive Curriculum Modules',
+        cols: ['Path ID & Track', 'Target Role', 'Avg Time Saved', 'Mastery Rate', 'Calibration'],
+        rows: [
+          { c1: 'PATH-01 · LLM Systems Arch', c2: 'Staff ML / Platform Eng', c3: '7.2 hrs pruned', c4: '94.8%', action: 'Re-Calibrate', done: 'Calibrated' },
+          { c1: 'PATH-04 · Speculative Decoding', c2: 'Inference Kernel Eng', c3: '5.8 hrs pruned', c4: '91.2%', action: 'Re-Calibrate', done: 'Calibrated' },
+          { c1: 'PATH-07 · W3C Token Governance', c2: 'Design Systems Lead', c3: '6.1 hrs pruned', c4: '96.1%', action: 'Re-Calibrate', done: 'Calibrated' },
+          { c1: 'PATH-09 · Vector HNSW & RAG', c2: 'Applied AI Engineer', c3: '6.9 hrs pruned', c4: '93.4%', action: 'Re-Calibrate', done: 'Calibrated' },
+          { c1: 'PATH-12 · Stochastic Vol Sim', c2: 'Quantitative Researcher', c3: '5.4 hrs pruned', c4: '90.6%', action: 'Re-Calibrate', done: 'Calibrated' }
+        ]
+      },
+      'Live Cohorts': {
+        tag: 'SYNCHRONOUS ENTERPRISE SPRINTS',
+        subtitle: 'High-accountability 6-week engineering cohorts combining live Socratic pair-labs, automated PR grading, and peer code reviews.',
+        ctaLabel: 'Launch Sprint Check-In',
+        ctaToast: 'Broadcasted Socratic lab check-in pulse to 8 active enterprise cohorts.',
+        kpis: [
+          { label: 'Active Live Cohorts', val: '08 Sprints', delta: '2,840 Live', tone: 'emerald', sub: '94.8% sprint retention' },
+          { label: 'Weekly Streak Rate', val: '92.4%', delta: '+14.2%', tone: 'indigo', sub: '3.2x industry benchmark' },
+          { label: 'Live Lab Attendance', val: '96.1%', delta: 'Global TZ', tone: 'sky', sub: 'AMER, EMEA & APAC pods' },
+          { label: 'Peer PRs Merged', val: '3,490', delta: '18m SLA', tone: 'amber', sub: 'AI + Staff mentor reviewed' }
+        ],
+        chartTitle: 'Active Cohort Sprint Velocity & Milestone Completion',
+        chartSub: 'Real-time capstone readiness across current enterprise cohort pods',
+        bars: [
+          { label: 'Cohort #19 · LLM Systems Architecture (Flagship)', pct: 89, meta: '480 Learners · Week 6 of 7', grad: 'from-indigo-600 to-sky-500' },
+          { label: 'Cohort #20 · Production Multi-Agent Orchestration', pct: 76, meta: '410 Learners · Week 4 of 6', grad: 'from-sky-500 to-emerald-500' },
+          { label: 'Cohort #11 · Multi-Brand Design Token Studio', pct: 92, meta: '320 Learners · Capstone Week', grad: 'from-emerald-500 to-teal-500' },
+          { label: 'Cohort #07 · Institutional Volatility Modeling', pct: 85, meta: '240 Learners · Week 5 of 6', grad: 'from-indigo-500 to-indigo-700' }
+        ],
+        svgPts: '14,128 94,116 174,100 254,88 334,72 414,56 486,42',
+        svgColor: '#0284C7',
+        tableTitle: 'Active Cohort Pods & Sprint Health',
+        cols: ['Cohort Pod', 'Lead Architect', 'Active Learners', 'Sprint Completion', 'Pod Action'],
+        rows: [
+          { c1: 'Cohort #19 · LLM Systems', c2: 'Dr. Elena Vance', c3: '480 / 490 Active', c4: '88.4% On-Pace', action: 'Nudge Pod', done: 'Nudged' },
+          { c1: 'Cohort #20 · Agentic Mesh', c2: 'Prof. K. Takahashi', c3: '410 / 420 Active', c4: '76.2% On-Pace', action: 'Nudge Pod', done: 'Nudged' },
+          { c1: 'Cohort #11 · Token Systems', c2: 'Clara Lin, Staff', c3: '320 / 325 Active', c4: '92.1% On-Pace', action: 'Nudge Pod', done: 'Nudged' },
+          { c1: 'Cohort #07 · Quant Surface', c2: 'Arjun Kapoor, PhD', c3: '240 / 248 Active', c4: '85.6% On-Pace', action: 'Nudge Pod', done: 'Nudged' },
+          { c1: 'Cohort #21 · Rust Kernels', c2: 'Marcus Kwon', c3: '360 / 370 Active', c4: '68.9% On-Pace', action: 'Nudge Pod', done: 'Nudged' }
+        ]
+      },
+      'Skill Matrix': {
+        tag: 'ENTERPRISE ROLE TAXONOMY',
+        subtitle: 'Verified AST code-execution competency scores mapped directly against L4–L7 engineering and design career ladders.',
+        ctaLabel: 'Sync Workday HRIS',
+        ctaToast: 'Synchronized 12,480 verified skill vectors with enterprise HRIS taxonomy.',
+        kpis: [
+          { label: 'Org Competency Index', val: '90.4%', delta: '+11.8 pts', tone: 'indigo', sub: 'Exceeds L5 role benchmark' },
+          { label: 'Verified Skill Vectors', val: '48,920', delta: 'AST Proved', tone: 'emerald', sub: 'Sandbox execution verified' },
+          { label: 'Critical Skill Gaps', val: '2 Domains', delta: '-64% YoY', tone: 'amber', sub: 'CUDA Memory & Formal Spec' },
+          { label: 'Internal Mobility Ready', val: '614 Eng', delta: '+28.4%', tone: 'sky', sub: 'Qualified for AI Platform' }
+        ],
+        chartTitle: 'Domain Proficiency vs L6 Principal Role Benchmark',
+        chartSub: 'Aggregated sandbox assessment performance across 5 core technical pillars',
+        bars: [
+          { label: 'Distributed Systems & Fault-Tolerant Architecture', pct: 94, meta: '94% Cohort vs 86% Target', grad: 'from-indigo-600 to-sky-500' },
+          { label: 'Applied LLM Eval, Guardrails & Prompt Engineering', pct: 92, meta: '92% Cohort vs 85% Target', grad: 'from-sky-500 to-emerald-500' },
+          { label: 'Automated Property Testing & Chaos Verification', pct: 91, meta: '91% Cohort vs 85% Target', grad: 'from-emerald-500 to-teal-500' },
+          { label: 'Cryptographic Auth & AI Supply-Chain Security', pct: 86, meta: '86% Cohort vs 82% Target', grad: 'from-amber-500 to-orange-500' }
+        ],
+        svgPts: '14,120 94,104 174,95 254,84 334,70 414,58 486,44',
+        svgColor: '#4F46E5',
+        tableTitle: 'Role-Mapped Competency Clusters',
+        cols: ['Competency Domain', 'Benchmark Tier', 'Verified Engineers', 'Gap Delta', 'Assessment'],
+        rows: [
+          { c1: 'LLM Eval & Guardrails', c2: 'L5 Senior AI Eng', c3: '3,420 Verified', c4: '+7.0% Above Target', action: 'Run Audit', done: 'Audited' },
+          { c1: 'GPU Memory Coalescing', c2: 'L6 Staff Systems', c3: '1,180 Verified', c4: '-2.4% Focus Area', action: 'Assign Lab', done: 'Assigned' },
+          { c1: 'Design Token Architecture', c2: 'L5 Design Tech', c3: '1,940 Verified', c4: '+9.1% Above Target', action: 'Run Audit', done: 'Audited' },
+          { c1: 'Zero-Trust Agent Sandboxes', c2: 'L6 Security Arch', c3: '1,510 Verified', c4: '+4.2% Above Target', action: 'Run Audit', done: 'Audited' },
+          { c1: 'Low-Latency Rust Async', c2: 'L5 Core Infra', c3: '2,290 Verified', c4: '+5.8% Above Target', action: 'Run Audit', done: 'Audited' }
+        ]
+      },
+      'Mentorship': {
+        tag: 'PRINCIPAL ARCHITECT PAIRING',
+        subtitle: 'AI-triaged escalation from Socratic tutor sessions to live 1:1 pairing with Staff & Principal engineering fellows.',
+        ctaLabel: 'Auto-Match Queue',
+        ctaToast: 'Matched 12 learners awaiting architectural review with Principal Mentors.',
+        kpis: [
+          { label: 'Active Staff Mentors', val: '148 Fellows', delta: '4.96 / 5.0', tone: 'indigo', sub: 'Verified L6/L7 practitioners' },
+          { label: 'Median Match Latency', val: '11 mins', delta: '-6.4 mins', tone: 'emerald', sub: 'Context packet pre-attached' },
+          { label: '1:1 Unblock Rate', val: '98.9%', delta: 'First Call', tone: 'sky', sub: 'Live collaborative sandbox' },
+          { label: 'Open Office Hours', val: '24 Slots', delta: 'Today UTC', tone: 'amber', sub: 'Systems, ML & Design tracks' }
+        ],
+        chartTitle: 'Mentorship Escalation & First-Session Resolution',
+        chartSub: 'Seamless handoff from Socratic AI hints (96.2%) to human architectural coaching (3.8%)',
+        bars: [
+          { label: 'Capstone Architecture & System Design Reviews', pct: 96, meta: '412 Sessions · 4.98 Rating', grad: 'from-indigo-600 to-sky-500' },
+          { label: 'Distributed GPU Kernel Debugging Clinics', pct: 89, meta: '284 Sessions · 4.95 Rating', grad: 'from-sky-500 to-emerald-500' },
+          { label: 'Design System Token Governance Critiques', pct: 93, meta: '198 Sessions · 4.97 Rating', grad: 'from-emerald-500 to-teal-500' },
+          { label: 'Quantitative Risk Derivation Walkthroughs', pct: 87, meta: '156 Sessions · 4.94 Rating', grad: 'from-indigo-500 to-indigo-700' }
+        ],
+        svgPts: '14,124 94,110 174,102 254,86 334,74 414,56 486,40',
+        svgColor: '#059669',
+        tableTitle: 'Live 1:1 Mentorship & Office Hours Queue',
+        cols: ['Mentor Fellow', 'Specialty Track', 'Assigned Learner', 'Session Window', 'Pairing'],
+        rows: [
+          { c1: 'Sonia Ramanathan', c2: 'Vector HNSW & Distributed DB', c3: 'Devon Lindqvist', c4: 'Today · 16:00 UTC', action: 'Confirm Slot', done: 'Confirmed' },
+          { c1: 'Marcus Kwon', c2: 'Speculative Decoding & CUDA', c3: 'Julian Thorne', c4: 'Today · 17:30 UTC', action: 'Confirm Slot', done: 'Confirmed' },
+          { c1: 'Clara Lin', c2: 'WCAG AAA Primitives & Motion', c3: 'Eva Varga', c4: 'Today · 18:15 UTC', action: 'Confirm Slot', done: 'Confirmed' },
+          { c1: 'Arjun Kapoor', c2: 'Heston Stochastic Calibration', c3: 'Lukas Lindholm', c4: 'Tomorrow · 09:00 UTC', action: 'Confirm Slot', done: 'Confirmed' },
+          { c1: 'Amara Haddad', c2: 'Constitutional AI Evals', c3: 'Open Pod Clinic (6)', c4: 'Tomorrow · 14:00 UTC', action: 'Confirm Slot', done: 'Confirmed' }
+        ]
+      },
+      'Certifications': {
+        tag: 'W3C VERIFIABLE CREDENTIALS',
+        subtitle: 'Cryptographically signed OpenBadges v3.0 backed by reproducible capstone benchmark runs and anti-plagiarism oral Socratic defense.',
+        ctaLabel: 'Batch Mint W3C Badges',
+        ctaToast: 'Minted 42 cryptographically signed W3C credentials to enterprise ledger.',
+        kpis: [
+          { label: 'Credentials Issued', val: '4,910', delta: '+28.6%', tone: 'emerald', sub: '100% Ed25519 signed proofs' },
+          { label: 'Capstone Pass Rate', val: '93.8%', delta: 'Rigorous', tone: 'indigo', sub: 'Automated CI + Socratic oral' },
+          { label: 'Employer Verifications', val: '18,420', delta: 'Zero Spoof', tone: 'sky', sub: 'Instant DID URL lookup' },
+          { label: 'Awaiting Final Sign-Off', val: '42 Ready', delta: 'Score >92%', tone: 'amber', sub: 'CI test suites 100% green' }
+        ],
+        chartTitle: 'Quarterly Verified Credential Issuance by Track',
+        chartSub: 'Cumulative cryptographic skill certificates anchored across enterprise academies',
+        bars: [
+          { label: 'Certified LLM Systems & Inference Architect', pct: 95, meta: '2,140 Issued · 99.2% CI Score', grad: 'from-indigo-600 to-sky-500' },
+          { label: 'Certified Enterprise Design Systems Engineer', pct: 88, meta: '1,420 Issued · 98.7% CI Score', grad: 'from-sky-500 to-emerald-500' },
+          { label: 'Certified Quantitative Microstructure Analyst', pct: 79, meta: '840 Issued · 98.4% CI Score', grad: 'from-emerald-500 to-teal-500' },
+          { label: 'Certified AI Security & Red-Team Specialist', pct: 68, meta: '510 Issued · 99.5% CI Score', grad: 'from-amber-500 to-orange-500' }
+        ],
+        svgPts: '14,132 94,118 174,104 254,88 334,70 414,52 486,34',
+        svgColor: '#D97706',
+        tableTitle: 'Capstone Verification & W3C Credential Queue',
+        cols: ['Candidate', 'Credential Title', 'Capstone CI Score', 'DID Fingerprint', 'Issuance'],
+        rows: [
+          { c1: 'Marcus Kwon', c2: 'LLM Systems Architect v4', c3: '97.4% (48/48 Tests)', c4: 'did:web:lumina#884a', action: 'Mint Badge', done: 'Minted' },
+          { c1: 'Amara Haddad', c2: 'Constitutional AI Evaluator', c3: '95.8% (48/48 Tests)', c4: 'did:web:lumina#883c', action: 'Mint Badge', done: 'Minted' },
+          { c1: 'Clara Lin', c2: 'Design Token Principal', c3: '98.2% (36/36 Tests)', c4: 'did:web:lumina#882f', action: 'Mint Badge', done: 'Minted' },
+          { c1: 'Rafael Mendes', c2: 'Cross-Platform UI Systems', c3: '96.1% (36/36 Tests)', c4: 'did:web:lumina#881b', action: 'Mint Badge', done: 'Minted' },
+          { c1: 'Arjun Kapoor', c2: 'Stochastic Risk Architect', c3: '96.5% (52/52 Tests)', c4: 'did:web:lumina#880e', action: 'Mint Badge', done: 'Minted' }
+        ]
+      }
+    };
+
+    function returnToAcademyPulse() {
+      const homeBtn = document.querySelector('.nav-item[data-nav="Academy Pulse"]');
+      if (homeBtn) selectNav(homeBtn, 'Academy Pulse');
+    }
+
+    function handleLuminaSubAction(btn, msg, doneLabel) {
+      btn.textContent = doneLabel;
+      btn.className = 'px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold transition';
+      triggerToast(msg);
+    }
+
+    function renderLuminaSubpage(label) {
+      const cfg = LUMINA_SUBPAGES[label];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const kpisHtml = cfg.kpis.map(k => {
+        const pill = k.tone === 'emerald'
+          ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
+          : k.tone === 'sky'
+            ? 'bg-sky-500/10 text-sky-700 border-sky-500/20'
+            : k.tone === 'amber'
+              ? 'bg-amber-500/10 text-amber-700 border-amber-500/20'
+              : 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20';
+        return `
+          <article class="cloud-glass cloud-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-xs font-medium text-slate-500">${k.label}</p>
+                <div class="font-mono font-bold text-2xl tracking-tight text-slate-900 mt-1.5">${k.val}</div>
+              </div>
+              <span class="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${pill}">${k.delta}</span>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/60 text-xs text-slate-500">${k.sub}</div>
+          </article>
+        `;
+      }).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div class="p-3 rounded-2xl bg-white/80 border border-white shadow-sm space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-800 truncate pr-2">${b.label}</span>
+            <span class="font-mono text-indigo-600 font-semibold shrink-0">${b.meta}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r ${b.grad}" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-white/60 transition-colors">
+          <td class="py-3.5 pl-2 font-semibold text-slate-900">${r.c1}</td>
+          <td class="py-3.5 text-slate-600 font-medium">${r.c2}</td>
+          <td class="py-3.5 font-mono text-slate-700">${r.c3}</td>
+          <td class="py-3.5 font-mono font-semibold text-indigo-600">${r.c4}</td>
+          <td class="py-3.5 text-right pr-2">
+            <button onclick="handleLuminaSubAction(this, '${r.action} completed for ${r.c1}.', '${r.done}')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-600 text-slate-700 hover:text-white border border-slate-200/90 shadow-sm text-xs font-semibold transition">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <section class="cloud-glass rounded-[28px] p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="returnToAcademyPulse()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl tactile-well text-xs font-semibold text-slate-700 hover:text-indigo-600 transition">
+                <svg class="w-3.5 h-3.5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Overview</span>
+              </button>
+              <span class="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/15 text-indigo-700 font-mono text-xs font-semibold">${cfg.tag}</span>
+            </div>
+            <h1 class="font-display font-extrabold text-2xl text-slate-900 pt-1">${label}</h1>
+            <p class="text-sm text-slate-600 max-w-2xl">${cfg.subtitle}</p>
+          </div>
+          <button onclick="triggerToast('${cfg.ctaToast}')" class="self-start sm:self-center tactile-btn-primary px-4 py-2.5 rounded-2xl text-xs font-semibold inline-flex items-center gap-2 shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span>${cfg.ctaLabel}</span>
+          </button>
+        </section>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          ${kpisHtml}
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-5 cloud-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between space-y-5">
+            <div>
+              <span class="font-mono text-xs font-semibold uppercase tracking-wider text-indigo-600">Pedagogical Telemetry</span>
+              <h2 class="font-display font-bold text-lg text-slate-900 mt-1">${cfg.chartTitle}</h2>
+              <p class="text-xs text-slate-500 mt-0.5">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-2xl bg-white/80 border border-white p-4 shadow-sm">
+              <svg class="w-full h-36 overflow-visible" viewBox="0 0 500 150" fill="none">
+                <defs>
+                  <linearGradient id="luminaSubGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${cfg.svgColor}" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="${cfg.svgColor}" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="14" y1="35" x2="486" y2="35" stroke="#E2E8F0" stroke-dasharray="4 4"/>
+                <line x1="14" y1="85" x2="486" y2="85" stroke="#E2E8F0" stroke-dasharray="4 4"/>
+                <line x1="14" y1="132" x2="486" y2="132" stroke="#CBD5E1"/>
+                <polygon points="${cfg.svgPts} 486,132 14,132" fill="url(#luminaSubGrad)"/>
+                <polyline points="${cfg.svgPts}" fill="none" stroke="${cfg.svgColor}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="14" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">Wk 01</text>
+                <text x="230" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">Wk 04</text>
+                <text x="444" y="147" fill="#0F172A" font-family="JetBrains Mono" font-size="12">Wk 08</text>
+              </svg>
+            </div>
+            <div class="space-y-2.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="xl:col-span-7 cloud-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <span class="font-mono text-xs font-semibold uppercase tracking-wider text-emerald-600">Interactive Cohort Ledger</span>
+                  <h2 class="font-display font-bold text-lg text-slate-900 mt-0.5">${cfg.tableTitle}</h2>
+                </div>
+                <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 font-mono text-xs font-semibold">Socratic Sync</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[560px]">
+                  <thead>
+                    <tr class="border-b border-slate-200/80 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      <th class="pb-3 pl-2">${cfg.cols[0]}</th>
+                      <th class="pb-3">${cfg.cols[1]}</th>
+                      <th class="pb-3">${cfg.cols[2]}</th>
+                      <th class="pb-3">${cfg.cols[3]}</th>
+                      <th class="pb-3 text-right pr-2">${cfg.cols[4]}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200/60 text-xs">
+                    ${rowsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between text-xs font-mono text-slate-500">
+              <span>Socratic Tutor Cluster · 38ms P95</span>
+              <span class="text-indigo-600 font-semibold">W3C OpenBadges v3 Ready</span>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function selectNav(btn, label) {
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('tactile-pill-active');
+        el.classList.add('text-slate-600');
+        const svg = el.querySelector('svg');
+        if (svg) {
+          svg.classList.remove('text-indigo-600');
+          svg.classList.add('text-slate-500');
+        }
+      });
+      btn.classList.add('tactile-pill-active');
+      btn.classList.remove('text-slate-600');
+      const activeSvg = btn.querySelector('svg');
+      if (activeSvg) {
+        activeSvg.classList.remove('text-slate-500');
+        activeSvg.classList.add('text-indigo-600');
+      }
+      document.getElementById('activeNavBreadcrumb').textContent = label;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (label === 'Academy Pulse') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        renderTrajectoryChart();
+        renderRadarAndTracks();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderLuminaSubpage(label);
+      }
+
+      toggleMobileSidebar(false);
+    }
+
+    // =========================================================================
+    // 3D INTERACTIVE TILT ON HERO VISUAL CARD
+    // =========================================================================
+    (function initHeroTilt() {
+      const card = document.getElementById('heroTiltCard');
+      const glare = document.getElementById('heroGlare');
+      if (!card) return;
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const px = (x / rect.width) - 0.5;
+        const py = (y / rect.height) - 0.5;
+        const rotY = px * 11;
+        const rotX = -py * 11;
+        card.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(1.012, 1.012, 1.012)`;
+        if (glare) {
+          glare.style.opacity = '1';
+          glare.style.background = `radial-gradient(circle at ${(x / rect.width) * 100}% ${(y / rect.height) * 100}%, rgba(255,255,255,0.52) 0%, rgba(255,255,255,0) 60%)`;
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+        if (glare) glare.style.opacity = '0';
+      });
+    })();
+
+    // =========================================================================
+    // PIPELINE INTERACTIVE NODE INSPECTOR
+    // =========================================================================
+    function inspectStage(idx) {
+      const s = PIPELINE_STAGES[idx];
+      document.getElementById('inspectorBadge').textContent = s.badge;
+      document.getElementById('inspectorDesc').innerHTML = s.desc;
+      document.getElementById('inspectorRetention').textContent = s.retention;
+      document.getElementById('inspectorLatency').textContent = s.latency;
+      document.getElementById('inspectorThroughput').textContent = s.throughput;
+
+      const strokeColors = ['#4F46E5', '#0284C7', '#4F46E5', '#059669'];
+      for (let i = 0; i < 4; i++) {
+        const card = document.getElementById('stageCard' + i);
+        const node = document.getElementById('svgNode' + i);
+        const halo = document.getElementById('svgHalo' + i);
+        const txt = i === 0 ? node.nextElementSibling : document.getElementById('svgText' + i);
+
+        if (i === idx) {
+          card.className = 'stage-card text-left p-4 rounded-2xl bg-white border-2 border-indigo-500 shadow-md transition-all';
+          node.setAttribute('fill', strokeColors[i]);
+          node.setAttribute('stroke', '#FFFFFF');
+          halo.setAttribute('opacity', '0.2');
+          halo.classList.add('pulse-ring');
+          if (txt) txt.setAttribute('fill', '#FFFFFF');
+        } else {
+          card.className = 'stage-card text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-slate-200/80 transition-all';
+          node.setAttribute('fill', '#FFFFFF');
+          node.setAttribute('stroke', strokeColors[i]);
+          halo.setAttribute('opacity', '0');
+          halo.classList.remove('pulse-ring');
+          if (txt) txt.setAttribute('fill', strokeColors[i]);
+        }
+      }
+    }
+
+    function togglePipelineAnimation() {
+      const sec = document.getElementById('pipelineSection');
+      const dot = document.getElementById('flowStatusDot');
+      const txt = document.getElementById('flowToggleText');
+      sec.classList.toggle('pipeline-paused');
+      const paused = sec.classList.contains('pipeline-paused');
+      dot.className = paused ? 'w-2 h-2 rounded-full bg-amber-500' : 'w-2 h-2 rounded-full bg-emerald-500';
+      txt.textContent = paused ? 'Stream Paused' : 'Live Stream Active';
+    }
+
+    // =========================================================================
+    // SVG TRAJECTORY AREA CHART + PENTAGON RADAR RENDERER
+    // =========================================================================
+    function buildSmoothPath(pts) {
+      if (!pts.length) return '';
+      let d = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i];
+        const p1 = pts[i + 1];
+        const cx = (p0.x + p1.x) / 2;
+        d += ` C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+      return d;
+    }
+
+    function renderTrajectoryChart() {
+      const data = PROGRAMS[currentProgramKey].series[currentTimeframe];
+      const xStart = 56;
+      const xEnd = 650;
+      const yBottom = 224;
+      const yTop = 28;
+      const step = (xEnd - xStart) / (data.labels.length - 1);
+
+      const valToY = (v) => yBottom - ((v - 20) / 80) * (yBottom - yTop);
+
+      const masteryPts = data.mastery.map((v, i) => ({ x: +(xStart + i * step).toFixed(1), y: +valToY(v).toFixed(1), v }));
+      const engagePts = data.engage.map((v, i) => ({ x: +(xStart + i * step).toFixed(1), y: +valToY(v).toFixed(1), v }));
+
+      const masteryLine = buildSmoothPath(masteryPts);
+      const engageLine = buildSmoothPath(engagePts);
+
+      document.getElementById('masteryLinePath').setAttribute('d', masteryLine);
+      document.getElementById('engageLinePath').setAttribute('d', engageLine);
+      document.getElementById('masteryAreaPath').setAttribute('d', `${masteryLine} L ${masteryPts[masteryPts.length - 1].x} ${yBottom} L ${masteryPts[0].x} ${yBottom} Z`);
+      document.getElementById('engageAreaPath').setAttribute('d', `${engageLine} L ${engagePts[engagePts.length - 1].x} ${yBottom} L ${engagePts[0].x} ${yBottom} Z`);
+
+      const ptsGroup = document.getElementById('chartPointsGroup');
+      const labelsGroup = document.getElementById('chartXLabelsGroup');
+      ptsGroup.innerHTML = '';
+      labelsGroup.innerHTML = '';
+
+      data.labels.forEach((lbl, idx) => {
+        const mp = masteryPts[idx];
+        const ep = engagePts[idx];
+
+        const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textEl.setAttribute('x', mp.x);
+        textEl.setAttribute('y', 246);
+        textEl.setAttribute('text-anchor', 'middle');
+        textEl.textContent = lbl;
+        labelsGroup.appendChild(textEl);
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'cursor-pointer');
+
+        const cEngage = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        cEngage.setAttribute('cx', ep.x);
+        cEngage.setAttribute('cy', ep.y);
+        cEngage.setAttribute('r', '4');
+        cEngage.setAttribute('fill', '#FFFFFF');
+        cEngage.setAttribute('stroke', '#0284C7');
+        cEngage.setAttribute('stroke-width', '2.2');
+
+        const cMastery = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        cMastery.setAttribute('cx', mp.x);
+        cMastery.setAttribute('cy', mp.y);
+        cMastery.setAttribute('r', '4.8');
+        cMastery.setAttribute('fill', '#4F46E5');
+        cMastery.setAttribute('stroke', '#FFFFFF');
+        cMastery.setAttribute('stroke-width', '2');
+
+        const hit = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        hit.setAttribute('x', mp.x - step / 2);
+        hit.setAttribute('y', 20);
+        hit.setAttribute('width', step);
+        hit.setAttribute('height', 215);
+        hit.setAttribute('fill', 'transparent');
+
+        hit.addEventListener('mouseenter', () => {
+          document.getElementById('chartHoverGuide').setAttribute('x1', mp.x);
+          document.getElementById('chartHoverGuide').setAttribute('x2', mp.x);
+          document.getElementById('chartReadoutMastery').textContent = mp.v + '%';
+          document.getElementById('chartReadoutEngage').textContent = ep.v + '%';
+          document.getElementById('chartReadoutPeriod').textContent = 'Period: ' + lbl;
+        });
+
+        g.appendChild(cEngage);
+        g.appendChild(cMastery);
+        g.appendChild(hit);
+        ptsGroup.appendChild(g);
+      });
+
+      const lastIdx = data.labels.length - 1;
+      document.getElementById('chartHoverGuide').setAttribute('x1', masteryPts[lastIdx].x);
+      document.getElementById('chartHoverGuide').setAttribute('x2', masteryPts[lastIdx].x);
+      document.getElementById('chartReadoutMastery').textContent = data.mastery[lastIdx] + '%';
+      document.getElementById('chartReadoutEngage').textContent = data.engage[lastIdx] + '%';
+      document.getElementById('chartReadoutPeriod').textContent = 'Period: ' + data.labels[lastIdx] + ' (Latest)';
+    }
+
+    function computePentagonPoints(values) {
+      const cx = 140, cy = 118, maxR = 82;
+      const angles = [-90, -18, 54, 126, 198].map(deg => (deg * Math.PI) / 180);
+      return values.map((v, i) => {
+        const r = (v / 100) * maxR;
+        const x = cx + r * Math.cos(angles[i]);
+        const y = cy + r * Math.sin(angles[i]);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+    }
+
+    function renderRadarAndTracks() {
+      const prog = PROGRAMS[currentProgramKey];
+      document.getElementById('radarCohortPoly').setAttribute('points', computePentagonPoints(prog.radarCohort));
+      document.getElementById('radarTargetPoly').setAttribute('points', computePentagonPoints(prog.radarTarget));
+
+      prog.radarCohort.forEach((v, i) => {
+        const el = document.getElementById('radVal' + i);
+        if (el) el.textContent = v + '%';
+      });
+      const avg = (prog.radarCohort.reduce((a, b) => a + b, 0) / prog.radarCohort.length).toFixed(1);
+      document.getElementById('radarAvgBadge').textContent = avg + '% Avg';
+
+      const container = document.getElementById('activeTracksContainer');
+      container.innerHTML = prog.tracks.map(t => `
+        <div class="p-3 rounded-2xl bg-white/80 border border-white shadow-sm">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-semibold text-slate-800 truncate pr-2">${t.name}</span>
+            <span class="font-mono font-bold text-indigo-600">${t.pct}%</span>
+          </div>
+          <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r ${t.color}" style="width: ${t.pct}%"></div>
+          </div>
+          <div class="text-xs text-slate-400 mt-1 font-mono">${t.learners}</div>
+        </div>
+      `).join('');
+    }
+
+    // =========================================================================
+    // LEARNER INTERVENTION TABLE & FILTERS
+    // =========================================================================
+    function renderLearnersTable() {
+      const query = (document.getElementById('learnerSearchInput').value || '').trim().toLowerCase();
+      const rows = PROGRAMS[currentProgramKey].learnersList.filter(item => {
+        const matchesStatus = currentLearnerFilter === 'all' || item.status === currentLearnerFilter;
+        const matchesQuery = !query ||
+          item.name.toLowerCase().includes(query) ||
+          item.role.toLowerCase().includes(query) ||
+          item.module.toLowerCase().includes(query);
+        return matchesStatus && matchesQuery;
+      });
+
+      const tbody = document.getElementById('learnerTableBody');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">No cohort learners match the current filter criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        let badgeStyle = 'bg-sky-50 text-sky-700 border-sky-200/70';
+        if (r.status === 'Credential Ready') badgeStyle = 'bg-emerald-50 text-emerald-700 border-emerald-200/70';
+        if (r.status === 'Needs AI Nudge') badgeStyle = 'bg-amber-50 text-amber-700 border-amber-200/70';
+
+        return `
+          <tr class="hover:bg-white/60 transition-colors">
+            <td class="py-3.5 pl-2">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-700 font-display font-bold text-[12.5px] uppercase flex items-center justify-center border border-indigo-500/15">${r.initials}</div>
+                <div>
+                  <div class="font-semibold text-slate-900">${r.name}</div>
+                  <div class="text-[12.5px] text-slate-500">${r.role}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3.5 font-medium text-slate-700">${r.module}</td>
+            <td class="py-3.5">
+              <div class="flex items-center gap-2">
+                <div class="w-20 h-1.5 rounded-full bg-slate-200/80 overflow-hidden">
+                  <div class="h-full rounded-full ${r.mastery >= 85 ? 'bg-indigo-600' : 'bg-amber-500'}" style="width:${r.mastery}%"></div>
+                </div>
+                <span class="font-mono font-semibold text-slate-800">${r.mastery}%</span>
+              </div>
+            </td>
+            <td class="py-3.5 font-mono text-slate-700">${r.xp}</td>
+            <td class="py-3.5">
+              <span class="px-2.5 py-1 rounded-full text-[12.5px] font-semibold border ${badgeStyle}">${r.status}</span>
+            </td>
+            <td class="py-3.5 text-right pr-2">
+              <button onclick="triggerToast('${r.action} dispatched for ${r.name}.')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-600 text-slate-700 hover:text-white border border-slate-200/90 shadow-sm text-[12.5px] font-semibold transition">
+                ${r.action}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function setLearnerFilter(filter, btn) {
+      currentLearnerFilter = filter;
+      document.querySelectorAll('.learner-filter-btn').forEach(b => {
+        b.classList.remove('tactile-pill-active', 'font-semibold');
+        b.classList.add('text-slate-600', 'font-medium');
+      });
+      btn.classList.add('tactile-pill-active', 'font-semibold');
+      btn.classList.remove('text-slate-600', 'font-medium');
+      renderLearnersTable();
+    }
+
+    function filterLearners() {
+      renderLearnersTable();
+    }
+
+    // =========================================================================
+    // PROGRAM & TIMEFRAME SWITCHERS
+    // =========================================================================
+    function switchProgram(key) {
+      currentProgramKey = key;
+      const p = PROGRAMS[key];
+
+      document.querySelectorAll('.program-tab').forEach(tab => {
+        const active = tab.getAttribute('data-program') === key;
+        tab.classList.toggle('tactile-pill-active', active);
+        tab.classList.toggle('font-semibold', active);
+        tab.classList.toggle('text-slate-600', !active);
+      });
+
+      document.getElementById('heroProgramBadge').textContent = p.badge;
+      document.getElementById('heroHeadline').innerHTML = p.headline;
+      document.getElementById('heroSubcopy').textContent = p.subcopy;
+      document.getElementById('liveOnlineCounter').textContent = p.online;
+      document.getElementById('heroMetric1').textContent = p.heroMetrics[0];
+      document.getElementById('heroMetric2').textContent = p.heroMetrics[1];
+      document.getElementById('heroMetric3').textContent = p.heroMetrics[2];
+      document.getElementById('spotlightCohortName').textContent = p.spotlightCohort;
+      document.getElementById('spotlightProgressPct').textContent = p.spotlightPct + '%';
+      document.getElementById('spotlightProgressBar').style.width = p.spotlightPct + '%';
+
+      document.getElementById('kpiLearners').textContent = p.kpis.learners;
+      document.getElementById('kpiLearnersDelta').textContent = p.kpis.learnersDelta;
+      document.getElementById('kpiResolution').textContent = p.kpis.resolution;
+      document.getElementById('kpiResolutionDelta').textContent = p.kpis.resolutionDelta;
+      document.getElementById('kpiVelocity').textContent = p.kpis.velocity;
+      document.getElementById('kpiCredentials').textContent = p.kpis.credentials;
+      document.getElementById('kpiCredentialsDelta').textContent = p.kpis.credentialsDelta;
+
+      document.getElementById('summaryHours').textContent = p.summary[0];
+      document.getElementById('summaryRecovery').textContent = p.summary[1];
+      document.getElementById('summaryReviews').textContent = p.summary[2];
+
+      renderTrajectoryChart();
+      renderRadarAndTracks();
+      renderLearnersTable();
+    }
+
+    function switchTimeframe(tf) {
+      currentTimeframe = tf;
+      document.querySelectorAll('.tf-tab').forEach(btn => {
+        const active = btn.getAttribute('data-tf') === tf;
+        btn.classList.toggle('tactile-pill-active', active);
+        btn.classList.toggle('font-semibold', active);
+        btn.classList.toggle('text-slate-600', !active);
+      });
+      renderTrajectoryChart();
+    }
+
+    // =========================================================================
+    // TOAST & KEYBOARD SHORTCUTS
+    // =========================================================================
+    let toastTimer = null;
+    function triggerToast(msg) {
+      const c = document.getElementById('toastContainer');
+      document.getElementById('toastMessage').textContent = msg;
+      c.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        c.classList.add('opacity-0', 'translate-y-3');
+      }, 3200);
+    }
+
+    function exportAcademyBrief() {
+      triggerToast('Compiled Lumina Executive Skill Matrix PDF for ' + PROGRAMS[currentProgramKey].badge + '.');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        document.getElementById('learnerSearchInput').focus();
+      }
+    });
+
+    // Initial Boot
+    renderTrajectoryChart();
+    renderRadarAndTracks();
+    renderLearnersTable();
+  </script>
+</body>
+</html>

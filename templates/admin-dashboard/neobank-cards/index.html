@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VALEUR BANK — Digital Corporate &amp; Personal Banking OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', '"Space Grotesk"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#F4F6FA',
+            obsidian: '#0F172A',
+            sapphire: '#1D4ED8',
+            emeraldBank: '#059669',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #F4F6FA;
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 60% 45% at 15% 0%, rgba(29, 78, 216, 0.05), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(5, 150, 105, 0.05), transparent 70%);
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .bank-surface {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 10px 28px -8px rgba(15, 23, 42, 0.06);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .bank-surface:hover {
+      border-color: #CBD5E1;
+      box-shadow:
+        0 2px 4px rgba(15, 23, 42, 0.04),
+        0 14px 32px -8px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Sidebar collapsible layout */
+    .sidebar-shell {
+      width: 268px;
+      transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.sidebar-collapsed .sidebar-shell {
+      width: 78px;
+    }
+    body.sidebar-collapsed .sidebar-label,
+    body.sidebar-collapsed .sidebar-badge,
+    body.sidebar-collapsed .sidebar-footer-detail,
+    body.sidebar-collapsed .sidebar-section-heading {
+      display: none !important;
+    }
+    body.sidebar-collapsed .sidebar-nav-item {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    body.sidebar-collapsed .sidebar-brand-wrap {
+      justify-content: center;
+    }
+    @media (min-width: 1024px) {
+      .main-shell {
+        margin-left: 268px;
+        transition: margin-left 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      body.sidebar-collapsed .main-shell {
+        margin-left: 78px;
+      }
+    }
+
+    /* Tactile Physical Bank Cards + 3D Tilt */
+    .card-stage {
+      perspective: 1100px;
+    }
+    .physical-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+    }
+    .card-specular-glare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      background: radial-gradient(
+        circle 240px at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255, 255, 255, 0.30),
+        rgba(255, 255, 255, 0.06) 45%,
+        transparent 72%
+      );
+      mix-blend-mode: overlay;
+      z-index: 15;
+    }
+    .physical-card:hover .card-specular-glare {
+      opacity: 1;
+    }
+
+    /* Kinetic Data Visualization Keyframes */
+    @keyframes barGrowUp {
+      0% {
+        transform: scaleY(0);
+        opacity: 0.25;
+      }
+      100% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+    .viz-bar-grow {
+      transform-box: fill-box;
+      transform-origin: bottom;
+      animation: barGrowUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    @keyframes drawSvgPath {
+      0% {
+        stroke-dashoffset: 1000;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+    .viz-path-draw {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawSvgPath 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.12s forwards;
+    }
+
+    @keyframes fadeAreaIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .viz-area-fade {
+      opacity: 0;
+      animation: fadeAreaIn 0.85s ease-out 0.25s forwards;
+    }
+
+    @keyframes flowDash {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+    .flow-guide-dash {
+      stroke-dasharray: 6 6;
+      animation: flowDash 1.8s linear infinite;
+    }
+
+    @keyframes sonarPing {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.85;
+      }
+      100% {
+        transform: scale(2.35);
+        opacity: 0;
+      }
+    }
+    .viz-sonar-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: sonarPing 2.1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .card-theme-obsidian {
+      background:
+        radial-gradient(circle at 88% 18%, rgba(148, 163, 184, 0.24), transparent 48%),
+        linear-gradient(135deg, #1E293B 0%, #0F172A 52%, #020617 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 24px 44px -14px rgba(15, 23, 42, 0.52),
+        inset 0 1px 1px rgba(255, 255, 255, 0.24);
+    }
+    .card-theme-sapphire {
+      background:
+        radial-gradient(circle at 85% 15%, rgba(96, 165, 250, 0.38), transparent 50%),
+        linear-gradient(135deg, #2563EB 0%, #1D4ED8 54%, #1E3A8A 100%);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow:
+        0 24px 44px -14px rgba(29, 78, 216, 0.45),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+    .card-theme-emerald {
+      background:
+        radial-gradient(circle at 82% 20%, rgba(52, 211, 153, 0.34), transparent 52%),
+        linear-gradient(135deg, #10B981 0%, #059669 52%, #064E3B 100%);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow:
+        0 24px 44px -14px rgba(5, 150, 105, 0.42),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+    .metallic-sheen {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          115deg,
+          rgba(255, 255, 255, 0.03) 0px,
+          rgba(255, 255, 255, 0.03) 1px,
+          transparent 1px,
+          transparent 5px
+        ),
+        linear-gradient(125deg, rgba(255, 255, 255, 0.16) 0%, transparent 38%, transparent 68%, rgba(255, 255, 255, 0.08) 100%);
+      pointer-events: none;
+    }
+    .frosted-freeze-layer {
+      background: linear-gradient(135deg, rgba(224, 242, 254, 0.28), rgba(186, 230, 253, 0.16));
+      backdrop-filter: blur(7px) saturate(130%);
+      -webkit-backdrop-filter: blur(7px) saturate(130%);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    @keyframes rowFlash {
+      0% { background-color: rgba(5, 150, 105, 0.14); }
+      100% { background-color: transparent; }
+    }
+    .new-tx-flash {
+      animation: rowFlash 1.8s ease-out forwards;
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900 selection:bg-blue-600 selection:text-white">
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="mobileOverlay" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm hidden lg:hidden" onclick="toggleMobileSidebar(false)"></div>
+
+  <!-- Left Banking Sidebar -->
+  <aside id="sidebar" class="sidebar-shell fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-slate-200 -translate-x-full lg:translate-x-0">
+    <!-- Brand Header -->
+    <div class="h-16 px-4 flex items-center justify-between border-b border-slate-200/80 sidebar-brand-wrap">
+      <a href="#" onclick="selectNav(null, 'Overview'); return false;" class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-obsidian text-white flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-tr from-blue-700/80 via-transparent to-emerald-500/50"></div>
+          <svg class="w-5 h-5 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 5l8 14 8-14" />
+            <path d="M9.5 5L12 9.5 14.5 5" />
+          </svg>
+        </div>
+        <div class="sidebar-label truncate">
+          <div class="font-display font-extrabold text-[15px] tracking-tight text-slate-900 leading-none">VALEUR BANK</div>
+          <div class="text-xs font-medium text-slate-500 mt-1">Treasury &amp; Cards OS</div>
+        </div>
+      </a>
+      <button onclick="toggleMobileSidebar(false)" class="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100" aria-label="Close navigation">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="flex-1 overflow-y-auto py-5 px-3 space-y-6">
+      <div>
+        <div class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400 sidebar-section-heading">Core Banking</div>
+        <nav class="space-y-1" id="sidebarNav">
+          <button data-nav="Overview" onclick="selectNav(this, 'Overview')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-semibold bg-blue-50 text-blue-700 transition-colors">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9" rx="1.5" />
+              <rect x="14" y="3" width="7" height="5" rx="1.5" />
+              <rect x="14" y="12" width="7" height="9" rx="1.5" />
+              <rect x="3" y="16" width="7" height="5" rx="1.5" />
+            </svg>
+            <span class="sidebar-label truncate">Overview</span>
+          </button>
+
+          <button data-nav="Cards & Limits" onclick="selectNav(this, 'Cards & Limits', 'cardsSection')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between gap-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+            <span class="flex items-center gap-3 min-w-0">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2.5" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+                <line x1="6" y1="15" x2="10" y2="15" />
+              </svg>
+              <span class="sidebar-label truncate">Cards &amp; Limits</span>
+            </span>
+            <span class="sidebar-badge text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">3</span>
+          </button>
+
+          <button data-nav="Transactions" onclick="selectNav(this, 'Transactions', 'transactionsSection')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 10l5-5 5 5" />
+              <path d="M17 14l-5 5-5-5" />
+            </svg>
+            <span class="sidebar-label truncate">Transactions</span>
+          </button>
+
+          <button data-nav="Global Accounts" onclick="selectNav(this, 'Global Accounts')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between gap-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+            <span class="flex items-center gap-3 min-w-0">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3.6 9h16.8M3.6 15h16.8" />
+                <path d="M12 3a14.5 14.5 0 0 0 0 18 14.5 14.5 0 0 0 0-18z" />
+              </svg>
+              <span class="sidebar-label truncate">Global Accounts</span>
+            </span>
+            <span class="sidebar-badge text-xs font-mono font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200/80 shrink-0">USD·EUR·GBP</span>
+          </button>
+
+          <button data-nav="Wire & ACH" onclick="selectNav(this, 'Wire & ACH', 'transferSection')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 2L11 13" />
+              <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+            </svg>
+            <span class="sidebar-label truncate">Wire &amp; ACH</span>
+          </button>
+
+          <button data-nav="Analytics" onclick="selectNav(this, 'Analytics', 'analyticsSection')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span class="sidebar-label truncate">Analytics</span>
+          </button>
+
+          <button data-nav="Statements" onclick="selectNav(this, 'Statements')" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center gap-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="8" y1="13" x2="16" y2="13" />
+              <line x1="8" y1="17" x2="13" y2="17" />
+            </svg>
+            <span class="sidebar-label truncate">Statements</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Multi-Currency Balances Quick Box -->
+      <div class="sidebar-footer-detail pt-2">
+        <div class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Currency Vaults</div>
+        <div class="rounded-xl bg-slate-50 border border-slate-200/80 p-3 space-y-2.5">
+          <div class="flex items-center justify-between text-sm">
+            <span class="flex items-center gap-2 font-medium text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-blue-700"></span>USD Primary
+            </span>
+            <span class="font-mono font-semibold text-slate-900 tabular-nums">$142,840</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="flex items-center gap-2 font-medium text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>EUR SEPA
+            </span>
+            <span class="font-mono font-semibold text-slate-900 tabular-nums">&euro;24,900</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="flex items-center gap-2 font-medium text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-slate-800"></span>GBP Faster
+            </span>
+            <span class="font-mono font-semibold text-slate-900 tabular-nums">&pound;11,480</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Profile + Collapse -->
+    <div class="p-3 border-t border-slate-200 space-y-2">
+      <div class="flex items-center gap-3 px-2 py-2 rounded-xl bg-slate-50/90 border border-slate-200/60">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-700 to-slate-900 text-white font-display font-bold text-xs flex items-center justify-center shrink-0">
+          CM
+        </div>
+        <div class="sidebar-footer-detail min-w-0 flex-1">
+          <div class="text-sm font-semibold text-slate-900 truncate">Claire Moreau</div>
+          <div class="text-xs text-slate-500 truncate">CFO &middot; Valeur Labs Inc.</div>
+        </div>
+      </div>
+      <button onclick="toggleDesktopSidebar()" class="hidden lg:flex w-full min-h-[40px] px-3 rounded-xl items-center justify-center gap-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" title="Toggle Sidebar Rail">
+        <svg id="collapseIcon" class="w-4 h-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        <span class="sidebar-label">Collapse Sidebar</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Shell -->
+  <div class="main-shell min-h-screen flex flex-col">
+
+    <!-- Sticky Banking Topbar -->
+    <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/90 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <button onclick="toggleMobileSidebar(true)" class="lg:hidden w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50" aria-label="Open menu">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="7" x2="20" y2="7" stroke-linecap="round" />
+            <line x1="4" y1="12" x2="20" y2="12" stroke-linecap="round" />
+            <line x1="4" y1="17" x2="14" y2="17" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 id="topbarTitle" class="font-display font-bold text-lg sm:text-xl text-slate-900 tracking-tight">Banking Overview</h1>
+            <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+              FDIC Tier-1 Protected
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <button onclick="openStatementModal()" class="hidden md:inline-flex h-10 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium items-center gap-2 transition-colors">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Export PDF</span>
+        </button>
+
+        <button onclick="openIssueCardModal()" class="h-10 px-4 rounded-xl bg-sapphire hover:bg-blue-800 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Issue Card</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Body -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-7 max-w-[1600px] w-full mx-auto space-y-6">
+      <div id="defaultDashboardView" class="space-y-6">
+
+      <!-- TOP ROW: Interactive Multi-Card Wallet (lg:col-span-5) + KPIs & Cashflow Analytics (lg:col-span-7) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+        <!-- LEFT (lg:col-span-5): My Financial Cards Interactive Stack/Switcher -->
+        <div id="cardsSection" class="lg:col-span-5 bank-surface rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Corporate &amp; Virtual Cards</h2>
+                <p class="text-sm text-slate-500">Select a card to manage controls, limits &amp; IBAN</p>
+              </div>
+              <span id="cardStatusPill" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Active
+              </span>
+            </div>
+
+            <!-- 3 Card Switcher Tabs -->
+            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200/80 mb-5" role="tablist">
+              <button onclick="switchCard(0)" id="cardTab0" class="card-tab min-h-[40px] px-2.5 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all truncate">
+                Obsidian &middot;&middot; 4829
+              </button>
+              <button onclick="switchCard(1)" id="cardTab1" class="card-tab min-h-[40px] px-2.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all truncate">
+                Sapphire &middot;&middot; 9014
+              </button>
+              <button onclick="switchCard(2)" id="cardTab2" class="card-tab min-h-[40px] px-2.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all truncate">
+                Emerald &middot;&middot; 3318
+              </button>
+            </div>
+
+            <!-- Tactile Visual Bank Card with 3D Hover Tilt & Specular Sheen -->
+            <div class="card-stage mb-5" id="cardTiltStage">
+              <div id="visualBankCard" class="physical-card card-theme-obsidian text-white p-6 aspect-[1.586/1] w-full flex flex-col justify-between select-none">
+                <div class="metallic-sheen"></div>
+                <div id="cardSpecularGlare" class="card-specular-glare"></div>
+
+                <!-- Frosted Ice Overlay when Card Frozen -->
+                <div id="frozenOverlay" class="hidden absolute inset-0 z-20 frosted-freeze-layer flex flex-col items-center justify-center p-6 text-center">
+                  <div class="px-4 py-2.5 rounded-2xl bg-slate-950/80 border border-sky-300/50 shadow-xl flex items-center gap-2.5">
+                    <svg class="w-5 h-5 text-sky-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" y1="2" x2="12" y2="22" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                      <path d="M20 16l-4-4 4-4M4 8l4 4-4 4M16 4l-4 4-4-4M8 20l4-4 4 4" />
+                    </svg>
+                    <div class="text-left">
+                      <div class="text-xs font-bold uppercase tracking-wider text-sky-200">Card Frozen</div>
+                      <div class="text-xs text-slate-200">All POS &amp; online authorizations paused</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card Top Row: Brand + Tier + Contactless Wave -->
+                <div class="relative z-10 flex items-start justify-between">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-display font-extrabold text-base tracking-wider">VALEUR</span>
+                      <span id="cardTierLabel" class="text-xs font-semibold uppercase tracking-widest px-2 py-0.5 rounded bg-white/10 border border-white/20">
+                        Obsidian Metal
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Contactless Wave SVG -->
+                  <svg class="w-6 h-6 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M8.5 14.5A4 4 0 0 0 8.5 9.5" />
+                    <path d="M11.5 17A7.5 7.5 0 0 0 11.5 7" />
+                    <path d="M14.5 19.5A11 11 0 0 0 14.5 4.5" />
+                  </svg>
+                </div>
+
+                <!-- Middle Row: Realistic EMV Chip + PAN -->
+                <div class="relative z-10 space-y-3 my-auto pt-2">
+                  <div class="flex items-center justify-between">
+                    <!-- Realistic EMV Chip SVG -->
+                    <svg class="w-11 h-8 rounded" viewBox="0 0 48 36" fill="none">
+                      <rect x="0.5" y="0.5" width="47" height="35" rx="5.5" fill="url(#emvGold)" stroke="rgba(255,255,255,0.45)" />
+                      <path d="M16 1v34M32 1v34M1 12h15M32 12h15M1 24h15M32 24h15" stroke="rgba(120,83,18,0.48)" stroke-width="1.1" />
+                      <rect x="18" y="9" width="12" height="18" rx="2.5" stroke="rgba(120,83,18,0.48)" stroke-width="1.1" />
+                      <defs>
+                        <linearGradient id="emvGold" x1="0" y1="0" x2="48" y2="36" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stop-color="#FDE68A" />
+                          <stop offset="50%" stop-color="#F59E0B" />
+                          <stop offset="100%" stop-color="#D97706" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <span id="cardCurrencyTag" class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-black/20 text-white/90 border border-white/10">
+                      USD &middot; MULTI-FX
+                    </span>
+                  </div>
+
+                  <div id="cardPanDisplay" class="font-mono text-lg sm:text-xl font-semibold tracking-[0.16em] text-white drop-shadow-sm tabular-nums">
+                    &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4829
+                  </div>
+                </div>
+
+                <!-- Card Bottom Row: Cardholder, Expiry, CVV, Network Logo -->
+                <div class="relative z-10 flex items-end justify-between gap-4 pt-2">
+                  <div class="flex items-center gap-5 sm:gap-6">
+                    <div>
+                      <div class="text-xs uppercase tracking-wider text-white/60">Cardholder</div>
+                      <div class="font-display text-sm font-semibold tracking-wide text-white">CLAIRE MOREAU</div>
+                    </div>
+                    <div>
+                      <div class="text-xs uppercase tracking-wider text-white/60">Expires</div>
+                      <div id="cardExpiryDisplay" class="font-mono text-sm font-semibold text-white tabular-nums">08/29</div>
+                    </div>
+                    <div>
+                      <div class="text-xs uppercase tracking-wider text-white/60">CVV</div>
+                      <div id="cardCvvDisplay" class="font-mono text-sm font-semibold text-white tabular-nums">&bull;&bull;&bull;</div>
+                    </div>
+                  </div>
+                  <!-- Dual Overlapping Payment Circles SVG -->
+                  <svg class="w-10 h-6 shrink-0" viewBox="0 0 40 24" fill="none">
+                    <circle cx="15" cy="12" r="10" fill="rgba(255,255,255,0.85)" />
+                    <circle cx="25" cy="12" r="10" fill="rgba(255,255,255,0.45)" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Card Controls Row -->
+            <div class="grid grid-cols-3 gap-2.5 mb-5">
+              <button id="freezeCardBtn" onclick="toggleFreezeCard()" class="min-h-[42px] px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                <svg class="w-4 h-4 text-slate-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span id="freezeBtnLabel">Freeze Card</span>
+              </button>
+
+              <button id="revealDetailsBtn" onclick="toggleRevealCard()" class="min-h-[42px] px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                <svg class="w-4 h-4 text-slate-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <span id="revealBtnLabel">Reveal Details</span>
+              </button>
+
+              <button onclick="copyCardIban()" class="min-h-[42px] px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                <svg class="w-4 h-4 text-slate-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span id="copyIbanLabel">Copy IBAN</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Monthly Spending Limit Progress Bar -->
+          <div class="pt-4 border-t border-slate-200/80">
+            <div class="flex items-center justify-between text-sm mb-2">
+              <span class="font-semibold text-slate-700">Monthly Spending Limit</span>
+              <div class="flex items-center gap-2">
+                <span id="limitAmountText" class="font-mono font-bold text-slate-900 tabular-nums">$6,420 / $15,000</span>
+                <span id="limitPctBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 tabular-nums">42.8%</span>
+              </div>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200/60">
+              <div id="limitProgressBar" class="h-full rounded-full bg-gradient-to-r from-blue-700 to-emerald-600 transition-all duration-300" style="width: 42.8%"></div>
+            </div>
+            <div class="flex items-center justify-between mt-2.5 text-xs text-slate-500">
+              <span id="ibanRoutingPreview" class="font-mono truncate">IBAN: FR76 3000 &bull;&bull;&bull;&bull; 0189</span>
+              <button onclick="cycleCardLimit()" class="text-sm font-semibold text-sapphire hover:text-blue-800 transition-colors">
+                Adjust Limit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT (lg:col-span-7): 3 Banking Balance KPI Cards + Cashflow Analytics Chart -->
+        <div id="analyticsSection" class="lg:col-span-7 flex flex-col gap-6">
+
+          <!-- 3 KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- KPI 1: Total Available Balance -->
+            <div class="bank-surface rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-medium text-slate-500">Total Available Balance</span>
+                <span class="w-9 h-9 rounded-xl bg-blue-50 text-sapphire flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </span>
+              </div>
+              <div id="kpiTotalBalance" class="font-display font-extrabold text-2xl text-slate-900 tracking-tight tabular-nums">$184,620.50</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15" />
+                  </svg>
+                  +8.4%
+                </span>
+                <span class="text-xs text-slate-500">vs last month</span>
+              </div>
+            </div>
+
+            <!-- KPI 2: Monthly Inflow -->
+            <div class="bank-surface rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-medium text-slate-500">Monthly Inflow</span>
+                <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emeraldBank flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="17" y1="7" x2="7" y2="17" />
+                    <polyline points="17 17 7 17 7 7" />
+                  </svg>
+                </span>
+              </div>
+              <div class="font-display font-extrabold text-2xl text-emeraldBank tracking-tight tabular-nums">+$42,890.00</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">18 payouts</span>
+                <span class="text-xs text-slate-500">Stripe &amp; ACH</span>
+              </div>
+            </div>
+
+            <!-- KPI 3: Monthly Card & Wire Spend -->
+            <div class="bank-surface rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-medium text-slate-500">Monthly Card &amp; Wire Spend</span>
+                <span class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </span>
+              </div>
+              <div id="kpiMonthlySpend" class="font-display font-extrabold text-2xl text-slate-900 tracking-tight tabular-nums">-$14,320.80</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">33.4% ratio</span>
+                <span class="text-xs text-slate-500">Healthy burn</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cashflow Analytics Chart (Income vs Expenses — 6M | 1Y toggle) -->
+          <div class="bank-surface rounded-2xl p-5 sm:p-6 flex-1 flex flex-col justify-between">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Cashflow Analytics</h2>
+                  <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-sapphire">Income vs Expenses</span>
+                </div>
+                <p id="chartHoverSummary" class="text-sm text-slate-500 mt-1 tabular-nums">
+                  Nov Breakdown: <strong class="text-sapphire font-semibold">Income $42,890</strong> &middot; <strong class="text-rose-600 font-semibold">Expenses $14,320</strong> &middot; <strong class="text-emeraldBank font-semibold">Net +$28,570</strong>
+                </p>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <!-- Legend -->
+                <div class="hidden sm:flex items-center gap-3 text-xs font-medium text-slate-600">
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-sapphire"></span>Income</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span>Expenses</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-1 rounded-full bg-emeraldBank"></span>Net Curve</span>
+                </div>
+
+                <!-- 6M | 1Y Switcher -->
+                <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200/80">
+                  <button id="cfBtn6M" onclick="setCashflowPeriod('6M')" class="min-h-[36px] px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all">6M</button>
+                  <button id="cfBtn1Y" onclick="setCashflowPeriod('1Y')" class="min-h-[36px] px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">1Y</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive SVG Dual-Bar + Net Savings Curve -->
+            <div class="relative w-full pt-2">
+              <svg id="cashflowSvg" viewBox="0 0 680 235" class="w-full h-[225px] overflow-visible select-none" aria-label="Cashflow Income versus Expenses chart"></svg>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- MIDDLE ROW: Real-Time Payment & Clearing Data Flow Pipeline (SVG Bezier + animateMotion) -->
+      <section class="bank-surface rounded-2xl p-5 sm:p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Real-Time Payment &amp; Clearing Data Flow</h2>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span id="clearingRateReadout" class="font-mono tabular-nums">1,428 tx/min</span>
+              </span>
+            </div>
+            <p id="clearingStageCaption" class="text-sm text-slate-500 mt-1">
+              Live end-to-end packet telemetry: <strong class="text-slate-800 font-semibold">14ms AI Fraud Scoring</strong> &middot; <strong class="text-sapphire font-semibold">99.998% Authorization</strong> &middot; <strong class="text-emeraldBank font-semibold">Instant Tier-1 Settlement</strong>
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200/80" id="railModeGroup">
+              <button type="button" onclick="setClearingRail('ALL', this)" class="rail-mode-btn min-h-[38px] px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all">All Rails</button>
+              <button type="button" onclick="setClearingRail('POS', this)" class="rail-mode-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">Card POS</button>
+              <button type="button" onclick="setClearingRail('WIRE', this)" class="rail-mode-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">SWIFT / SEPA</button>
+            </div>
+            <button type="button" onclick="triggerClearingBurst()" class="h-10 px-3.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-sapphire text-sm font-semibold inline-flex items-center gap-2 transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <span>Simulate Packet Burst</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Animated SVG Clearing Pipeline -->
+        <div class="w-full overflow-x-auto">
+          <div class="min-w-[780px]">
+            <svg id="paymentFlowSvg" viewBox="0 0 1080 188" class="w-full h-[188px] select-none overflow-visible" aria-label="Real-time payment clearing pipeline">
+              <defs>
+                <filter id="packetSapphireGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="packetEmeraldGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <linearGradient id="pipeGradBlue" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#1D4ED8" stop-opacity="0.22" />
+                  <stop offset="50%" stop-color="#1D4ED8" stop-opacity="0.55" />
+                  <stop offset="100%" stop-color="#059669" stop-opacity="0.35" />
+                </linearGradient>
+
+                <!-- Bezier Motion Paths between Stages -->
+                <path id="flowLane1A" d="M 218 76 C 268 42, 302 42, 352 76" />
+                <path id="flowLane1B" d="M 218 106 C 268 140, 302 140, 352 106" />
+                <path id="flowLane2A" d="M 522 76 C 572 40, 608 40, 658 76" />
+                <path id="flowLane2B" d="M 522 106 C 572 142, 608 142, 658 106" />
+                <path id="flowLane3A" d="M 828 76 C 875 46, 908 46, 952 84" />
+                <path id="flowLane3B" d="M 828 106 C 875 136, 908 136, 952 98" />
+              </defs>
+
+              <!-- Background Subtle Grid -->
+              <rect x="6" y="10" width="1068" height="168" rx="16" fill="#F8FAFC" stroke="#E2E8F0" />
+
+              <!-- Connecting Bezier Guide Rails -->
+              <use href="#flowLane1A" fill="none" stroke="#CBD5E1" stroke-width="2" />
+              <use href="#flowLane1B" fill="none" stroke="#CBD5E1" stroke-width="2" />
+              <use href="#flowLane2A" fill="none" stroke="#CBD5E1" stroke-width="2" />
+              <use href="#flowLane2B" fill="none" stroke="#CBD5E1" stroke-width="2" />
+              <use href="#flowLane3A" fill="none" stroke="#CBD5E1" stroke-width="2" />
+              <use href="#flowLane3B" fill="none" stroke="#CBD5E1" stroke-width="2" />
+
+              <!-- Animated Dashed Energy Streams -->
+              <use href="#flowLane1A" fill="none" stroke="url(#pipeGradBlue)" stroke-width="2.5" class="flow-guide-dash" />
+              <use href="#flowLane2A" fill="none" stroke="url(#pipeGradBlue)" stroke-width="2.5" class="flow-guide-dash" />
+              <use href="#flowLane3A" fill="none" stroke="#059669" stroke-opacity="0.45" stroke-width="2.5" class="flow-guide-dash" />
+
+              <!-- Streaming Glowing Data Packets (animateMotion) -->
+              <g id="flowPacketLayer">
+                <!-- Hop 1: Card Swipe / ACH -> Fraud AI Shield -->
+                <circle r="5" fill="#1D4ED8" filter="url(#packetSapphireGlow)">
+                  <animateMotion dur="1.9s" repeatCount="indefinite"><mpath href="#flowLane1A" /></animateMotion>
+                </circle>
+                <circle r="4.5" fill="#2563EB" filter="url(#packetSapphireGlow)">
+                  <animateMotion dur="1.9s" begin="0.95s" repeatCount="indefinite"><mpath href="#flowLane1A" /></animateMotion>
+                </circle>
+                <circle r="4.5" fill="#059669" filter="url(#packetEmeraldGlow)">
+                  <animateMotion dur="2.3s" begin="0.4s" repeatCount="indefinite"><mpath href="#flowLane1B" /></animateMotion>
+                </circle>
+
+                <!-- Hop 2: Fraud AI Shield -> SWIFT/SEPA Clearing -->
+                <circle r="5" fill="#1D4ED8" filter="url(#packetSapphireGlow)">
+                  <animateMotion dur="1.75s" begin="0.2s" repeatCount="indefinite"><mpath href="#flowLane2A" /></animateMotion>
+                </circle>
+                <circle r="4.5" fill="#059669" filter="url(#packetEmeraldGlow)">
+                  <animateMotion dur="2.1s" begin="0.8s" repeatCount="indefinite"><mpath href="#flowLane2B" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#3B82F6" filter="url(#packetSapphireGlow)">
+                  <animateMotion dur="1.75s" begin="1.1s" repeatCount="indefinite"><mpath href="#flowLane2A" /></animateMotion>
+                </circle>
+
+                <!-- Hop 3: SWIFT/SEPA Clearing -> Vault Settlement -->
+                <circle r="5.5" fill="#059669" filter="url(#packetEmeraldGlow)">
+                  <animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#flowLane3A" /></animateMotion>
+                </circle>
+                <circle r="4.5" fill="#10B981" filter="url(#packetEmeraldGlow)">
+                  <animateMotion dur="1.85s" begin="0.75s" repeatCount="indefinite"><mpath href="#flowLane3B" /></animateMotion>
+                </circle>
+              </g>
+
+              <!-- Extra Burst Layer (populated dynamically on burst/transfer) -->
+              <g id="burstPacketLayer"></g>
+
+              <!-- STAGE 1: Card Swipe / ACH -->
+              <g class="cursor-pointer" onclick="inspectFlowStage(0)">
+                <rect id="stageBox0" x="28" y="40" width="190" height="108" rx="14" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="1.8" />
+                <rect x="44" y="54" width="34" height="34" rx="9" fill="#EFF6FF" />
+                <path d="M53 67h16M53 73h10" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" />
+                <rect x="51" y="62" width="20" height="16" rx="2.5" fill="none" stroke="#1D4ED8" stroke-width="1.8" />
+                <text x="88" y="69" fill="#0F172A" font-size="13" font-weight="700" font-family="Plus Jakarta Sans, sans-serif">Card Swipe / ACH</text>
+                <text x="88" y="85" fill="#64748B" font-size="12" font-family="Inter, sans-serif">POS &middot; Apple Pay</text>
+                <text x="44" y="116" fill="#1D4ED8" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">INGRESS &middot; 4.2ms</text>
+                <text x="44" y="134" fill="#475569" font-size="12" font-family="Inter, sans-serif">ISO-8583 / Webhook</text>
+              </g>
+
+              <!-- STAGE 2: Fraud AI Shield -->
+              <g class="cursor-pointer" onclick="inspectFlowStage(1)">
+                <rect id="stageBox1" x="352" y="40" width="170" height="108" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
+                <circle cx="385" cy="71" r="14" fill="#ECFDF5" class="viz-sonar-ring" />
+                <rect x="368" y="54" width="34" height="34" rx="9" fill="#ECFDF5" />
+                <path d="M385 61l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10v-5l7-3z" fill="none" stroke="#059669" stroke-width="1.9" stroke-linejoin="round" />
+                <text x="410" y="69" fill="#0F172A" font-size="13" font-weight="700" font-family="Plus Jakarta Sans, sans-serif">Fraud AI Shield</text>
+                <text x="410" y="85" fill="#64748B" font-size="12" font-family="Inter, sans-serif">Neural 3DS2</text>
+                <text x="368" y="116" fill="#059669" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">RISK 0.01% &middot; 14ms</text>
+                <text x="368" y="134" fill="#475569" font-size="12" font-family="Inter, sans-serif">210 ML signals/tx</text>
+              </g>
+
+              <!-- STAGE 3: SWIFT / SEPA Clearing -->
+              <g class="cursor-pointer" onclick="inspectFlowStage(2)">
+                <rect id="stageBox2" x="658" y="40" width="170" height="108" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
+                <rect x="674" y="54" width="34" height="34" rx="9" fill="#EFF6FF" />
+                <circle cx="691" cy="71" r="8.5" fill="none" stroke="#1D4ED8" stroke-width="1.8" />
+                <path d="M683 71h16M691 62.5a12 12 0 0 1 0 17 12 12 0 0 1 0-17z" fill="none" stroke="#1D4ED8" stroke-width="1.5" />
+                <text x="716" y="69" fill="#0F172A" font-size="13" font-weight="700" font-family="Plus Jakarta Sans, sans-serif">SWIFT / SEPA</text>
+                <text x="716" y="85" fill="#64748B" font-size="12" font-family="Inter, sans-serif">Clearing Router</text>
+                <text x="674" y="116" fill="#1D4ED8" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">FX MID-MKT &middot; 0%</text>
+                <text x="674" y="134" fill="#475569" font-size="12" font-family="Inter, sans-serif">FedNow + Target2</text>
+              </g>
+
+              <!-- STAGE 4: Vault Settlement -->
+              <g class="cursor-pointer" onclick="inspectFlowStage(3)">
+                <rect id="stageBox3" x="952" y="40" width="102" height="108" rx="14" fill="#0F172A" stroke="#059669" stroke-width="1.8" />
+                <circle cx="1003" cy="69" r="15" fill="rgba(16,185,129,0.18)" />
+                <polyline points="996 69 1001 74 1011 64" fill="none" stroke="#34D399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                <text x="1003" y="104" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="700" font-family="Plus Jakarta Sans, sans-serif">Vault</text>
+                <text x="1003" y="121" text-anchor="middle" fill="#34D399" font-size="12" font-weight="600" font-family="JetBrains Mono, monospace">SETTLED</text>
+                <text x="1003" y="137" text-anchor="middle" fill="#94A3B8" font-size="12" font-family="Inter, sans-serif">Tier-1</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTOM ROW: Quick Send Money & Spend Breakdown (lg:col-span-4) + Recent Transactions Table (lg:col-span-8) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT (lg:col-span-4): Instant Transfer & Monthly Category Spend -->
+        <div id="transferSection" class="lg:col-span-4 space-y-6">
+
+          <!-- Instant Transfer Widget -->
+          <div class="bank-surface rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Instant Money Transfer</h2>
+                <p class="text-sm text-slate-500">Zero-fee FedNow, SEPA Instant &amp; ACH</p>
+              </div>
+              <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emeraldBank flex items-center justify-center">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </span>
+            </div>
+
+            <!-- Recipient Quick Avatar Selector -->
+            <div class="mb-4">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Quick Recipient</label>
+              <div class="grid grid-cols-4 gap-2" id="recipientGrid">
+                <button type="button" onclick="selectRecipient(0)" class="recipient-btn min-h-[68px] p-2 rounded-xl border-2 border-sapphire bg-blue-50/50 flex flex-col items-center justify-center gap-1.5 transition-all">
+                  <span class="w-8 h-8 rounded-full bg-blue-700 text-white font-display font-bold text-xs flex items-center justify-center">LC</span>
+                  <span class="text-xs font-semibold text-slate-900 truncate w-full text-center">Liam Chen</span>
+                </button>
+                <button type="button" onclick="selectRecipient(1)" class="recipient-btn min-h-[68px] p-2 rounded-xl border border-slate-200 hover:bg-slate-50 flex flex-col items-center justify-center gap-1.5 transition-all">
+                  <span class="w-8 h-8 rounded-full bg-emerald-600 text-white font-display font-bold text-xs flex items-center justify-center">SR</span>
+                  <span class="text-xs font-medium text-slate-700 truncate w-full text-center">Sofia Rossi</span>
+                </button>
+                <button type="button" onclick="selectRecipient(2)" class="recipient-btn min-h-[68px] p-2 rounded-xl border border-slate-200 hover:bg-slate-50 flex flex-col items-center justify-center gap-1.5 transition-all">
+                  <span class="w-8 h-8 rounded-full bg-slate-800 text-white font-display font-bold text-xs flex items-center justify-center">KS</span>
+                  <span class="text-xs font-medium text-slate-700 truncate w-full text-center">Kenji Sato</span>
+                </button>
+                <button type="button" onclick="selectRecipient(3)" class="recipient-btn min-h-[68px] p-2 rounded-xl border border-slate-200 hover:bg-slate-50 flex flex-col items-center justify-center gap-1.5 transition-all">
+                  <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-display font-bold text-xs flex items-center justify-center">SV</span>
+                  <span class="text-xs font-medium text-slate-700 truncate w-full text-center">Stripe Vault</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Source Account Selector -->
+            <div class="space-y-3.5">
+              <div>
+                <label for="transferAccount" class="block text-sm font-medium text-slate-700 mb-1.5">From Account</label>
+                <select id="transferAccount" class="w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-sapphire">
+                  <option value="USD Checking">USD Checking (&middot;&middot; 8841) &mdash; $142,840.00</option>
+                  <option value="EUR SEPA Vault">EUR SEPA Vault (&middot;&middot; 2209) &mdash; &euro;24,900.00</option>
+                  <option value="Sapphire Corporate">Sapphire Corporate (&middot;&middot; 9014)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="transferAmount" class="block text-sm font-medium text-slate-700 mb-1.5">Transfer Amount (USD)</label>
+                <div class="relative">
+                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-semibold text-slate-500 text-[15px]">$</span>
+                  <input id="transferAmount" type="text" value="1,250.00" class="w-full h-11 pl-8 pr-16 rounded-xl border border-slate-200 bg-white font-mono font-semibold text-[15px] text-slate-900 tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-sapphire" />
+                  <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">USD</span>
+                </div>
+              </div>
+
+              <button type="button" onclick="sendInstantTransfer()" class="w-full h-11 rounded-xl bg-obsidian hover:bg-slate-800 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                <span>Send Instant Transfer</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Monthly Spend Category Breakdown -->
+          <div class="bank-surface rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-display font-bold text-base text-slate-900">Monthly Spend Breakdown</h3>
+              <span class="text-xs font-semibold text-slate-500">Nov 2026</span>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-sm mb-1.5">
+                  <span class="font-medium text-slate-700">Cloud Infrastructure</span>
+                  <span class="font-mono font-semibold text-slate-900 tabular-nums">38% &middot; $5,442</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div class="h-full rounded-full bg-sapphire" style="width: 38%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between text-sm mb-1.5">
+                  <span class="font-medium text-slate-700">SaaS Subscriptions</span>
+                  <span class="font-mono font-semibold text-slate-900 tabular-nums">26% &middot; $3,723</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div class="h-full rounded-full bg-emeraldBank" style="width: 26%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between text-sm mb-1.5">
+                  <span class="font-medium text-slate-700">Business Travel</span>
+                  <span class="font-mono font-semibold text-slate-900 tabular-nums">22% &middot; $3,151</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div class="h-full rounded-full bg-obsidian" style="width: 22%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between text-sm mb-1.5">
+                  <span class="font-medium text-slate-700">Team Dining</span>
+                  <span class="font-mono font-semibold text-slate-900 tabular-nums">14% &middot; $2,005</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div class="h-full rounded-full bg-amber-500" style="width: 14%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT (lg:col-span-8): Smart Recent Transactions Table -->
+        <div id="transactionsSection" class="lg:col-span-8 bank-surface rounded-2xl overflow-hidden">
+          <div class="p-5 sm:p-6 border-b border-slate-200/80 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Recent Transactions Ledger</h2>
+                <p class="text-sm text-slate-500">Real-time card authorizations, ACH settlements &amp; wire transfers</p>
+              </div>
+              <span id="txCountBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 tabular-nums">
+                7 transactions
+              </span>
+            </div>
+
+            <!-- Live Search + Filter Pills -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div class="relative flex-1 max-w-sm">
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input id="txSearchInput" oninput="renderTransactions()" type="text" placeholder="Search merchant, card, or method..." class="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/70 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-sapphire" />
+              </div>
+
+              <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="txFilterGroup">
+                <button onclick="setTxFilter('All')" data-filter="All" class="tx-filter-btn h-10 px-3.5 rounded-xl text-sm font-semibold bg-obsidian text-white shrink-0 transition-colors">All</button>
+                <button onclick="setTxFilter('Income')" data-filter="Income" class="tx-filter-btn h-10 px-3.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:text-slate-900 shrink-0 transition-colors">Income</button>
+                <button onclick="setTxFilter('Card Spend')" data-filter="Card Spend" class="tx-filter-btn h-10 px-3.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:text-slate-900 shrink-0 transition-colors">Card Spend</button>
+                <button onclick="setTxFilter('Wire Transfer')" data-filter="Wire Transfer" class="tx-filter-btn h-10 px-3.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:text-slate-900 shrink-0 transition-colors">Wire Transfer</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200/80 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 pl-6 pr-3">Merchant / Counterparty</th>
+                  <th class="py-3.5 px-3">Method / Card</th>
+                  <th class="py-3.5 px-3">Status</th>
+                  <th class="py-3.5 px-3">Date</th>
+                  <th class="py-3.5 pl-3 pr-6 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="txTableBody" class="divide-y divide-slate-200/70 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+      </div>
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+    </main>
+  </div>
+
+  <!-- Issue New Virtual Card Modal -->
+  <div id="issueCardModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-lg text-slate-900">Issue Instant Corporate Card</h3>
+          <p class="text-sm text-slate-500">Provision a virtual Visa Infinite card in seconds</p>
+        </div>
+        <button onclick="closeIssueCardModal()" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Card Nickname / Department</label>
+          <input id="newCardLabelInput" type="text" value="Cloud Infrastructure Ops" class="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-sapphire" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Monthly Limit</label>
+            <input id="newCardLimitInput" type="text" value="$10,000" class="w-full h-11 px-3.5 rounded-xl border border-slate-200 font-mono text-sm text-slate-900 focus:outline-none focus:border-sapphire" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Card Finish</label>
+            <select class="w-full h-11 px-3 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white">
+              <option>Sapphire Corporate</option>
+              <option>Emerald Virtual</option>
+              <option>Obsidian Executive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button onclick="closeIssueCardModal()" class="h-11 px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+        <button onclick="confirmIssueCard()" class="h-11 px-5 rounded-xl bg-sapphire hover:bg-blue-800 text-white text-sm font-semibold">Provision Card</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statement Download Modal -->
+  <div id="statementModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-lg text-slate-900">Certified Bank Statements</h3>
+          <p class="text-sm text-slate-500">Download signed PDF or CSV reconciliation exports</p>
+        </div>
+        <button onclick="closeStatementModal()" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-2.5">
+        <button onclick="downloadStatement('October 2026 Consolidated PDF')" class="w-full min-h-[48px] px-4 py-3 rounded-xl border border-slate-200 hover:border-sapphire hover:bg-blue-50/50 flex items-center justify-between text-sm transition-colors">
+          <span class="font-semibold text-slate-800">October 2026 &mdash; USD / EUR / GBP</span>
+          <span class="text-xs font-semibold text-sapphire">Download PDF</span>
+        </button>
+        <button onclick="downloadStatement('September 2026 Consolidated PDF')" class="w-full min-h-[48px] px-4 py-3 rounded-xl border border-slate-200 hover:border-sapphire hover:bg-blue-50/50 flex items-center justify-between text-sm transition-colors">
+          <span class="font-semibold text-slate-800">September 2026 &mdash; USD / EUR / GBP</span>
+          <span class="text-xs font-semibold text-sapphire">Download PDF</span>
+        </button>
+        <button onclick="downloadStatement('Q3 2026 Tax & Audit Ledger CSV')" class="w-full min-h-[48px] px-4 py-3 rounded-xl border border-slate-200 hover:border-sapphire hover:bg-blue-50/50 flex items-center justify-between text-sm transition-colors">
+          <span class="font-semibold text-slate-800">Q3 2026 Audit Ledger (CSV)</span>
+          <span class="text-xs font-semibold text-emeraldBank">Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="bankToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="px-4 py-3 rounded-xl bg-obsidian text-white shadow-xl border border-slate-700 flex items-center gap-3 text-sm font-medium">
+      <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </span>
+      <span id="bankToastMsg">Action completed</span>
+    </div>
+  </div>
+
+  <script>
+    // --- State Management ---
+    let totalAvailableBalance = 184620.50;
+    let monthlyCardWireSpend = 14320.80;
+
+    const bankCards = [
+      {
+        id: 0,
+        tabName: 'Obsidian ·· 4829',
+        tierLabel: 'Obsidian Metal',
+        themeClass: 'card-theme-obsidian',
+        currencyTag: 'USD · MULTI-FX',
+        last4: '4829',
+        fullPan: '4532 8910 7421 4829',
+        expiry: '08/29',
+        cvv: '842',
+        iban: 'FR76 3000 6000 0112 3456 7890 189',
+        ibanShort: 'IBAN: FR76 3000 •••• 0189',
+        spent: 6420,
+        limit: 15000,
+        frozen: false,
+        revealed: false
+      },
+      {
+        id: 1,
+        tabName: 'Sapphire ·· 9014',
+        tierLabel: 'Sapphire Corporate',
+        themeClass: 'card-theme-sapphire',
+        currencyTag: 'USD · CLOUD OPS',
+        last4: '9014',
+        fullPan: '5412 7530 1198 9014',
+        expiry: '11/28',
+        cvv: '319',
+        iban: 'DE89 3704 0044 0532 0130 00',
+        ibanShort: 'IBAN: DE89 3704 •••• 3000',
+        spent: 9150,
+        limit: 25000,
+        frozen: false,
+        revealed: false
+      },
+      {
+        id: 2,
+        tabName: 'Emerald ·· 3318',
+        tierLabel: 'Emerald Travel Virtual',
+        themeClass: 'card-theme-emerald',
+        currencyTag: 'EUR · ZERO FX',
+        last4: '3318',
+        fullPan: '4916 3302 6840 3318',
+        expiry: '04/30',
+        cvv: '607',
+        iban: 'GB29 NWBK 6016 1331 9268 19',
+        ibanShort: 'IBAN: GB29 NWBK •••• 6819',
+        spent: 2180,
+        limit: 8000,
+        frozen: false,
+        revealed: false
+      }
+    ];
+
+    let activeCardIndex = 0;
+
+    const recipients = [
+      { name: 'Liam Chen', role: 'Lead Contractor · FedNow', method: 'Wire Transfer' },
+      { name: 'Sofia Rossi', role: 'Milan Design Studio · SEPA', method: 'Wire Transfer' },
+      { name: 'Kenji Sato', role: 'Tokyo Cloud Consulting · SWIFT', method: 'Wire Transfer' },
+      { name: 'Stripe Vault', role: 'Reserve Liquidity Sweep · ACH', method: 'Wire Transfer' }
+    ];
+    let selectedRecipientIndex = 0;
+
+    const cashflowDatasets = {
+      '6M': [
+        { month: 'Jun', income: 34200, expense: 13800 },
+        { month: 'Jul', income: 36900, expense: 15100 },
+        { month: 'Aug', income: 33500, expense: 12900 },
+        { month: 'Sep', income: 39400, expense: 16200 },
+        { month: 'Oct', income: 41100, expense: 14900 },
+        { month: 'Nov', income: 42890, expense: 14320 }
+      ],
+      '1Y': [
+        { month: 'Dec', income: 29800, expense: 13400 },
+        { month: 'Jan', income: 31200, expense: 12800 },
+        { month: 'Feb', income: 30400, expense: 12100 },
+        { month: 'Mar', income: 35100, expense: 14400 },
+        { month: 'Apr', income: 33800, expense: 13900 },
+        { month: 'May', income: 36500, expense: 14700 },
+        { month: 'Jun', income: 34200, expense: 13800 },
+        { month: 'Jul', income: 36900, expense: 15100 },
+        { month: 'Aug', income: 33500, expense: 12900 },
+        { month: 'Sep', income: 39400, expense: 16200 },
+        { month: 'Oct', income: 41100, expense: 14900 },
+        { month: 'Nov', income: 42890, expense: 14320 }
+      ]
+    };
+    let activeCashflowPeriod = '6M';
+
+    const transactions = [
+      {
+        id: 'tx-1',
+        merchant: 'Stripe Settlement',
+        subtitle: 'Merchant Payout #STR-9921',
+        category: 'Income',
+        filterTags: ['Income'],
+        method: 'ACH Settlement',
+        status: 'Completed',
+        date: 'Nov 16, 14:20',
+        amount: 18400.00,
+        iconBg: 'bg-emerald-50 text-emerald-700',
+        iconType: 'inflow'
+      },
+      {
+        id: 'tx-2',
+        merchant: 'Amazon Web Services',
+        subtitle: 'Cloud Infrastructure · us-east-1',
+        category: 'Card Spend',
+        filterTags: ['Card Spend'],
+        method: 'Sapphire ·· 9014',
+        status: 'Completed',
+        date: 'Nov 15, 09:42',
+        amount: -2140.00,
+        iconBg: 'bg-blue-50 text-blue-700',
+        iconType: 'cloud'
+      },
+      {
+        id: 'tx-3',
+        merchant: 'Apple Store Fifth Ave',
+        subtitle: 'MacBook Pro M4 Workstation',
+        category: 'Card Spend',
+        filterTags: ['Card Spend'],
+        method: 'Obsidian ·· 4829',
+        status: 'Completed',
+        date: 'Nov 14, 17:15',
+        amount: -1999.00,
+        iconBg: 'bg-slate-100 text-slate-800',
+        iconType: 'hardware'
+      },
+      {
+        id: 'tx-4',
+        merchant: 'Figma Enterprise',
+        subtitle: 'Annual Organization Seats (12)',
+        category: 'Card Spend',
+        filterTags: ['Card Spend'],
+        method: 'Sapphire ·· 9014',
+        status: 'Completed',
+        date: 'Nov 13, 11:05',
+        amount: -540.00,
+        iconBg: 'bg-indigo-50 text-indigo-700',
+        iconType: 'saas'
+      },
+      {
+        id: 'tx-5',
+        merchant: 'Air France Business',
+        subtitle: 'JFK to CDG Executive Cabin',
+        category: 'Card Spend',
+        filterTags: ['Card Spend'],
+        method: 'Emerald ·· 3318',
+        status: 'Pending',
+        date: 'Nov 12, 21:30',
+        amount: -1480.00,
+        iconBg: 'bg-sky-50 text-sky-700',
+        iconType: 'travel'
+      },
+      {
+        id: 'tx-6',
+        merchant: 'Acme Client Retainer',
+        subtitle: 'Q4 Enterprise Advisory Wire',
+        category: 'Income',
+        filterTags: ['Income', 'Wire Transfer'],
+        method: 'SWIFT Wire',
+        status: 'Completed',
+        date: 'Nov 11, 16:08',
+        amount: 12500.00,
+        iconBg: 'bg-emerald-50 text-emerald-700',
+        iconType: 'wire'
+      },
+      {
+        id: 'tx-7',
+        merchant: 'Uber Executive',
+        subtitle: 'Airport Black Car Transfer',
+        category: 'Card Spend',
+        filterTags: ['Card Spend'],
+        method: 'Obsidian ·· 4829',
+        status: 'Completed',
+        date: 'Nov 10, 08:50',
+        amount: -64.50,
+        iconBg: 'bg-slate-100 text-slate-700',
+        iconType: 'car'
+      }
+    ];
+
+    let activeTxFilter = 'All';
+
+    // --- Formatting Helpers ---
+    function formatUSD(val, includePlus = false) {
+      const abs = Math.abs(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (val < 0) return '-$' + abs;
+      if (includePlus && val > 0) return '+$' + abs;
+      return '$' + abs;
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      const toast = document.getElementById('bankToast');
+      document.getElementById('bankToastMsg').textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 2800);
+    }
+
+    // --- Sidebar & Navigation ---
+    function toggleDesktopSidebar() {
+      document.body.classList.toggle('sidebar-collapsed');
+      const icon = document.getElementById('collapseIcon');
+      if (document.body.classList.contains('sidebar-collapsed')) {
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobileOverlay');
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    const VALEUR_SUBPAGES = {
+      'Cards & Limits': {
+        badge: '3 Active Corporate Cards',
+        title: 'Corporate Cards & Velocity Limits',
+        subtitle: 'Departmental Visa Infinite cards, MCC merchant category locks, and instant Apple Pay provisioning.',
+        cta: 'Issue Virtual Card',
+        ctaFn: "openIssueCardModal()",
+        kpis: [
+          { label: 'Active Cards', val: '14 Cards', sub: '3 Metal · 11 Virtual' },
+          { label: 'Aggregate Limit', val: '$48,000', sub: '$17,000 utilized MTD' },
+          { label: 'Cashback Earned', val: '+$684.20', sub: '1.75% Treasury Rebate' },
+          { label: 'Blocked Swipes', val: '2 Blocked', sub: 'MCC policy guard' }
+        ],
+        chartTitle: 'Card Utilization by Department',
+        chartSub: 'Real-time monthly card spend vs assigned policy ceilings',
+        bars: [
+          { label: 'Cloud & Infrastructure (Sapphire ·· 9014)', pct: 64, val: '$8,400 / $25k' },
+          { label: 'Executive Travel (Obsidian ·· 4829)', pct: 43, val: '$6,420 / $15k' },
+          { label: 'Marketing & SaaS (Emerald ·· 3318)', pct: 27, val: '$2,180 / $8k' }
+        ],
+        cols: ['Card / Holder', 'MCC Policy', 'MTD Spend', 'Status', 'Control'],
+        rows: [
+          { c1: 'Obsidian Metal ·· 4829', sub: 'Claire Moreau · CFO', c2: 'All Corporate', c3: '$6,420 / $15,000', status: 'Active', act: 'Toggle Freeze' },
+          { c1: 'Sapphire Cloud ·· 9014', sub: 'DevOps AWS Auto-Pay', c2: 'Cloud & SaaS Only', c3: '$8,400 / $25,000', status: 'Active', act: 'Toggle Freeze' },
+          { c1: 'Emerald Travel ·· 3318', sub: 'EU Executive Pod', c2: 'Airlines & Hotels', c3: '$2,180 / $8,000', status: 'Active', act: 'Toggle Freeze' },
+          { c1: 'Virtual Vendor ·· 7741', sub: 'Figma & Linear Seat', c2: 'Single-Merchant', c3: '$540 / $1,000', status: 'Active', act: 'Toggle Freeze' },
+          { c1: 'Virtual Offsite ·· 1109', sub: 'Q4 Paris Summit', c2: 'Expires Nov 30', c3: '$0 / $5,000', status: 'Standby', act: 'Toggle Freeze' }
+        ]
+      },
+      'Transactions': {
+        badge: 'ISO-20022 Ledger',
+        title: 'Settlement & Clearing Audit Ledger',
+        subtitle: 'Atomic double-entry postings, VAT receipt matching, and NetSuite ERP synchronization.',
+        cta: 'Export CSV Ledger',
+        ctaFn: "showToast('Exported 142 reconciled ISO-20022 ledger rows to CSV')",
+        kpis: [
+          { label: 'Cleared (30d)', val: '142 Tx', sub: '100% Reconciled' },
+          { label: 'Net Cashflow', val: '+$28,570', sub: '+14.2% vs Oct' },
+          { label: 'Receipt Match', val: '96.5%', sub: 'AI OCR Verified' },
+          { label: 'ERP Sync Lag', val: '0.8 sec', sub: 'NetSuite Live' }
+        ],
+        chartTitle: 'Settlement Rail Volume',
+        chartSub: 'Cleared dollar volume across ACH, SWIFT/SEPA, and Visa Infinite POS',
+        bars: [
+          { label: 'ACH & FedNow Inbound Settlements', pct: 82, val: '$42,890' },
+          { label: 'Corporate Visa Infinite Authorizations', pct: 48, val: '$8,920' },
+          { label: 'International SEPA / SWIFT Wires', pct: 34, val: '$5,400' }
+        ],
+        cols: ['Counterparty', 'Rail / Reference', 'Amount', 'ERP Sync', 'Action'],
+        rows: [
+          { c1: 'Stripe Merchant Payout', sub: 'Ref #STR-9921-US', c2: 'ACH Same-Day', c3: '+$18,400.00', status: 'Matched', act: 'Verify Receipt' },
+          { c1: 'Amazon Web Services', sub: 'Invoice #AWS-1104', c2: 'Sapphire ·· 9014', c3: '-$2,140.00', status: 'Matched', act: 'Verify Receipt' },
+          { c1: 'Acme Client Advisory', sub: 'Ref #SWF-88412', c2: 'SWIFT gpi', c3: '+$12,500.00', status: 'Matched', act: 'Verify Receipt' },
+          { c1: 'Apple Fifth Avenue', sub: 'Hardware Asset #M4-09', c2: 'Obsidian ·· 4829', c3: '-$1,999.00', status: 'Matched', act: 'Verify Receipt' },
+          { c1: 'Air France Executive', sub: 'PNR #AF-772K', c2: 'Emerald ·· 3318', c3: '-$1,480.00', status: 'Pending VAT', act: 'Attach PDF' }
+        ]
+      },
+      'Global Accounts': {
+        badge: 'USD · EUR · GBP · JPY',
+        title: 'Multi-Currency IBAN & FX Vaults',
+        subtitle: 'Local clearing coordinates in 4 jurisdictions with 0.00% mid-market interbank FX conversion.',
+        cta: 'Convert Currency',
+        ctaFn: "showToast('Locked mid-market EUR/USD rate (1.0842) for instant vault swap')",
+        kpis: [
+          { label: 'Consolidated USD', val: '$184,620', sub: 'Across 4 currency vaults' },
+          { label: 'Treasury Yield', val: '4.95% APY', sub: 'FDIC Insured Sweep' },
+          { label: 'FX Spread', val: '0.00%', sub: 'Interbank Mid-Market' },
+          { label: 'Local IBANs', val: '4 Active', sub: 'US · FR · UK · SG' }
+        ],
+        chartTitle: 'Currency Liquidity Allocation',
+        chartSub: 'Real-time mark-to-market treasury distribution across sovereign vaults',
+        bars: [
+          { label: 'USD Primary Checking & Sweep (77%)', pct: 77, val: '$142,840' },
+          { label: 'EUR SEPA Instant IBAN (15%)', pct: 42, val: '€24,900' },
+          { label: 'GBP Faster Payments Sort-Code (8%)', pct: 26, val: '£11,480' }
+        ],
+        cols: ['Currency Vault', 'Local Routing / IBAN', 'Available Balance', 'Yield', 'Action'],
+        rows: [
+          { c1: 'United States Dollar (USD)', sub: 'JPMorgan Tier-1 Custody', c2: 'ABA 021000021 ·· 8841', c3: '$142,840.00', status: '4.95% APY', act: 'Copy IBAN' },
+          { c1: 'Eurozone SEPA (EUR)', sub: 'BNP Paribas Paris Branch', c2: 'FR76 3000 ···· 0189', c3: '€24,900.00', status: '3.40% APY', act: 'Copy IBAN' },
+          { c1: 'British Pound (GBP)', sub: 'Barclays London Clearing', c2: 'Sort 20-00-00 ·· 6819', c3: '£11,480.00', status: '4.60% APY', act: 'Copy IBAN' },
+          { c1: 'Singapore Dollar (SGD)', sub: 'DBS Marina Bay Hub', c2: 'FAST 7171 ···· 4410', c3: 'S$8,200.00', status: '3.15% APY', act: 'Copy IBAN' },
+          { c1: 'Overnight Treasury Reserve', sub: 'T+0 Liquid Sweep Pool', c2: 'CUSIP 912797-VL', c3: '$50,000.00', status: '5.22% APY', act: 'Sweep In' }
+        ]
+      },
+      'Wire & ACH': {
+        badge: 'FedNow · SEPA · SWIFT gpi',
+        title: 'Wire & ACH Payment Operations',
+        subtitle: 'Instant beneficiary payouts, dual-approval treasury rules, and recurring payroll batches.',
+        cta: 'New Batch Wire',
+        ctaFn: "showToast('Batch wire template loaded with dual-CFO signature check')",
+        kpis: [
+          { label: 'Outgoing (30d)', val: '$38,450', sub: '19 instant settlements' },
+          { label: 'FedNow Speed', val: '1.8 sec', sub: '24/7/365 Finality' },
+          { label: 'Verified Payees', val: '26 Vendors', sub: 'OFAC & IBAN Screened' },
+          { label: 'Wire Fee Saved', val: '$490.00', sub: '$0 Domestic & SEPA' }
+        ],
+        chartTitle: 'Outbound Rail Settlement Speed',
+        chartSub: 'Share of corporate disbursements settling in under 10 seconds',
+        bars: [
+          { label: 'FedNow Instant Domestic Rails', pct: 92, val: '1.8s Median' },
+          { label: 'SEPA Instant Eurozone Rails', pct: 86, val: '4.2s Median' },
+          { label: 'SWIFT gpi Tracked Cross-Border', pct: 68, val: '22m Median' }
+        ],
+        cols: ['Beneficiary', 'Clearing Rail', 'Last Payout', 'Approval Policy', 'Action'],
+        rows: [
+          { c1: 'Liam Chen · Lead Contractor', sub: 'Chase Manhattan ·· 4412', c2: 'FedNow Instant', c3: '$4,500.00', status: 'Auto-Approved', act: 'Send $1,250' },
+          { c1: 'Sofia Rossi · Milan Studio', sub: 'Intesa Sanpaolo ·· 9021', c2: 'SEPA Instant', c3: '€3,200.00', status: 'Auto-Approved', act: 'Send €1,000' },
+          { c1: 'Kenji Sato · Cloud Advisory', sub: 'MUFG Bank Tokyo ·· 1184', c2: 'SWIFT gpi', c3: '$6,800.00', status: 'Dual-Sign', act: 'Request Sign' },
+          { c1: 'Stripe Liquidity Reserve', sub: 'Treasury Sweep ·· 0092', c2: 'Same-Day ACH', c3: '$15,000.00', status: 'Whitelisted', act: 'Trigger Sweep' },
+          { c1: 'AWS Enterprise Billing', sub: 'Citibank NA ·· 7730', c2: 'Direct Debit ACH', c3: '$2,140.00', status: 'Capped $5k', act: 'Inspect Cap' }
+        ]
+      },
+      'Analytics': {
+        badge: 'CFO Intelligence',
+        title: 'Treasury Cashflow & Burn Analytics',
+        subtitle: 'Net burn multiple, 36-month cash runway modeling, and vendor spend concentration.',
+        cta: 'Run Stress Test',
+        ctaFn: "showToast('Treasury stress-test complete: 41.4 months runway under -20% inflow scenario')",
+        kpis: [
+          { label: 'Monthly Net Savings', val: '+$28,570', sub: '66.6% Net Margin' },
+          { label: 'Cash Runway', val: 'Cash+ Inf', sub: 'Net Cashflow Positive' },
+          { label: 'Burn Ratio', val: '33.4%', sub: '-4.1% vs Q3 Avg' },
+          { label: 'Yield Earned YTD', val: '+$7,840', sub: 'Offsets 100% SaaS' }
+        ],
+        chartTitle: 'Category Spend Efficiency',
+        chartSub: 'Actual departmental spend vs approved Q4 CFO budget allocation',
+        bars: [
+          { label: 'Cloud Infrastructure ($5,442 / $7k)', pct: 78, val: '78% of Budget' },
+          { label: 'SaaS Subscriptions ($3,723 / $5k)', pct: 74, val: '74% of Budget' },
+          { label: 'Executive Travel ($3,151 / $6k)', pct: 52, val: '52% of Budget' }
+        ],
+        cols: ['Vendor / Cost Center', 'Category', 'Monthly Run-Rate', 'YoY Trend', 'Action'],
+        rows: [
+          { c1: 'Amazon Web Services', sub: 'Production compute', c2: 'Cloud Infra', c3: '$5,442.00', status: '-6.2% Optimized', act: 'Set Alert' },
+          { c1: 'Figma & Linear Licenses', sub: 'Product & Design pod', c2: 'SaaS Tools', c3: '$1,890.00', status: 'Flat 0.0%', act: 'Audit Seats' },
+          { c1: 'Air France & Eurostar', sub: 'Client QBR travel', c2: 'Travel', c3: '$3,151.00', status: '+8.4% Seasonal', act: 'Cap Policy' },
+          { c1: 'Snowflake Warehouse', sub: 'Analytics storage', c2: 'Cloud Infra', c3: '$1,833.00', status: '-11.0% Saved', act: 'Set Alert' },
+          { c1: 'Executive Team Offsites', sub: 'Quarterly summit', c2: 'Dining & Events', c3: '$2,005.00', status: 'Under Budget', act: 'Inspect' }
+        ]
+      },
+      'Statements': {
+        badge: 'CPA & Audit Ready',
+        title: 'Official Bank Statements & Tax Forms',
+        subtitle: 'Cryptographically signed monthly account statements, 1099-INT yield forms, and balance letters.',
+        cta: 'Open PDF Exporter',
+        ctaFn: "openStatementModal()",
+        kpis: [
+          { label: 'Available Statements', val: '24 Months', sub: 'PDF + CSV + MT940' },
+          { label: 'FDIC Proof Letter', val: 'Verified', sub: 'Dated Today' },
+          { label: '2026 1099-INT Accrued', val: '$7,840.12', sub: 'Auto-filed IRS' },
+          { label: 'Audit Confirmations', val: 'Instant', sub: 'Deloitte / PwC Portal' }
+        ],
+        chartTitle: 'Closing Monthly Balance Progression',
+        chartSub: 'Audited month-end statement balances across consolidated vaults',
+        bars: [
+          { label: 'November 2026 (Current)', pct: 92, val: '$184,620.50' },
+          { label: 'October 2026 (Audited)', pct: 80, val: '$156,050.20' },
+          { label: 'September 2026 (Audited)', pct: 68, val: '$129,870.00' }
+        ],
+        cols: ['Document Title', 'Account Scope', 'Closing Balance', 'Format', 'Action'],
+        rows: [
+          { c1: 'November 2026 Interim Statement', sub: 'Nov 1 – Nov 16, 2026', c2: 'All Multi-FX Vaults', c3: '$184,620.50', status: 'Signed PDF', act: 'Download' },
+          { c1: 'October 2026 Monthly Statement', sub: 'Oct 1 – Oct 31, 2026', c2: 'All Multi-FX Vaults', c3: '$156,050.20', status: 'Signed PDF', act: 'Download' },
+          { c1: 'September 2026 Monthly Statement', sub: 'Sep 1 – Sep 30, 2026', c2: 'All Multi-FX Vaults', c3: '$129,870.00', status: 'Signed PDF', act: 'Download' },
+          { c1: 'Proof of Good Standing & IBAN Letter', sub: 'Stamped for vendor KYC', c2: 'Valeur Labs Inc.', c3: 'Tier-1 Verified', status: 'Official Cert', act: 'Download' },
+          { c1: 'FY2026 Treasury Yield Tax Preview', sub: 'Form 1099-INT worksheet', c2: 'USD Sweep Vault', c3: '+$7,840.12', status: 'CPA Ready', act: 'Download' }
+        ]
+      }
+    };
+
+    function renderValeurSubpage(title) {
+      const cfg = VALEUR_SUBPAGES[title];
+      const container = document.getElementById('tabSubpageView');
+      if (!cfg || !container) return;
+
+      const kpiHtml = cfg.kpis.map(k => `
+        <div class="bank-surface rounded-2xl p-5 flex flex-col justify-between gap-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">${k.label}</span>
+            <span class="w-8 h-8 rounded-xl bg-blue-50 text-sapphire flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+          </div>
+          <div class="font-display font-extrabold text-2xl text-slate-900 tracking-tight tabular-nums">${k.val}</div>
+          <p class="text-xs font-medium text-emeraldBank">${k.sub}</p>
+        </div>
+      `).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div>
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-medium text-slate-700">${b.label}</span>
+            <span class="font-mono font-semibold text-slate-900 tabular-nums">${b.val}</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-blue-700 to-emerald-600" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-slate-50/90 transition-colors">
+          <td class="py-3.5 pl-6 pr-3">
+            <div class="font-semibold text-sm text-slate-900">${r.c1}</div>
+            <div class="text-xs text-slate-500">${r.sub}</div>
+          </td>
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200/70">${r.c2}</span>
+          </td>
+          <td class="py-3.5 px-3 font-mono text-sm font-bold text-slate-900 tabular-nums whitespace-nowrap">${r.c3}</td>
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            <span class="bank-row-pill inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span><span>${r.status}</span>
+            </span>
+          </td>
+          <td class="py-3.5 pl-3 pr-6 text-right whitespace-nowrap">
+            <button type="button" onclick="handleValeurAction(this, '${r.c1}', '${r.act}')" class="h-8 px-3 rounded-xl border border-slate-200 bg-white hover:bg-sapphire hover:border-sapphire hover:text-white text-xs font-semibold text-slate-700 transition-colors">
+              ${r.act}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="bank-surface rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5 mb-1.5">
+              <button type="button" onclick="selectNav(null, 'Overview')" class="h-8 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-obsidian hover:text-white text-xs font-semibold text-slate-800 inline-flex items-center gap-1.5 transition-colors">
+                <span>&larr; Overview</span>
+              </button>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-sapphire border border-blue-200">${cfg.badge}</span>
+            </div>
+            <h2 class="font-display font-bold text-xl sm:text-2xl text-slate-900 tracking-tight">${cfg.title}</h2>
+            <p class="text-sm text-slate-500 mt-1">${cfg.subtitle}</p>
+          </div>
+          <button type="button" onclick="${cfg.ctaFn}" class="h-10 px-4 rounded-xl bg-sapphire hover:bg-blue-800 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm transition-colors shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>${cfg.cta}</span>
+          </button>
+        </div>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          ${kpiHtml}
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 bank-surface rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-5">
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">${cfg.chartTitle}</h3>
+              <p class="text-xs text-slate-500 mt-0.5">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200/80 p-4">
+              <svg viewBox="0 0 360 130" class="w-full h-32 overflow-visible" fill="none">
+                <line x1="16" y1="24" x2="344" y2="24" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <line x1="16" y1="68" x2="344" y2="68" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <line x1="16" y1="110" x2="344" y2="110" stroke="#CBD5E1" />
+                <path d="M 20 96 C 84 84, 138 66, 196 58 C 254 50, 298 34, 340 20 L 340 110 L 20 110 Z" fill="rgba(29, 78, 216, 0.10)" />
+                <path d="M 20 96 C 84 84, 138 66, 196 58 C 254 50, 298 34, 340 20" stroke="#1D4ED8" stroke-width="2.8" stroke-linecap="round" class="viz-path-draw" />
+                <circle cx="340" cy="20" r="4.5" fill="#FFFFFF" stroke="#059669" stroke-width="2.5" />
+                <g fill="#64748B" font-size="12" font-family="JetBrains Mono, monospace">
+                  <text x="20" y="126">Jun</text>
+                  <text x="122" y="126">Aug</text>
+                  <text x="224" y="126">Oct</text>
+                  <text x="316" y="126">Nov</text>
+                </g>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 bank-surface rounded-2xl overflow-hidden flex flex-col justify-between">
+            <div class="p-5 sm:p-6 border-b border-slate-200/80 flex items-center justify-between gap-3">
+              <div>
+                <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">${title} Controls &amp; Ledger</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Tier-1 audited banking controls with instant execution</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">5 Records</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200/80 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <th class="py-3.5 pl-6 pr-3">${cfg.cols[0]}</th>
+                    <th class="py-3.5 px-3">${cfg.cols[1]}</th>
+                    <th class="py-3.5 px-3">${cfg.cols[2]}</th>
+                    <th class="py-3.5 px-3">${cfg.cols[3]}</th>
+                    <th class="py-3.5 pl-3 pr-6 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200/70 text-sm">
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function handleValeurAction(btn, itemLabel, actionLabel) {
+      if (actionLabel === 'Toggle Freeze') {
+        const row = btn.closest('tr');
+        const pillSpan = row ? row.querySelector('.bank-row-pill span:last-child') : null;
+        const isFrozen = pillSpan && pillSpan.textContent === 'Frozen';
+        if (pillSpan) pillSpan.textContent = isFrozen ? 'Active' : 'Frozen';
+        showToast(`${itemLabel} ${isFrozen ? 'unfrozen and active' : 'frozen immediately'}`);
+        return;
+      }
+      btn.textContent = 'Confirmed';
+      btn.className = 'h-8 px-3 rounded-xl bg-emeraldBank text-white text-xs font-semibold transition-colors';
+      showToast(`${actionLabel} completed for ${itemLabel}`);
+    }
+
+    function selectNav(btn, title, scrollId) {
+      document.querySelectorAll('#sidebarNav .sidebar-nav-item').forEach(el => {
+        const isMatch = btn ? (el === btn) : (el.dataset.nav === title);
+        if (isMatch) {
+          el.classList.remove('text-slate-600', 'font-medium');
+          el.classList.add('bg-blue-50', 'text-blue-700', 'font-semibold');
+        } else {
+          el.classList.remove('bg-blue-50', 'text-blue-700', 'font-semibold');
+          el.classList.add('text-slate-600', 'font-medium');
+        }
+      });
+      document.getElementById('topbarTitle').textContent = title === 'Overview' ? 'Banking Overview' : title;
+      toggleMobileSidebar(false);
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (title === 'Overview') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderValeurSubpage(title);
+      }
+    }
+
+    // --- Interactive Multi-Card Wallet ---
+    function switchCard(idx) {
+      activeCardIndex = idx;
+      updateCardView();
+    }
+
+    function updateCardView() {
+      const card = bankCards[activeCardIndex];
+
+      // Tabs styling
+      [0, 1, 2].forEach(i => {
+        const tab = document.getElementById('cardTab' + i);
+        if (i === activeCardIndex) {
+          tab.className = 'card-tab min-h-[40px] px-2.5 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all truncate';
+        } else {
+          tab.className = 'card-tab min-h-[40px] px-2.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all truncate';
+        }
+      });
+
+      // Card surface theme
+      const cardEl = document.getElementById('visualBankCard');
+      cardEl.className = `physical-card ${card.themeClass} text-white p-6 aspect-[1.586/1] w-full flex flex-col justify-between select-none`;
+
+      document.getElementById('cardTierLabel').textContent = card.tierLabel;
+      document.getElementById('cardCurrencyTag').textContent = card.currencyTag;
+      document.getElementById('cardExpiryDisplay').textContent = card.expiry;
+
+      // Reveal / Mask PAN & CVV
+      const panEl = document.getElementById('cardPanDisplay');
+      const cvvEl = document.getElementById('cardCvvDisplay');
+      const revealBtnLabel = document.getElementById('revealBtnLabel');
+      const revealBtn = document.getElementById('revealDetailsBtn');
+
+      if (card.revealed) {
+        panEl.textContent = card.fullPan;
+        cvvEl.textContent = card.cvv;
+        revealBtnLabel.textContent = 'Hide Details';
+        revealBtn.classList.add('bg-blue-50', 'border-blue-200', 'text-sapphire');
+        revealBtn.classList.remove('bg-slate-50', 'border-slate-200', 'text-slate-800');
+      } else {
+        panEl.innerHTML = `&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; ${card.last4}`;
+        cvvEl.innerHTML = '&bull;&bull;&bull;';
+        revealBtnLabel.textContent = 'Reveal Details';
+        revealBtn.classList.remove('bg-blue-50', 'border-blue-200', 'text-sapphire');
+        revealBtn.classList.add('bg-slate-50', 'border-slate-200', 'text-slate-800');
+      }
+
+      // Freeze state
+      const frozenOverlay = document.getElementById('frozenOverlay');
+      const statusPill = document.getElementById('cardStatusPill');
+      const freezeBtn = document.getElementById('freezeCardBtn');
+      const freezeBtnLabel = document.getElementById('freezeBtnLabel');
+
+      if (card.frozen) {
+        frozenOverlay.classList.remove('hidden');
+        statusPill.textContent = 'Frozen';
+        statusPill.className = 'px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200';
+        freezeBtnLabel.textContent = 'Unfreeze Card';
+        freezeBtn.classList.add('bg-sky-50', 'border-sky-200', 'text-sky-800');
+        freezeBtn.classList.remove('bg-slate-50', 'border-slate-200', 'text-slate-800');
+      } else {
+        frozenOverlay.classList.add('hidden');
+        statusPill.textContent = 'Active';
+        statusPill.className = 'px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+        freezeBtnLabel.textContent = 'Freeze Card';
+        freezeBtn.classList.remove('bg-sky-50', 'border-sky-200', 'text-sky-800');
+        freezeBtn.classList.add('bg-slate-50', 'border-slate-200', 'text-slate-800');
+      }
+
+      // Spending Limit bar
+      const pct = ((card.spent / card.limit) * 100).toFixed(1);
+      document.getElementById('limitAmountText').textContent =
+        `$${card.spent.toLocaleString('en-US')} / $${card.limit.toLocaleString('en-US')}`;
+      document.getElementById('limitPctBadge').textContent = `${pct}%`;
+      document.getElementById('limitProgressBar').style.width = `${Math.min(100, parseFloat(pct))}%`;
+      document.getElementById('ibanRoutingPreview').textContent = card.ibanShort;
+    }
+
+    function toggleFreezeCard() {
+      const card = bankCards[activeCardIndex];
+      card.frozen = !card.frozen;
+      updateCardView();
+      showToast(card.frozen
+        ? `${card.tierLabel} (·· ${card.last4}) has been frozen`
+        : `${card.tierLabel} (·· ${card.last4}) is active again`);
+    }
+
+    function toggleRevealCard() {
+      const card = bankCards[activeCardIndex];
+      card.revealed = !card.revealed;
+      updateCardView();
+      if (card.revealed) {
+        showToast(`PAN & CVV unmasked for ${card.tierLabel}`);
+      }
+    }
+
+    function copyCardIban() {
+      const card = bankCards[activeCardIndex];
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(card.iban).catch(() => {});
+      }
+      const lbl = document.getElementById('copyIbanLabel');
+      lbl.textContent = 'Copied!';
+      showToast(`IBAN ${card.iban} copied to clipboard`);
+      setTimeout(() => { lbl.textContent = 'Copy IBAN'; }, 1800);
+    }
+
+    function cycleCardLimit() {
+      const card = bankCards[activeCardIndex];
+      const presets = [10000, 15000, 20000, 25000, 35000];
+      const nextIdx = (presets.indexOf(card.limit) + 1) % presets.length;
+      card.limit = presets[nextIdx];
+      updateCardView();
+      showToast(`Monthly limit updated to $${card.limit.toLocaleString('en-US')}`);
+    }
+
+    // --- Cashflow Analytics Chart (Grouped Dual-Bar + Net Savings Curve) ---
+    function setCashflowPeriod(period) {
+      activeCashflowPeriod = period;
+      const btn6 = document.getElementById('cfBtn6M');
+      const btn1 = document.getElementById('cfBtn1Y');
+      if (period === '6M') {
+        btn6.className = 'min-h-[36px] px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all';
+        btn1.className = 'min-h-[36px] px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all';
+      } else {
+        btn1.className = 'min-h-[36px] px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all';
+        btn6.className = 'min-h-[36px] px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all';
+      }
+      renderCashflowChart();
+    }
+
+    function renderCashflowChart() {
+      const svg = document.getElementById('cashflowSvg');
+      const data = cashflowDatasets[activeCashflowPeriod];
+      const W = 680;
+      const H = 235;
+      const padLeft = 48;
+      const padRight = 18;
+      const padTop = 16;
+      const padBottom = 34;
+      const plotW = W - padLeft - padRight;
+      const plotH = H - padTop - padBottom;
+      const maxVal = 50000;
+
+      let html = `
+        <defs>
+          <linearGradient id="incBarGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2563EB" />
+            <stop offset="100%" stop-color="#1D4ED8" />
+          </linearGradient>
+          <linearGradient id="expBarGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FB7185" />
+            <stop offset="100%" stop-color="#E11D48" />
+          </linearGradient>
+          <linearGradient id="netSavingsArea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#059669" stop-opacity="0.20" />
+            <stop offset="100%" stop-color="#059669" stop-opacity="0.0" />
+          </linearGradient>
+          <filter id="netCurveGlow" x="-15%" y="-20%" width="130%" height="140%">
+            <feGaussianBlur stdDeviation="2.8" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+      `;
+
+      // Horizontal Grid Lines + Y Labels
+      const yTicks = [0, 15000, 30000, 45000];
+      yTicks.forEach(tick => {
+        const y = padTop + plotH - (tick / maxVal) * plotH;
+        const label = tick === 0 ? '$0' : `$${tick / 1000}k`;
+        html += `
+          <line x1="${padLeft}" y1="${y}" x2="${W - padRight}" y2="${y}" stroke="#E2E8F0" stroke-dasharray="4 4" />
+          <text x="${padLeft - 10}" y="${y + 4}" text-anchor="end" fill="#64748B" font-size="12" font-family="JetBrains Mono, monospace">${label}</text>
+        `;
+      });
+
+      const step = plotW / data.length;
+      const barW = activeCashflowPeriod === '6M' ? 18 : 11;
+      const gap = activeCashflowPeriod === '6M' ? 6 : 3;
+      const netPoints = [];
+      let peakIdx = 0;
+      let peakNet = -Infinity;
+
+      data.forEach((d, idx) => {
+        const cx = padLeft + step * idx + step / 2;
+        const incH = (d.income / maxVal) * plotH;
+        const expH = (d.expense / maxVal) * plotH;
+        const incY = padTop + plotH - incH;
+        const expY = padTop + plotH - expH;
+        const net = d.income - d.expense;
+        if (net > peakNet) {
+          peakNet = net;
+          peakIdx = idx;
+        }
+        const netY = padTop + plotH - (net / maxVal) * plotH;
+        netPoints.push({ x: cx, y: netY, d });
+        const delayInc = (idx * 0.045).toFixed(3);
+        const delayExp = (idx * 0.045 + 0.03).toFixed(3);
+
+        html += `
+          <g class="cursor-pointer group" onmouseenter="highlightCashflowMonth('${d.month}', ${d.income}, ${d.expense})">
+            <rect x="${cx - step / 2 + 2}" y="${padTop}" width="${step - 4}" height="${plotH}" rx="8" fill="transparent" class="hover:fill-slate-100/80 transition-colors" />
+            <rect x="${cx - barW - gap / 2}" y="${incY}" width="${barW}" height="${incH}" rx="4" fill="url(#incBarGrad)" class="viz-bar-grow" style="animation-delay:${delayInc}s" />
+            <rect x="${cx + gap / 2}" y="${expY}" width="${barW}" height="${expH}" rx="4" fill="url(#expBarGrad)" class="viz-bar-grow" style="animation-delay:${delayExp}s" />
+            <text x="${cx}" y="${H - 10}" text-anchor="middle" fill="#475569" font-size="12" font-weight="600" font-family="Inter, sans-serif">${d.month}</text>
+          </g>
+        `;
+      });
+
+      // Smooth Catmull-inspired Net Savings Curve + Animated Draw-In + Traveling Glider
+      const pathD = netPoints.map((p, i) => {
+        if (i === 0) return `M ${p.x} ${p.y}`;
+        const prev = netPoints[i - 1];
+        const midX = ((prev.x + p.x) / 2).toFixed(1);
+        return `C ${midX} ${prev.y}, ${midX} ${p.y}, ${p.x} ${p.y}`;
+      }).join(' ');
+      const areaD = `${pathD} L ${netPoints[netPoints.length - 1].x} ${padTop + plotH} L ${netPoints[0].x} ${padTop + plotH} Z`;
+
+      html += `<path d="${areaD}" fill="url(#netSavingsArea)" class="viz-area-fade" pointer-events="none" />`;
+      html += `<path id="netSavingsMotionPath" d="${pathD}" pathLength="1000" fill="none" stroke="#059669" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#netCurveGlow)" class="viz-path-draw" pointer-events="none" />`;
+
+      // Animated Glowing Packet Gliding Along Net Savings Curve
+      html += `
+        <circle r="4" fill="#10B981" filter="url(#netCurveGlow)" pointer-events="none">
+          <animateMotion dur="4.2s" repeatCount="indefinite">
+            <mpath href="#netSavingsMotionPath" />
+          </animateMotion>
+        </circle>
+      `;
+
+      netPoints.forEach((p, idx) => {
+        if (idx === peakIdx) {
+          html += `<circle cx="${p.x}" cy="${p.y}" r="8" fill="rgba(5, 150, 105, 0.25)" class="viz-sonar-ring" pointer-events="none" />`;
+        }
+        html += `
+          <circle cx="${p.x}" cy="${p.y}" r="${idx === peakIdx ? 5 : 4}" fill="#FFFFFF" stroke="#059669" stroke-width="2.5" pointer-events="none" />
+        `;
+      });
+
+      svg.innerHTML = html;
+    }
+
+    function highlightCashflowMonth(month, inc, exp) {
+      const net = inc - exp;
+      document.getElementById('chartHoverSummary').innerHTML =
+        `${month} Breakdown: <strong class="text-sapphire font-semibold">Income $${inc.toLocaleString('en-US')}</strong> &middot; <strong class="text-rose-600 font-semibold">Expenses $${exp.toLocaleString('en-US')}</strong> &middot; <strong class="text-emeraldBank font-semibold">Net +$${net.toLocaleString('en-US')}</strong>`;
+    }
+
+    // --- Quick Send Money ---
+    function selectRecipient(idx) {
+      selectedRecipientIndex = idx;
+      const buttons = document.querySelectorAll('#recipientGrid .recipient-btn');
+      buttons.forEach((btn, i) => {
+        const nameSpan = btn.querySelector('span:last-child');
+        if (i === idx) {
+          btn.className = 'recipient-btn min-h-[68px] p-2 rounded-xl border-2 border-sapphire bg-blue-50/50 flex flex-col items-center justify-center gap-1.5 transition-all';
+          nameSpan.className = 'text-xs font-semibold text-slate-900 truncate w-full text-center';
+        } else {
+          btn.className = 'recipient-btn min-h-[68px] p-2 rounded-xl border border-slate-200 hover:bg-slate-50 flex flex-col items-center justify-center gap-1.5 transition-all';
+          nameSpan.className = 'text-xs font-medium text-slate-700 truncate w-full text-center';
+        }
+      });
+    }
+
+    function sendInstantTransfer() {
+      const rawAmount = document.getElementById('transferAmount').value.replace(/[^0-9.]/g, '');
+      const amount = parseFloat(rawAmount);
+      if (isNaN(amount) || amount <= 0) {
+        showToast('Please enter a valid transfer amount greater than $0');
+        return;
+      }
+      if (amount > totalAvailableBalance) {
+        showToast('Insufficient available funds for this transfer');
+        return;
+      }
+
+      const recipient = recipients[selectedRecipientIndex];
+      const account = document.getElementById('transferAccount').value;
+
+      // Update KPIs live
+      totalAvailableBalance -= amount;
+      monthlyCardWireSpend += amount;
+      document.getElementById('kpiTotalBalance').textContent = formatUSD(totalAvailableBalance);
+      document.getElementById('kpiMonthlySpend').textContent = formatUSD(-monthlyCardWireSpend);
+
+      // Prepend new transaction to ledger
+      transactions.unshift({
+        id: 'tx-' + Date.now(),
+        merchant: recipient.name,
+        subtitle: `Instant Transfer · ${account}`,
+        category: 'Wire Transfer',
+        filterTags: ['Wire Transfer'],
+        method: 'FedNow Wire',
+        status: 'Completed',
+        date: 'Just now',
+        amount: -amount,
+        iconBg: 'bg-blue-50 text-sapphire',
+        iconType: 'wire',
+        isNew: true
+      });
+
+      renderTransactions();
+      triggerClearingBurst(true);
+      showToast(`Sent ${formatUSD(amount)} instant transfer to ${recipient.name}`);
+    }
+
+    // --- Transactions Table ---
+    function getMerchantSvg(type) {
+      switch (type) {
+        case 'inflow':
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="7" x2="7" y2="17"/><polyline points="17 17 7 17 7 7"/></svg>`;
+        case 'cloud':
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`;
+        case 'hardware':
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`;
+        case 'saas':
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`;
+        case 'travel':
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>`;
+        case 'wire':
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+        default:
+          return `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>`;
+      }
+    }
+
+    function setTxFilter(filterName) {
+      activeTxFilter = filterName;
+      document.querySelectorAll('.tx-filter-btn').forEach(btn => {
+        if (btn.dataset.filter === filterName) {
+          btn.className = 'tx-filter-btn h-10 px-3.5 rounded-xl text-sm font-semibold bg-obsidian text-white shrink-0 transition-colors';
+        } else {
+          btn.className = 'tx-filter-btn h-10 px-3.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:text-slate-900 shrink-0 transition-colors';
+        }
+      });
+      renderTransactions();
+    }
+
+    function renderTransactions() {
+      const query = document.getElementById('txSearchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('txTableBody');
+
+      const filtered = transactions.filter(tx => {
+        const matchesFilter = activeTxFilter === 'All' || tx.filterTags.includes(activeTxFilter);
+        const matchesQuery = !query ||
+          tx.merchant.toLowerCase().includes(query) ||
+          tx.subtitle.toLowerCase().includes(query) ||
+          tx.method.toLowerCase().includes(query);
+        return matchesFilter && matchesQuery;
+      });
+
+      document.getElementById('txCountBadge').textContent =
+        `${filtered.length} transaction${filtered.length === 1 ? '' : 's'}`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-12 text-center text-sm text-slate-500">
+              No matching transactions found for this filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(tx => {
+        const isPositive = tx.amount > 0;
+        const amountStr = formatUSD(tx.amount, true);
+        const amountClass = isPositive ? 'text-emeraldBank' : 'text-slate-900';
+        const statusBadge = tx.status === 'Completed'
+          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Completed</span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span>`;
+
+        const flashClass = tx.isNew ? 'new-tx-flash' : '';
+        if (tx.isNew) setTimeout(() => { tx.isNew = false; }, 1900);
+
+        return `
+          <tr class="hover:bg-slate-50/90 transition-colors ${flashClass}">
+            <td class="py-3.5 pl-6 pr-3">
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl ${tx.iconBg} flex items-center justify-center shrink-0">
+                  ${getMerchantSvg(tx.iconType)}
+                </div>
+                <div class="min-w-0">
+                  <div class="font-semibold text-slate-900 text-sm truncate">${tx.merchant}</div>
+                  <div class="text-xs text-slate-500 truncate">${tx.subtitle}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3.5 px-3 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200/70">
+                ${tx.method}
+              </span>
+            </td>
+            <td class="py-3.5 px-3 whitespace-nowrap">${statusBadge}</td>
+            <td class="py-3.5 px-3 whitespace-nowrap text-sm text-slate-500 tabular-nums">${tx.date}</td>
+            <td class="py-3.5 pl-3 pr-6 whitespace-nowrap text-right font-mono font-bold text-[15px] ${amountClass} tabular-nums">
+              ${amountStr}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- Modals ---
+    function openIssueCardModal() {
+      const m = document.getElementById('issueCardModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeIssueCardModal() {
+      const m = document.getElementById('issueCardModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function confirmIssueCard() {
+      const label = document.getElementById('newCardLabelInput').value.trim() || 'Corporate Virtual';
+      closeIssueCardModal();
+      showToast(`Virtual card "${label}" provisioned & ready in Apple Pay`);
+    }
+
+    function openStatementModal() {
+      const m = document.getElementById('statementModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeStatementModal() {
+      const m = document.getElementById('statementModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function downloadStatement(title) {
+      closeStatementModal();
+      showToast(`Prepared ${title} for download`);
+    }
+
+    // --- 3D Card Tilt Micro-Interaction (mousemove rotateX / rotateY + Specular Glare) ---
+    function initCard3DTilt() {
+      const stage = document.getElementById('cardTiltStage');
+      const cardEl = document.getElementById('visualBankCard');
+      if (!stage || !cardEl) return;
+
+      stage.addEventListener('mousemove', (e) => {
+        const rect = cardEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const pctX = (x / rect.width) - 0.5;
+        const pctY = (y / rect.height) - 0.5;
+        const rotateY = (pctX * 15).toFixed(2);
+        const rotateX = (-pctY * 13).toFixed(2);
+
+        cardEl.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`;
+        cardEl.style.setProperty('--glare-x', `${((x / rect.width) * 100).toFixed(1)}%`);
+        cardEl.style.setProperty('--glare-y', `${((y / rect.height) * 100).toFixed(1)}%`);
+      });
+
+      stage.addEventListener('mouseleave', () => {
+        cardEl.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    }
+
+    // --- Real-Time Payment & Clearing Data Flow Controls ---
+    const clearingStageDetails = [
+      {
+        title: 'Stage 1 — Card Swipe / ACH Ingress',
+        summary: '<strong class="text-sapphire font-semibold">4.2ms Edge Gateway</strong> &middot; Visa Infinite EMV, Apple Pay NFC &amp; ACH ISO-20022 webhooks'
+      },
+      {
+        title: 'Stage 2 — Fraud AI Shield',
+        summary: '<strong class="text-emeraldBank font-semibold">14ms Neural Scoring</strong> &middot; 210 real-time behavioral &amp; merchant velocity features per swipe'
+      },
+      {
+        title: 'Stage 3 — SWIFT / SEPA Multi-Rail Router',
+        summary: '<strong class="text-sapphire font-semibold">0.00% Mid-Market FX</strong> &middot; Smart routing across FedNow, SEPA Instant &amp; SWIFT gpi'
+      },
+      {
+        title: 'Stage 4 — Tier-1 Vault Settlement',
+        summary: '<strong class="text-emeraldBank font-semibold">100% Atomic Finality</strong> &middot; Real-time ledger posting into USD, EUR &amp; GBP insured vaults'
+      }
+    ];
+
+    function inspectFlowStage(idx) {
+      [0, 1, 2, 3].forEach(i => {
+        const box = document.getElementById('stageBox' + i);
+        if (!box) return;
+        if (i === idx) {
+          box.setAttribute('stroke', i === 3 ? '#10B981' : '#1D4ED8');
+          box.setAttribute('stroke-width', '2.4');
+        } else {
+          box.setAttribute('stroke', i === 3 ? '#059669' : '#CBD5E1');
+          box.setAttribute('stroke-width', '1.5');
+        }
+      });
+      const info = clearingStageDetails[idx];
+      document.getElementById('clearingStageCaption').innerHTML = `${info.title}: ${info.summary}`;
+    }
+
+    function setClearingRail(mode, btn) {
+      document.querySelectorAll('#railModeGroup .rail-mode-btn').forEach(b => {
+        b.className = 'rail-mode-btn min-h-[38px] px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all';
+      });
+      btn.className = 'rail-mode-btn min-h-[38px] px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all';
+
+      const rateMap = { ALL: '1,428 tx/min', POS: '984 tx/min', WIRE: '444 tx/min' };
+      document.getElementById('clearingRateReadout').textContent = rateMap[mode] || '1,428 tx/min';
+      triggerClearingBurst(true);
+    }
+
+    function triggerClearingBurst(silent) {
+      const burstLayer = document.getElementById('burstPacketLayer');
+      if (!burstLayer) return;
+      const lanes = ['flowLane1A', 'flowLane1B', 'flowLane2A', 'flowLane2B', 'flowLane3A', 'flowLane3B'];
+      let packetMarkup = '';
+      lanes.forEach((laneId, i) => {
+        const isEmerald = i >= 3 || i % 2 === 1;
+        const fill = isEmerald ? '#10B981' : '#2563EB';
+        const filter = isEmerald ? 'url(#packetEmeraldGlow)' : 'url(#packetSapphireGlow)';
+        packetMarkup += `
+          <circle r="6" fill="${fill}" filter="${filter}">
+            <animateMotion dur="0.95s" begin="${(i * 0.08).toFixed(2)}s" repeatCount="2">
+              <mpath href="#${laneId}" />
+            </animateMotion>
+          </circle>
+        `;
+      });
+      burstLayer.innerHTML = packetMarkup;
+      document.getElementById('clearingRateReadout').textContent = '2,190 tx/min';
+      setTimeout(() => {
+        burstLayer.innerHTML = '';
+        document.getElementById('clearingRateReadout').textContent = '1,428 tx/min';
+      }, 2100);
+      if (!silent) {
+        showToast('Simulated high-frequency clearing burst across SWIFT, SEPA & FedNow');
+      }
+    }
+
+    // Subtle live telemetry pulse every 4s
+    setInterval(() => {
+      const el = document.getElementById('clearingRateReadout');
+      if (el && !el.textContent.startsWith('2,190')) {
+        const jitter = 1410 + Math.floor(Math.random() * 45);
+        el.textContent = `${jitter.toLocaleString('en-US')} tx/min`;
+      }
+    }, 4000);
+
+    // Initialize
+    initCard3DTilt();
+    updateCardView();
+    renderCashflowChart();
+    renderTransactions();
+  </script>
+</body>
+</html>

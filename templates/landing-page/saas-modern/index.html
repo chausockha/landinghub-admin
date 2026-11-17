@@ -1,0 +1,2264 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VELOX — The Autonomous Infrastructure Platform for Modern Product Teams</title>
+  <meta name="description" content="Orchestrate workflows, deploy to 320+ global edge nodes in sub-milliseconds, and observe every microservice in one unified dark-mode workspace." />
+
+  <!-- Google Fonts: Plus Jakarta Sans (Display/Headings), Inter (UI/Body), JetBrains Mono (Telemetry/Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: {
+              950: '#06070B',
+              900: '#0B0D14',
+              850: '#10131E',
+              800: '#151928',
+              700: '#1F253A',
+            },
+            accent: {
+              indigo: '#6366F1',
+              violet: '#8B5CF6',
+              cyan: '#06B6D4',
+              emerald: '#10B981',
+              amber: '#F59E0B',
+              rose: '#F43F5E',
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 40px -10px rgba(99, 102, 241, 0.45)',
+            'glow-cyan': '0 0 40px -10px rgba(6, 182, 212, 0.35)',
+            'card-dark': '0 20px 50px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.08)',
+            'nav-pill': '0 16px 40px -8px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.12)',
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-base: #06070B;
+      --bg-surface: #0B0D14;
+      --bg-elevated: #10131E;
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-highlight: rgba(255, 255, 255, 0.16);
+      --accent-primary: #6366F1;
+      --accent-secondary: #06B6D4;
+      --accent-violet: #8B5CF6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: #F8FAFC;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      selection-background-color: rgba(99, 102, 241, 0.35);
+    }
+
+    ::selection {
+      background: rgba(99, 102, 241, 0.35);
+      color: #FFFFFF;
+    }
+
+    /* Architectural Background Grid + Radial Mask */
+    .bg-architectural-grid {
+      background-size: 48px 48px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 25%, #000 45%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 25%, #000 45%, transparent 100%);
+    }
+
+    /* Subtle Dot Matrix Pattern */
+    .bg-dot-matrix {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* Oversized Hero Display Typography */
+    .hero-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(2.65rem, 5.8vw, 5.15rem);
+      line-height: 1.03;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .section-heading {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(2rem, 3.8vw, 3.25rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+
+    /* Bento Card with Mouse-Tracking Radial Spotlight */
+    .bento-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(18, 22, 35, 0.82) 0%, rgba(11, 13, 20, 0.94) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .bento-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        550px circle at var(--mouse-x, 50%) var(--mouse-y, 0%),
+        rgba(99, 102, 241, 0.13),
+        transparent 45%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .bento-card:hover::before {
+      opacity: 1;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(99, 102, 241, 0.32);
+      box-shadow: 0 28px 60px -15px rgba(0, 0, 0, 0.85), 0 0 35px -12px rgba(99, 102, 241, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .bento-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Scroll Reveal Animations */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-up.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Data packet animation on SVG paths */
+    @keyframes dashFlow {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+
+    .animate-dash {
+      stroke-dasharray: 6 6;
+      animation: dashFlow 1.6s linear infinite;
+    }
+
+    /* Custom Range Slider for Pricing */
+    input[type="range"].velox-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      outline: none;
+    }
+
+    input[type="range"].velox-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #6366F1;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.8);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"].velox-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Accessibility Focus Ring */
+    :focus-visible {
+      outline: 2px solid #6366F1;
+      outline-offset: 3px;
+    }
+
+    /* Respect Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal-up {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-500/30 selection:text-white">
+
+  <!-- AMBIENT SPOTLIGHTS & ARCHITECTURAL GRID -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute inset-0 bg-architectural-grid"></div>
+    <div class="absolute -top-48 left-1/2 -translate-x-1/2 w-[960px] h-[520px] rounded-full bg-indigo-600/15 blur-[135px]"></div>
+    <div class="absolute top-[28%] -right-40 w-[520px] h-[480px] rounded-full bg-cyan-500/10 blur-[140px]"></div>
+    <div class="absolute top-[62%] -left-40 w-[560px] h-[520px] rounded-full bg-violet-600/10 blur-[140px]"></div>
+  </div>
+
+  <!-- =====================================================================
+       1. FLOATING NAVIGATION BAR
+       ===================================================================== -->
+  <header class="fixed top-4 inset-x-0 z-50 px-4 sm:px-6 lg:px-8">
+    <nav aria-label="Main Navigation" class="max-w-6xl mx-auto rounded-2xl bg-obsidian-900/75 backdrop-blur-xl border border-white/[0.09] shadow-nav-pill px-4 sm:px-6 py-3 transition-all duration-300">
+      <div class="flex items-center justify-between gap-4">
+        <!-- Brand Logo -->
+        <a href="#" class="flex items-center gap-2.5 group focus:outline-none">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-cyan-500 p-[1px] shadow-glow-indigo transition-transform duration-300 group-hover:scale-105">
+            <div class="w-full h-full bg-obsidian-950/90 rounded-[11px] flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-bold text-lg tracking-tight text-white">VELOX</span>
+            <span class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs font-mono font-medium uppercase tracking-wider bg-indigo-500/15 text-indigo-300 rounded border border-indigo-500/30">v4.2</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex items-center gap-1 lg:gap-2">
+          <a href="#features" data-nav-link class="px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.05] transition-colors">Platform</a>
+          <a href="#showcase" data-nav-link class="px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.05] transition-colors">Architecture</a>
+          <a href="#testimonials" data-nav-link class="px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.05] transition-colors">Customers</a>
+          <a href="#pricing" data-nav-link class="px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.05] transition-colors">Pricing</a>
+          <a href="#faq" data-nav-link class="px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.05] transition-colors">FAQ</a>
+        </div>
+
+        <!-- Right Actions: Command Palette + CTA -->
+        <div class="flex items-center gap-2.5">
+          <button
+            type="button"
+            id="openCmdPaletteBtn"
+            aria-label="Open Command Palette"
+            class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs text-slate-300 transition-all cursor-pointer"
+          >
+            <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <span>Quick Jump</span>
+            <kbd class="px-1.5 py-0.5 text-xs font-mono bg-obsidian-950/90 text-slate-400 rounded border border-white/10">⌘K</kbd>
+          </button>
+
+          <a
+            href="#cta"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 shadow-glow-indigo transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]"
+          >
+            <span>Start Building</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+
+          <!-- Mobile Menu Button -->
+          <button
+            type="button"
+            id="mobileMenuBtn"
+            aria-label="Toggle Menu"
+            aria-expanded="false"
+            class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/[0.05] border border-white/10 text-slate-200 hover:bg-white/10 cursor-pointer"
+          >
+            <svg id="menuIconOpen" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+            <svg id="menuIconClose" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown Menu -->
+      <div id="mobileMenuDrawer" class="hidden md:hidden pt-4 pb-2 mt-3 border-t border-white/[0.08]">
+        <div class="flex flex-col gap-1">
+          <a href="#features" class="mobile-nav-link px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/[0.06]">Platform Features</a>
+          <a href="#showcase" class="mobile-nav-link px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/[0.06]">Architecture Showcase</a>
+          <a href="#testimonials" class="mobile-nav-link px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/[0.06]">Customer Stories</a>
+          <a href="#pricing" class="mobile-nav-link px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/[0.06]">Pricing & Plans</a>
+          <a href="#faq" class="mobile-nav-link px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/[0.06]">FAQ</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="relative z-10">
+
+    <!-- =====================================================================
+         2. LARGE HERO SECTION + INTERACTIVE WORKSPACE PREVIEW
+         ===================================================================== -->
+    <section class="pt-32 sm:pt-40 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto">
+
+        <!-- Hero Copy Centerpiece -->
+        <div class="max-w-4xl mx-auto text-center reveal-up">
+          <!-- Release Pill -->
+          <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.1] backdrop-blur-md mb-8">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
+            </span>
+            <span class="text-xs font-mono uppercase tracking-wider text-cyan-300 font-medium">Velox Engine 4.2</span>
+            <span class="text-white/20">|</span>
+            <a href="#showcase" class="text-xs text-slate-300 hover:text-white inline-flex items-center gap-1 transition-colors">
+              <span>Zero-cold-start WebAssembly runtime</span>
+              <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Oversized Hero Typography -->
+          <h1 class="hero-display text-white tracking-tight mb-6">
+            Ship autonomous systems at
+            <span class="bg-gradient-to-r from-indigo-400 via-violet-300 to-cyan-400 bg-clip-text text-transparent">sub-millisecond</span>
+            scale.
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+            Velox unifies distributed workflow orchestration, instant global edge compute, and deterministic AI telemetry into one precision-engineered control plane.
+          </p>
+
+          <!-- Primary & Secondary CTA Cluster -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            <a
+              href="#cta"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-indigo-500 via-indigo-600 to-violet-600 hover:from-indigo-400 hover:to-violet-500 shadow-glow-indigo transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+            >
+              <span>Deploy Free Workspace</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <button
+              type="button"
+              id="copyCliBtn"
+              class="w-full sm:w-auto group inline-flex items-center justify-center gap-3 px-5 py-4 rounded-2xl text-sm font-mono text-slate-300 bg-obsidian-900/90 hover:bg-obsidian-800 border border-white/[0.1] hover:border-indigo-500/40 transition-all cursor-pointer"
+            >
+              <span class="text-indigo-400">$</span>
+              <span>npx velox-cli@latest init</span>
+              <span id="copyCliStatus" class="ml-1 px-2 py-0.5 rounded text-[12.5px] bg-white/[0.06] text-slate-400 group-hover:text-white transition-colors">Copy</span>
+            </button>
+          </div>
+
+          <!-- High-trust Micro Telemetry Bar -->
+          <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-slate-400 font-mono">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>0.84ms Global p99 Latency</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>SOC2 Type II &amp; HIPAA Verified</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span>No credit card required</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Hero Control Plane Preview -->
+        <div class="mt-14 sm:mt-16 reveal-up">
+          <div class="relative rounded-3xl p-[1px] bg-gradient-to-b from-white/20 via-indigo-500/25 to-white/[0.04] shadow-2xl">
+            <!-- Top Glow Bar -->
+            <div class="
+              absolute -top-px left-1/2 -translate-x-1/2 w-2/3 h-[2px]
+              bg-gradient-to-r from-transparent via-indigo-400 to-transparent
+            "></div>
+
+            <div class="rounded-[23px] bg-obsidian-950/95 backdrop-blur-2xl overflow-hidden border border-white/[0.05]">
+              <!-- Window Chrome & Interactive Mode Switcher -->
+              <div class="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3.5 bg-obsidian-900/90 border-b border-white/[0.07]">
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-rose-500/70"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-500/70"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-500/70"></span>
+                  </div>
+                  <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-obsidian-950/80 border border-white/[0.06] text-xs font-mono text-slate-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>velox://prod-cluster-us-east/control-plane</span>
+                  </div>
+                </div>
+
+                <!-- Interactive Hero Workspace Mode Tabs -->
+                <div class="flex items-center gap-1 bg-obsidian-950 p-1 rounded-xl border border-white/[0.07]" role="tablist" aria-label="Hero Workspace Mode">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    data-hero-tab="topology"
+                    class="hero-tab-btn px-3 py-1 rounded-lg text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition-all cursor-pointer"
+                  >
+                    Live Mesh Topology
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-hero-tab="traces"
+                    class="hero-tab-btn px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-transparent transition-all cursor-pointer"
+                  >
+                    Stream Telemetry
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-hero-tab="deploy"
+                    class="hero-tab-btn px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-transparent transition-all cursor-pointer"
+                  >
+                    Edge Rollout
+                  </button>
+                </div>
+
+                <!-- Live Metric Pill -->
+                <div class="hidden lg:flex items-center gap-3 text-xs font-mono">
+                  <span class="text-slate-400">THROUGHPUT: <strong id="heroLiveRps" class="text-cyan-300">148,920 req/s</strong></span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">HEALTHY</span>
+                </div>
+              </div>
+
+              <!-- Workspace Body Grid -->
+              <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[420px]">
+                <!-- Left Sidebar: Active Services -->
+                <div class="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-white/[0.06] p-4 sm:p-5 bg-obsidian-900/40 flex flex-col justify-between">
+                  <div>
+                    <div class="text-[12.5px] font-mono uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+                      <span>Active Nodes (324)</span>
+                      <span class="text-emerald-400">100% online</span>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                          <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                          <div>
+                            <div class="text-xs font-medium text-white">api-gateway-edge</div>
+                            <div class="text-[12.5px] font-mono text-slate-400">wasm-v4 • 0.41ms</div>
+                          </div>
+                        </div>
+                        <span class="text-[12.5px] font-mono text-indigo-300">99.99%</span>
+                      </div>
+
+                      <div class="p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] flex items-center justify-between transition-colors">
+                        <div class="flex items-center gap-2.5">
+                          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                          <div>
+                            <div class="text-xs font-medium text-slate-200">vector-inference-gpu</div>
+                            <div class="text-[12.5px] font-mono text-slate-400">h100-cluster • 4.2ms</div>
+                          </div>
+                        </div>
+                        <span class="text-[12.5px] font-mono text-cyan-300">42.1k/s</span>
+                      </div>
+
+                      <div class="p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] flex items-center justify-between transition-colors">
+                        <div class="flex items-center gap-2.5">
+                          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                          <div>
+                            <div class="text-xs font-medium text-slate-200">crdt-state-replicator</div>
+                            <div class="text-[12.5px] font-mono text-slate-400">raft-quorum • 0.78ms</div>
+                          </div>
+                        </div>
+                        <span class="text-[12.5px] font-mono text-emerald-300">SYNCED</span>
+                      </div>
+
+                      <div class="p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] flex items-center justify-between transition-colors">
+                        <div class="flex items-center gap-2.5">
+                          <span class="w-2 h-2 rounded-full bg-violet-400"></span>
+                          <div>
+                            <div class="text-xs font-medium text-slate-200">zero-trust-auth-guard</div>
+                            <div class="text-[12.5px] font-mono text-slate-400">mtls-rotator • 0.19ms</div>
+                          </div>
+                        </div>
+                        <span class="text-[12.5px] font-mono text-violet-300">LOCKED</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Simulate Traffic Burst Button -->
+                  <div class="mt-6 pt-4 border-t border-white/[0.06]">
+                    <button
+                      type="button"
+                      id="simulateBurstBtn"
+                      class="w-full py-2.5 px-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono font-medium text-indigo-200 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      <span>Simulate 10x Traffic Burst</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Center Interactive Graph / View Canvas -->
+                <div class="lg:col-span-6 p-5 sm:p-6 relative bg-dot-matrix flex flex-col justify-between overflow-hidden">
+                  <!-- Top Canvas Header -->
+                  <div class="flex items-center justify-between z-10">
+                    <div>
+                      <span id="heroCanvasTitle" class="text-xs font-mono uppercase tracking-wider text-indigo-300">Autonomous Execution DAG</span>
+                      <h2 id="heroCanvasSubtitle" class="text-sm sm:text-base font-semibold text-white mt-0.5">Global Request Routing &amp; Self-Healing Mesh</h2>
+                    </div>
+                    <span id="burstBadge" class="px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-white/[0.05] text-slate-300 border border-white/10">
+                      Auto-Scaling: Standby
+                    </span>
+                  </div>
+
+                  <!-- SVG Interactive Node Graph -->
+                  <div class="my-6 relative z-10">
+                    <svg class="w-full h-52 sm:h-60" viewBox="0 0 600 220" fill="none" aria-label="Interactive workflow node graph">
+                      <defs>
+                        <linearGradient id="edgeGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#6366F1" />
+                          <stop offset="100%" stop-color="#06B6D4" />
+                        </linearGradient>
+                        <linearGradient id="edgeGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#06B6D4" />
+                          <stop offset="100%" stop-color="#10B981" />
+                        </linearGradient>
+                      </defs>
+
+                      <!-- Connecting Paths -->
+                      <path d="M115 110 C 175 110, 185 55, 245 55" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+                      <path d="M115 110 C 175 110, 185 165, 245 165" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+                      <path d="M355 55 C 415 55, 425 110, 485 110" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+                      <path d="M355 165 C 415 165, 425 110, 485 110" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+
+                      <!-- Animated Telemetry Streams -->
+                      <path d="M115 110 C 175 110, 185 55, 245 55" stroke="url(#edgeGrad1)" stroke-width="2.2" class="animate-dash" />
+                      <path d="M115 110 C 175 110, 185 165, 245 165" stroke="url(#edgeGrad1)" stroke-width="2.2" class="animate-dash" />
+                      <path d="M355 55 C 415 55, 425 110, 485 110" stroke="url(#edgeGrad2)" stroke-width="2.2" class="animate-dash" />
+                      <path d="M355 165 C 415 165, 425 110, 485 110" stroke="url(#edgeGrad2)" stroke-width="2.2" class="animate-dash" />
+
+                      <!-- Node 1: Ingress -->
+                      <g transform="translate(15, 82)">
+                        <rect width="100" height="56" rx="12" fill="#10131E" stroke="#6366F1" stroke-width="1.5" />
+                        <circle cx="20" cy="28" r="5" fill="#6366F1" />
+                        <text x="32" y="25" fill="#FFFFFF" font-family="Plus Jakarta Sans" font-size="11" font-weight="700">Edge Ingress</text>
+                        <text x="32" y="40" fill="#94A3B8" font-family="JetBrains Mono" font-size="9.5">anycast • 0.2ms</text>
+                      </g>
+
+                      <!-- Node 2: AI Router -->
+                      <g transform="translate(245, 27)">
+                        <rect width="110" height="56" rx="12" fill="#10131E" stroke="#06B6D4" stroke-width="1.5" />
+                        <circle cx="20" cy="28" r="5" fill="#06B6D4" />
+                        <text x="32" y="25" fill="#FFFFFF" font-family="Plus Jakarta Sans" font-size="11" font-weight="700">Neural Router</text>
+                        <text x="32" y="40" fill="#94A3B8" font-family="JetBrains Mono" font-size="9.5">wasm-isolate</text>
+                      </g>
+
+                      <!-- Node 3: State Sync -->
+                      <g transform="translate(245, 137)">
+                        <rect width="110" height="56" rx="12" fill="#10131E" stroke="#8B5CF6" stroke-width="1.5" />
+                        <circle cx="20" cy="28" r="5" fill="#8B5CF6" />
+                        <text x="32" y="25" fill="#FFFFFF" font-family="Plus Jakarta Sans" font-size="11" font-weight="700">CRDT State</text>
+                        <text x="32" y="40" fill="#94A3B8" font-family="JetBrains Mono" font-size="9.5">zero-lock</text>
+                      </g>
+
+                      <!-- Node 4: Global Commit -->
+                      <g transform="translate(485, 82)">
+                        <rect width="102" height="56" rx="12" fill="#10131E" stroke="#10B981" stroke-width="1.5" />
+                        <circle cx="20" cy="28" r="5" fill="#10B981" />
+                        <text x="32" y="25" fill="#FFFFFF" font-family="Plus Jakarta Sans" font-size="11" font-weight="700">Verified Out</text>
+                        <text x="32" y="40" fill="#10B981" font-family="JetBrains Mono" font-size="9.5">p99: 0.84ms</text>
+                      </g>
+                    </svg>
+                  </div>
+
+                  <!-- Bottom Metrics Strip -->
+                  <div class="grid grid-cols-3 gap-3 pt-3 border-t border-white/[0.06] z-10">
+                    <div class="p-2.5 rounded-xl bg-obsidian-950/75 border border-white/[0.05]">
+                      <div class="text-xs font-mono uppercase text-slate-400">Cold Start</div>
+                      <div id="heroMetricCold" class="text-sm sm:text-base font-mono font-semibold text-white mt-0.5">0.00 ms</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-obsidian-950/75 border border-white/[0.05]">
+                      <div class="text-xs font-mono uppercase text-slate-400">Active Isolates</div>
+                      <div id="heroMetricIsolates" class="text-sm sm:text-base font-mono font-semibold text-cyan-300 mt-0.5">18,420</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-obsidian-950/75 border border-white/[0.05]">
+                      <div class="text-xs font-mono uppercase text-slate-400">Error Budget</div>
+                      <div id="heroMetricError" class="text-sm sm:text-base font-mono font-semibold text-emerald-400 mt-0.5">99.998%</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Sidebar: Live Event Stream -->
+                <div class="lg:col-span-3 border-t lg:border-t-0 lg:border-l border-white/[0.06] p-4 sm:p-5 bg-obsidian-900/40 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between text-[12.5px] font-mono uppercase tracking-wider text-slate-400 mb-3">
+                      <span>Live Audit Stream</span>
+                      <span class="inline-flex items-center gap-1 text-cyan-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                        tail -f
+                      </span>
+                    </div>
+
+                    <div id="heroLogContainer" class="space-y-2.5 font-mono text-[12.5px]">
+                      <div class="p-2.5 rounded-lg bg-obsidian-950/80 border border-white/[0.05]">
+                        <div class="flex items-center justify-between text-slate-400 mb-1">
+                          <span class="text-indigo-400">[fra-01]</span>
+                          <span>14:29:58.104</span>
+                        </div>
+                        <div class="text-slate-200">Deployed isolate <span class="text-cyan-300">sha256:9f8a..c1</span> in 18ms</div>
+                      </div>
+
+                      <div class="p-2.5 rounded-lg bg-obsidian-950/80 border border-white/[0.05]">
+                        <div class="flex items-center justify-between text-slate-400 mb-1">
+                          <span class="text-emerald-400">[iad-04]</span>
+                          <span>14:29:59.012</span>
+                        </div>
+                        <div class="text-slate-200">Zero-trust mTLS token rotated across 324 nodes</div>
+                      </div>
+
+                      <div class="p-2.5 rounded-lg bg-obsidian-950/80 border border-white/[0.05]">
+                        <div class="flex items-center justify-between text-slate-400 mb-1">
+                          <span class="text-violet-400">[hnd-02]</span>
+                          <span>14:30:01.440</span>
+                        </div>
+                        <div class="text-slate-200">CRDT state snapshot verified • <span class="text-emerald-300">0 conflicts</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[12.5px] font-mono text-slate-400">
+                    <span>Region Coverage</span>
+                    <span class="text-white font-semibold">320+ PoPs</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trusted By Engineering Leaders Strip -->
+        <div class="mt-16 pt-10 border-t border-white/[0.06] text-center reveal-up">
+          <p class="text-xs font-mono uppercase tracking-[0.2em] text-slate-400 mb-8">
+            Powering mission-critical infrastructure for high-velocity engineering teams
+          </p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 items-center justify-items-center opacity-75">
+            <div class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-display font-bold text-base tracking-tight">
+              <svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5l-6-3 6-3 6 3-6 3zm0 2.5l-10-5v10l10 5 10-5V7l-10 5z"/></svg>
+              <span>HYPERION</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-display font-bold text-base tracking-tight">
+              <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
+              <span>ORBITAL.AI</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-display font-bold text-base tracking-tight">
+              <svg class="w-5 h-5 text-violet-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 22 20 2 20"/></svg>
+              <span>KINETIX</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-display font-bold text-base tracking-tight">
+              <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
+              <span>CHRONOS</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-display font-bold text-base tracking-tight">
+              <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l4 8 8 4-8 4-4 8-4-8-8-4 8-4z"/></svg>
+              <span>VECTRA</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-display font-bold text-base tracking-tight">
+              <svg class="w-5 h-5 text-rose-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+              <span>SYNTHESIS</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         3. BENTO GRID FEATURE CARDS SECTION
+         ===================================================================== -->
+    <section id="features" class="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 relative">
+      <div class="max-w-7xl mx-auto">
+
+        <!-- Section Header -->
+        <div class="max-w-3xl mb-16 reveal-up">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-xs font-mono uppercase tracking-wider text-indigo-300 mb-4">
+            <span>Modular Architecture</span>
+          </div>
+          <h2 class="section-heading text-white mb-5">
+            Every primitive you need.<br />
+            <span class="text-slate-400">Engineered into one cohesive grid.</span>
+          </h2>
+          <p class="text-base sm:text-lg text-slate-400 leading-relaxed">
+            Replace fragile glue-code across six cloud vendors with deterministic primitives that scale from your first prototype to 100M+ daily events.
+          </p>
+        </div>
+
+        <!-- 12-Column Asymmetric Bento Grid -->
+        <div id="bentoGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- BENTO CARD 1 (7 Cols): Autonomous Workflow DAG Engine -->
+          <article class="bento-card lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between reveal-up">
+            <div class="bento-content">
+              <div class="flex items-center justify-between gap-4 mb-6">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-xs font-mono text-indigo-300">
+                  <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                  WORKFLOW ENGINE
+                </span>
+                <button
+                  type="button"
+                  id="runDagBtn"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-indigo-500/25 border border-white/10 hover:border-indigo-500/40 text-xs font-mono text-slate-200 transition-all cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <span id="runDagBtnLabel">Execute Pipeline</span>
+                </button>
+              </div>
+
+              <h3 class="font-display text-xl sm:text-2xl font-bold text-white mb-2.5">
+                Deterministic Durable Execution
+              </h3>
+              <p class="text-sm sm:text-base text-slate-400 leading-relaxed mb-8 max-w-xl">
+                Write stateful distributed workflows in standard TypeScript or Rust. Automatic retries, state checkpointing, and zero-downtime replay come built-in.
+              </p>
+
+              <!-- Interactive Step Pipeline Visualizer -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-obsidian-950/90 border border-white/[0.07]">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4" id="dagStepsGrid">
+                  <button type="button" data-dag-step="0" class="dag-step-card text-left p-3 rounded-xl bg-indigo-500/15 border border-indigo-500/40 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between text-[12.5px] font-mono text-indigo-300 mb-1">
+                      <span>01. INGEST</span>
+                      <span>✓ 1.2ms</span>
+                    </div>
+                    <div class="text-xs font-semibold text-white">Webhook Stream</div>
+                  </button>
+
+                  <button type="button" data-dag-step="1" class="dag-step-card text-left p-3 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:border-white/20 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between text-[12.5px] font-mono text-cyan-300 mb-1">
+                      <span>02. EMBED</span>
+                      <span>✓ 3.8ms</span>
+                    </div>
+                    <div class="text-xs font-semibold text-white">Vector Index</div>
+                  </button>
+
+                  <button type="button" data-dag-step="2" class="dag-step-card text-left p-3 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:border-white/20 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between text-[12.5px] font-mono text-violet-300 mb-1">
+                      <span>03. REASON</span>
+                      <span>✓ 8.4ms</span>
+                    </div>
+                    <div class="text-xs font-semibold text-white">Agent Guardrail</div>
+                  </button>
+
+                  <button type="button" data-dag-step="3" class="dag-step-card text-left p-3 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:border-white/20 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between text-[12.5px] font-mono text-emerald-300 mb-1">
+                      <span>04. COMMIT</span>
+                      <span>✓ 0.6ms</span>
+                    </div>
+                    <div class="text-xs font-semibold text-white">Edge Replicate</div>
+                  </button>
+                </div>
+
+                <!-- Live Step Code / Output Inspector -->
+                <div class="px-3.5 py-2.5 rounded-xl bg-obsidian-900 border border-white/[0.05] font-mono text-xs flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-center gap-2 text-slate-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="dagInspectorText">step.run("ingest-webhook", async (ctx) =&gt; ctx.verifySignature())</span>
+                  </div>
+                  <span id="dagStatusBadge" class="text-[12.5px] text-emerald-400">CHECKPOINT SAVED</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- BENTO CARD 2 (5 Cols): Sub-Millisecond Global Edge Network -->
+          <article class="bento-card lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between reveal-up">
+            <div class="bento-content">
+              <div class="flex items-center justify-between gap-4 mb-6">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-xs font-mono text-cyan-300">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  GLOBAL ANYCAST
+                </span>
+                <span class="text-xs font-mono text-slate-400">320+ Edge PoPs</span>
+              </div>
+
+              <h3 class="font-display text-xl sm:text-2xl font-bold text-white mb-2.5">
+                Sub-Millisecond Edge Compute
+              </h3>
+              <p class="text-sm sm:text-base text-slate-400 leading-relaxed mb-6">
+                Select a region below to inspect live round-trip telemetry across our bare-metal Anycast backbone.
+              </p>
+
+              <!-- Interactive Region Selector Buttons -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                <button type="button" data-region="iad" data-latency="0.62ms" data-rps="64.2k/s" data-city="Virginia, US" class="region-btn px-3 py-2 rounded-xl text-xs font-mono bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 cursor-pointer transition-all">
+                  us-east-1
+                </button>
+                <button type="button" data-region="fra" data-latency="0.79ms" data-rps="51.8k/s" data-city="Frankfurt, DE" class="region-btn px-3 py-2 rounded-xl text-xs font-mono bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.07] cursor-pointer transition-all">
+                  eu-central
+                </button>
+                <button type="button" data-region="hnd" data-latency="0.91ms" data-rps="48.5k/s" data-city="Tokyo, JP" class="region-btn px-3 py-2 rounded-xl text-xs font-mono bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.07] cursor-pointer transition-all">
+                  ap-east-1
+                </button>
+                <button type="button" data-region="gru" data-latency="1.14ms" data-rps="23.9k/s" data-city="São Paulo, BR" class="region-btn px-3 py-2 rounded-xl text-xs font-mono bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.07] cursor-pointer transition-all">
+                  sa-east-1
+                </button>
+              </div>
+
+              <!-- Live Telemetry readout box -->
+              <div class="p-4 rounded-2xl bg-obsidian-950/90 border border-white/[0.07] flex items-center justify-between">
+                <div>
+                  <div id="regionCityLabel" class="text-xs font-mono text-slate-400">Virginia, US (iad-04)</div>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="regionLatencyValue" class="text-2xl sm:text-3xl font-mono font-bold text-white">0.62ms</span>
+                    <span class="text-xs font-mono text-emerald-400">p99 RTT</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs font-mono text-slate-400">Throughput</div>
+                  <div id="regionRpsValue" class="text-lg font-mono font-semibold text-cyan-300 mt-1">64.2k/s</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- BENTO CARD 3 (4 Cols): Zero-Trust Cryptographic Vault -->
+          <article class="bento-card lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between reveal-up">
+            <div class="bento-content">
+              <div class="flex items-center justify-between mb-6">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-xs font-mono text-emerald-300">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  ZERO-TRUST SECURITY
+                </span>
+                <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+
+              <h3 class="font-display text-xl font-bold text-white mb-2">
+                Hardware-Backed Enclaves
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                Every isolate runs inside an ephemeral micro-VM with automated mTLS certificate rotation every 60 seconds.
+              </p>
+
+              <!-- Interactive Security Toggles -->
+              <div class="space-y-2.5">
+                <label class="flex items-center justify-between p-3 rounded-xl bg-obsidian-950/80 border border-white/[0.07] cursor-pointer hover:border-emerald-500/30 transition-colors">
+                  <div>
+                    <div class="text-xs font-semibold text-white">E2E AES-256-GCM</div>
+                    <div class="text-[12.5px] font-mono text-slate-400">Envelope encryption active</div>
+                  </div>
+                  <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 rounded cursor-pointer" aria-label="Toggle E2E AES-256-GCM" />
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl bg-obsidian-950/80 border border-white/[0.07] cursor-pointer hover:border-emerald-500/30 transition-colors">
+                  <div>
+                    <div class="text-xs font-semibold text-white">RBAC Policy Guard</div>
+                    <div class="text-[12.5px] font-mono text-slate-400">Strict least-privilege</div>
+                  </div>
+                  <input type="checkbox" checked class="accent-emerald-500 w-4 h-4 rounded cursor-pointer" aria-label="Toggle RBAC Policy Guard" />
+                </label>
+              </div>
+            </div>
+          </article>
+
+          <!-- BENTO CARD 4 (4 Cols): Instant Command Palette -->
+          <article class="bento-card lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between reveal-up">
+            <div class="bento-content">
+              <div class="flex items-center justify-between mb-6">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-violet-500/15 border border-violet-500/30 text-xs font-mono text-violet-300">
+                  <span class="w-2 h-2 rounded-full bg-violet-400"></span>
+                  KEYBOARD FIRST
+                </span>
+                <kbd class="px-2 py-0.5 text-xs font-mono bg-white/[0.06] text-slate-300 rounded border border-white/10">⌘K</kbd>
+              </div>
+
+              <h3 class="font-display text-xl font-bold text-white mb-2">
+                Instant Command Center
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                Trigger rollbacks, inspect live memory heaps, or provision preview branches without lifting your hands from the keyboard.
+              </p>
+
+              <!-- Mini Interactive Command List -->
+              <div class="p-3 rounded-2xl bg-obsidian-950/90 border border-white/[0.07] space-y-1.5">
+                <button
+                  type="button"
+                  onclick="document.getElementById('openCmdPaletteBtn').click()"
+                  class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-violet-500/15 border border-violet-500/30 text-xs text-white transition-colors cursor-pointer"
+                >
+                  <span class="flex items-center gap-2">
+                    <span class="text-violet-400">→</span>
+                    <span>Promote Canary to 100%</span>
+                  </span>
+                  <span class="font-mono text-xs text-violet-300">⏎ Run</span>
+                </button>
+                <button
+                  type="button"
+                  onclick="document.getElementById('openCmdPaletteBtn').click()"
+                  class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/[0.04] text-xs text-slate-300 transition-colors cursor-pointer"
+                >
+                  <span class="flex items-center gap-2">
+                    <span class="text-slate-400">→</span>
+                    <span>Tail Production Error Logs</span>
+                  </span>
+                  <span class="font-mono text-xs text-slate-400">⌘L</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- BENTO CARD 5 (4 Cols): Real-Time Multiplayer Collaboration -->
+          <article class="bento-card lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between reveal-up">
+            <div class="bento-content">
+              <div class="flex items-center justify-between mb-6">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-xs font-mono text-amber-300">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  MULTIPLAYER OPS
+                </span>
+                <div class="flex -space-x-2">
+                  <span class="w-6 h-6 rounded-full bg-indigo-500 text-xs font-bold flex items-center justify-center ring-2 ring-obsidian-900">EL</span>
+                  <span class="w-6 h-6 rounded-full bg-cyan-500 text-xs font-bold text-obsidian-950 flex items-center justify-center ring-2 ring-obsidian-900">MK</span>
+                  <span class="w-6 h-6 rounded-full bg-emerald-500 text-xs font-bold text-obsidian-950 flex items-center justify-center ring-2 ring-obsidian-900">KT</span>
+                </div>
+              </div>
+
+              <h3 class="font-display text-xl font-bold text-white mb-2">
+                Multiplayer Incident Rooms
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                Debug production traces together in real time with shared cursors, synchronized time-travel scrubbers, and inline annotations.
+              </p>
+
+              <!-- Animated Collaborative Canvas Box -->
+              <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/[0.07] relative overflow-hidden">
+                <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
+                  <span>trace_id: <strong class="text-white">tr_8921x</strong></span>
+                  <span class="text-emerald-400">3 engineers live</span>
+                </div>
+                <div class="h-2 w-full rounded-full bg-white/[0.06] overflow-hidden mb-3">
+                  <div class="h-full w-3/4 bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 rounded-full"></div>
+                </div>
+                <div class="flex items-center justify-between text-[12.5px]">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    <span>Elena pinned root cause</span>
+                  </span>
+                  <span class="font-mono text-slate-400">Just now</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         4. DEEP-DIVE INTERACTIVE PRODUCT SHOWCASE
+         ===================================================================== -->
+    <section id="showcase" class="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-y border-white/[0.06] bg-obsidian-900/30">
+      <div class="max-w-7xl mx-auto">
+
+        <!-- Header + Interactive Pillar Selector -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 reveal-up">
+          <div class="max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-xs font-mono uppercase tracking-wider text-cyan-300 mb-4">
+              <span>Interactive Product Tour</span>
+            </div>
+            <h2 class="section-heading text-white">
+              Designed for clarity under high-load pressure.
+            </h2>
+          </div>
+
+          <!-- Showcase Switcher Buttons -->
+          <div class="flex flex-wrap gap-2 bg-obsidian-950 p-1.5 rounded-2xl border border-white/[0.08]" role="tablist" aria-label="Product Showcase Views">
+            <button
+              type="button"
+              role="tab"
+              aria-selected="true"
+              data-showcase-tab="observability"
+              class="showcase-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-glow-indigo transition-all cursor-pointer"
+            >
+              01. Distributed Traces
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              data-showcase-tab="sdk"
+              class="showcase-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all cursor-pointer"
+            >
+              02. Declarative SDK
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              data-showcase-tab="rollbacks"
+              class="showcase-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all cursor-pointer"
+            >
+              03. Instant Rollbacks
+            </button>
+          </div>
+        </div>
+
+        <!-- Showcase Display Container -->
+        <div class="rounded-3xl bg-obsidian-950 border border-white/[0.09] shadow-card-dark overflow-hidden reveal-up">
+          <!-- Panel 1: Distributed Traces & Flamegraph -->
+          <div id="showcase-panel-observability" class="showcase-panel grid grid-cols-1 lg:grid-cols-12">
+            <div class="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.07]">
+              <div>
+                <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">Real-Time Observability</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white mt-2 mb-4">
+                  Pinpoint p99 bottlenecks across 10,000 microservices in seconds.
+                </h3>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed mb-8">
+                  High-cardinality tracing with zero sampling blind spots. Correlate logs, SQL queries, and LLM token latency in a single unified waterfall.
+                </p>
+
+                <ul class="space-y-3.5 text-sm text-slate-300">
+                  <li class="flex items-start gap-3">
+                    <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs mt-0.5">✓</span>
+                    <span>Sub-millisecond eBPF kernel-level telemetry collection</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs mt-0.5">✓</span>
+                    <span>Automatic anomaly detection with root-cause commit diff</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs mt-0.5">✓</span>
+                    <span>OpenTelemetry native ingest with 90-day hot retention</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="mt-8 pt-6 border-t border-white/[0.07] grid grid-cols-2 gap-4">
+                <div>
+                  <div class="text-2xl font-mono font-bold text-white">100%</div>
+                  <div class="text-xs text-slate-400">Unsampled tail-based traces</div>
+                </div>
+                <div>
+                  <div class="text-2xl font-mono font-bold text-cyan-400">&lt; 1.2%</div>
+                  <div class="text-xs text-slate-400">CPU overhead via eBPF</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Trace Waterfall Visualizer -->
+            <div class="lg:col-span-7 p-6 sm:p-10 bg-obsidian-900/50 flex flex-col justify-between">
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-white/[0.07]">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">200 OK</span>
+                  <span class="font-mono text-xs sm:text-sm text-white">POST /v2/agent/orchestrate</span>
+                </div>
+                <span class="font-mono text-xs text-slate-400">Total Duration: <strong class="text-cyan-300">14.2ms</strong></span>
+              </div>
+
+              <!-- Waterfall Spans -->
+              <div class="my-6 space-y-3 font-mono text-xs">
+                <div class="p-3 rounded-xl bg-obsidian-950/90 border border-white/[0.06]">
+                  <div class="flex justify-between text-slate-300 mb-1.5">
+                    <span>edge.tls.handshake</span>
+                    <span class="text-indigo-300">0.4ms</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full w-[8%] bg-indigo-500 rounded-full"></div>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-obsidian-950/90 border border-white/[0.06]">
+                  <div class="flex justify-between text-slate-300 mb-1.5">
+                    <span>auth.jwt.verify_enclave</span>
+                    <span class="text-cyan-300">0.9ms</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full w-[16%] ml-[8%] bg-cyan-400 rounded-full"></div>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-obsidian-950/90 border border-white/[0.06]">
+                  <div class="flex justify-between text-slate-300 mb-1.5">
+                    <span>vector.qdrant.hybrid_search</span>
+                    <span class="text-violet-300">4.6ms</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full w-[38%] ml-[24%] bg-violet-500 rounded-full"></div>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-obsidian-950/90 border border-white/[0.06]">
+                  <div class="flex justify-between text-slate-300 mb-1.5">
+                    <span>workflow.crdt.commit_quorum</span>
+                    <span class="text-emerald-300">1.8ms</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full w-[22%] ml-[62%] bg-emerald-400 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-between text-xs">
+                <span class="text-indigo-200 font-mono">AI Insight: Vector index cache hit saved 38.4ms on this trace.</span>
+                <span class="font-mono text-indigo-300 font-semibold">OPTIMAL</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Declarative TypeScript SDK -->
+          <div id="showcase-panel-sdk" class="showcase-panel hidden grid-cols-1 lg:grid-cols-12">
+            <div class="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.07]">
+              <div>
+                <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Developer Experience</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white mt-2 mb-4">
+                  Infrastructure defined as pure, type-safe code.
+                </h3>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed mb-8">
+                  Zero YAML files. Define cron schedules, edge queues, GPU inference steps, and retry policies with full IDE autocomplete.
+                </p>
+                <div class="space-y-3 text-sm text-slate-300">
+                  <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <strong class="text-white">Zero-Config Local Emulator:</strong> Run the entire distributed mesh offline on your laptop with `velox dev`.
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <strong class="text-white">Preview Environments on Every PR:</strong> Isolated state branches spin up in 400ms.
+                  </div>
+                </div>
+              </div>
+              <div class="mt-8 pt-6 border-t border-white/[0.07] font-mono text-xs text-slate-400">
+                Supported SDKs: TypeScript, Rust, Go, Python 3.12+
+              </div>
+            </div>
+
+            <div class="lg:col-span-7 p-6 sm:p-10 bg-obsidian-900/60 font-mono text-xs sm:text-sm overflow-x-auto">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/[0.07] text-xs text-slate-400">
+                <span>workflows/autonomous-billing.ts</span>
+                <span class="text-emerald-400">TypeScript 5.6 • Strict</span>
+              </div>
+              <pre class="text-slate-200 leading-relaxed"><code><span class="text-violet-400">import</span> { workflow, edgeStep } <span class="text-violet-400">from</span> <span class="text-emerald-300">"@velox/sdk"</span>;
+
+<span class="text-violet-400">export const</span> reconcileUsage = workflow({
+  id: <span class="text-emerald-300">"reconcile-tenant-usage"</span>,
+  regions: [<span class="text-emerald-300">"iad"</span>, <span class="text-emerald-300">"fra"</span>, <span class="text-emerald-300">"hnd"</span>],
+  retryPolicy: { maxAttempts: <span class="text-cyan-300">5</span>, backoff: <span class="text-emerald-300">"exponential"</span> },
+
+  <span class="text-indigo-300">async</span> run({ event, step }) {
+    <span class="text-slate-500">// 1. Durable checkpointed aggregation</span>
+    <span class="text-violet-400">const</span> rollup = <span class="text-indigo-300">await</span> step.run(<span class="text-emerald-300">"aggregate-meters"</span>, () =&gt;
+      edgeStep.queryClickhouse({ tenantId: event.data.tenantId })
+    );
+
+    <span class="text-slate-500">// 2. Cryptographically signed ledger commit</span>
+    <span class="text-violet-400">return await</span> step.commit(<span class="text-emerald-300">"finalize-invoice"</span>, {
+      totalEvents: rollup.count,
+      p99LatencyMs: <span class="text-cyan-300">0.74</span>,
+    });
+  }
+});</code></pre>
+            </div>
+          </div>
+
+          <!-- Panel 3: Instant Atomic Rollbacks -->
+          <div id="showcase-panel-rollbacks" class="showcase-panel hidden grid-cols-1 lg:grid-cols-12">
+            <div class="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.07]">
+              <div>
+                <span class="text-xs font-mono uppercase tracking-wider text-emerald-400">Immutable Releases</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white mt-2 mb-4">
+                  Revert any bad deploy globally in 180 milliseconds.
+                </h3>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed mb-6">
+                  Every deployment is content-addressed and cached across all 320+ edge PoPs. Rolling back is a single atomic pointer swap—no container rebuilds required.
+                </p>
+              </div>
+              <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-200">
+                ✓ Automated Canary Protection: Auto-reverts if error rate exceeds 0.05% within 5 minutes of rollout.
+              </div>
+            </div>
+
+            <div class="lg:col-span-7 p-6 sm:p-10 bg-obsidian-900/50 flex flex-col justify-center space-y-3 font-mono text-xs">
+              <div class="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-between">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/30 text-emerald-200 text-xs mr-2">ACTIVE PROD</span>
+                  <span class="text-white font-semibold">v4.2.18 — sha256:8f91c0b</span>
+                  <div class="text-slate-400 mt-1">Deployed 4 mins ago by @elena • 100% traffic</div>
+                </div>
+                <span class="text-emerald-300">0.001% err</span>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-obsidian-950/85 border border-white/[0.07] flex items-center justify-between">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-white/10 text-slate-300 text-xs mr-2">PREVIOUS</span>
+                  <span class="text-slate-200 font-semibold">v4.2.17 — sha256:4d12a7e</span>
+                  <div class="text-slate-400 mt-1">Deployed 2 hours ago by @marcus • Warm standby</div>
+                </div>
+                <button type="button" class="px-3 py-1.5 rounded-lg bg-white/[0.07] hover:bg-indigo-500/30 text-white border border-white/10 transition-colors cursor-pointer">
+                  Instant Promote
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         5. TESTIMONIALS SECTION (CAROUSEL + VERIFIED METRICS WALL)
+         ===================================================================== -->
+    <section id="testimonials" class="py-24 sm:py-32 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto">
+
+        <!-- Section Header + Accessible Carousel Controls -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 reveal-up">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/25 text-xs font-mono uppercase tracking-wider text-violet-300 mb-4">
+              <span>Verified Customer Impact</span>
+            </div>
+            <h2 class="section-heading text-white">
+              Trusted by principal architects.
+            </h2>
+          </div>
+
+          <!-- Accessible Carousel Controls (Prev / Pause / Next + Live Slide Counter) -->
+          <div class="flex items-center gap-2" aria-label="Testimonial Carousel Controls">
+            <button
+              type="button"
+              id="testimonialPrevBtn"
+              aria-label="Previous Testimonial"
+              class="w-10 h-10 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/10 flex items-center justify-center text-slate-200 transition-colors cursor-pointer"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button
+              type="button"
+              id="testimonialPauseBtn"
+              aria-label="Pause Testimonial Rotation"
+              aria-pressed="false"
+              class="px-3 h-10 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/10 text-xs font-mono text-slate-300 transition-colors cursor-pointer"
+            >
+              Pause
+            </button>
+            <button
+              type="button"
+              id="testimonialNextBtn"
+              aria-label="Next Testimonial"
+              class="w-10 h-10 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/10 flex items-center justify-center text-slate-200 transition-colors cursor-pointer"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <span id="testimonialSlideStatus" aria-live="polite" class="ml-2 text-xs font-mono text-slate-400">01 / 03</span>
+          </div>
+        </div>
+
+        <!-- Featured Spotlight Testimonial Card -->
+        <div
+          id="testimonialSpotlight"
+          class="bento-card p-8 sm:p-12 mb-8 reveal-up"
+          aria-roledescription="carousel"
+          aria-label="Featured Customer Testimonials"
+        >
+          <div class="bento-content grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-8">
+              <div class="inline-flex items-center gap-2 text-xs font-mono text-indigo-300 mb-4">
+                <span>★ ★ ★ ★ ★</span>
+                <span class="text-white/20">•</span>
+                <span id="spotlightCompanyTag">HYPERION FINANCIAL SYSTEMS</span>
+              </div>
+              <blockquote id="spotlightQuote" class="font-display text-xl sm:text-2xl lg:text-3xl font-semibold text-white leading-snug mb-8">
+                “Migrating our core settlement workflows from Kubernetes + Temporal to Velox cut our p99 global latency from 48ms down to 0.9ms while reducing cloud compute spend by 64%.”
+              </blockquote>
+              <div class="flex items-center gap-4">
+                <div id="spotlightAvatar" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center font-display font-bold text-white text-base">
+                  SR
+                </div>
+                <div>
+                  <div id="spotlightAuthor" class="font-display font-bold text-white text-base">Soren Lindqvist</div>
+                  <div id="spotlightRole" class="text-xs sm:text-sm text-slate-400">VP of Infrastructure, Hyperion (Series D)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-4 lg:border-l border-white/[0.08] lg:pl-8 flex flex-col justify-center gap-5">
+              <div class="p-5 rounded-2xl bg-obsidian-950/85 border border-white/[0.07]">
+                <div id="spotlightMetric1Val" class="font-mono text-3xl sm:text-4xl font-bold text-cyan-300">53x</div>
+                <div id="spotlightMetric1Label" class="text-xs sm:text-sm text-slate-400 mt-1">Faster p99 workflow execution</div>
+              </div>
+              <div class="p-5 rounded-2xl bg-obsidian-950/85 border border-white/[0.07]">
+                <div id="spotlightMetric2Val" class="font-mono text-3xl sm:text-4xl font-bold text-emerald-400">-64%</div>
+                <div id="spotlightMetric2Label" class="text-xs sm:text-sm text-slate-400 mt-1">Reduction in monthly AWS bill</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary 3-Card Bento Social Proof Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-up">
+          <div class="bento-card p-6 flex flex-col justify-between">
+            <p class="text-sm text-slate-300 leading-relaxed mb-6">
+              “The local emulator and TypeScript SDK feel like magic. Our engineers ship complex distributed state machines in an afternoon instead of three sprints.”
+            </p>
+            <div class="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+              <div class="w-9 h-9 rounded-xl bg-violet-500/20 border border-violet-500/40 text-violet-300 font-mono text-xs font-bold flex items-center justify-center">AK</div>
+              <div>
+                <div class="text-xs font-semibold text-white">Aria Kowalski</div>
+                <div class="text-[12.5px] text-slate-400">Staff Engineer, Orbital.ai</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bento-card p-6 flex flex-col justify-between">
+            <p class="text-sm text-slate-300 leading-relaxed mb-6">
+              “Instant atomic rollbacks saved us during our Black Friday peak. We reverted a regression across 300+ edge locations in under 200 milliseconds.”
+            </p>
+            <div class="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+              <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold flex items-center justify-center">DM</div>
+              <div>
+                <div class="text-xs font-semibold text-white">Devon Mercer</div>
+                <div class="text-[12.5px] text-slate-400">Head of Platform, Kinetix</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bento-card p-6 flex flex-col justify-between">
+            <p class="text-sm text-slate-300 leading-relaxed mb-6">
+              “Zero-trust hardware enclaves out of the box meant we passed our enterprise SOC2 Type II and HIPAA audits in 3 weeks with zero custom middleware.”
+            </p>
+            <div class="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center">TN</div>
+              <div>
+                <div class="text-xs font-semibold text-white">Tetsuya Nakamura</div>
+                <div class="text-[12.5px] text-slate-400">CISO, Chronos Health</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         6. PRICING SECTION (BILLING TOGGLE + VOLUME SLIDER + 3 TIERS)
+         ===================================================================== -->
+    <section id="pricing" class="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-white/[0.06]">
+      <div class="max-w-7xl mx-auto">
+
+        <!-- Pricing Header & Interactive Billing Controls -->
+        <div class="max-w-3xl mx-auto text-center mb-14 reveal-up">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-xs font-mono uppercase tracking-wider text-emerald-300 mb-4">
+            <span>Predictable Usage Pricing</span>
+          </div>
+          <h2 class="section-heading text-white mb-4">
+            Scale without surprise overages.
+          </h2>
+          <p class="text-slate-400 text-base sm:text-lg mb-8">
+            Start free with generous monthly execution credits. Upgrade as your throughput grows.
+          </p>
+
+          <!-- Monthly / Annual Switch -->
+          <div class="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-obsidian-900 border border-white/[0.08]">
+            <button
+              type="button"
+              id="billingMonthlyBtn"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer"
+            >
+              Monthly Billing
+            </button>
+            <button
+              type="button"
+              id="billingAnnualBtn"
+              class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-500 text-white shadow-glow-indigo transition-all cursor-pointer flex items-center gap-2"
+            >
+              <span>Annual Billing</span>
+              <span class="px-1.5 py-0.5 text-xs font-mono bg-obsidian-950/60 text-emerald-300 rounded">SAVE 20%</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Monthly Execution Estimator Bar -->
+        <div class="max-w-3xl mx-auto mb-12 p-5 sm:p-6 rounded-2xl bg-obsidian-900/80 border border-white/[0.08] reveal-up">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <label for="volumeSlider" class="text-xs sm:text-sm font-medium text-slate-300">
+              Estimated Monthly Workflow Executions: <strong id="volumeDisplayLabel" class="font-mono text-white">10M events / mo</strong>
+            </label>
+            <span class="text-xs font-mono text-cyan-300">Zero cold-start surcharges</span>
+          </div>
+          <input
+            id="volumeSlider"
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value="2"
+            class="velox-slider"
+          />
+          <div class="flex justify-between text-[12.5px] font-mono text-slate-400 mt-2">
+            <span>1M</span>
+            <span>10M</span>
+            <span>50M</span>
+            <span>250M</span>
+            <span>1B+</span>
+          </div>
+        </div>
+
+        <!-- 3 Pricing Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch reveal-up">
+
+          <!-- Tier 1: Hobby / Developer -->
+          <div class="bento-card p-8 flex flex-col justify-between">
+            <div class="bento-content">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display text-xl font-bold text-white">Developer</h3>
+                <span class="text-xs font-mono text-slate-400">For side projects</span>
+              </div>
+              <p class="text-sm text-slate-400 mb-6">
+                Full access to the global edge mesh and durable workflow studio for solo builders.
+              </p>
+              <div class="flex items-baseline gap-1 mb-6">
+                <span class="font-display text-4xl sm:text-5xl font-extrabold text-white">$0</span>
+                <span class="text-xs font-mono text-slate-400">/ forever</span>
+              </div>
+
+              <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                <li class="flex items-center gap-2.5">
+                  <span class="text-emerald-400">✓</span>
+                  <span>1,000,000 free workflow steps / mo</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-emerald-400">✓</span>
+                  <span>Deploy to 320+ Global Edge PoPs</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-emerald-400">✓</span>
+                  <span>7-day OpenTelemetry trace retention</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-emerald-400">✓</span>
+                  <span>Community Discord &amp; CLI emulator</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="#cta"
+              class="bento-content w-full py-3.5 px-5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-center text-sm font-semibold text-white transition-all"
+            >
+              Start Free Forever
+            </a>
+          </div>
+
+          <!-- Tier 2: Pro / Scale (Highlighted) -->
+          <div class="bento-card p-8 flex flex-col justify-between border-indigo-500/50 shadow-glow-indigo relative">
+            <div class="bento-content">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display text-xl font-bold text-white">Pro Scale</h3>
+                <span class="px-2.5 py-1 rounded-full text-[12.5px] font-mono font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                  MOST POPULAR
+                </span>
+              </div>
+              <p class="text-sm text-slate-400 mb-6">
+                For production SaaS teams requiring high concurrency, multiplayer debugging, and SLAs.
+              </p>
+              <div class="flex items-baseline gap-1 mb-6">
+                <span id="proPriceValue" class="font-display text-4xl sm:text-5xl font-extrabold text-white">$79</span>
+                <span class="text-xs font-mono text-slate-400">/ month <span id="proBillingNote">(billed annually)</span></span>
+              </div>
+
+              <ul class="space-y-3 text-sm text-slate-200 mb-8">
+                <li class="flex items-center gap-2.5">
+                  <span class="text-indigo-400">✓</span>
+                  <span><strong id="proEventsQuota">10M</strong> included workflow steps / mo</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-indigo-400">✓</span>
+                  <span>Unlimited team seats &amp; PR preview branches</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-indigo-400">✓</span>
+                  <span>90-day hot trace &amp; flamegraph retention</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-indigo-400">✓</span>
+                  <span>Automated canary rollbacks &amp; PagerDuty sync</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-indigo-400">✓</span>
+                  <span>SOC2 Type II compliance reports</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="#cta"
+              class="bento-content w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-center text-sm font-semibold text-white shadow-glow-indigo transition-all"
+            >
+              Start 14-Day Pro Trial
+            </a>
+          </div>
+
+          <!-- Tier 3: Enterprise -->
+          <div class="bento-card p-8 flex flex-col justify-between">
+            <div class="bento-content">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display text-xl font-bold text-white">Enterprise</h3>
+                <span class="text-xs font-mono text-cyan-300">Custom BYOC</span>
+              </div>
+              <p class="text-sm text-slate-400 mb-6">
+                Dedicated bare-metal enclaves, custom data residency, and 99.999% contractual uptime SLA.
+              </p>
+              <div class="flex items-baseline gap-1 mb-6">
+                <span class="font-display text-4xl sm:text-5xl font-extrabold text-white">Custom</span>
+                <span class="text-xs font-mono text-slate-400">/ annual contract</span>
+              </div>
+
+              <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                <li class="flex items-center gap-2.5">
+                  <span class="text-cyan-400">✓</span>
+                  <span>Bring Your Own Cloud (AWS, GCP, Azure VPC)</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-cyan-400">✓</span>
+                  <span>Dedicated H100 GPU &amp; bare-metal edge isolates</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-cyan-400">✓</span>
+                  <span>HIPAA BAA, FedRAMP &amp; custom KMS keys</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <span class="text-cyan-400">✓</span>
+                  <span>24/7/365 Slack channel with principal engineers</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="#cta"
+              class="bento-content w-full py-3.5 px-5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-center text-sm font-semibold text-white transition-all"
+            >
+              Book Architecture Review
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         7. INTERACTIVE FAQ ACCORDION
+         ===================================================================== -->
+    <section id="faq" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-white/[0.06]">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-14 reveal-up">
+          <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">Technical FAQ</span>
+          <h2 class="section-heading text-white mt-2">
+            Questions from engineering teams.
+          </h2>
+        </div>
+
+        <div class="space-y-4 reveal-up">
+          <div class="bento-card">
+            <button type="button" class="faq-trigger bento-content w-full px-6 py-5 text-left flex items-center justify-between gap-4 cursor-pointer" aria-expanded="true">
+              <span class="font-display font-semibold text-base sm:text-lg text-white">How does Velox achieve 0.00ms cold starts across 320+ edge locations?</span>
+              <span class="faq-icon text-indigo-400 font-mono text-xl leading-none">−</span>
+            </button>
+            <div class="faq-content bento-content px-6 pb-5 text-sm sm:text-base text-slate-400 leading-relaxed">
+              Instead of booting heavy Docker containers, Velox compiles your workflows and services into lightweight V8/WebAssembly isolates with pre-initialized memory snapshots. Isolates spin up during the TLS handshake itself—before the first HTTP packet finishes arriving.
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <button type="button" class="faq-trigger bento-content w-full px-6 py-5 text-left flex items-center justify-between gap-4 cursor-pointer" aria-expanded="false">
+              <span class="font-display font-semibold text-base sm:text-lg text-white">Can we run Velox inside our own AWS or GCP Virtual Private Cloud (BYOC)?</span>
+              <span class="faq-icon text-indigo-400 font-mono text-xl leading-none">+</span>
+            </button>
+            <div class="faq-content hidden bento-content px-6 pb-5 text-sm sm:text-base text-slate-400 leading-relaxed">
+              Yes. With our Enterprise plan, the Velox data plane runs entirely inside your own AWS, GCP, or Azure VPC via a stateless Kubernetes operator, while your team still enjoys the unified Velox control plane UI and instant rollbacks.
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <button type="button" class="faq-trigger bento-content w-full px-6 py-5 text-left flex items-center justify-between gap-4 cursor-pointer" aria-expanded="false">
+              <span class="font-display font-semibold text-base sm:text-lg text-white">What happens if a third-party API fails mid-workflow?</span>
+              <span class="faq-icon text-indigo-400 font-mono text-xl leading-none">+</span>
+            </button>
+            <div class="faq-content hidden bento-content px-6 pb-5 text-sm sm:text-base text-slate-400 leading-relaxed">
+              Every `step.run()` call is automatically persisted to our distributed Raft journal. If a downstream API times out on step 4, Velox retries only step 4 with exponential backoff—steps 1 through 3 are never re-executed or double-charged.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         8. STRONG ARCHITECTURAL CTA SECTION
+         ===================================================================== -->
+    <section id="cta" class="py-24 sm:py-32 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-6xl mx-auto">
+        <div class="relative rounded-3xl overflow-hidden border border-indigo-500/35 bg-gradient-to-b from-indigo-950/60 via-obsidian-900 to-obsidian-950 p-8 sm:p-14 lg:p-20 text-center shadow-glow-indigo reveal-up">
+          <!-- Ambient Radial Glow inside CTA -->
+          <div class="absolute -top-36 left-1/2 -translate-x-1/2 w-[620px] h-[320px] rounded-full bg-indigo-500/25 blur-[110px] pointer-events-none" aria-hidden="true"></div>
+
+          <div class="relative z-10 max-w-3xl mx-auto">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.06] border border-white/15 text-xs font-mono text-indigo-200 mb-6">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Provision your global cluster in 30 seconds</span>
+            </span>
+
+            <h2 class="section-heading text-white mb-6">
+              Ready to experience sub-millisecond infrastructure?
+            </h2>
+
+            <p class="text-base sm:text-lg text-slate-300 mb-10 leading-relaxed">
+              Join 14,000+ engineering teams shipping resilient workflows and edge APIs on Velox. Start with 1,000,000 free monthly steps—no credit card required.
+            </p>
+
+            <!-- Interactive Workspace Claim Form -->
+            <form id="claimWorkspaceForm" class="max-w-xl mx-auto flex flex-col sm:flex-row gap-3" novalidate>
+              <div class="flex-1 flex items-center rounded-2xl bg-obsidian-950/90 border border-white/15 focus-within:border-indigo-400 px-4 py-3.5">
+                <span class="text-xs sm:text-sm font-mono text-slate-400 select-none">velox.sh/</span>
+                <input
+                  type="text"
+                  id="workspaceSlugInput"
+                  placeholder="your-team-name"
+                  required
+                  aria-label="Workspace team slug"
+                  class="w-full bg-transparent text-xs sm:text-sm font-mono text-white placeholder-slate-500 focus:outline-none ml-0.5"
+                />
+              </div>
+              <button
+                type="submit"
+                class="px-7 py-4 rounded-2xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 shadow-glow-indigo transition-all cursor-pointer whitespace-nowrap"
+              >
+                Claim Workspace →
+              </button>
+            </form>
+
+            <p id="claimWorkspaceFeedback" class="mt-4 text-xs font-mono text-emerald-400 hidden" role="status"></p>
+
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-mono">
+              <span>✓ Instant GitHub / GitLab SSO</span>
+              <span>✓ Full Terraform &amp; Pulumi Provider</span>
+              <span>✓ Cancel or export anytime</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================================
+       FOOTER
+       ===================================================================== -->
+  <footer class="border-t border-white/[0.07] bg-obsidian-950 py-16 px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-10 pb-12 border-b border-white/[0.06]">
+        <div class="col-span-2">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold">V</div>
+            <span class="font-display font-bold text-lg text-white">VELOX</span>
+          </div>
+          <p class="text-sm text-slate-400 max-w-xs leading-relaxed mb-6">
+            The autonomous cloud control plane for deterministic workflows, sub-millisecond edge compute, and high-cardinality observability.
+          </p>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-xs font-mono text-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>All 324 Edge PoPs Operational (99.998%)</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-xs uppercase tracking-wider text-white mb-4">Platform</h4>
+          <ul class="space-y-2.5 text-sm text-slate-400">
+            <li><a href="#features" class="hover:text-white transition-colors">Workflow DAG</a></li>
+            <li><a href="#features" class="hover:text-white transition-colors">Anycast Edge</a></li>
+            <li><a href="#showcase" class="hover:text-white transition-colors">eBPF Tracing</a></li>
+            <li><a href="#showcase" class="hover:text-white transition-colors">Zero-Trust Vault</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-xs uppercase tracking-wider text-white mb-4">Developers</h4>
+          <ul class="space-y-2.5 text-sm text-slate-400">
+            <li><a href="#showcase" class="hover:text-white transition-colors">TypeScript SDK</a></li>
+            <li><a href="#showcase" class="hover:text-white transition-colors">Rust Crate</a></li>
+            <li><a href="#showcase" class="hover:text-white transition-colors">CLI Reference</a></li>
+            <li><a href="#faq" class="hover:text-white transition-colors">Architecture Docs</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-xs uppercase tracking-wider text-white mb-4">Company</h4>
+          <ul class="space-y-2.5 text-sm text-slate-400">
+            <li><a href="#testimonials" class="hover:text-white transition-colors">Customers</a></li>
+            <li><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></li>
+            <li><a href="#faq" class="hover:text-white transition-colors">Security &amp; SOC2</a></li>
+            <li><a href="#cta" class="hover:text-white transition-colors">Contact Sales</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-xs uppercase tracking-wider text-white mb-4">Legal</h4>
+          <ul class="space-y-2.5 text-sm text-slate-400">
+            <li><a href="#cta" class="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><a href="#cta" class="hover:text-white transition-colors">Terms of Service</a></li>
+            <li><a href="#cta" class="hover:text-white transition-colors">DPA &amp; GDPR</a></li>
+            <li><a href="#cta" class="hover:text-white transition-colors">SLA Guarantee</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+        <span>© 2026 Velox Labs, Inc. Crafted with precision.</span>
+        <span>Press <kbd class="px-1.5 py-0.5 bg-white/[0.06] text-slate-300 rounded">⌘K</kbd> anytime to open Quick Jump</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       INTERACTIVE COMMAND PALETTE MODAL (⌘K)
+       ===================================================================== -->
+  <div
+    id="cmdPaletteModal"
+    class="fixed inset-0 z-50 hidden items-start justify-center pt-24 px-4 bg-black/75 backdrop-blur-md"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Command Palette"
+  >
+    <div class="w-full max-w-lg rounded-2xl bg-obsidian-900 border border-white/15 shadow-2xl overflow-hidden">
+      <div class="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.08]">
+        <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input
+          id="cmdSearchInput"
+          type="text"
+          placeholder="Type a command or jump to section..."
+          class="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+        />
+        <button type="button" id="closeCmdPaletteBtn" class="px-2 py-0.5 text-xs font-mono bg-white/[0.06] text-slate-400 rounded hover:text-white cursor-pointer">ESC</button>
+      </div>
+      <div id="cmdList" class="p-2 max-h-72 overflow-y-auto space-y-1 text-xs">
+        <a href="#features" class="cmd-item flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-indigo-500/20 text-slate-200">
+          <span>Jump to Bento Platform Features</span>
+          <span class="font-mono text-slate-400">#features</span>
+        </a>
+        <a href="#showcase" class="cmd-item flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-indigo-500/20 text-slate-200">
+          <span>Inspect Distributed Trace Waterfall</span>
+          <span class="font-mono text-slate-400">#showcase</span>
+        </a>
+        <a href="#testimonials" class="cmd-item flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-indigo-500/20 text-slate-200">
+          <span>Read Customer Engineering Case Studies</span>
+          <span class="font-mono text-slate-400">#testimonials</span>
+        </a>
+        <a href="#pricing" class="cmd-item flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-indigo-500/20 text-slate-200">
+          <span>Calculate Monthly Workflow Pricing</span>
+          <span class="font-mono text-slate-400">#pricing</span>
+        </a>
+        <a href="#cta" class="cmd-item flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-indigo-500/20 text-indigo-300 font-semibold">
+          <span>Claim Free Velox Workspace →</span>
+          <span class="font-mono text-indigo-400">ENTER</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       PRODUCTION MICRO-INTERACTIONS & TELEMETRY SCRIPT
+       ===================================================================== -->
+  <script>
+    (function () {
+      // 1. Mobile Navigation Drawer
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenuDrawer = document.getElementById('mobileMenuDrawer');
+      const menuIconOpen = document.getElementById('menuIconOpen');
+      const menuIconClose = document.getElementById('menuIconClose');
+
+      if (mobileMenuBtn && mobileMenuDrawer) {
+        mobileMenuBtn.addEventListener('click', () => {
+          const isOpen = !mobileMenuDrawer.classList.contains('hidden');
+          mobileMenuDrawer.classList.toggle('hidden');
+          menuIconOpen.classList.toggle('hidden', !isOpen);
+          menuIconClose.classList.toggle('hidden', isOpen);
+          mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+        });
+
+        document.querySelectorAll('.mobile-nav-link').forEach((link) => {
+          link.addEventListener('click', () => {
+            mobileMenuDrawer.classList.add('hidden');
+            menuIconOpen.classList.remove('hidden');
+            menuIconClose.classList.add('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+
+      // 2. Cursor-Tracking Radial Spotlight on Bento Cards
+      const bentoCards = document.querySelectorAll('.bento-card');
+      bentoCards.forEach((card) => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+
+      // 3. Scroll-Triggered Reveal Animations (IntersectionObserver)
+      const revealElements = document.querySelectorAll('.reveal-up');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12 }
+        );
+        revealElements.forEach((el) => observer.observe(el));
+      } else {
+        revealElements.forEach((el) => el.classList.add('is-visible'));
+      }
+
+      // 4. Copy CLI Command Micro-Interaction
+      const copyCliBtn = document.getElementById('copyCliBtn');
+      const copyCliStatus = document.getElementById('copyCliStatus');
+      if (copyCliBtn && copyCliStatus) {
+        copyCliBtn.addEventListener('click', () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText('npx velox-cli@latest init').catch(() => {});
+          }
+          copyCliStatus.textContent = 'Copied ✓';
+          copyCliStatus.classList.add('text-emerald-300');
+          setTimeout(() => {
+            copyCliStatus.textContent = 'Copy';
+            copyCliStatus.classList.remove('text-emerald-300');
+          }, 2000);
+        });
+      }
+
+      // 5. Hero Control Plane Mode Switcher & Burst Simulator
+      const heroTabBtns = document.querySelectorAll('.hero-tab-btn');
+      const heroCanvasTitle = document.getElementById('heroCanvasTitle');
+      const heroCanvasSubtitle = document.getElementById('heroCanvasSubtitle');
+      const heroMetricCold = document.getElementById('heroMetricCold');
+      const heroMetricIsolates = document.getElementById('heroMetricIsolates');
+      const heroMetricError = document.getElementById('heroMetricError');
+
+      const heroModes = {
+        topology: {
+          title: 'Autonomous Execution DAG',
+          subtitle: 'Global Request Routing & Self-Healing Mesh',
+          cold: '0.00 ms',
+          isolates: '18,420',
+          err: '99.998%',
+        },
+        traces: {
+          title: 'eBPF Kernel Telemetry',
+          subtitle: 'Zero-Sampling Distributed Flamegraph Stream',
+          cold: '0.12 ms',
+          isolates: '24,910',
+          err: '99.999%',
+        },
+        deploy: {
+          title: 'Atomic Content-Addressed Rollout',
+          subtitle: '324 Edge PoPs Synchronized in 180ms',
+          cold: '0.00 ms',
+          isolates: '32,400',
+          err: '100.00%',
+        },
+      };
+
+      heroTabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-hero-tab');
+          heroTabBtns.forEach((b) => {
+            b.setAttribute('aria-selected', 'false');
+            b.className = 'hero-tab-btn px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-transparent transition-all cursor-pointer';
+          });
+          btn.setAttribute('aria-selected', 'true');
+          btn.className = 'hero-tab-btn px-3 py-1 rounded-lg text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition-all cursor-pointer';
+
+          if (heroModes[mode]) {
+            heroCanvasTitle.textContent = heroModes[mode].title;
+            heroCanvasSubtitle.textContent = heroModes[mode].subtitle;
+            heroMetricCold.textContent = heroModes[mode].cold;
+            heroMetricIsolates.textContent = heroModes[mode].isolates;
+            heroMetricError.textContent = heroModes[mode].err;
+          }
+        });
+      });
+
+      const simulateBurstBtn = document.getElementById('simulateBurstBtn');
+      const heroLiveRps = document.getElementById('heroLiveRps');
+      const burstBadge = document.getElementById('burstBadge');
+      if (simulateBurstBtn) {
+        simulateBurstBtn.addEventListener('click', () => {
+          heroLiveRps.textContent = '1,420,880 req/s';
+          heroMetricIsolates.textContent = '142,800';
+          burstBadge.textContent = 'Auto-Scaling: 10x BURST ACTIVE';
+          burstBadge.className = 'px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+          setTimeout(() => {
+            heroLiveRps.textContent = '148,920 req/s';
+            heroMetricIsolates.textContent = '18,420';
+            burstBadge.textContent = 'Auto-Scaling: Standby';
+            burstBadge.className = 'px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-white/[0.05] text-slate-300 border border-white/10';
+          }, 3200);
+        });
+      }
+
+      // 6. Bento Card 1: Interactive DAG Step Inspector & Runner
+      const dagSnippets = [
+        'step.run("ingest-webhook", async (ctx) => ctx.verifySignature())',
+        'step.run("embed-vector", async (ctx) => ctx.qdrant.upsert(1536))',
+        'step.run("reason-guardrail", async (ctx) => ctx.policy.assertSafe())',
+        'step.commit("edge-replicate", { quorum: "global", rtt: "0.6ms" })',
+      ];
+      const dagCards = document.querySelectorAll('.dag-step-card');
+      const dagInspectorText = document.getElementById('dagInspectorText');
+      const runDagBtn = document.getElementById('runDagBtn');
+      const runDagBtnLabel = document.getElementById('runDagBtnLabel');
+
+      function activateDagStep(idx) {
+        dagCards.forEach((c, i) => {
+          if (i === idx) {
+            c.className = 'dag-step-card text-left p-3 rounded-xl bg-indigo-500/15 border border-indigo-500/40 transition-all cursor-pointer';
+          } else {
+            c.className = 'dag-step-card text-left p-3 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:border-white/20 transition-all cursor-pointer';
+          }
+        });
+        if (dagInspectorText && dagSnippets[idx]) {
+          dagInspectorText.textContent = dagSnippets[idx];
+        }
+      }
+
+      dagCards.forEach((card, index) => {
+        card.addEventListener('click', () => activateDagStep(index));
+      });
+
+      if (runDagBtn) {
+        runDagBtn.addEventListener('click', () => {
+          runDagBtnLabel.textContent = 'Running...';
+          let step = 0;
+          const interval = setInterval(() => {
+            activateDagStep(step);
+            step++;
+            if (step >= dagCards.length) {
+              clearInterval(interval);
+              setTimeout(() => {
+                runDagBtnLabel.textContent = 'Execute Pipeline';
+              }, 500);
+            }
+          }, 360);
+        });
+      }
+
+      // 7. Bento Card 2: Interactive Global Region Latency Selector
+      const regionBtns = document.querySelectorAll('.region-btn');
+      const regionCityLabel = document.getElementById('regionCityLabel');
+      const regionLatencyValue = document.getElementById('regionLatencyValue');
+      const regionRpsValue = document.getElementById('regionRpsValue');
+
+      regionBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          regionBtns.forEach((b) => {
+            b.className = 'region-btn px-3 py-2 rounded-xl text-xs font-mono bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.07] cursor-pointer transition-all';
+          });
+          btn.className = 'region-btn px-3 py-2 rounded-xl text-xs font-mono bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 cursor-pointer transition-all';
+          regionCityLabel.textContent = `${btn.getAttribute('data-city')} (${btn.getAttribute('data-region')}-01)`;
+          regionLatencyValue.textContent = btn.getAttribute('data-latency');
+          regionRpsValue.textContent = btn.getAttribute('data-rps');
+        });
+      });
+
+      // 8. Product Showcase Tabs
+      const showcaseBtns = document.querySelectorAll('.showcase-tab-btn');
+      const showcasePanels = {
+        observability: document.getElementById('showcase-panel-observability'),
+        sdk: document.getElementById('showcase-panel-sdk'),
+        rollbacks: document.getElementById('showcase-panel-rollbacks'),
+      };
+
+      showcaseBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-showcase-tab');
+          showcaseBtns.forEach((b) => {
+            b.setAttribute('aria-selected', 'false');
+            b.className = 'showcase-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all cursor-pointer';
+          });
+          btn.setAttribute('aria-selected', 'true');
+          btn.className = 'showcase-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-glow-indigo transition-all cursor-pointer';
+
+          Object.keys(showcasePanels).forEach((key) => {
+            const panel = showcasePanels[key];
+            if (!panel) return;
+            if (key === target) {
+              panel.classList.remove('hidden');
+              panel.classList.add('grid');
+            } else {
+              panel.classList.add('hidden');
+              panel.classList.remove('grid');
+            }
+          });
+        });
+      });
+
+      // 9. Accessible Testimonials Carousel with Pause/Prev/Next
+      const testimonials = [
+        {
+          company: 'HYPERION FINANCIAL SYSTEMS',
+          quote: '“Migrating our core settlement workflows from Kubernetes + Temporal to Velox cut our p99 global latency from 48ms down to 0.9ms while reducing cloud compute spend by 64%.”',
+          initials: 'SL',
+          author: 'Soren Lindqvist',
+          role: 'VP of Infrastructure, Hyperion (Series D)',
+          m1Val: '53x',
+          m1Label: 'Faster p99 workflow execution',
+          m2Val: '-64%',
+          m2Label: 'Reduction in monthly AWS bill',
+        },
+        {
+          company: 'ORBITAL AUTONOMOUS LABS',
+          quote: '“Our AI agents execute 180M durable tool calls every day on Velox. Automatic state checkpointing means we never lose context even when upstream LLM providers rate-limit.”',
+          initials: 'MC',
+          author: 'Maya Chen',
+          role: 'Principal Systems Architect, Orbital.ai',
+          m1Val: '180M+',
+          m1Label: 'Daily durable agent steps',
+          m2Val: '99.999%',
+          m2Label: 'Workflow completion reliability',
+        },
+        {
+          company: 'VECTRA GLOBAL COMMERCE',
+          quote: '“With Velox Anycast isolates, checkout latency in Tokyo, Frankfurt, and São Paulo dropped below 1 millisecond. Conversion rates jumped 11.4% in the first week.”',
+          initials: 'JR',
+          author: 'Julian Vance',
+          role: 'CTO, Vectra Commerce',
+          m1Val: '+11.4%',
+          m1Label: 'Global checkout conversion lift',
+          m2Val: '0.84ms',
+          m2Label: 'Worldwide p99 edge response',
+        },
+      ];
+
+      let currentSlide = 0;
+      let isCarouselPaused = false;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const spotlightCompanyTag = document.getElementById('spotlightCompanyTag');
+      const spotlightQuote = document.getElementById('spotlightQuote');
+      const spotlightAvatar = document.getElementById('spotlightAvatar');
+      const spotlightAuthor = document.getElementById('spotlightAuthor');
+      const spotlightRole = document.getElementById('spotlightRole');
+      const spotlightMetric1Val = document.getElementById('spotlightMetric1Val');
+      const spotlightMetric1Label = document.getElementById('spotlightMetric1Label');
+      const spotlightMetric2Val = document.getElementById('spotlightMetric2Val');
+      const spotlightMetric2Label = document.getElementById('spotlightMetric2Label');
+      const testimonialSlideStatus = document.getElementById('testimonialSlideStatus');
+      const testimonialPauseBtn = document.getElementById('testimonialPauseBtn');
+
+      function renderTestimonial(idx) {
+        const item = testimonials[idx];
+        if (!item) return;
+        spotlightCompanyTag.textContent = item.company;
+        spotlightQuote.textContent = item.quote;
+        spotlightAvatar.textContent = item.initials;
+        spotlightAuthor.textContent = item.author;
+        spotlightRole.textContent = item.role;
+        spotlightMetric1Val.textContent = item.m1Val;
+        spotlightMetric1Label.textContent = item.m1Label;
+        spotlightMetric2Val.textContent = item.m2Val;
+        spotlightMetric2Label.textContent = item.m2Label;
+        testimonialSlideStatus.textContent = `0${idx + 1} / 0${testimonials.length}`;
+      }
+
+      document.getElementById('testimonialPrevBtn')?.addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + testimonials.length) % testimonials.length;
+        renderTestimonial(currentSlide);
+      });
+
+      document.getElementById('testimonialNextBtn')?.addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % testimonials.length;
+        renderTestimonial(currentSlide);
+      });
+
+      testimonialPauseBtn?.addEventListener('click', () => {
+        isCarouselPaused = !isCarouselPaused;
+        testimonialPauseBtn.textContent = isCarouselPaused ? 'Play' : 'Pause';
+        testimonialPauseBtn.setAttribute('aria-pressed', String(isCarouselPaused));
+      });
+
+      if (!prefersReducedMotion) {
+        setInterval(() => {
+          if (!isCarouselPaused) {
+            currentSlide = (currentSlide + 1) % testimonials.length;
+            renderTestimonial(currentSlide);
+          }
+        }, 6500);
+      }
+
+      // 10. Pricing Calculator (Billing Toggle + Volume Slider)
+      let isAnnual = true;
+      const billingMonthlyBtn = document.getElementById('billingMonthlyBtn');
+      const billingAnnualBtn = document.getElementById('billingAnnualBtn');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const volumeDisplayLabel = document.getElementById('volumeDisplayLabel');
+      const proPriceValue = document.getElementById('proPriceValue');
+      const proBillingNote = document.getElementById('proBillingNote');
+      const proEventsQuota = document.getElementById('proEventsQuota');
+
+      const volumeTiers = {
+        1: { label: '1M events / mo', quota: '1M', monthly: 49, annual: 39 },
+        2: { label: '10M events / mo', quota: '10M', monthly: 99, annual: 79 },
+        3: { label: '50M events / mo', quota: '50M', monthly: 249, annual: 199 },
+        4: { label: '250M events / mo', quota: '250M', monthly: 599, annual: 479 },
+        5: { label: '1B+ events / mo', quota: '1B+', monthly: 1199, annual: 959 },
+      };
+
+      function updatePricing() {
+        const tier = volumeTiers[volumeSlider.value] || volumeTiers[2];
+        volumeDisplayLabel.textContent = tier.label;
+        proEventsQuota.textContent = tier.quota;
+        const price = isAnnual ? tier.annual : tier.monthly;
+        proPriceValue.textContent = `$${price}`;
+        proBillingNote.textContent = isAnnual ? '(billed annually)' : '(billed monthly)';
+      }
+
+      billingMonthlyBtn?.addEventListener('click', () => {
+        isAnnual = false;
+        billingMonthlyBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-500 text-white shadow-glow-indigo transition-all cursor-pointer';
+        billingAnnualBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-2';
+        updatePricing();
+      });
+
+      billingAnnualBtn?.addEventListener('click', () => {
+        isAnnual = true;
+        billingAnnualBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-500 text-white shadow-glow-indigo transition-all cursor-pointer flex items-center gap-2';
+        billingMonthlyBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer';
+        updatePricing();
+      });
+
+      volumeSlider?.addEventListener('input', updatePricing);
+
+      // 11. FAQ Accordion
+      document.querySelectorAll('.faq-trigger').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const content = trigger.nextElementSibling;
+          const icon = trigger.querySelector('.faq-icon');
+          const expanded = trigger.getAttribute('aria-expanded') === 'true';
+          trigger.setAttribute('aria-expanded', String(!expanded));
+          content.classList.toggle('hidden', expanded);
+          if (icon) icon.textContent = expanded ? '+' : '−';
+        });
+      });
+
+      // 12. Workspace Claim Form Feedback
+      const claimForm = document.getElementById('claimWorkspaceForm');
+      const slugInput = document.getElementById('workspaceSlugInput');
+      const feedbackEl = document.getElementById('claimWorkspaceFeedback');
+      claimForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const slug = (slugInput.value || 'acme-ops').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+        feedbackEl.textContent = `✓ Workspace velox.sh/${slug} is available! Provisioning edge isolate...`;
+        feedbackEl.classList.remove('hidden');
+      });
+
+      // 13. Command Palette Modal (⌘K / Ctrl+K)
+      const cmdModal = document.getElementById('cmdPaletteModal');
+      const openCmdBtn = document.getElementById('openCmdPaletteBtn');
+      const closeCmdBtn = document.getElementById('closeCmdPaletteBtn');
+      const cmdInput = document.getElementById('cmdSearchInput');
+
+      function openCmdModal() {
+        cmdModal.classList.remove('hidden');
+        cmdModal.classList.add('flex');
+        setTimeout(() => cmdInput?.focus(), 40);
+      }
+
+      function closeCmdModal() {
+        cmdModal.classList.add('hidden');
+        cmdModal.classList.remove('flex');
+      }
+
+      openCmdBtn?.addEventListener('click', openCmdModal);
+      closeCmdBtn?.addEventListener('click', closeCmdModal);
+      cmdModal?.addEventListener('click', (e) => {
+        if (e.target === cmdModal) closeCmdModal();
+      });
+
+      document.querySelectorAll('.cmd-item').forEach((item) => {
+        item.addEventListener('click', closeCmdModal);
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (cmdModal.classList.contains('hidden')) {
+            openCmdModal();
+          } else {
+            closeCmdModal();
+          }
+        } else if (e.key === 'Escape' && !cmdModal.classList.contains('hidden')) {
+          closeCmdModal();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

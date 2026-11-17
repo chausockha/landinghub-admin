@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERGE OPS v4.2 — Modern SaaS Operations &amp; E-Commerce Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', '"Inter"', 'sans-serif'],
+            grotesk: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            sidebarBg: '#131B26',
+            sidebarHover: '#1C2736',
+            sidebarBorder: '#222F42',
+            sidebarMuted: '#94A3B8',
+            emeraldBrand: '#10B981',
+            emeraldDark: '#059669',
+            canvasLight: '#F8FAFC',
+            cardBorder: '#E2E8F0',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    .verge-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+      transition: border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .verge-card-hover:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 10px 26px -6px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+
+    /* Sidebar desktop width transition: 268px <-> 78px */
+    .sidebar-shell {
+      width: 268px;
+      background-color: #131B26;
+      transition: width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (min-width: 1024px) {
+      body.sidebar-collapsed .sidebar-shell {
+        width: 78px;
+      }
+      body.sidebar-collapsed .main-shell {
+        padding-left: 78px;
+      }
+      body:not(.sidebar-collapsed) .main-shell {
+        padding-left: 268px;
+      }
+      body.sidebar-collapsed .sidebar-hide-collapsed {
+        display: none !important;
+      }
+      body.sidebar-collapsed .sidebar-nav-item {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      body.sidebar-collapsed .sidebar-brand-wrap {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      body.sidebar-collapsed .sidebar-user-wrap {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      body.sidebar-collapsed .sidebar-section-label {
+        opacity: 0;
+        height: 8px;
+        overflow: hidden;
+        margin-top: 4px;
+        margin-bottom: 4px;
+      }
+    }
+
+    .main-shell {
+      transition: padding-left 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 9999px;
+    }
+
+    /* Kinetic Data Visualization Animations */
+    @keyframes barRise {
+      from { transform: scaleY(0.08); opacity: 0.2; }
+      to { transform: scaleY(1); }
+    }
+
+    .bar-col {
+      transform-box: fill-box;
+      transform-origin: bottom;
+      animation: barRise 0.78s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      transition: opacity 0.2s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), height 0.45s cubic-bezier(0.22, 1, 0.36, 1), y 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      cursor: pointer;
+    }
+    .bar-col:hover {
+      opacity: 1 !important;
+      transform: scaleY(1.08);
+    }
+
+    .progress-fill-anim {
+      width: 0%;
+      transition: width 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes areaFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .area-fade {
+      animation: areaFadeIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes dashedDraw {
+      from { stroke-dashoffset: 240; opacity: 0.3; }
+      to { stroke-dashoffset: 0; opacity: 1; }
+    }
+
+    .dashed-series-anim {
+      animation: dashedDraw 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes beaconPing {
+      0% { transform: scale(1); opacity: 0.85; }
+      75%, 100% { transform: scale(2.35); opacity: 0; }
+    }
+
+    .beacon-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: beaconPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+    .live-dot {
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes valueFlash {
+      0% { color: #059669; }
+      100% { color: #0F172A; }
+    }
+    .kpi-flash {
+      animation: valueFlash 0.7s ease-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-emerald-500/20 selection:text-emerald-900">
+
+  <!-- Floating Mini-Sparkline Tooltip -->
+  <div id="miniBarTooltip" class="pointer-events-none fixed z-50 hidden px-2.5 py-1.5 rounded-lg bg-slate-900 text-white font-mono text-xs font-medium shadow-lg border border-slate-700 -translate-x-1/2 -translate-y-full"></div>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div id="mobileOverlay" class="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm hidden lg:hidden transition-opacity" onclick="closeMobileSidebar()"></div>
+
+  <!-- LEFT DARK CONTRAST SIDEBAR -->
+  <aside id="sidebar" class="sidebar-shell fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#222F42] text-[#94A3B8] -translate-x-full lg:translate-x-0 select-none">
+    <!-- Brand Header -->
+    <div class="sidebar-brand-wrap h-16 px-5 flex items-center justify-between border-b border-[#222F42] shrink-0">
+      <a href="#" onclick="switchNav('Operations', 'Home / Operations'); return false;" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3L4 7.5v9L12 21l8-4.5v-9L12 3z" />
+            <path d="M12 12l8-4.5" />
+            <path d="M12 12v9" />
+            <path d="M12 12L4 7.5" />
+          </svg>
+        </div>
+        <div class="sidebar-hide-collapsed flex items-center gap-2">
+          <span class="font-display font-bold text-base tracking-tight text-white">VERGE OPS</span>
+          <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-semibold">v4.2</span>
+        </div>
+      </a>
+      <button type="button" onclick="closeMobileSidebar()" class="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10" aria-label="Close navigation">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Scrollable Navigation -->
+    <nav class="sidebar-scroll flex-1 overflow-y-auto px-3 py-4 space-y-5" aria-label="Sidebar Navigation">
+      <!-- GENERAL -->
+      <div>
+        <div class="sidebar-section-label px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 transition-all">General</div>
+        <div class="space-y-1">
+          <!-- Expandable Dashboards -->
+          <div>
+            <button type="button" id="dashboardsGroupBtn" onclick="toggleDashboardsMenu()" title="Dashboards" class="sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-white bg-white/5 hover:bg-white/10 transition-colors">
+              <span class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                  <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                  <rect x="3" y="16" width="7" height="5" rx="1.5" />
+                </svg>
+                <span class="sidebar-hide-collapsed">Dashboards</span>
+              </span>
+              <svg id="dashboardsChevron" class="sidebar-hide-collapsed w-4 h-4 text-slate-400 transition-transform duration-200 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <!-- Submenu -->
+            <div id="dashboardsSubmenu" class="sidebar-hide-collapsed mt-1.5 ml-4 pl-3 border-l border-[#243247] space-y-1">
+              <button type="button" data-nav="Operations" onclick="switchNav('Operations', 'Home / Operations')" class="nav-link w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-semibold bg-[#10B981] text-white shadow-sm shadow-emerald-500/20 transition-all">
+                <span>Operations</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              </button>
+              <button type="button" data-nav="Analytics" onclick="switchNav('Analytics', 'Dashboards / Analytics')" class="nav-link w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+                <span>Analytics</span>
+              </button>
+              <button type="button" data-nav="Sales" onclick="switchNav('Sales', 'Dashboards / Sales')" class="nav-link w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+                <span>Sales</span>
+              </button>
+              <button type="button" data-nav="System Health" onclick="switchNav('System Health', 'Dashboards / System Health')" class="nav-link w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+                <span>System Health</span>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" data-nav="Forms" onclick="switchNav('Forms', 'General / Forms')" title="Forms" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Forms</span>
+            </span>
+            <span class="sidebar-hide-collapsed px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-semibold">Hot</span>
+          </button>
+
+          <button type="button" data-nav="Tables" onclick="switchNav('Tables', 'General / Tables')" title="Tables" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 9v12" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Tables</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Charts" onclick="switchNav('Charts', 'General / Charts')" title="Charts" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18" /><path d="M7 14l4-4 4 4 5-6" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Charts</span>
+            </span>
+            <span class="sidebar-hide-collapsed px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">New</span>
+          </button>
+
+          <button type="button" data-nav="Calendar" onclick="switchNav('Calendar', 'General / Calendar')" title="Calendar" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Calendar</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Geo Map" onclick="switchNav('Geo Map', 'General / Geo Map')" title="Geo Map" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="10" r="3" /><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 10-16 0c0 3 2.7 7 8 11.7z" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Geo Map</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- APPS -->
+      <div>
+        <div class="sidebar-section-label px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 transition-all">Apps</div>
+        <div class="space-y-1">
+          <button type="button" data-nav="Chat" onclick="switchNav('Chat', 'Apps / Chat')" title="Chat" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Chat</span>
+            </span>
+            <span class="sidebar-hide-collapsed px-2 py-0.5 rounded-full bg-emerald-500 text-white text-xs font-semibold">3</span>
+          </button>
+
+          <button type="button" data-nav="Inbox" onclick="switchNav('Inbox', 'Apps / Inbox')" title="Inbox" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+                <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Inbox</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Kanban" onclick="switchNav('Kanban', 'Apps / Kanban')" title="Kanban" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="5" height="18" rx="1" /><rect x="10" y="3" width="5" height="12" rx="1" /><rect x="17" y="3" width="4" height="15" rx="1" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Kanban</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Files" onclick="switchNav('Files', 'Apps / Files')" title="Files" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Files</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Notifications" onclick="switchNav('Notifications', 'Apps / Notifications')" title="Notifications" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Notifications</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- E-COMMERCE -->
+      <div>
+        <div class="sidebar-section-label px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 transition-all">E-Commerce</div>
+        <div class="space-y-1">
+          <button type="button" data-nav="Storefront" onclick="switchNav('Storefront', 'E-Commerce / Storefront')" title="Storefront" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Storefront</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Products" onclick="switchNav('Products', 'E-Commerce / Products')" title="Products" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Products</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Orders" onclick="switchNav('Orders', 'E-Commerce / Orders')" title="Orders" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Orders</span>
+            </span>
+          </button>
+
+          <button type="button" data-nav="Invoices" onclick="switchNav('Invoices', 'E-Commerce / Invoices')" title="Invoices" class="nav-link sidebar-nav-item w-full min-h-[42px] px-3 rounded-xl flex items-center justify-between text-sm font-medium text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              <span class="sidebar-hide-collapsed">Invoices</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- User Footer -->
+    <div class="p-3 border-t border-[#222F42] shrink-0">
+      <div class="sidebar-user-wrap flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer" onclick="showToast('Signed in as Aigars Silkalns (Operations Lead)')">
+        <div class="relative shrink-0">
+          <div class="w-10 h-10 rounded-full bg-emerald-500 text-white font-display font-bold text-sm flex items-center justify-center shadow-md shadow-emerald-500/20">
+            AS
+          </div>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#131B26]"></span>
+        </div>
+        <div class="sidebar-hide-collapsed min-w-0 flex-1">
+          <p class="text-sm font-semibold text-white truncate">Aigars Silkalns</p>
+          <p class="text-xs text-[#94A3B8] truncate">Operations Lead</p>
+        </div>
+        <svg class="sidebar-hide-collapsed w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN LIGHT WORKSPACE -->
+  <div class="main-shell min-h-screen flex flex-col">
+    <!-- Sticky White Topbar -->
+    <header class="sticky top-0 z-30 h-16 bg-white/95 backdrop-blur border-b border-[#E2E8F0] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <!-- Left: Collapse button + Breadcrumb -->
+      <div class="flex items-center gap-3 min-w-0">
+        <button type="button" onclick="handleSidebarToggle()" class="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shrink-0" aria-label="Toggle sidebar" title="Toggle Sidebar">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="14" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
+          </svg>
+        </button>
+
+        <nav aria-label="Breadcrumb" class="hidden sm:flex items-center gap-2 text-sm">
+          <span class="text-slate-500 font-medium" id="breadcrumbRoot">Home</span>
+          <svg class="w-4 h-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-slate-900 font-semibold" id="breadcrumbCurrent">Operations</span>
+        </nav>
+      </div>
+
+      <!-- Center: Command Search -->
+      <div class="flex-1 max-w-md">
+        <button type="button" onclick="openCommandModal()" class="w-full h-[42px] px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200 flex items-center justify-between text-sm text-slate-500 transition-all group">
+          <span class="flex items-center gap-2.5 truncate">
+            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+            </svg>
+            <span class="truncate">Search pages or run a command...</span>
+          </span>
+          <kbd class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 font-mono text-xs font-medium text-slate-500 shadow-sm shrink-0">Cmd+K</kbd>
+        </button>
+      </div>
+
+      <!-- Right: Live Telemetry Toggle + Bell + Mail + Avatar -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <!-- Live Telemetry Stream Switch -->
+        <button id="liveStreamToggle" type="button" onclick="toggleLiveTelemetry()" class="hidden md:inline-flex h-10 px-3 rounded-xl border border-emerald-200 bg-emerald-50/80 text-emerald-800 text-xs font-semibold items-center gap-2 transition-all" title="Toggle real-time KPI &amp; packet telemetry">
+          <span class="relative flex h-2.5 w-2.5">
+            <span id="liveStreamPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
+            <span id="liveStreamDot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span id="liveStreamLabel">Live Stream: ON</span>
+        </button>
+
+        <button type="button" onclick="showToast('3 unread operations alerts in queue')" class="relative w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors" aria-label="Notifications">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <span class="live-dot absolute top-2 right-2.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+        </button>
+
+        <button type="button" onclick="showToast('Inbox synced: 2 partner messages received')" class="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors" aria-label="Messages">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" /><path d="M22 7l-10 7L2 7" />
+          </svg>
+        </button>
+
+        <button type="button" onclick="showToast('Workspace profile: Aigars Silkalns')" class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-display font-bold text-sm flex items-center justify-center shadow-sm transition-colors" aria-label="Account Profile">
+          A
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Body -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-7 max-w-[1600px] w-full mx-auto space-y-6">
+      <div id="defaultDashboardView" class="space-y-6">
+
+      <!-- Page Header Row -->
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-1">Overview</p>
+          <h1 id="pageMainHeading" class="font-display text-[26px] leading-tight font-bold text-slate-900 tracking-tight">Operations Dashboard</h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" onclick="openNewViewModal()" class="h-[42px] px-4 rounded-xl bg-white hover:bg-slate-50 border border-[#E2E8F0] text-slate-700 text-sm font-semibold inline-flex items-center gap-2 shadow-sm transition-all">
+            <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>New view</span>
+          </button>
+          <button type="button" onclick="openReportModal()" class="h-[42px] px-4 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/20 transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>Create report</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- LIVE SVG DATA FLOW / TELEMETRY TOPOLOGY STRIP -->
+      <section aria-label="Live Operations Data Flow Pipeline" class="verge-card px-5 py-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-display text-sm font-bold text-slate-900">Real-Time Operations Event Mesh</h2>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-xs font-semibold" id="meshThroughputBadge">1,428 req/s</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5" id="meshInspectorText">Hover any pipeline node to inspect live latency &amp; packet routing</p>
+            </div>
+          </div>
+
+          <!-- Animated SVG Data Flow Mesh with <animateMotion> Packets & Pulsing Beacons -->
+          <div class="flex-1 max-w-3xl overflow-x-auto">
+            <svg class="w-full min-w-[540px] h-[66px]" viewBox="0 0 680 66" fill="none" aria-label="Animated operations packet mesh">
+              <!-- Conduit Paths -->
+              <path id="flowEdgeToGateway" d="M 76 33 C 128 33, 152 33, 210 33" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 4" />
+              <path id="flowGatewayToOrder" d="M 250 33 C 305 12, 345 12, 404 24" stroke="#A7F3D0" stroke-width="2.2" />
+              <path id="flowGatewayToCache" d="M 250 33 C 305 54, 345 54, 404 42" stroke="#BAE6FD" stroke-width="2.2" />
+              <path id="flowMergeToLake" d="M 444 33 C 505 33, 545 33, 602 33" stroke="#DDD6FE" stroke-width="2.2" />
+
+              <!-- Animated Data Packets (<animateMotion>) -->
+              <g id="packetLayer">
+                <circle r="4" fill="#10B981">
+                  <animateMotion dur="2.1s" repeatCount="indefinite" path="M 76 33 C 128 33, 152 33, 210 33" />
+                </circle>
+                <circle r="3.5" fill="#10B981" opacity="0.7">
+                  <animateMotion dur="2.1s" begin="1.05s" repeatCount="indefinite" path="M 76 33 C 128 33, 152 33, 210 33" />
+                </circle>
+
+                <circle r="4" fill="#10B981">
+                  <animateMotion dur="2.4s" repeatCount="indefinite" path="M 250 33 C 305 12, 345 12, 404 24" />
+                </circle>
+                <circle r="4" fill="#0EA5E9">
+                  <animateMotion dur="2.7s" begin="0.5s" repeatCount="indefinite" path="M 250 33 C 305 54, 345 54, 404 42" />
+                </circle>
+
+                <circle r="4" fill="#8B5CF6">
+                  <animateMotion dur="2.2s" begin="0.3s" repeatCount="indefinite" path="M 444 33 C 505 33, 545 33, 602 33" />
+                </circle>
+                <circle r="3.5" fill="#10B981">
+                  <animateMotion dur="2.2s" begin="1.4s" repeatCount="indefinite" path="M 444 33 C 505 33, 545 33, 602 33" />
+                </circle>
+              </g>
+
+              <!-- Node 1: Edge Ingress -->
+              <g class="cursor-pointer" onmouseenter="inspectMeshNode('Edge Ingress CDN · 1,428 req/s · 6.2ms TLS edge handshake')">
+                <circle class="beacon-ring" cx="56" cy="33" r="10" fill="#10B981" opacity="0.25" />
+                <rect x="14" y="17" width="84" height="32" rx="9" fill="#FFFFFF" stroke="#10B981" stroke-width="1.6" />
+                <circle cx="28" cy="33" r="4" fill="#10B981" />
+                <text x="38" y="37" fill="#0F172A" font-size="12" font-weight="600">Ingress</text>
+              </g>
+
+              <!-- Node 2: API Gateway -->
+              <g class="cursor-pointer" onmouseenter="inspectMeshNode('Verge API Gateway · 99.99% uptime · 11.4ms p95 routing')">
+                <circle class="beacon-ring" cx="230" cy="33" r="10" fill="#0EA5E9" opacity="0.22" />
+                <rect x="184" y="17" width="92" height="32" rx="9" fill="#FFFFFF" stroke="#0EA5E9" stroke-width="1.6" />
+                <circle cx="198" cy="33" r="4" fill="#0EA5E9" />
+                <text x="208" y="37" fill="#0F172A" font-size="12" font-weight="600">Gateway</text>
+              </g>
+
+              <!-- Node 3: Order Engine -->
+              <g class="cursor-pointer" onmouseenter="inspectMeshNode('Order &amp; Checkout Engine · 78 shipments/day · Zero queue lag')">
+                <circle class="beacon-ring" cx="424" cy="33" r="10" fill="#10B981" opacity="0.25" />
+                <rect x="372" y="17" width="104" height="32" rx="9" fill="#FFFFFF" stroke="#10B981" stroke-width="1.6" />
+                <circle cx="386" cy="33" r="4" fill="#10B981" />
+                <text x="396" y="37" fill="#0F172A" font-size="12" font-weight="600">Order Core</text>
+              </g>
+
+              <!-- Node 4: Analytics Lake -->
+              <g class="cursor-pointer" onmouseenter="inspectMeshNode('Analytics Warehouse · 6.8 GB indexed · Sub-second OLAP sync')">
+                <circle class="beacon-ring" cx="622" cy="33" r="10" fill="#8B5CF6" opacity="0.22" />
+                <rect x="572" y="17" width="96" height="32" rx="9" fill="#FFFFFF" stroke="#8B5CF6" stroke-width="1.6" />
+                <circle cx="586" cy="33" r="4" fill="#8B5CF6" />
+                <text x="596" y="37" fill="#0F172A" font-size="12" font-weight="600">Data Lake</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6-CARD CLEAN GRID KPI MATRIX (3 columns x 2 rows) -->
+      <section aria-label="Key Performance Indicators" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <!-- Card 1: TOTAL USERS -->
+        <article class="verge-card verge-card-hover p-5 flex items-center justify-between gap-4">
+          <div class="space-y-2">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Total Users</span>
+            <div class="flex items-baseline gap-2.5">
+              <span id="kpiUsersVal" class="font-display text-[28px] leading-none font-bold text-slate-900 tracking-tight">2,540</span>
+              <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H9M17 7v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                +12%
+              </span>
+            </div>
+            <p class="text-sm text-slate-500">342 new this week</p>
+          </div>
+          <!-- 8-bar vertical emerald SVG mini-histogram -->
+          <div class="shrink-0">
+            <svg id="histUsers" class="w-[104px] h-[56px]" viewBox="0 0 104 56" fill="none" aria-label="Total users 8-day trend">
+              <rect class="bar-col" style="animation-delay:0.04s" data-tip="Day 1: 310 users" x="2" y="28" width="9" height="28" rx="3" fill="#10B981" opacity="0.35"></rect>
+              <rect class="bar-col" style="animation-delay:0.09s" data-tip="Day 2: 345 users" x="15" y="22" width="9" height="34" rx="3" fill="#10B981" opacity="0.45"></rect>
+              <rect class="bar-col" style="animation-delay:0.14s" data-tip="Day 3: 290 users" x="28" y="30" width="9" height="26" rx="3" fill="#10B981" opacity="0.4"></rect>
+              <rect class="bar-col" style="animation-delay:0.19s" data-tip="Day 4: 410 users" x="41" y="16" width="9" height="40" rx="3" fill="#10B981" opacity="0.6"></rect>
+              <rect class="bar-col" style="animation-delay:0.24s" data-tip="Day 5: 380 users" x="54" y="20" width="9" height="36" rx="3" fill="#10B981" opacity="0.55"></rect>
+              <rect class="bar-col" style="animation-delay:0.29s" data-tip="Day 6: 450 users" x="67" y="12" width="9" height="44" rx="3" fill="#10B981" opacity="0.75"></rect>
+              <rect class="bar-col" style="animation-delay:0.34s" data-tip="Day 7: 430 users" x="80" y="15" width="9" height="41" rx="3" fill="#10B981" opacity="0.8"></rect>
+              <rect class="bar-col" style="animation-delay:0.39s" data-tip="Today: 525 users" x="93" y="4" width="9" height="52" rx="3" fill="#10B981"></rect>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Card 2: AVG SESSION -->
+        <article class="verge-card verge-card-hover p-5 flex items-center justify-between gap-4">
+          <div class="space-y-2">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Avg Session</span>
+            <div class="flex items-baseline gap-2.5">
+              <span id="kpiSessionVal" class="font-display text-[28px] leading-none font-bold text-slate-900 tracking-tight">123.5 min</span>
+              <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H9M17 7v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                +8%
+              </span>
+            </div>
+            <p class="text-sm text-slate-500">+14 min from last week</p>
+          </div>
+          <!-- 8-bar vertical sky-blue SVG mini-histogram -->
+          <div class="shrink-0">
+            <svg id="histSession" class="w-[104px] h-[56px]" viewBox="0 0 104 56" fill="none" aria-label="Average session 8-day trend">
+              <rect class="bar-col" style="animation-delay:0.06s" data-tip="Day 1: 106 min" x="2" y="26" width="9" height="30" rx="3" fill="#0EA5E9" opacity="0.35"></rect>
+              <rect class="bar-col" style="animation-delay:0.11s" data-tip="Day 2: 112 min" x="15" y="20" width="9" height="36" rx="3" fill="#0EA5E9" opacity="0.45"></rect>
+              <rect class="bar-col" style="animation-delay:0.16s" data-tip="Day 3: 109 min" x="28" y="24" width="9" height="32" rx="3" fill="#0EA5E9" opacity="0.45"></rect>
+              <rect class="bar-col" style="animation-delay:0.21s" data-tip="Day 4: 116 min" x="41" y="18" width="9" height="38" rx="3" fill="#0EA5E9" opacity="0.6"></rect>
+              <rect class="bar-col" style="animation-delay:0.26s" data-tip="Day 5: 119 min" x="54" y="14" width="9" height="42" rx="3" fill="#0EA5E9" opacity="0.65"></rect>
+              <rect class="bar-col" style="animation-delay:0.31s" data-tip="Day 6: 115 min" x="67" y="19" width="9" height="37" rx="3" fill="#0EA5E9" opacity="0.7"></rect>
+              <rect class="bar-col" style="animation-delay:0.36s" data-tip="Day 7: 121 min" x="80" y="10" width="9" height="46" rx="3" fill="#0EA5E9" opacity="0.85"></rect>
+              <rect class="bar-col" style="animation-delay:0.41s" data-tip="Today: 123.5 min" x="93" y="6" width="9" height="50" rx="3" fill="#0EA5E9"></rect>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Card 3: ORDERS -->
+        <article class="verge-card verge-card-hover p-5 flex items-center justify-between gap-4">
+          <div class="space-y-2">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Orders</span>
+            <div class="flex items-baseline gap-2.5">
+              <span id="kpiOrdersVal" class="font-display text-[28px] leading-none font-bold text-slate-900 tracking-tight">1,240</span>
+              <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-semibold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 7l10 10M17 17H9M17 17V9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                -3%
+              </span>
+            </div>
+            <p class="text-sm text-slate-500">78 shipped today</p>
+          </div>
+          <!-- 8-bar vertical amber SVG mini-histogram -->
+          <div class="shrink-0">
+            <svg id="histOrders" class="w-[104px] h-[56px]" viewBox="0 0 104 56" fill="none" aria-label="Orders 8-day trend">
+              <rect class="bar-col" style="animation-delay:0.08s" data-tip="Day 1: 168 orders" x="2" y="12" width="9" height="44" rx="3" fill="#F59E0B" opacity="0.45"></rect>
+              <rect class="bar-col" style="animation-delay:0.13s" data-tip="Day 2: 175 orders" x="15" y="8" width="9" height="48" rx="3" fill="#F59E0B" opacity="0.55"></rect>
+              <rect class="bar-col" style="animation-delay:0.18s" data-tip="Day 3: 154 orders" x="28" y="16" width="9" height="40" rx="3" fill="#F59E0B" opacity="0.5"></rect>
+              <rect class="bar-col" style="animation-delay:0.23s" data-tip="Day 4: 170 orders" x="41" y="10" width="9" height="46" rx="3" fill="#F59E0B" opacity="0.65"></rect>
+              <rect class="bar-col" style="animation-delay:0.28s" data-tip="Day 5: 149 orders" x="54" y="18" width="9" height="38" rx="3" fill="#F59E0B" opacity="0.65"></rect>
+              <rect class="bar-col" style="animation-delay:0.33s" data-tip="Day 6: 160 orders" x="67" y="14" width="9" height="42" rx="3" fill="#F59E0B" opacity="0.8"></rect>
+              <rect class="bar-col" style="animation-delay:0.38s" data-tip="Day 7: 142 orders" x="80" y="20" width="9" height="36" rx="3" fill="#F59E0B" opacity="0.85"></rect>
+              <rect class="bar-col" style="animation-delay:0.43s" data-tip="Today: 158 orders" x="93" y="15" width="9" height="41" rx="3" fill="#F59E0B"></rect>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Card 4: REVENUE -->
+        <article class="verge-card verge-card-hover p-5 flex flex-col justify-between gap-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-2">
+              <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Revenue</span>
+              <div class="flex items-baseline gap-2.5">
+                <span id="kpiRevenueVal" class="font-display text-[28px] leading-none font-bold text-slate-900 tracking-tight">$24,567</span>
+                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H9M17 7v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  +18%
+                </span>
+              </div>
+              <p class="text-sm text-slate-500">$3,218 today</p>
+            </div>
+            <span class="font-mono text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">76% goal</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="progress-fill-anim h-full rounded-full bg-[#10B981]" data-target-width="76%"></div>
+          </div>
+        </article>
+
+        <!-- Card 5: CONVERSIONS -->
+        <article class="verge-card verge-card-hover p-5 flex flex-col justify-between gap-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-2">
+              <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Conversions</span>
+              <div class="flex items-baseline gap-2.5">
+                <span id="kpiConversionsVal" class="font-display text-[28px] leading-none font-bold text-slate-900 tracking-tight">2,315</span>
+                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H9M17 7v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  +5%
+                </span>
+              </div>
+              <p class="text-sm text-slate-500">Rate: 4.2%</p>
+            </div>
+            <span class="font-mono text-xs font-semibold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg">54% cap</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="progress-fill-anim h-full rounded-full bg-rose-500" data-target-width="54%"></div>
+          </div>
+        </article>
+
+        <!-- Card 6: PAGE VIEWS -->
+        <article class="verge-card verge-card-hover p-5 flex flex-col justify-between gap-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-2">
+              <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Page Views</span>
+              <div class="flex items-baseline gap-2.5">
+                <span id="kpiViewsVal" class="font-display text-[28px] leading-none font-bold text-slate-900 tracking-tight">47,325</span>
+                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H9M17 7v8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  +22%
+                </span>
+              </div>
+              <p class="text-sm text-slate-500">6,854 unique visitors</p>
+            </div>
+            <span class="font-mono text-xs font-semibold text-violet-700 bg-violet-50 px-2.5 py-1 rounded-lg">68% quota</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="progress-fill-anim h-full rounded-full bg-violet-500" data-target-width="68%"></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- MIDDLE 12-COL GRID: Network Activities (8) + Recent Activity (4) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left (lg:col-span-8): Network Activities Card -->
+        <div class="verge-card p-6 lg:col-span-8 flex flex-col justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h2 class="font-display text-lg font-bold text-slate-900">Network Activities</h2>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <span class="live-dot w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Live curve
+                </span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2.5">
+                <span id="chartTotalSessions" class="font-display text-2xl font-bold text-slate-900">6,782</span>
+                <span id="chartDeltaBadge" class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  7%
+                </span>
+                <span id="chartPeriodSubtitle" class="text-sm text-slate-500">Total sessions this week</span>
+              </div>
+            </div>
+
+            <!-- Right: Legend + Segmented Switcher -->
+            <div class="flex flex-wrap items-center gap-4">
+              <div class="flex items-center gap-4 text-sm text-slate-600">
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-3 h-1 rounded-full bg-[#10B981]"></span>
+                  Sessions
+                </span>
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-3 h-0.5 border-t-2 border-dashed border-[#3B82F6]"></span>
+                  Page views
+                </span>
+              </div>
+
+              <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200/80" role="tablist" aria-label="Chart timeframe">
+                <button type="button" data-range="7d" onclick="setChartRange('7d')" class="chart-range-btn h-9 px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all">7 days</button>
+                <button type="button" data-range="30d" onclick="setChartRange('30d')" class="chart-range-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">30 days</button>
+                <button type="button" data-range="90d" onclick="setChartRange('90d')" class="chart-range-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">90 days</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Dual-Series Smooth SVG Chart -->
+          <div class="relative w-full pt-2 select-none">
+            <!-- Hover Tooltip -->
+            <div id="chartTooltip" class="pointer-events-none hidden absolute z-20 -translate-x-1/2 -translate-y-full px-3.5 py-2.5 rounded-xl bg-slate-900/95 text-white shadow-xl border border-slate-700 text-xs min-w-[158px]">
+              <div id="tooltipDay" class="font-semibold text-slate-300 mb-1.5 pb-1 border-b border-slate-700/80">Wednesday</div>
+              <div class="flex items-center justify-between gap-3 mb-1">
+                <span class="inline-flex items-center gap-1.5 text-slate-300"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Sessions</span>
+                <span id="tooltipSessions" class="font-mono font-semibold text-white">640</span>
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <span class="inline-flex items-center gap-1.5 text-slate-300"><span class="w-2 h-2 rounded-full bg-blue-400"></span>Page views</span>
+                <span id="tooltipViews" class="font-mono font-semibold text-white">745</span>
+              </div>
+            </div>
+
+            <svg id="networkSvg" class="w-full h-[290px] overflow-visible" viewBox="0 0 720 270" aria-label="Network activities chart">
+              <defs>
+                <linearGradient id="emeraldAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+
+              <!-- Horizontal Y-Axis Gridlines (0..800) -->
+              <g class="text-slate-400 font-mono" font-size="12">
+                <line x1="48" y1="24" x2="702" y2="24" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <text x="36" y="28" text-anchor="end" fill="#64748B">800</text>
+
+                <line x1="48" y1="76" x2="702" y2="76" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <text x="36" y="80" text-anchor="end" fill="#64748B">600</text>
+
+                <line x1="48" y1="128" x2="702" y2="128" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <text x="36" y="132" text-anchor="end" fill="#64748B">400</text>
+
+                <line x1="48" y1="180" x2="702" y2="180" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <text x="36" y="184" text-anchor="end" fill="#64748B">200</text>
+
+                <line x1="48" y1="232" x2="702" y2="232" stroke="#CBD5E1" />
+                <text x="36" y="236" text-anchor="end" fill="#64748B">0</text>
+              </g>
+
+              <!-- Dynamic Chart Paths -->
+              <path id="sessionsAreaPath" class="area-fade" d="" fill="url(#emeraldAreaGrad)" />
+              <path id="viewsLinePath" class="dashed-series-anim" d="" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round" />
+              <path id="sessionsLinePath" d="" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" />
+
+              <!-- Flowing Live Telemetry Packet along Sessions Curve -->
+              <g id="chartLivePackets">
+                <circle r="4.5" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5">
+                  <animateMotion id="sessionsPacketAnim" dur="4.2s" repeatCount="indefinite" path="M 70 138 L 682 44" />
+                </circle>
+              </g>
+
+              <!-- End-of-curve Live Pulsing Beacon -->
+              <g id="chartEndBeacon">
+                <circle id="endBeaconRing" class="beacon-ring" cx="682" cy="44" r="9" fill="#10B981" opacity="0.3" />
+                <circle id="endBeaconDot" cx="682" cy="44" r="4.5" fill="#10B981" stroke="#FFFFFF" stroke-width="2" />
+              </g>
+
+              <!-- Hover Vertical Guide & Active Dots -->
+              <line id="hoverGuideLine" x1="0" y1="24" x2="0" y2="232" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="3 3" opacity="0" />
+              <circle id="hoverDotViews" cx="0" cy="0" r="5.5" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2.5" opacity="0" />
+              <circle id="hoverDotSessions" cx="0" cy="0" r="6" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5" opacity="0" />
+
+              <!-- X-Axis Labels Group -->
+              <g id="xAxisLabels" font-size="12" fill="#64748B" font-weight="500"></g>
+
+              <!-- Interactive Hit Columns -->
+              <g id="chartHitZones"></g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Right (lg:col-span-4): Recent Activity Card -->
+        <div class="verge-card p-6 lg:col-span-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <h2 class="font-display text-lg font-bold text-slate-900">Recent Activity</h2>
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                <span class="live-dot w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Real-time
+              </span>
+            </div>
+
+            <ul class="space-y-4">
+              <!-- Item 1: SK -->
+              <li class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-display font-bold text-xs flex items-center justify-center shrink-0">SK</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-800 leading-snug"><span class="font-semibold text-slate-900">Sarah K.</span> placed a new order for <span class="font-semibold text-slate-900">$245.00</span></p>
+                  <p class="text-xs text-slate-400 mt-0.5">2 min ago</p>
+                </div>
+              </li>
+
+              <!-- Item 2: MR -->
+              <li class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-display font-bold text-xs flex items-center justify-center shrink-0">MR</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-800 leading-snug"><span class="font-semibold text-slate-900">Michael R.</span> registered a new enterprise account</p>
+                  <p class="text-xs text-slate-400 mt-0.5">18 min ago</p>
+                </div>
+              </li>
+
+              <!-- Item 3: SY -->
+              <li class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full bg-green-100 text-green-700 font-display font-bold text-xs flex items-center justify-center shrink-0">SY</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-800 leading-snug">Payment processed — <span class="font-mono font-medium text-slate-900">Invoice #4521</span></p>
+                  <p class="text-xs text-slate-400 mt-0.5">45 min ago</p>
+                </div>
+              </li>
+
+              <!-- Item 4: JL -->
+              <li class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 font-display font-bold text-xs flex items-center justify-center shrink-0">JL</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-800 leading-snug"><span class="font-semibold text-slate-900">Jeffie L.</span> reviewed <span class="font-medium text-slate-900">Dashboard Kit</span></p>
+                  <p class="text-xs text-slate-400 mt-0.5">1 hour ago</p>
+                </div>
+              </li>
+
+              <!-- Item 5: EL -->
+              <li class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 font-display font-bold text-xs flex items-center justify-center shrink-0">EL</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-800 leading-snug"><span class="font-semibold text-slate-900">Emmy L.</span> created project <span class="font-medium text-slate-900">Morning Clock</span></p>
+                  <p class="text-xs text-slate-400 mt-0.5">4 hours ago</p>
+                </div>
+              </li>
+
+              <!-- Item 6: DS -->
+              <li class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 font-display font-bold text-xs flex items-center justify-center shrink-0">DS</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-800 leading-snug">Shipment dispatched — <span class="font-mono font-medium text-slate-900">Order #3847</span></p>
+                  <p class="text-xs text-slate-400 mt-0.5">6 hours ago</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" onclick="showToast('Activity log synced up to latest webhook event')" class="mt-5 w-full h-10 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors">
+            View audit log
+          </button>
+        </div>
+      </section>
+
+      <!-- BOTTOM 12-COL GRID: Recent Orders Table (8) + Cloud Storage & Quota (4) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left (lg:col-span-8): Recent Orders Table -->
+        <div class="verge-card lg:col-span-8 overflow-hidden flex flex-col">
+          <div class="p-6 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
+            <div>
+              <h2 class="font-display text-lg font-bold text-slate-900">Recent Orders</h2>
+              <p class="text-sm text-slate-500 mt-0.5">Latest storefront and enterprise subscription transactions</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Live Status Filter Pills -->
+              <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200/80" role="group" aria-label="Filter orders by status">
+                <button type="button" data-status="All" onclick="filterOrders('All')" class="order-filter-btn h-9 px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all">All</button>
+                <button type="button" data-status="Paid" onclick="filterOrders('Paid')" class="order-filter-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">Paid</button>
+                <button type="button" data-status="Shipped" onclick="filterOrders('Shipped')" class="order-filter-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">Shipped</button>
+                <button type="button" data-status="Pending" onclick="filterOrders('Pending')" class="order-filter-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all">Pending</button>
+              </div>
+
+              <button type="button" onclick="switchNav('Orders', 'E-Commerce / Orders')" class="h-10 px-3.5 rounded-xl text-sm font-semibold text-emerald-600 hover:bg-emerald-50 inline-flex items-center gap-1.5 transition-colors">
+                <span>View All</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Sub-bar -->
+          <div class="px-6 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="relative flex-1 max-w-xs">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+              </svg>
+              <input id="orderSearchInput" type="text" oninput="renderOrders()" placeholder="Filter customer or order ID..." class="w-full h-10 pl-9 pr-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 transition-colors" />
+            </div>
+            <span id="orderCountLabel" class="text-xs font-medium text-slate-500">Showing 6 orders</span>
+          </div>
+
+          <!-- Responsive Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200/80 bg-slate-50/50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 pl-6 pr-3">Order</th>
+                  <th class="py-3.5 px-3">Customer</th>
+                  <th class="py-3.5 px-3">Product</th>
+                  <th class="py-3.5 px-3">Amount</th>
+                  <th class="py-3.5 px-3">Status</th>
+                  <th class="py-3.5 pl-3 pr-6 text-right">Date</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody" class="divide-y divide-slate-100 text-sm">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right (lg:col-span-4): Cloud Storage & Quota Card -->
+        <div class="verge-card p-6 lg:col-span-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div>
+                <h2 class="font-display text-lg font-bold text-slate-900">Cloud Storage &amp; Quota</h2>
+                <p id="storageSubtitle" class="text-sm text-slate-500 mt-0.5">6.8 GB of 8.0 GB used</p>
+              </div>
+              <span id="storagePctBadge" class="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200/80">85% full</span>
+            </div>
+
+            <!-- Multi-segment rounded bar -->
+            <div class="mt-5 mb-6">
+              <div class="w-full h-3.5 rounded-full bg-slate-100 p-0.5 flex items-center gap-1 overflow-hidden">
+                <div id="segRegular" class="progress-fill-anim h-full rounded-l-full bg-[#10B981]" data-target-width="42.5%" title="Regular: 3.4 GB"></div>
+                <div id="segSystem" class="progress-fill-anim h-full bg-[#3B82F6]" data-target-width="17.5%" title="System: 1.4 GB"></div>
+                <div id="segAnalytics" class="progress-fill-anim h-full bg-[#F59E0B]" data-target-width="15%" title="Analytics: 1.2 GB"></div>
+                <div id="segBackups" class="progress-fill-anim h-full rounded-r-full bg-[#64748B]" data-target-width="10%" title="Backups: 0.8 GB"></div>
+              </div>
+            </div>
+
+            <!-- Breakdown List -->
+            <div class="space-y-3.5">
+              <div class="flex items-center justify-between py-2 border-b border-slate-100 text-sm">
+                <span class="flex items-center gap-2.5 font-medium text-slate-700">
+                  <span class="w-3 h-3 rounded-sm bg-[#10B981]"></span>
+                  Regular Assets
+                </span>
+                <span class="font-mono text-sm font-semibold text-slate-900">3.4 GB</span>
+              </div>
+
+              <div class="flex items-center justify-between py-2 border-b border-slate-100 text-sm">
+                <span class="flex items-center gap-2.5 font-medium text-slate-700">
+                  <span class="w-3 h-3 rounded-sm bg-[#3B82F6]"></span>
+                  System Core
+                </span>
+                <span class="font-mono text-sm font-semibold text-slate-900">1.4 GB</span>
+              </div>
+
+              <div class="flex items-center justify-between py-2 border-b border-slate-100 text-sm">
+                <span class="flex items-center gap-2.5 font-medium text-slate-700">
+                  <span class="w-3 h-3 rounded-sm bg-[#F59E0B]"></span>
+                  Analytics Logs
+                </span>
+                <span id="analyticsSizeText" class="font-mono text-sm font-semibold text-slate-900">1.2 GB</span>
+              </div>
+
+              <div class="flex items-center justify-between py-2 text-sm">
+                <span class="flex items-center gap-2.5 font-medium text-slate-700">
+                  <span class="w-3 h-3 rounded-sm bg-[#64748B]"></span>
+                  Automated Backups
+                </span>
+                <span class="font-mono text-sm font-semibold text-slate-900">0.8 GB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-3">
+            <button id="cleanCacheBtn" type="button" onclick="cleanStorageCache()" class="flex-1 h-[42px] px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+              </svg>
+              <span>Clean Cache</span>
+            </button>
+            <button type="button" onclick="showToast('Upgrade plan dialog opened for Cloud Storage')" class="h-[42px] px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+              Upgrade
+            </button>
+          </div>
+        </div>
+      </section>
+
+      </div>
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+    </main>
+  </div>
+
+  <!-- CREATE REPORT MODAL -->
+  <div id="reportModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="font-display text-lg font-bold text-slate-900">Create Operations Report</h3>
+          <p class="text-sm text-slate-500 mt-0.5">Compile KPI metrics and order logs into an export</p>
+        </div>
+        <button type="button" onclick="closeReportModal()" class="w-10 h-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <form onsubmit="submitReportForm(event)" class="p-6 space-y-4">
+        <div>
+          <label for="reportTitle" class="block text-sm font-semibold text-slate-700 mb-1.5">Report Name</label>
+          <input id="reportTitle" type="text" required value="Weekly Operations Executive Summary" class="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="reportWindow" class="block text-sm font-semibold text-slate-700 mb-1.5">Timeframe</label>
+            <select id="reportWindow" class="w-full h-11 px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:border-emerald-500">
+              <option value="Last 7 days">Last 7 days</option>
+              <option value="Last 30 days">Last 30 days</option>
+              <option value="Q4 Quarter">Q4 Quarter</option>
+            </select>
+          </div>
+          <div>
+            <label for="reportFormat" class="block text-sm font-semibold text-slate-700 mb-1.5">Export Format</label>
+            <select id="reportFormat" class="w-full h-11 px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:border-emerald-500">
+              <option value="PDF Brief">PDF Brief</option>
+              <option value="CSV Workbook">CSV Workbook</option>
+              <option value="JSON Snapshot">JSON Snapshot</option>
+            </select>
+          </div>
+        </div>
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeReportModal()" class="h-11 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-colors">Cancel</button>
+          <button type="submit" class="h-11 px-5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white text-sm font-semibold shadow-sm shadow-emerald-500/20 transition-colors">Generate Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW VIEW MODAL -->
+  <div id="newViewModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="font-display text-lg font-bold text-slate-900">Save Custom Dashboard View</h3>
+        <button type="button" onclick="closeNewViewModal()" class="w-10 h-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <form onsubmit="submitNewView(event)" class="p-6 space-y-4">
+        <div>
+          <label for="viewNameInput" class="block text-sm font-semibold text-slate-700 mb-1.5">View Label</label>
+          <input id="viewNameInput" type="text" required placeholder="e.g., EMEA Fulfillment Watch" class="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onclick="closeNewViewModal()" class="h-11 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold text-slate-700">Cancel</button>
+          <button type="submit" class="h-11 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold">Save View</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- COMMAND PALETTE MODAL (Cmd+K) -->
+  <div id="commandModal" class="fixed inset-0 z-50 hidden items-start justify-center pt-20 p-4 bg-slate-950/50 backdrop-blur-sm" onclick="if(event.target===this) closeCommandModal()">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+        <svg class="w-5 h-5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+        </svg>
+        <input id="cmdSearchInput" type="text" oninput="filterCommands()" placeholder="Jump to page or run operations command..." class="w-full h-10 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none" />
+        <button type="button" onclick="closeCommandModal()" class="px-2 py-1 rounded-md bg-slate-100 text-xs font-mono text-slate-500">ESC</button>
+      </div>
+      <div id="cmdResultsList" class="p-2 max-h-72 overflow-y-auto space-y-1"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+  <script>
+    // --- 1. SIDEBAR & NAVIGATION ---
+    let dashboardsOpen = true;
+
+    function handleSidebarToggle() {
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        document.body.classList.toggle('sidebar-collapsed');
+      }
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobileOverlay');
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    }
+
+    function toggleDashboardsMenu() {
+      if (document.body.classList.contains('sidebar-collapsed') && window.innerWidth >= 1024) {
+        document.body.classList.remove('sidebar-collapsed');
+        dashboardsOpen = true;
+      } else {
+        dashboardsOpen = !dashboardsOpen;
+      }
+      const sub = document.getElementById('dashboardsSubmenu');
+      const chev = document.getElementById('dashboardsChevron');
+      if (dashboardsOpen) {
+        sub.classList.remove('hidden');
+        chev.classList.add('rotate-180');
+      } else {
+        sub.classList.add('hidden');
+        chev.classList.remove('rotate-180');
+      }
+    }
+
+    const VERGE_SUBPAGES = {
+      'Analytics': {
+        cat: 'Dashboards', title: 'Analytics Intelligence', subtitle: 'Funnel conversion rates, retention cohorts, and real-time event attribution.', cta: 'Export Cohort CSV',
+        kpis: [
+          { label: 'Conversion Rate', val: '4.86%', delta: '+0.64%', sub: 'Checkout completion' },
+          { label: 'Weekly Retention', val: '84.2%', delta: '+3.1%', sub: 'W4 active cohorts' },
+          { label: 'Tracked Events', val: '1.94M', delta: '+18%', sub: 'Zero schema drops' },
+          { label: 'Bounce Velocity', val: '21.4%', delta: '-2.8%', sub: 'Edge cached landings' }
+        ],
+        chartTitle: 'Funnel Stage Throughput', chartSub: 'Session progression across 4 core product milestones',
+        bars: [
+          { label: 'Landing Ingress', pct: 94, val: '48,290' },
+          { label: 'Product Activation', pct: 72, val: '34,768' },
+          { label: 'Cart / Trial Commit', pct: 48, val: '23,179' },
+          { label: 'Paid Settlement', pct: 31, val: '14,970' }
+        ],
+        cols: ['Cohort Segment', 'Active Users', 'Conversion', 'Status', 'Action'],
+        rows: [
+          { c1: 'Enterprise SSO Teams', sub: 'Annual billing', c2: '1,180', c3: '9.42%', status: 'Optimal', act: 'Inspect' },
+          { c1: 'Self-Serve Pro', sub: 'Monthly card', c2: '3,420', c3: '5.18%', status: 'Growing', act: 'Inspect' },
+          { c1: 'Partner Referral', sub: 'Co-marketing UTM', c2: '890', c3: '6.75%', status: 'Optimal', act: 'Inspect' },
+          { c1: 'Organic Docs Search', sub: 'Developer guides', c2: '4,110', c3: '3.90%', status: 'Steady', act: 'Inspect' },
+          { c1: 'Mobile Web Checkout', sub: 'Apple Pay express', c2: '2,290', c3: '4.62%', status: 'Growing', act: 'Inspect' }
+        ]
+      },
+      'Sales': {
+        cat: 'Dashboards', title: 'Sales & Revenue Pipeline', subtitle: 'B2B quota attainment, regional ACV velocity, and deal desk approvals.', cta: 'New Deal Quote',
+        kpis: [
+          { label: 'Closed-Won MTD', val: '$184,900', delta: '+22%', sub: '38 enterprise contracts' },
+          { label: 'Weighted Pipeline', val: '$642,000', delta: '+14%', sub: '4.1x coverage ratio' },
+          { label: 'Avg Order Value', val: '$1,890', delta: '+9.5%', sub: 'Upsell bundle lift' },
+          { label: 'Win Rate', val: '36.8%', delta: '+4.2%', sub: 'Competitive deals' }
+        ],
+        chartTitle: 'Quota Attainment by Pod', chartSub: 'Q4 committed bookings vs target run-rate',
+        bars: [
+          { label: 'North America Enterprise', pct: 92, val: '$294k' },
+          { label: 'EMEA Commercial', pct: 81, val: '$198k' },
+          { label: 'APAC Channel Partners', pct: 74, val: '$150k' }
+        ],
+        cols: ['Opportunity', 'Owner', 'Deal Value', 'Stage', 'Action'],
+        rows: [
+          { c1: 'Acme Global Fleet', sub: '250 seats · Annual', c2: 'S. Jenkins', c3: '$42,000', status: 'Contracting', act: 'Approve' },
+          { c1: 'Northstar DevOps', sub: 'Dedicated cluster', c2: 'M. Vance', c3: '$28,500', status: 'Negotiation', act: 'Approve' },
+          { c1: 'Lumina Robotics', sub: 'IoT sensor license', c2: 'E. Rostova', c3: '$19,200', status: 'Closed Won', act: 'Receipt' },
+          { c1: 'Kinetix Cloud', sub: 'Storage expansion', c2: 'D. Brooks', c3: '$14,800', status: 'Proposal', act: 'Follow Up' },
+          { c1: 'Velox AI Labs', sub: 'Webhook enterprise', c2: 'L. OConnor', c3: '$31,400', status: 'Contracting', act: 'Approve' }
+        ]
+      },
+      'System Health': {
+        cat: 'Dashboards', title: 'System Health & SLA Telemetry', subtitle: 'Kubernetes node saturation, edge p95 latency, and zero-downtime replication.', cta: 'Run Diagnostics',
+        kpis: [
+          { label: 'Global Uptime', val: '99.994%', delta: 'SLA Met', sub: 'Last 90 days rolling' },
+          { label: 'Edge P95 Latency', val: '11.4 ms', delta: '-1.8 ms', sub: '28 PoP regions' },
+          { label: 'Error Budget Left', val: '94.2%', delta: 'Healthy', sub: '0.004% 5xx rate' },
+          { label: 'Queue Lag', val: '0.4 ms', delta: 'Nominal', sub: 'Kafka partition sync' }
+        ],
+        chartTitle: 'Cluster Resource Utilization', chartSub: 'Live compute & memory headroom across primary regions',
+        bars: [
+          { label: 'us-east-1 (Primary Core)', pct: 64, val: '64% CPU' },
+          { label: 'eu-central-1 (Frankfurt)', pct: 52, val: '52% CPU' },
+          { label: 'ap-northeast-1 (Tokyo)', pct: 47, val: '47% CPU' }
+        ],
+        cols: ['Service Cluster', 'Region', 'P95 Latency', 'Health', 'Action'],
+        rows: [
+          { c1: 'verge-api-gateway', sub: 'Envoy v1.31 mesh', c2: 'us-east-1', c3: '8.2 ms', status: 'Healthy', act: 'Ping' },
+          { c1: 'order-checkout-svc', sub: 'Postgres ACID primary', c2: 'us-east-1', c3: '14.1 ms', status: 'Healthy', act: 'Ping' },
+          { c1: 'realtime-event-bus', sub: '1,428 req/s stream', c2: 'eu-central-1', c3: '11.9 ms', status: 'Healthy', act: 'Ping' },
+          { c1: 'olap-analytics-lake', sub: 'ClickHouse shard 04', c2: 'us-west-2', c3: '22.4 ms', status: 'Syncing', act: 'Reindex' },
+          { c1: 'cdn-edge-ingress', sub: 'TLS 1.3 Anycast', c2: 'Global PoP', c3: '6.2 ms', status: 'Healthy', act: 'Purge' }
+        ]
+      }
+    };
+
+    function getVergeSubpageConfig(name, crumbPath) {
+      if (VERGE_SUBPAGES[name]) return VERGE_SUBPAGES[name];
+      const parts = crumbPath.split(' / ');
+      const cat = parts[0] || 'Workspace';
+      const presets = {
+        'Forms': { sub: 'Validated multi-step intake schemas, webhook triggers, and submission conversion rates.', cta: 'Create Form Schema', u1: 'Active Schemas', v1: '18', u2: 'Submissions (7d)', v2: '4,290', u3: 'Completion Rate', v3: '89.4%', u4: 'Spam Blocked', v4: '99.8%' },
+        'Tables': { sub: 'High-density relational datasets, indexed views, and bulk CSV synchronization.', cta: 'Create Data View', u1: 'Indexed Tables', v1: '24', u2: 'Total Records', v2: '482.5k', u3: 'Query Speed', v3: '9.4 ms', u4: 'Sync Status', v4: '100%' },
+        'Charts': { sub: 'Declarative SVG telemetry widgets, custom metric series, and anomaly thresholds.', cta: 'Add Chart Widget', u1: 'Live Widgets', v1: '32', u2: 'Data Streams', v2: '14', u3: 'Refresh Cadence', v3: '2.8s', u4: 'Anomaly Alerts', v4: '0 Active' },
+        'Calendar': { sub: 'Release windows, on-call rotations, maintenance freezes, and QBR milestones.', cta: 'Schedule Window', u1: 'Upcoming Sprints', v1: '6', u2: 'Deploy Windows', v2: '12', u3: 'On-Call Coverage', v3: '100%', u4: 'Team Syncs', v4: '9 This Wk' },
+        'Geo Map': { sub: 'Global fulfillment routing, regional CDN traffic density, and warehouse proximity.', cta: 'Optimize Routes', u1: 'Active Regions', v1: '28', u2: 'Fulfillment Hubs', v2: '9', u3: 'On-Time Delivery', v3: '98.7%', u4: 'Cross-Border', v4: '34.2%' },
+        'Chat': { sub: 'Real-time operations channels, incident war-rooms, and automated Slack bridges.', cta: 'New Channel', u1: 'Unread Threads', v1: '3', u2: 'Active Operators', v2: '42', u3: 'Median Reply', v3: '1.8 min', u4: 'Bot Automations', v4: '16 Live' },
+        'Inbox': { sub: 'Unified partner dispatches, VIP customer escalations, and SLA ticket triage.', cta: 'Compose Dispatch', u1: 'Open Tickets', v1: '14', u2: 'First Response', v2: '6.4 min', u3: 'CSAT Score', v3: '98.2%', u4: 'Auto-Resolved', v4: '61.5%' },
+        'Kanban': { sub: ' Agile operations sprint board, WIP limits, and deployment readiness gates.', cta: 'Create Task Card', u1: 'In Progress', v1: '11', u2: 'Shipped This Wk', v2: '29', u3: 'Cycle Time', v3: '1.9 Days', u4: 'Sprint Velocity', v4: '94 pts' },
+        'Files': { sub: 'Encrypted S3 object buckets, compliance artifacts, and CDN media distribution.', cta: 'Upload Artifact', u1: 'Stored Objects', v1: '12,840', u2: 'Bucket Usage', v2: '6.8 GB', u3: 'CDN Cache Hit', v3: '99.1%', u4: 'Encrypted', v4: 'AES-256' },
+        'Notifications': { sub: 'Webhook alert rules, PagerDuty escalation policies, and threshold digests.', cta: 'Configure Rule', u1: 'Active Rules', v1: '22', u2: 'Dispatched (24h)', v2: '184', u3: 'Delivery Rate', v3: '99.98%', u4: 'Muted Channels', v4: '2' },
+        'Storefront': { sub: 'Headless commerce edge storefront, localized catalogs, and checkout experiments.', cta: 'Publish Storefront', u1: 'Live Sessions', v1: '842', u2: 'Cart Add Rate', v2: '11.4%', u3: 'LCP Speed', v3: '0.7s', u4: 'Active Locales', v4: '12' },
+        'Products': { sub: 'SKU catalog inventory, bundle pricing tiers, and automated restock thresholds.', cta: 'Add New SKU', u1: 'Active SKUs', v1: '148', u2: 'In-Stock Ratio', v2: '97.3%', u3: 'Top GrossMargin', v3: '78.4%', u4: 'Low Stock SKUs', v4: '3' },
+        'Orders': { sub: 'End-to-end order fulfillment queue, carrier tracking, and instant refund controls.', cta: 'Export Manifest', u1: 'Total Orders', v1: '1,240', u2: 'Fulfilled <24h', v2: '96.8%', u3: 'Pending Queue', v3: '18', u4: 'Return Rate', v4: '0.8%' },
+        'Invoices': { sub: 'Automated B2B tax invoices, net-30 ACH collections, and VAT reconciliation.', cta: 'Issue Invoice', u1: 'Settled MTD', v1: '$142,600', u2: 'Paid On-Time', v2: '95.4%', u3: 'Open Net-30', v3: '7', u4: 'Auto-Dunning', v4: 'Active' }
+      };
+      const p = presets[name] || { sub: `Live ${name} operations workspace, metrics, and automated rules.`, cta: `New ${name} Item`, u1: 'Active Items', v1: '64', u2: 'Throughput', v2: '98.4%', u3: 'Latency', v3: '12 ms', u4: 'Status', v4: 'Healthy' };
+      return {
+        cat,
+        title: `${name} Workspace`,
+        subtitle: p.sub,
+        cta: p.cta,
+        kpis: [
+          { label: p.u1, val: p.v1, delta: '+12%', sub: 'Updated just now' },
+          { label: p.u2, val: p.v2, delta: '+6.4%', sub: 'Rolling 7-day window' },
+          { label: p.u3, val: p.v3, delta: 'Optimal', sub: 'Verified SLA benchmark' },
+          { label: p.u4, val: p.v4, delta: 'Live', sub: 'Zero critical warnings' }
+        ],
+        chartTitle: `${name} Throughput & Utilization`,
+        chartSub: 'Real-time operational capacity and automation distribution',
+        bars: [
+          { label: `Primary ${name} Pipeline`, pct: 86, val: '86% Capacity' },
+          { label: 'Automated Webhook Sync', pct: 74, val: '74% Coverage' },
+          { label: 'Archived / Cold Tier', pct: 42, val: '42% Indexed' }
+        ],
+        cols: [`${name} Record`, 'Owner / Pod', 'Metric', 'State', 'Action'],
+        rows: [
+          { c1: `${name} — Production Primary`, sub: 'Synced via Verge API v4.2', c2: 'Ops Pod Alpha', c3: '99.4%', status: 'Active', act: 'Configure' },
+          { c1: `${name} — Enterprise EU`, sub: 'Frankfurt edge cluster', c2: 'EMEA Desk', c3: '97.8%', status: 'Active', act: 'Configure' },
+          { c1: `${name} — Automated Batch`, sub: 'Hourly cron pipeline', c2: 'System Bot', c3: '100%', status: 'Synced', act: 'Trigger' },
+          { c1: `${name} — Partner Sandbox`, sub: 'Isolated staging key', c2: 'Solutions Team', c3: '88.2%', status: 'Staging', act: 'Inspect' },
+          { c1: `${name} — Compliance Archive`, sub: 'SOC2 immutable ledger', c2: 'SecOps', c3: 'Verified', status: 'Locked', act: 'Audit' }
+        ]
+      };
+    }
+
+    function renderVergeSubpage(name, crumbPath) {
+      const cfg = getVergeSubpageConfig(name, crumbPath);
+      const container = document.getElementById('tabSubpageView');
+      if (!container) return;
+
+      const kpiCards = cfg.kpis.map((k, i) => `
+        <article class="verge-card verge-card-hover p-5 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">${k.label}</span>
+            <span class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${i % 2 === 0 ? '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>' : '<path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>'}
+              </svg>
+            </span>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-2.5">
+              <span class="font-display text-2xl font-bold text-slate-900 tracking-tight">${k.val}</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">${k.delta}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">${k.sub}</p>
+          </div>
+        </article>
+      `).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div>
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-semibold text-slate-700">${b.label}</span>
+            <span class="font-mono font-semibold text-slate-900">${b.val}</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-[#10B981]" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="py-3.5 pl-6 pr-3">
+            <div class="font-semibold text-sm text-slate-900">${r.c1}</div>
+            <div class="text-xs text-slate-500">${r.sub}</div>
+          </td>
+          <td class="py-3.5 px-3 text-sm text-slate-600 whitespace-nowrap">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono text-sm font-semibold text-slate-900 whitespace-nowrap">${r.c3}</td>
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${r.status}
+            </span>
+          </td>
+          <td class="py-3.5 pl-3 pr-6 text-right whitespace-nowrap">
+            <button type="button" onclick="handleVergeSubAction(this, '${r.c1}', '${r.act}')" class="h-8 px-3 rounded-lg border border-slate-200 bg-white hover:bg-[#10B981] hover:border-[#10B981] hover:text-white text-xs font-semibold text-slate-700 transition-colors">
+              ${r.act}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5 mb-1.5">
+              <button type="button" onclick="switchNav('Operations', 'Home / Operations')" class="h-8 px-3 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 inline-flex items-center gap-1.5 shadow-sm transition-colors">
+                <span>&larr; Overview</span>
+              </button>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-semibold">${cfg.cat}</span>
+            </div>
+            <h1 class="font-display text-[26px] leading-tight font-bold text-slate-900 tracking-tight">${cfg.title}</h1>
+            <p class="text-sm text-slate-500 mt-1">${cfg.subtitle}</p>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <button type="button" onclick="showToast('${cfg.cta} initialized in ${cfg.title}')" class="h-[42px] px-4 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm shadow-emerald-500/20 transition-all">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              <span>${cfg.cta}</span>
+            </button>
+          </div>
+        </div>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          ${kpiCards}
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 verge-card p-6 flex flex-col justify-between gap-5">
+            <div>
+              <h2 class="font-display text-base font-bold text-slate-900">${cfg.chartTitle}</h2>
+              <p class="text-xs text-slate-500 mt-0.5">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200/70 p-4">
+              <svg viewBox="0 0 360 130" class="w-full h-32 overflow-visible" fill="none">
+                <line x1="16" y1="24" x2="344" y2="24" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <line x1="16" y1="68" x2="344" y2="68" stroke="#E2E8F0" stroke-dasharray="4 4" />
+                <line x1="16" y1="110" x2="344" y2="110" stroke="#CBD5E1" />
+                <path d="M 20 96 C 80 86, 130 58, 190 62 C 250 66, 290 34, 340 22 L 340 110 L 20 110 Z" fill="rgba(16, 185, 129, 0.14)" />
+                <path d="M 20 96 C 80 86, 130 58, 190 62 C 250 66, 290 34, 340 22" stroke="#10B981" stroke-width="2.8" stroke-linecap="round" />
+                <circle cx="340" cy="22" r="4.5" fill="#10B981" stroke="#FFFFFF" stroke-width="2" />
+                <g fill="#64748B" font-size="12" font-family="JetBrains Mono, monospace">
+                  <text x="20" y="126">Mon</text>
+                  <text x="122" y="126">Wed</text>
+                  <text x="224" y="126">Fri</text>
+                  <text x="316" y="126">Sun</text>
+                </g>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 verge-card overflow-hidden flex flex-col justify-between">
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div>
+                <h2 class="font-display text-base font-bold text-slate-900">${name} Operational Ledger</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Click any row action button to execute instant workflow feedback</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 font-mono text-xs font-semibold text-slate-700">5 Live Records</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <th class="py-3 pl-6 pr-3">${cfg.cols[0]}</th>
+                    <th class="py-3 px-3">${cfg.cols[1]}</th>
+                    <th class="py-3 px-3">${cfg.cols[2]}</th>
+                    <th class="py-3 px-3">${cfg.cols[3]}</th>
+                    <th class="py-3 pl-3 pr-6 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function handleVergeSubAction(btn, recordName, actionLabel) {
+      btn.textContent = 'Done';
+      btn.className = 'h-8 px-3 rounded-lg bg-emerald-600 text-white text-xs font-semibold transition-colors';
+      showToast(`${actionLabel} executed for ${recordName}`);
+    }
+
+    function switchNav(name, crumbPath) {
+      const parts = (crumbPath || ('Home / ' + name)).split(' / ');
+      document.getElementById('breadcrumbRoot').textContent = parts[0] || 'Home';
+      document.getElementById('breadcrumbCurrent').textContent = parts[1] || name;
+      document.getElementById('pageMainHeading').textContent =
+        ['Operations', 'Analytics', 'Sales', 'System Health'].includes(name)
+          ? name + ' Dashboard'
+          : name + ' Workspace';
+
+      document.querySelectorAll('.nav-link').forEach((btn) => {
+        const isMatch = btn.getAttribute('data-nav') === name;
+        if (isMatch) {
+          btn.className = btn.className
+            .replace(/text-\[#94A3B8\]/g, '')
+            .replace(/hover:bg-white\/5/g, '')
+            .replace(/bg-white\/5/g, '');
+          btn.classList.add('bg-[#10B981]', 'text-white', 'font-semibold', 'shadow-sm', 'shadow-emerald-500/20');
+        } else {
+          btn.classList.remove('bg-[#10B981]', 'text-white', 'font-semibold', 'shadow-sm', 'shadow-emerald-500/20');
+          btn.classList.add('text-[#94A3B8]', 'hover:bg-white/5');
+        }
+      });
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (name === 'Operations') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderVergeSubpage(name, crumbPath || ('Workspace / ' + name));
+      }
+
+      closeMobileSidebar();
+    }
+
+    // --- 2. KINETIC ENTRANCE & MINI-HISTOGRAM TOOLTIPS ---
+    function animateProgressBarsEntrance() {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          document.querySelectorAll('.progress-fill-anim').forEach((el) => {
+            const target = el.getAttribute('data-target-width');
+            if (target) el.style.width = target;
+          });
+        }, 60);
+      });
+    }
+
+    function bindMiniHistogramTooltips() {
+      const tip = document.getElementById('miniBarTooltip');
+      document.querySelectorAll('.bar-col').forEach((rect) => {
+        rect.addEventListener('mouseenter', () => {
+          const label = rect.getAttribute('data-tip');
+          if (!label) return;
+          const box = rect.getBoundingClientRect();
+          tip.textContent = label;
+          tip.style.left = `${box.left + box.width / 2}px`;
+          tip.style.top = `${box.top - 8}px`;
+          tip.classList.remove('hidden');
+        });
+        rect.addEventListener('mouseleave', () => {
+          tip.classList.add('hidden');
+        });
+      });
+    }
+
+    function inspectMeshNode(text) {
+      document.getElementById('meshInspectorText').textContent = text;
+    }
+
+    // --- 3. LIVE TELEMETRY STREAM TOGGLE & REAL-TIME UPDATES ---
+    let liveTelemetryEnabled = true;
+    let liveState = {
+      users: 2540,
+      revenue: 24567,
+      views: 47325,
+      orders: 1240,
+      reqPerSec: 1428
+    };
+
+    function flashElement(el) {
+      el.classList.remove('kpi-flash');
+      void el.offsetWidth;
+      el.classList.add('kpi-flash');
+    }
+
+    function toggleLiveTelemetry() {
+      liveTelemetryEnabled = !liveTelemetryEnabled;
+      const btn = document.getElementById('liveStreamToggle');
+      const ping = document.getElementById('liveStreamPing');
+      const dot = document.getElementById('liveStreamDot');
+      const label = document.getElementById('liveStreamLabel');
+      const packets = document.getElementById('packetLayer');
+      const chartPackets = document.getElementById('chartLivePackets');
+
+      if (liveTelemetryEnabled) {
+        btn.className = 'hidden md:inline-flex h-10 px-3 rounded-xl border border-emerald-200 bg-emerald-50/80 text-emerald-800 text-xs font-semibold items-center gap-2 transition-all';
+        ping.classList.remove('hidden');
+        dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500';
+        label.textContent = 'Live Stream: ON';
+        packets.style.opacity = '1';
+        chartPackets.style.opacity = '1';
+        showToast('Live Telemetry Stream resumed');
+      } else {
+        btn.className = 'hidden md:inline-flex h-10 px-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 text-xs font-semibold items-center gap-2 transition-all';
+        ping.classList.add('hidden');
+        dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-slate-400';
+        label.textContent = 'Live Stream: PAUSED';
+        packets.style.opacity = '0';
+        chartPackets.style.opacity = '0';
+        showToast('Live Telemetry Stream paused');
+      }
+    }
+
+    setInterval(() => {
+      if (!liveTelemetryEnabled) return;
+      liveState.users += Math.floor(Math.random() * 3) + 1;
+      liveState.revenue += Math.floor(Math.random() * 45) + 10;
+      liveState.views += Math.floor(Math.random() * 14) + 3;
+      liveState.reqPerSec = 1390 + Math.floor(Math.random() * 95);
+
+      const uEl = document.getElementById('kpiUsersVal');
+      const rEl = document.getElementById('kpiRevenueVal');
+      const vEl = document.getElementById('kpiViewsVal');
+      const mEl = document.getElementById('meshThroughputBadge');
+
+      uEl.textContent = liveState.users.toLocaleString();
+      rEl.textContent = '$' + liveState.revenue.toLocaleString();
+      vEl.textContent = liveState.views.toLocaleString();
+      mEl.textContent = liveState.reqPerSec.toLocaleString() + ' req/s';
+
+      flashElement(uEl);
+      flashElement(vEl);
+
+      // Gently animate last bar of Users mini-histogram
+      const userBars = document.querySelectorAll('#histUsers .bar-col');
+      const lastBar = userBars[userBars.length - 1];
+      if (lastBar) {
+        const nextH = 44 + Math.floor(Math.random() * 11);
+        lastBar.setAttribute('height', String(nextH));
+        lastBar.setAttribute('y', String(56 - nextH));
+      }
+    }, 2800);
+
+    // --- 4. NETWORK ACTIVITIES DUAL-SERIES SVG CHART WITH DRAW-IN ANIMATION ---
+    const chartDatasets = {
+      '7d': {
+        total: '6,782',
+        delta: '7%',
+        subtitle: 'Total sessions this week',
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        fullLabels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        sessions: [360, 445, 415, 590, 535, 680, 725],
+        views: [470, 560, 520, 695, 650, 760, 790]
+      },
+      '30d': {
+        total: '28,940',
+        delta: '14%',
+        subtitle: 'Total sessions over 30 days',
+        labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Now'],
+        fullLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Current Window'],
+        sessions: [420, 480, 530, 495, 620, 670, 745],
+        views: [540, 590, 660, 635, 730, 765, 795]
+      },
+      '90d': {
+        total: '84,120',
+        delta: '21%',
+        subtitle: 'Total sessions over 90 days',
+        labels: ['Sep 1', 'Sep 15', 'Oct 1', 'Oct 15', 'Nov 1', 'Nov 8', 'Nov 16'],
+        fullLabels: ['Sep 1', 'Sep 15', 'Oct 1', 'Oct 15', 'Nov 1', 'Nov 8', 'Nov 16'],
+        sessions: [310, 390, 465, 520, 580, 645, 710],
+        views: [430, 510, 595, 640, 705, 740, 785]
+      }
+    };
+
+    let activeRange = '7d';
+
+    function valToY(val) {
+      const clamped = Math.max(0, Math.min(800, val));
+      return 232 - (clamped / 800) * 208;
+    }
+
+    function buildSmoothPath(points) {
+      if (!points.length) return '';
+      let d = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cx = (p0.x + p1.x) / 2;
+        d += ` C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+      return d;
+    }
+
+    function animateSvgStrokeDraw(pathEl) {
+      if (!pathEl || typeof pathEl.getTotalLength !== 'function') return;
+      const len = pathEl.getTotalLength();
+      pathEl.style.transition = 'none';
+      pathEl.style.strokeDasharray = `${len}`;
+      pathEl.style.strokeDashoffset = `${len}`;
+      void pathEl.getBoundingClientRect();
+      pathEl.style.transition = 'stroke-dashoffset 0.95s cubic-bezier(0.22, 1, 0.36, 1)';
+      pathEl.style.strokeDashoffset = '0';
+    }
+
+    function renderNetworkChart(rangeKey) {
+      const data = chartDatasets[rangeKey];
+      document.getElementById('chartTotalSessions').textContent = data.total;
+      document.getElementById('chartPeriodSubtitle').textContent = data.subtitle;
+      document.getElementById('chartDeltaBadge').innerHTML = `
+        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${data.delta}
+      `;
+
+      const startX = 70;
+      const endX = 682;
+      const stepX = (endX - startX) / (data.labels.length - 1);
+
+      const sessionPts = data.sessions.map((v, idx) => ({
+        x: Math.round(startX + idx * stepX),
+        y: Math.round(valToY(v)),
+        val: v
+      }));
+
+      const viewPts = data.views.map((v, idx) => ({
+        x: Math.round(startX + idx * stepX),
+        y: Math.round(valToY(v)),
+        val: v
+      }));
+
+      const sessionLine = buildSmoothPath(sessionPts);
+      const viewLine = buildSmoothPath(viewPts);
+      const areaPath = `${sessionLine} L ${sessionPts[sessionPts.length - 1].x} 232 L ${sessionPts[0].x} 232 Z`;
+
+      const sPathEl = document.getElementById('sessionsLinePath');
+      const vPathEl = document.getElementById('viewsLinePath');
+      const aPathEl = document.getElementById('sessionsAreaPath');
+
+      sPathEl.setAttribute('d', sessionLine);
+      vPathEl.setAttribute('d', viewLine);
+      aPathEl.setAttribute('d', areaPath);
+
+      // Re-trigger smooth draw-in animation
+      animateSvgStrokeDraw(sPathEl);
+      aPathEl.classList.remove('area-fade');
+      void aPathEl.offsetWidth;
+      aPathEl.classList.add('area-fade');
+
+      // Sync live packet motion path & end-of-curve beacon
+      const packetAnim = document.getElementById('sessionsPacketAnim');
+      if (packetAnim) packetAnim.setAttribute('path', sessionLine);
+
+      const lastPt = sessionPts[sessionPts.length - 1];
+      document.getElementById('endBeaconRing').setAttribute('cx', lastPt.x);
+      document.getElementById('endBeaconRing').setAttribute('cy', lastPt.y);
+      document.getElementById('endBeaconDot').setAttribute('cx', lastPt.x);
+      document.getElementById('endBeaconDot').setAttribute('cy', lastPt.y);
+
+      const xAxisGroup = document.getElementById('xAxisLabels');
+      const hitZones = document.getElementById('chartHitZones');
+      xAxisGroup.innerHTML = '';
+      hitZones.innerHTML = '';
+
+      data.labels.forEach((lbl, idx) => {
+        const cx = sessionPts[idx].x;
+        const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textEl.setAttribute('x', cx);
+        textEl.setAttribute('y', '256');
+        textEl.setAttribute('text-anchor', 'middle');
+        textEl.textContent = lbl;
+        xAxisGroup.appendChild(textEl);
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const colW = stepX;
+        rect.setAttribute('x', cx - colW / 2);
+        rect.setAttribute('y', '20');
+        rect.setAttribute('width', colW);
+        rect.setAttribute('height', '225');
+        rect.setAttribute('fill', 'transparent');
+        rect.style.cursor = 'pointer';
+
+        rect.addEventListener('mouseenter', () => showChartHover(idx, sessionPts[idx], viewPts[idx], data.fullLabels[idx]));
+        rect.addEventListener('mouseleave', hideChartHover);
+        hitZones.appendChild(rect);
+      });
+    }
+
+    function showChartHover(idx, sPt, vPt, dayTitle) {
+      const guide = document.getElementById('hoverGuideLine');
+      const dotS = document.getElementById('hoverDotSessions');
+      const dotV = document.getElementById('hoverDotViews');
+      const tooltip = document.getElementById('chartTooltip');
+      const svgEl = document.getElementById('networkSvg');
+
+      guide.setAttribute('x1', sPt.x);
+      guide.setAttribute('x2', sPt.x);
+      guide.setAttribute('opacity', '1');
+
+      dotS.setAttribute('cx', sPt.x);
+      dotS.setAttribute('cy', sPt.y);
+      dotS.setAttribute('opacity', '1');
+
+      dotV.setAttribute('cx', vPt.x);
+      dotV.setAttribute('cy', vPt.y);
+      dotV.setAttribute('opacity', '1');
+
+      document.getElementById('tooltipDay').textContent = dayTitle;
+      document.getElementById('tooltipSessions').textContent = sPt.val.toLocaleString();
+      document.getElementById('tooltipViews').textContent = vPt.val.toLocaleString();
+
+      const pctX = (sPt.x / 720) * 100;
+      const topY = (Math.min(sPt.y, vPt.y) / 270) * svgEl.clientHeight;
+
+      tooltip.style.left = `${Math.min(86, Math.max(14, pctX))}%`;
+      tooltip.style.top = `${Math.max(12, topY - 6)}px`;
+      tooltip.classList.remove('hidden');
+    }
+
+    function hideChartHover() {
+      document.getElementById('hoverGuideLine').setAttribute('opacity', '0');
+      document.getElementById('hoverDotSessions').setAttribute('opacity', '0');
+      document.getElementById('hoverDotViews').setAttribute('opacity', '0');
+      document.getElementById('chartTooltip').classList.add('hidden');
+    }
+
+    function setChartRange(rangeKey) {
+      activeRange = rangeKey;
+      document.querySelectorAll('.chart-range-btn').forEach((btn) => {
+        const active = btn.getAttribute('data-range') === rangeKey;
+        btn.className = active
+          ? 'chart-range-btn h-9 px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all'
+          : 'chart-range-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all';
+      });
+      renderNetworkChart(rangeKey);
+    }
+
+    // --- 5. RECENT ORDERS TABLE ---
+    const ordersData = [
+      { id: '#ORD-4829', customer: 'Sarah Jenkins', email: 'sarah.j@acmecorp.io', product: 'Verge Enterprise Seat (Annual)', amount: '$2,450.00', status: 'Paid', date: 'Nov 16, 2026' },
+      { id: '#ORD-4828', customer: 'Marcus Vance', email: 'mvance@northstar.dev', product: 'Analytics Pro Add-on', amount: '$490.00', status: 'Shipped', date: 'Nov 16, 2026' },
+      { id: '#ORD-4827', customer: 'Elena Rostova', email: 'elena@lumina.co', product: 'IoT Gateway Sensor Kit x4', amount: '$1,120.00', status: 'Shipped', date: 'Nov 15, 2026' },
+      { id: '#ORD-4826', customer: 'Devon Brooks', email: 'dbrooks@kinetix.io', product: 'Cloud Storage Expansion (2TB)', amount: '$320.00', status: 'Pending', date: 'Nov 15, 2026' },
+      { id: '#ORD-4825', customer: 'Hannah Abbott', email: 'hannah@crestline.org', product: 'Dashboard UI Kit Team License', amount: '$780.00', status: 'Paid', date: 'Nov 14, 2026' },
+      { id: '#ORD-4824', customer: "Liam O'Connor", email: 'liam@veloxlabs.ai', product: 'Dedicated Webhook Cluster', amount: '$1,890.00', status: 'Pending', date: 'Nov 14, 2026' }
+    ];
+
+    let activeOrderStatus = 'All';
+
+    function statusBadgeHtml(status) {
+      if (status === 'Paid') {
+        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Paid</span>';
+      }
+      if (status === 'Shipped') {
+        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Shipped</span>';
+      }
+      return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span>';
+    }
+
+    function filterOrders(status) {
+      activeOrderStatus = status;
+      document.querySelectorAll('.order-filter-btn').forEach((btn) => {
+        const active = btn.getAttribute('data-status') === status;
+        btn.className = active
+          ? 'order-filter-btn h-9 px-3 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-sm transition-all'
+          : 'order-filter-btn h-9 px-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all';
+      });
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const q = (document.getElementById('orderSearchInput').value || '').trim().toLowerCase();
+      const filtered = ordersData.filter((row) => {
+        const matchStatus = activeOrderStatus === 'All' || row.status === activeOrderStatus;
+        const matchQuery = !q ||
+          row.id.toLowerCase().includes(q) ||
+          row.customer.toLowerCase().includes(q) ||
+          row.product.toLowerCase().includes(q);
+        return matchStatus && matchQuery;
+      });
+
+      document.getElementById('orderCountLabel').textContent =
+        `Showing ${filtered.length} order${filtered.length === 1 ? '' : 's'}`;
+
+      const tbody = document.getElementById('ordersTableBody');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-sm text-slate-500">No matching orders found for current filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((row) => `
+        <tr class="hover:bg-slate-50/80 transition-colors cursor-pointer" onclick="showToast('Inspecting order ${row.id} for ${row.customer}')">
+          <td class="py-3.5 pl-6 pr-3 font-mono font-semibold text-slate-900 whitespace-nowrap">${row.id}</td>
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            <div class="font-semibold text-slate-900">${row.customer}</div>
+            <div class="text-xs text-slate-500">${row.email}</div>
+          </td>
+          <td class="py-3.5 px-3 text-slate-700">${row.product}</td>
+          <td class="py-3.5 px-3 font-mono font-semibold text-slate-900 whitespace-nowrap">${row.amount}</td>
+          <td class="py-3.5 px-3 whitespace-nowrap">${statusBadgeHtml(row.status)}</td>
+          <td class="py-3.5 pl-3 pr-6 text-right text-slate-500 whitespace-nowrap">${row.date}</td>
+        </tr>
+      `).join('');
+    }
+
+    // --- 6. CLOUD STORAGE CACHE CLEANER ---
+    let cacheCleaned = false;
+    function cleanStorageCache() {
+      if (cacheCleaned) {
+        showToast('Storage cache is already optimized (0 B reclaimable)');
+        return;
+      }
+      cacheCleaned = true;
+      document.getElementById('storageSubtitle').textContent = '6.2 GB of 8.0 GB used';
+      const badge = document.getElementById('storagePctBadge');
+      badge.textContent = '78% full';
+      badge.className = 'font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80';
+      document.getElementById('analyticsSizeText').textContent = '0.6 GB';
+      document.getElementById('segAnalytics').style.width = '7.5%';
+      document.getElementById('cleanCacheBtn').querySelector('span').textContent = 'Cache Cleaned';
+      showToast('Reclaimed 600 MB of temporary analytics cache');
+    }
+
+    // --- 7. MODALS & COMMAND PALETTE ---
+    function openReportModal() {
+      const m = document.getElementById('reportModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeReportModal() {
+      const m = document.getElementById('reportModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function submitReportForm(e) {
+      e.preventDefault();
+      const title = document.getElementById('reportTitle').value;
+      const fmt = document.getElementById('reportFormat').value;
+      closeReportModal();
+      showToast(`Generated "${title}" (${fmt})`);
+    }
+
+    function openNewViewModal() {
+      const m = document.getElementById('newViewModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      setTimeout(() => document.getElementById('viewNameInput').focus(), 40);
+    }
+    function closeNewViewModal() {
+      const m = document.getElementById('newViewModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function submitNewView(e) {
+      e.preventDefault();
+      const name = document.getElementById('viewNameInput').value.trim();
+      if (name) {
+        document.getElementById('breadcrumbCurrent').textContent = name;
+        document.getElementById('pageMainHeading').textContent = name;
+        document.getElementById('viewNameInput').value = '';
+        closeNewViewModal();
+        showToast(`Saved and activated view "${name}"`);
+      }
+    }
+
+    const commandItems = [
+      { label: 'Go to Operations Dashboard', category: 'Navigation', action: () => switchNav('Operations', 'Home / Operations') },
+      { label: 'Open Analytics Intelligence', category: 'Navigation', action: () => switchNav('Analytics', 'Dashboards / Analytics') },
+      { label: 'Open Sales & Revenue Pipeline', category: 'Navigation', action: () => switchNav('Sales', 'Dashboards / Sales') },
+      { label: 'Toggle Live Telemetry Stream', category: 'Stream', action: () => toggleLiveTelemetry() },
+      { label: 'Create Operations Report', category: 'Action', action: () => openReportModal() },
+      { label: 'Clean Cloud Storage Cache', category: 'Maintenance', action: () => { switchNav('Operations', 'Home / Operations'); cleanStorageCache(); } },
+      { label: 'Filter Pending Orders', category: 'Orders', action: () => { switchNav('Operations', 'Home / Operations'); filterOrders('Pending'); } },
+      { label: 'Switch Chart to 90-Day Horizon', category: 'Telemetry', action: () => { switchNav('Operations', 'Home / Operations'); setChartRange('90d'); } }
+    ];
+
+    function openCommandModal() {
+      const m = document.getElementById('commandModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      const input = document.getElementById('cmdSearchInput');
+      input.value = '';
+      filterCommands();
+      setTimeout(() => input.focus(), 30);
+    }
+    function closeCommandModal() {
+      const m = document.getElementById('commandModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function filterCommands() {
+      const q = (document.getElementById('cmdSearchInput').value || '').toLowerCase();
+      const list = document.getElementById('cmdResultsList');
+      const matches = commandItems.filter(c => c.label.toLowerCase().includes(q) || c.category.toLowerCase().includes(q));
+      list.innerHTML = matches.map((item) => `
+        <button type="button" onclick="runCommand(${commandItems.indexOf(item)})" class="w-full h-11 px-3.5 rounded-xl hover:bg-emerald-50 flex items-center justify-between text-left text-sm font-medium text-slate-800 transition-colors">
+          <span>${item.label}</span>
+          <span class="text-xs font-mono text-slate-400">${item.category}</span>
+        </button>
+      `).join('') || `<div class="py-6 text-center text-sm text-slate-400">No matching commands</div>`;
+    }
+    function runCommand(idx) {
+      closeCommandModal();
+      if (commandItems[idx]) commandItems[idx].action();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openCommandModal();
+      } else if (e.key === 'Escape') {
+        closeCommandModal();
+        closeReportModal();
+        closeNewViewModal();
+      }
+    });
+
+    // --- 8. TOAST HELPER ---
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-medium shadow-xl border border-slate-700/80 transition-all duration-300';
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 260);
+      }, 2800);
+    }
+
+    // Initialize
+    renderNetworkChart('7d');
+    renderOrders();
+    animateProgressBarsEntrance();
+    bindMiniHistogramTooltips();
+  </script>
+</body>
+</html>

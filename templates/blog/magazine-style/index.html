@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MERIDIAN — Visual Data Journalism, AI Economics &amp; Systems Culture</title>
+  <meta name="description" content="Meridian Issue No. 42 — Long-form visual data journalism on AI economics, grid infrastructure, semiconductor lithography, and systems culture." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FBF9F4',
+            paperWarm: '#F3EFE6',
+            ink: '#0D1017',
+            inkCard: '#141923',
+            crimson: '#E11D48',
+            cobalt: '#1D4ED8',
+            cobaltBright: '#3B82F6'
+          },
+          fontFamily: {
+            serif: ['Newsreader', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-page: #FBF9F4;
+      --bg-surface: #F4F0E6;
+      --bg-card: #FFFFFF;
+      --text-primary: #111318;
+      --text-secondary: #4A4E58;
+      --text-muted: #767B87;
+      --rule-color: rgba(17, 19, 24, 0.14);
+      --rule-strong: rgba(17, 19, 24, 0.82);
+    }
+
+    html.dark {
+      --bg-page: #0D1017;
+      --bg-surface: #131823;
+      --bg-card: #151A26;
+      --text-primary: #F4F2EC;
+      --text-secondary: #B8C0CE;
+      --text-muted: #7D8799;
+      --rule-color: rgba(244, 242, 236, 0.13);
+      --rule-strong: rgba(244, 242, 236, 0.75);
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.28s ease, color 0.28s ease;
+    }
+
+    .hairline-b { border-bottom: 1px solid var(--rule-color); }
+    .hairline-t { border-top: 1px solid var(--rule-color); }
+    .hairline-r { border-right: 1px solid var(--rule-color); }
+    .hairline-border { border: 1px solid var(--rule-color); }
+    .editorial-surface { background-color: var(--bg-surface); }
+    .editorial-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--rule-color);
+      transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.28s ease;
+    }
+    .editorial-card:hover {
+      border-color: var(--rule-strong);
+    }
+
+    .drop-cap::first-letter {
+      float: left;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 3.9rem;
+      line-height: 0.82;
+      padding-right: 0.65rem;
+      padding-top: 0.22rem;
+      font-weight: 600;
+      color: #E11D48;
+    }
+
+    .chart-bar {
+      transition: y 0.45s cubic-bezier(0.22, 1, 0.36, 1), height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .chart-line {
+      transition: d 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-crimson selection:text-white">
+
+  <!-- TOP READING PROGRESS BAR -->
+  <div class="fixed top-0 left-0 right-0 h-[3px] z-50 bg-transparent pointer-events-none">
+    <div id="readingProgressBar" class="h-full bg-gradient-to-r from-crimson via-rose-500 to-cobalt w-0 transition-[width] duration-100"></div>
+  </div>
+
+  <!-- EDITORIAL MASTHEAD -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-[#FBF9F4]/90 dark:bg-[#0D1017]/90 hairline-b transition-colors">
+    <!-- Upper Folio Metadata Strip -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between hairline-b text-[12.5px] font-mono tracking-wider">
+      <div class="flex items-center gap-3 text-[var(--text-secondary)]">
+        <span class="inline-block w-2 h-2 rounded-full bg-crimson"></span>
+        <span class="font-semibold text-[var(--text-primary)]">ISSUE NO. 42 &middot; NOV 2026</span>
+        <span class="hidden sm:inline opacity-40">|</span>
+        <span class="hidden sm:inline">QUARTERLY OF VISUAL DATA &amp; SYSTEMS</span>
+      </div>
+
+      <div class="flex items-center gap-4 text-[var(--text-secondary)]">
+        <span class="hidden md:inline">ISSN 2994-081X</span>
+        <button id="savedFilterBtn" type="button" class="inline-flex items-center gap-1.5 hover:text-crimson transition-colors" title="Filter bookmarked essays">
+          <svg class="w-3.5 h-3.5 text-crimson" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>SAVED (<span id="savedCountBadge">1</span>)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Masthead Bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <!-- Publication Wordmark -->
+      <a href="#" class="flex items-baseline gap-3 group focus:outline-none">
+        <span class="font-serif font-bold text-3xl sm:text-4xl tracking-tight leading-none">MERIDIAN</span>
+        <span class="hidden xl:inline-block font-mono text-xs uppercase tracking-widest px-2 py-0.5 rounded hairline-border text-[var(--text-muted)]">
+          DATA JOURNALISM
+        </span>
+      </a>
+
+      <!-- Search + Reading Mode Toggle + Subscribe -->
+      <div class="flex items-center gap-2.5 sm:gap-3 ml-auto">
+        <!-- Search Input -->
+        <div class="relative hidden md:block">
+          <svg class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="essaySearchInput"
+            type="search"
+            placeholder="Search essays, authors..."
+            aria-label="Search essays"
+            class="w-48 lg:w-56 pl-8 pr-3 py-1.5 rounded-lg editorial-surface hairline-border text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-crimson"
+          />
+        </div>
+
+        <!-- Interactive Light Paper / Dark Ink Reading Mode Toggle -->
+        <button
+          id="themeToggleBtn"
+          type="button"
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg editorial-surface hairline-border text-xs font-mono font-medium hover:border-crimson transition-colors"
+          aria-label="Toggle Light Paper or Dark Ink reading mode"
+        >
+          <!-- Sun SVG (shown in dark mode) -->
+          <svg id="iconSun" class="w-3.5 h-3.5 text-amber-400 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+          <!-- Moon/Ink Nib SVG (shown in light mode) -->
+          <svg id="iconMoon" class="w-3.5 h-3.5 text-cobalt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span id="themeModeLabel">Ink Mode</span>
+        </button>
+
+        <!-- Subscribe CTA -->
+        <a
+          href="#membership"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-crimson hover:bg-rose-700 text-white font-sans font-bold text-xs tracking-wide transition-colors"
+        >
+          <span>Subscribe</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Topic Filter Bar -->
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 hairline-t flex items-center gap-2 overflow-x-auto no-scrollbar" aria-label="Editorial Topic Filter">
+      <button type="button" data-topic="all" class="topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs bg-ink text-paper dark:bg-paper dark:text-ink transition-colors">
+        All Essays
+      </button>
+      <button type="button" data-topic="AI Economics" class="topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs text-[var(--text-secondary)] hover:text-crimson transition-colors">
+        AI Economics
+      </button>
+      <button type="button" data-topic="Energy & Compute" class="topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs text-[var(--text-secondary)] hover:text-crimson transition-colors">
+        Energy &amp; Compute
+      </button>
+      <button type="button" data-topic="Design Systems" class="topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs text-[var(--text-secondary)] hover:text-crimson transition-colors">
+        Design Systems
+      </button>
+      <button type="button" data-topic="Semiconductors" class="topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs text-[var(--text-secondary)] hover:text-crimson transition-colors">
+        Semiconductors
+      </button>
+
+      <!-- Mobile Search Input -->
+      <div class="md:hidden ml-auto pl-2 shrink-0">
+        <input
+          id="essaySearchInputMobile"
+          type="search"
+          placeholder="Filter..."
+          aria-label="Filter essays"
+          class="w-28 px-2.5 py-1 rounded editorial-surface hairline-border text-xs font-sans text-[var(--text-primary)]"
+        />
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 1. LEAD COVER FEATURE + INTERACTIVE VISUAL DATA ESSAY -->
+    <section class="pt-10 pb-16 lg:pt-14 lg:pb-20 hairline-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Cover Kicker Row -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-6 mb-8 hairline-b">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-0.5 rounded bg-crimson text-white font-mono text-[12.5px] font-semibold uppercase tracking-wider">Cover Investigation</span>
+            <span class="font-mono text-xs text-[var(--text-muted)]">ENERGY &amp; COMPUTE // FOLIO 42.01</span>
+          </div>
+          <div class="flex items-center gap-4 font-mono text-xs text-[var(--text-secondary)]">
+            <span>22 MIN READ</span>
+            <span>&middot;</span>
+            <span>48 PRIMARY UTILITY FILINGS</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          
+          <!-- Left Column (5 Cols): Editorial Cover Essay Lead -->
+          <div class="lg:col-span-5 space-y-6">
+            <h1 class="font-serif font-semibold text-4xl sm:text-5xl lg:text-[52px] leading-[1.06] tracking-tight">
+              The Terawatt Compute Decade: Mapping Global AI Infrastructure CapEx 2020–2030
+            </h1>
+
+            <p class="font-serif italic text-xl sm:text-[22px] leading-relaxed text-[var(--text-secondary)]">
+              Why transformer substations, high-voltage interconnects, and baseload nuclear PPAs have overtaken lithography as the binding constraint on frontier intelligence.
+            </p>
+
+            <!-- Author Byline Strip -->
+            <div class="py-4 hairline-t hairline-b flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-cobalt/15 border border-cobalt/30 flex items-center justify-center font-serif font-bold text-sm text-cobalt dark:text-cobaltBright">
+                  ER
+                </div>
+                <div>
+                  <div class="text-xs font-bold tracking-wide uppercase">Dr. Elena Rostova &amp; Marcus Vance</div>
+                  <div class="font-mono text-[12.5px] text-[var(--text-muted)]">Meridian Macro &amp; Grid Desk &middot; Zurich / SF</div>
+                </div>
+              </div>
+              <button
+                id="leadBookmarkBtn"
+                type="button"
+                class="p-2 rounded-lg editorial-surface hairline-border text-[var(--text-secondary)] hover:text-crimson transition-colors"
+                aria-label="Bookmark cover investigation"
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Opening Drop-Cap Paragraph -->
+            <p class="font-serif text-lg leading-[1.75] text-[var(--text-primary)] drop-cap">
+              Every industrial revolution eventually collides with civil engineering. Between 2020 and 2026, capital expenditure across the six largest hyperscalers quadrupled from $84 billion to $312 billion annually—the fastest private capital mobilization since nineteenth-century trunk rail. Yet our audit of 140 regional transmission queues reveals a stark divergence between silicon delivery schedules and megawatt energization.
+            </p>
+
+            <!-- Pull Quote -->
+            <blockquote class="pl-4 border-l-2 border-crimson py-1 my-4">
+              <p class="font-serif italic text-lg text-[var(--text-primary)] leading-snug">
+                "A cluster of 100,000 next-generation accelerators can be assembled in nineteen weeks; the 345kV substation feeding it now waits fifty-one months."
+              </p>
+            </blockquote>
+
+            <div class="pt-1">
+              <button
+                id="readCoverModalBtn"
+                type="button"
+                class="inline-flex items-center gap-2.5 px-5 py-3 rounded-lg bg-ink text-paper dark:bg-paper dark:text-ink font-sans font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity"
+              >
+                <span>Read Full Cover Essay</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column (7 Cols): Embedded Interactive Visual Data Chart + Bento Takeaways -->
+          <div class="lg:col-span-7 space-y-5">
+            <div class="rounded-2xl editorial-card p-5 sm:p-7 shadow-sm">
+              <!-- Chart Header & Interactive Dataset Toggle -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 hairline-b">
+                <div>
+                  <div class="font-mono text-[12.5px] uppercase tracking-wider text-crimson font-semibold">FIG 1.0 // INTERACTIVE INFRASTRUCTURE MODEL</div>
+                  <h2 id="chartMainTitle" class="font-serif font-semibold text-2xl mt-0.5">
+                    Global AI Datacenter CapEx ($ Billions, 2020–2030E)
+                  </h2>
+                </div>
+
+                <!-- Dataset Switcher -->
+                <div class="inline-flex p-1 rounded-xl editorial-surface hairline-border self-start sm:self-auto" role="tablist" aria-label="Select Chart Dataset">
+                  <button
+                    type="button"
+                    data-dataset="capex"
+                    class="dataset-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-crimson text-white transition-all"
+                  >
+                    Hyperscaler CapEx $B
+                  </button>
+                  <button
+                    type="button"
+                    data-dataset="power"
+                    class="dataset-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
+                  >
+                    Grid Power GW
+                  </button>
+                </div>
+              </div>
+
+              <!-- Legend Strip -->
+              <div class="flex flex-wrap items-center justify-between gap-3 py-3.5 text-xs font-mono">
+                <div class="flex flex-wrap items-center gap-5">
+                  <span class="inline-flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-sm bg-crimson"></span>
+                    <span id="legendSeriesA">Compute Silicon &amp; Networking</span>
+                  </span>
+                  <span class="inline-flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-sm bg-cobalt dark:bg-cobaltBright"></span>
+                    <span id="legendSeriesB">Power Shells, Cooling &amp; Grid</span>
+                  </span>
+                </div>
+                <span id="legendTrendTag" class="text-crimson font-semibold">TREND: +23.4% 10-YR CAGR</span>
+              </div>
+
+              <!-- Interactive Stacked Bar + Trendline SVG Chart -->
+              <div class="mt-1 rounded-xl editorial-surface p-3 sm:p-4 hairline-border">
+                <svg id="coverDataChart" viewBox="0 0 640 270" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Global AI Infrastructure CapEx and Grid Power Chart">
+                  <!-- Horizontal Hairline Grid -->
+                  <g stroke="currentColor" class="text-black/10 dark:text-white/10" stroke-width="1">
+                    <line x1="54" y1="28" x2="615" y2="28" />
+                    <line x1="54" y1="78" x2="615" y2="78" />
+                    <line x1="54" y1="128" x2="615" y2="128" />
+                    <line x1="54" y1="178" x2="615" y2="178" />
+                    <line x1="54" y1="228" x2="615" y2="228" stroke-width="1.4" />
+                  </g>
+
+                  <!-- Y-Axis Labels -->
+                  <g font-family="JetBrains Mono" font-size="10" fill="currentColor" class="text-[var(--text-muted)]" text-anchor="end">
+                    <text id="yLabel4" x="46" y="32">$800B</text>
+                    <text id="yLabel3" x="46" y="82">$600B</text>
+                    <text id="yLabel2" x="46" y="132">$400B</text>
+                    <text id="yLabel1" x="46" y="182">$200B</text>
+                    <text id="yLabel0" x="46" y="232">$0</text>
+                  </g>
+
+                  <!-- Stacked Columns (6 Years: 2020, 2022, 2024, 2026, 2028E, 2030E) -->
+                  <!-- 2020 -->
+                  <g>
+                    <rect id="barB0" class="chart-bar" x="82" y="218" width="44" height="10" rx="2" fill="#1D4ED8" />
+                    <rect id="barA0" class="chart-bar" x="82" y="205" width="44" height="13" rx="2" fill="#E11D48" />
+                    <text id="val0" x="104" y="198" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="currentColor" class="text-[var(--text-primary)]">$84B</text>
+                    <text x="104" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="currentColor" class="text-[var(--text-secondary)]">2020</text>
+                  </g>
+
+                  <!-- 2022 -->
+                  <g>
+                    <rect id="barB1" class="chart-bar" x="172" y="212" width="44" height="16" rx="2" fill="#1D4ED8" />
+                    <rect id="barA1" class="chart-bar" x="172" y="191" width="44" height="21" rx="2" fill="#E11D48" />
+                    <text id="val1" x="194" y="184" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="currentColor" class="text-[var(--text-primary)]">$142B</text>
+                    <text x="194" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="currentColor" class="text-[var(--text-secondary)]">2022</text>
+                  </g>
+
+                  <!-- 2024 -->
+                  <g>
+                    <rect id="barB2" class="chart-bar" x="262" y="206" width="44" height="22" rx="2" fill="#1D4ED8" />
+                    <rect id="barA2" class="chart-bar" x="262" y="171" width="44" height="35" rx="2" fill="#E11D48" />
+                    <text id="val2" x="284" y="164" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="currentColor" class="text-[var(--text-primary)]">$228B</text>
+                    <text x="284" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="currentColor" class="text-[var(--text-secondary)]">2024</text>
+                  </g>
+
+                  <!-- 2026 (Current Issue Benchmark) -->
+                  <g>
+                    <rect id="barB3" class="chart-bar" x="352" y="198" width="44" height="30" rx="2" fill="#1D4ED8" />
+                    <rect id="barA3" class="chart-bar" x="352" y="150" width="44" height="48" rx="2" fill="#E11D48" />
+                    <text id="val3" x="374" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" font-weight="700" fill="#E11D48">$312B</text>
+                    <text x="374" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" font-weight="700" fill="#E11D48">2026</text>
+                  </g>
+
+                  <!-- 2028E -->
+                  <g>
+                    <rect id="barB4" class="chart-bar" x="442" y="182" width="44" height="46" rx="2" fill="#1D4ED8" fill-opacity="0.88" />
+                    <rect id="barA4" class="chart-bar" x="442" y="106" width="44" height="76" rx="2" fill="#E11D48" fill-opacity="0.88" />
+                    <text id="val4" x="464" y="98" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="currentColor" class="text-[var(--text-primary)]">$488B</text>
+                    <text x="464" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="currentColor" class="text-[var(--text-secondary)]">2028E</text>
+                  </g>
+
+                  <!-- 2030E -->
+                  <g>
+                    <rect id="barB5" class="chart-bar" x="532" y="160" width="44" height="68" rx="2" fill="#1D4ED8" fill-opacity="0.82" />
+                    <rect id="barA5" class="chart-bar" x="532" y="55" width="44" height="105" rx="2" fill="#E11D48" fill-opacity="0.82" />
+                    <text id="val5" x="554" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" font-weight="700" fill="currentColor" class="text-[var(--text-primary)]">$690B</text>
+                    <text x="554" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="currentColor" class="text-[var(--text-secondary)]">2030E</text>
+                  </g>
+
+                  <!-- Overlay Cumulative Trajectory Spline -->
+                  <path
+                    id="chartTrendSpline"
+                    class="chart-line"
+                    d="M104 205 C145 199, 160 195, 194 191 C235 182, 250 178, 284 171 C325 162, 340 157, 374 150 C415 130, 430 118, 464 106 C502 86, 522 70, 554 55"
+                    stroke="#E11D48"
+                    stroke-width="2"
+                    stroke-dasharray="4 4"
+                    fill="none"
+                  />
+                </svg>
+              </div>
+
+              <!-- Key Takeaways Bento Callouts -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-5">
+                <div class="p-3.5 rounded-xl editorial-surface hairline-border">
+                  <div class="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">2026–2030 Cumulative</div>
+                  <div id="calloutStat1" class="font-mono font-bold text-xl text-crimson mt-1">$2.48 Trillion</div>
+                  <div id="calloutDesc1" class="text-xs text-[var(--text-secondary)] mt-0.5">Committed sovereign &amp; cloud CapEx</div>
+                </div>
+
+                <div class="p-3.5 rounded-xl editorial-surface hairline-border">
+                  <div class="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">Grid Bottleneck</div>
+                  <div id="calloutStat2" class="font-mono font-bold text-xl text-cobalt dark:text-cobaltBright mt-1">51 Months</div>
+                  <div id="calloutDesc2" class="text-xs text-[var(--text-secondary)] mt-0.5">Median US/EU HV transformer queue</div>
+                </div>
+
+                <div class="p-3.5 rounded-xl editorial-surface hairline-border">
+                  <div class="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">Non-Silicon Share</div>
+                  <div id="calloutStat3" class="font-mono font-bold text-xl text-[var(--text-primary)] mt-1">39.4% by 2030</div>
+                  <div id="calloutDesc3" class="text-xs text-[var(--text-secondary)] mt-0.5">Cooling, switchgear &amp; generation</div>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-3 hairline-t flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[var(--text-muted)]">
+                <span>SOURCE: MERIDIAN INFRASTRUCTURE DATABASE, FERC FORM 714, SEC 10-K FILINGS</span>
+                <span>UPDATED NOV 2026</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. THE MERIDIAN DATA INDEX STRIP (4 LIVE MACRO INDICATORS WITH MINI SPARKLINES) -->
+    <section class="editorial-surface hairline-b py-6" aria-label="The Meridian Data Index">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2 font-mono text-[12.5px] uppercase tracking-widest font-semibold text-[var(--text-secondary)]">
+            <span class="w-2 h-2 rounded-full bg-cobalt dark:bg-cobaltBright"></span>
+            <span>THE MERIDIAN MACRO INDEX // BENCHMARK TELEMETRY</span>
+          </div>
+          <span class="font-mono text-xs text-[var(--text-muted)]">Q4 2026 SNAPSHOT</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Indicator 1 -->
+          <div class="p-4 rounded-xl editorial-card flex items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)]">Global H100 Spot $/hr</div>
+              <div class="font-mono font-bold text-xl mt-0.5">$2.14</div>
+              <div class="font-mono text-[12.5px] text-cobalt dark:text-cobaltBright font-medium mt-0.5">-18.4% YoY deflation</div>
+            </div>
+            <svg viewBox="0 0 84 34" class="w-20 h-9 shrink-0" fill="none">
+              <path d="M2 6 L18 10 L34 15 L50 13 L66 23 L82 28" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="82" cy="28" r="2.8" fill="#1D4ED8"/>
+            </svg>
+          </div>
+
+          <!-- Indicator 2 -->
+          <div class="p-4 rounded-xl editorial-card flex items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)]">Solar LCOE $/MWh</div>
+              <div class="font-mono font-bold text-xl mt-0.5">$28.60</div>
+              <div class="font-mono text-[12.5px] text-cobalt dark:text-cobaltBright font-medium mt-0.5">-9.2% utility median</div>
+            </div>
+            <svg viewBox="0 0 84 34" class="w-20 h-9 shrink-0" fill="none">
+              <path d="M2 8 L20 12 L38 14 L54 19 L70 24 L82 27" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="82" cy="27" r="2.8" fill="#1D4ED8"/>
+            </svg>
+          </div>
+
+          <!-- Indicator 3 -->
+          <div class="p-4 rounded-xl editorial-card flex items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)]">Frontier Model Params</div>
+              <div class="font-mono font-bold text-xl mt-0.5">3.8T MoE</div>
+              <div class="font-mono text-[12.5px] text-crimson font-medium mt-0.5">+140% sparse capacity</div>
+            </div>
+            <svg viewBox="0 0 84 34" class="w-20 h-9 shrink-0" fill="none">
+              <path d="M2 29 L18 26 L36 22 L52 15 L68 9 L82 5" stroke="#E11D48" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="82" cy="5" r="2.8" fill="#E11D48"/>
+            </svg>
+          </div>
+
+          <!-- Indicator 4 -->
+          <div class="p-4 rounded-xl editorial-card flex items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)]">Open-Weights Share %</div>
+              <div class="font-mono font-bold text-xl mt-0.5">41.8%</div>
+              <div class="font-mono text-[12.5px] text-crimson font-medium mt-0.5">+14.6 pts enterprise</div>
+            </div>
+            <svg viewBox="0 0 84 34" class="w-20 h-9 shrink-0" fill="none">
+              <path d="M2 27 L20 25 L38 20 L54 16 L70 10 L82 7" stroke="#E11D48" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="82" cy="7" r="2.8" fill="#E11D48"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BENTO EDITORIAL STORY GRID (FILTERABLE BY TOPIC & SEARCH) -->
+    <section id="essays" class="py-16 lg:py-24 hairline-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <div>
+            <div class="font-mono text-xs uppercase tracking-widest text-crimson font-semibold">ISSUE NO. 42 DISPATCHES</div>
+            <h2 class="font-serif font-semibold text-3xl sm:text-4xl mt-1">Long-Form Essays &amp; Empirical Monographs</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="essayCountLabel" class="font-mono text-xs text-[var(--text-muted)]">Showing 6 of 6 essays</span>
+            <button id="resetFilterBtn" type="button" class="hidden font-mono text-xs text-crimson underline">Reset filters</button>
+          </div>
+        </div>
+
+        <!-- Asymmetric Bento Grid of 6 Art-Directed Essays -->
+        <div id="bentoEssayGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+          <!-- Hydrated via JS with custom geometric/data SVGs & bookmark toggles -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. INSTITUTIONAL SUBSCRIBERS & READER TESTIMONIALS -->
+    <section class="py-16 lg:py-24 editorial-surface hairline-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Institutional Logos / Wordmarks Row -->
+        <div class="pb-12 mb-12 hairline-b text-center">
+          <div class="font-mono text-[12.5px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-6">
+            SITE-LICENSED BY RESEARCH GROUPS, LABS &amp; ECONOMIC POLICY DESKS AT
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 items-center max-w-4xl mx-auto">
+            <div class="py-3 px-4 rounded-xl hairline-border bg-[var(--bg-card)] font-serif font-bold text-lg tracking-tight">
+              MIT <span class="font-mono font-normal text-xs text-[var(--text-muted)]">CSAIL</span>
+            </div>
+            <div class="py-3 px-4 rounded-xl hairline-border bg-[var(--bg-card)] font-sans font-extrabold text-lg tracking-tight">
+              stripe <span class="font-mono font-normal text-xs text-[var(--text-muted)]">econ</span>
+            </div>
+            <div class="py-3 px-4 rounded-xl hairline-border bg-[var(--bg-card)] font-sans font-bold text-lg tracking-tight">
+              DeepMind <span class="font-mono font-normal text-xs text-[var(--text-muted)]">UK</span>
+            </div>
+            <div class="py-3 px-4 rounded-xl hairline-border bg-[var(--bg-card)] font-serif font-bold text-lg tracking-tight">
+              ETH <span class="font-mono font-normal text-xs text-[var(--text-muted)]">Z&uuml;rich</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reader Testimonials -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <blockquote class="rounded-2xl editorial-card p-6 sm:p-7 flex flex-col justify-between">
+            <p class="font-serif italic text-lg leading-relaxed text-[var(--text-primary)]">
+              "Meridian is the rare publication that treats semiconductor lithography, transformer queues, and unit economics as a single interconnected system rather than isolated press releases."
+            </p>
+            <footer class="mt-6 pt-4 hairline-t">
+              <div class="font-sans font-bold text-xs uppercase tracking-wider">Prof. Lukas Meyer</div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)] mt-0.5">Energy Systems Laboratory &middot; ETH Zurich</div>
+            </footer>
+          </blockquote>
+
+          <blockquote class="rounded-2xl editorial-card p-6 sm:p-7 flex flex-col justify-between">
+            <p class="font-serif italic text-lg leading-relaxed text-[var(--text-primary)]">
+              "Every quarterly print edition sits permanently on our product infrastructure desk. Their datasets on inference pricing decay shaped two of our internal capacity planning models."
+            </p>
+            <footer class="mt-6 pt-4 hairline-t">
+              <div class="font-sans font-bold text-xs uppercase tracking-wider">Hannah Okafor</div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)] mt-0.5">Staff Infrastructure Economist &middot; Stripe</div>
+            </footer>
+          </blockquote>
+
+          <blockquote class="rounded-2xl editorial-card p-6 sm:p-7 flex flex-col justify-between">
+            <p class="font-serif italic text-lg leading-relaxed text-[var(--text-primary)]">
+              "Visual journalism at the caliber of classic scientific monographs. The interactive charts never obscure the underlying methodology—you can inspect every assumption."
+            </p>
+            <footer class="mt-6 pt-4 hairline-t">
+              <div class="font-sans font-bold text-xs uppercase tracking-wider">Dr. Siddharth Rao</div>
+              <div class="font-mono text-[12.5px] text-[var(--text-muted)] mt-0.5">Research Scientist &middot; DeepMind &amp; MIT Alum</div>
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. PRINT + DIGITAL MEMBERSHIP TIERS & NEWSLETTER SIGNUP -->
+    <section id="membership" class="py-20 lg:py-28 hairline-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mb-12">
+          <div class="font-mono text-xs uppercase tracking-widest text-crimson font-semibold">INDEPENDENT &amp; READER-FUNDED</div>
+          <h2 class="font-serif font-semibold text-4xl sm:text-5xl mt-2 tracking-tight">
+            Zero Advertising. Patronage by Builders &amp; Researchers.
+          </h2>
+          <p class="text-[var(--text-secondary)] text-base mt-3 leading-relaxed">
+            Choose digital access to all interactive datasets and CSV notebooks, or collect our Smyth-sewn quarterly print volumes on 120gsm archival Munken paper.
+          </p>
+        </div>
+
+        <!-- 3 Membership Tiers -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
+          
+          <!-- Tier 1: Reader Free -->
+          <div class="rounded-2xl editorial-card p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">TIER 01 // OPEN DISPATCH</span>
+              </div>
+              <h3 class="font-serif font-semibold text-2xl mt-2">Reader Free</h3>
+              <div class="mt-4 flex items-baseline gap-1">
+                <span class="font-mono font-bold text-4xl">$0</span>
+                <span class="font-mono text-xs text-[var(--text-muted)]">/ forever</span>
+              </div>
+              <p class="text-xs text-[var(--text-secondary)] mt-3">Essential weekly data dispatches and selected public cover essays.</p>
+
+              <ul class="mt-6 pt-6 hairline-t space-y-3 text-xs text-[var(--text-secondary)]">
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-cobalt dark:text-cobaltBright shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Sunday Macro Index brief via email</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-cobalt dark:text-cobaltBright shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>2 full flagship essays per month</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-cobalt dark:text-cobaltBright shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Interactive web charts &amp; reading mode</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              type="button"
+              data-tier="Reader Free ($0)"
+              class="select-tier-btn mt-8 w-full py-3 rounded-xl editorial-surface hairline-border font-sans font-bold text-xs uppercase tracking-wider hover:border-crimson transition-colors"
+            >
+              Select Free Dispatch
+            </button>
+          </div>
+
+          <!-- Tier 2: Digital Annual $96/yr -->
+          <div class="rounded-2xl editorial-card p-7 flex flex-col justify-between ring-2 ring-crimson relative">
+            <span class="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-crimson text-white font-mono text-xs font-semibold uppercase tracking-wider">
+              Most Popular
+            </span>
+            <div>
+              <div class="font-mono text-xs uppercase tracking-wider text-crimson font-semibold">TIER 02 // FULL ARCHIVE + DATA</div>
+              <h3 class="font-serif font-semibold text-2xl mt-2">Digital Annual</h3>
+              <div class="mt-4 flex items-baseline gap-1.5">
+                <span class="font-mono font-bold text-4xl">$96</span>
+                <span class="font-mono text-xs text-[var(--text-muted)]">/ year ($8/mo)</span>
+              </div>
+              <p class="text-xs text-[var(--text-secondary)] mt-3">Complete access to 42 back issues, underlying CSV/Parquet series, and audio editions.</p>
+
+              <ul class="mt-6 pt-6 hairline-t space-y-3 text-xs text-[var(--text-secondary)]">
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-crimson shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Unlimited essays &amp; 2018–2026 digital archive</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-crimson shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Raw CSV / Python notebook dataset downloads</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-crimson shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Narrated studio audio essays + EPUB exports</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              type="button"
+              data-tier="Digital Annual ($96/yr)"
+              class="select-tier-btn mt-8 w-full py-3 rounded-xl bg-crimson hover:bg-rose-700 text-white font-sans font-bold text-xs uppercase tracking-wider transition-colors"
+            >
+              Subscribe Digital — $96/yr
+            </button>
+          </div>
+
+          <!-- Tier 3: Print Quarterly Edition $180/yr -->
+          <div class="rounded-2xl editorial-card p-7 flex flex-col justify-between">
+            <div>
+              <div class="font-mono text-xs uppercase tracking-wider text-cobalt dark:text-cobaltBright font-semibold">TIER 03 // COLLECTOR PRINT</div>
+              <h3 class="font-serif font-semibold text-2xl mt-2">Print Quarterly Edition</h3>
+              <div class="mt-4 flex items-baseline gap-1.5">
+                <span class="font-mono font-bold text-4xl">$180</span>
+                <span class="font-mono text-xs text-[var(--text-muted)]">/ year (4 volumes)</span>
+              </div>
+              <p class="text-xs text-[var(--text-secondary)] mt-3">Four 192-page Smyth-sewn print editions shipped worldwide + full Digital Annual membership.</p>
+
+              <ul class="mt-6 pt-6 hairline-t space-y-3 text-xs text-[var(--text-secondary)]">
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-cobalt dark:text-cobaltBright shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>4 archival 120gsm print issues delivered</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-cobalt dark:text-cobaltBright shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Fold-out gatefold systems cartography poster</span>
+                </li>
+                <li class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-cobalt dark:text-cobaltBright shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Includes all Digital Annual data privileges</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              type="button"
+              data-tier="Print Quarterly Edition ($180/yr)"
+              class="select-tier-btn mt-8 w-full py-3 rounded-xl bg-ink text-paper dark:bg-paper dark:text-ink font-sans font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity"
+            >
+              Order Print + Digital — $180/yr
+            </button>
+          </div>
+        </div>
+
+        <!-- Newsletter Signup Box with Instant Confirmation State -->
+        <div id="newsletterBox" class="rounded-2xl editorial-surface hairline-border p-7 sm:p-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7 space-y-2">
+              <div class="inline-flex items-center gap-2 font-mono text-xs text-crimson font-semibold">
+                <span>THE SUNDAY BRIEFING // 94,000+ SUBSCRIBERS</span>
+              </div>
+              <h3 class="font-serif font-semibold text-2xl sm:text-3xl">
+                Receive one empirically grounded visual essay every Sunday morning.
+              </h3>
+              <p id="selectedTierHint" class="font-mono text-xs text-[var(--text-muted)]">
+                Selected Plan: Reader Free ($0) &middot; Unsubscribe in one click anytime.
+              </p>
+            </div>
+
+            <div class="lg:col-span-5">
+              <form id="newsletterForm" class="flex flex-col sm:flex-row gap-3">
+                <input
+                  id="newsletterEmail"
+                  type="email"
+                  required
+                  placeholder="researcher@institution.edu"
+                  class="flex-1 rounded-xl bg-[var(--bg-card)] hairline-border px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-crimson"
+                />
+                <button
+                  type="submit"
+                  class="px-6 py-3 rounded-xl bg-crimson hover:bg-rose-700 text-white font-sans font-bold text-xs uppercase tracking-wider shrink-0 transition-colors"
+                >
+                  Confirm Dispatch
+                </button>
+              </form>
+
+              <!-- Instant Confirmation State -->
+              <div id="newsletterConfirmation" class="hidden p-4 rounded-xl bg-[var(--bg-card)] border border-emerald-600/40 space-y-1">
+                <div class="flex items-center gap-2 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>DISPATCH CONFIRMED // ISSUE NO. 42</span>
+                </div>
+                <p id="newsletterConfirmText" class="text-xs text-[var(--text-secondary)]"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- COLOPHON FOOTER -->
+  <footer class="py-14 text-xs text-[var(--text-secondary)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 hairline-b">
+        <div class="md:col-span-5 space-y-3">
+          <div class="font-serif font-bold text-2xl text-[var(--text-primary)]">MERIDIAN</div>
+          <p class="leading-relaxed max-w-sm text-[var(--text-secondary)]">
+            A quarterly print and digital journal investigating the physical infrastructure of compute, industrial economics, semiconductor fabrication, and design systems.
+          </p>
+          <div class="pt-2 font-mono text-[12.5px] text-[var(--text-muted)]">
+            COLOPHON: Headlines set in Optical Newsreader; UI in Plus Jakarta Sans; Data figures in JetBrains Mono. Print edition bound in Ghent on 120gsm Munken Lynx.
+          </div>
+        </div>
+
+        <div class="md:col-span-2 space-y-2.5">
+          <div class="font-mono uppercase tracking-wider text-[var(--text-primary)] font-semibold mb-3">Desks</div>
+          <div><a href="#essays" data-jump-topic="AI Economics" class="footer-topic-link hover:text-crimson">AI Economics</a></div>
+          <div><a href="#essays" data-jump-topic="Energy & Compute" class="footer-topic-link hover:text-crimson">Energy &amp; Compute</a></div>
+          <div><a href="#essays" data-jump-topic="Design Systems" class="footer-topic-link hover:text-crimson">Design Systems</a></div>
+          <div><a href="#essays" data-jump-topic="Semiconductors" class="footer-topic-link hover:text-crimson">Semiconductors</a></div>
+        </div>
+
+        <div class="md:col-span-2 space-y-2.5">
+          <div class="font-mono uppercase tracking-wider text-[var(--text-primary)] font-semibold mb-3">Publication</div>
+          <div><a href="#membership" class="hover:text-crimson">Print Editions</a></div>
+          <div><a href="#membership" class="hover:text-crimson">Institutional Licenses</a></div>
+          <div><a href="#essays" class="hover:text-crimson">Methodology &amp; CSVs</a></div>
+          <div><a href="#membership" class="hover:text-crimson">Submissions</a></div>
+        </div>
+
+        <div class="md:col-span-3 space-y-2.5 font-mono text-[12.5px]">
+          <div class="uppercase tracking-wider text-[var(--text-primary)] font-semibold mb-3">Editorial Bureaus</div>
+          <div>ZURICH // BAHNHOFSTRASSE</div>
+          <div>SAN FRANCISCO // JACKSON SQ</div>
+          <div>LONDON // CLERKENWELL</div>
+          <div class="pt-2 text-crimson">ISSN 2994-081X (PRINT)</div>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[12.5px] text-[var(--text-muted)]">
+        <span>&copy; 2026 MERIDIAN PRESS LTD. ALL DATASETS LICENSED CC-BY-NC 4.0 WITH ATTRIBUTION.</span>
+        <span>ISSUE NO. 42 &middot; PRINTED ON ARCHIVAL PAPER</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE ESSAY READER DRAWER / MODAL -->
+  <div id="readerModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="readerModalTitle">
+    <div id="readerBackdrop" class="fixed inset-0 bg-black/65 backdrop-blur-sm"></div>
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-12">
+      <div class="w-screen max-w-2xl bg-[var(--bg-page)] text-[var(--text-primary)] hairline-border shadow-2xl flex flex-col justify-between overflow-hidden">
+        <div class="px-6 py-4 hairline-b flex items-center justify-between">
+          <span id="readerModalKicker" class="font-mono text-xs uppercase tracking-wider text-crimson font-semibold">FOLIO EXCERPT</span>
+          <button id="closeReaderBtn" type="button" class="p-2 rounded-lg editorial-surface hairline-border hover:border-crimson" aria-label="Close reader">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 sm:p-10 space-y-6">
+          <h2 id="readerModalTitle" class="font-serif font-semibold text-3xl sm:text-4xl leading-tight"></h2>
+          <div id="readerModalByline" class="font-mono text-xs text-[var(--text-muted)] pb-4 hairline-b"></div>
+          <p id="readerModalBody1" class="font-serif text-lg leading-[1.8] drop-cap"></p>
+          <p id="readerModalBody2" class="font-serif text-lg leading-[1.8] text-[var(--text-secondary)]"></p>
+        </div>
+
+        <div class="px-6 py-4 editorial-surface hairline-t flex items-center justify-between">
+          <span class="font-mono text-xs text-[var(--text-muted)]">MERIDIAN ISSUE NO. 42 ARCHIVE</span>
+          <a href="#membership" id="readerSubscribeCta" class="px-4 py-2 rounded-lg bg-crimson text-white font-sans font-bold text-xs uppercase tracking-wider">
+            Unlock Complete Dataset
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VANILLA JS EDITORIAL ENGINE -->
+  <script>
+    (function () {
+      // 1. Top Reading Progress Bar
+      const progressBar = document.getElementById('readingProgressBar');
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+        progressBar.style.width = pct + '%';
+      }, { passive: true });
+
+      // 2. Light Paper / Dark Ink Reading Mode Toggle
+      const htmlEl = document.documentElement;
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      const themeModeLabel = document.getElementById('themeModeLabel');
+      const iconSun = document.getElementById('iconSun');
+      const iconMoon = document.getElementById('iconMoon');
+
+      function setDarkMode(isDark) {
+        if (isDark) {
+          htmlEl.classList.add('dark');
+          themeModeLabel.textContent = 'Paper Mode';
+          iconSun.classList.remove('hidden');
+          iconMoon.classList.add('hidden');
+        } else {
+          htmlEl.classList.remove('dark');
+          themeModeLabel.textContent = 'Ink Mode';
+          iconSun.classList.add('hidden');
+          iconMoon.classList.remove('hidden');
+        }
+      }
+
+      themeToggleBtn.addEventListener('click', () => {
+        setDarkMode(!htmlEl.classList.contains('dark'));
+      });
+
+      // 3. Cover Interactive SVG Data Chart Toggle (Hyperscaler CapEx $B vs Grid Power GW)
+      const CHART_DATASETS = {
+        capex: {
+          title: 'Global AI Datacenter CapEx ($ Billions, 2020–2030E)',
+          seriesA: 'Compute Silicon & Networking',
+          seriesB: 'Power Shells, Cooling & Grid',
+          trendTag: 'TREND: +23.4% 10-YR CAGR',
+          yLabels: ['$0', '$200B', '$400B', '$600B', '$800B'],
+          bars: [
+            { aY: 205, aH: 13, bY: 218, bH: 10, label: '$84B', labelY: 198 },
+            { aY: 191, aH: 21, bY: 212, bH: 16, label: '$142B', labelY: 184 },
+            { aY: 171, aH: 35, bY: 206, bH: 22, label: '$228B', labelY: 164 },
+            { aY: 150, aH: 48, bY: 198, bH: 30, label: '$312B', labelY: 142 },
+            { aY: 106, aH: 76, bY: 182, bH: 46, label: '$488B', labelY: 98 },
+            { aY: 55,  aH: 105, bY: 160, bH: 68, label: '$690B', labelY: 47 }
+          ],
+          spline: 'M104 205 C145 199, 160 195, 194 191 C235 182, 250 178, 284 171 C325 162, 340 157, 374 150 C415 130, 430 118, 464 106 C502 86, 522 70, 554 55',
+          callouts: [
+            ['$2.48 Trillion', 'Committed sovereign & cloud CapEx'],
+            ['51 Months', 'Median US/EU HV transformer queue'],
+            ['39.4% by 2030', 'Cooling, switchgear & generation']
+          ]
+        },
+        power: {
+          title: 'Continuous Global AI Datacenter Grid Load (Gigawatts, 2020–2030E)',
+          seriesA: 'Dedicated Firm Baseload (Nuclear / Gas / Geo)',
+          seriesB: 'Solar + Utility-Scale BESS Storage',
+          trendTag: 'LOAD SURGE: 8.8x DECADE MULTIPLIER',
+          yLabels: ['0 GW', '50 GW', '100 GW', '150 GW', '200 GW'],
+          bars: [
+            { aY: 209, aH: 12, bY: 221, bH: 7,  label: '19 GW',  labelY: 201 },
+            { aY: 196, aH: 20, bY: 216, bH: 12, label: '32 GW',  labelY: 188 },
+            { aY: 176, aH: 32, bY: 208, bH: 20, label: '52 GW',  labelY: 168 },
+            { aY: 154, aH: 44, bY: 198, bH: 30, label: '74 GW',  labelY: 146 },
+            { aY: 112, aH: 66, bY: 178, bH: 50, label: '116 GW', labelY: 104 },
+            { aY: 60,  aH: 92, bY: 152, bH: 76, label: '168 GW', labelY: 51 }
+          ],
+          spline: 'M104 209 C145 204, 160 200, 194 196 C235 188, 250 183, 284 176 C325 167, 340 161, 374 154 C415 135, 430 124, 464 112 C502 92, 522 76, 554 60',
+          callouts: [
+            ['168 Gigawatts', '2030 continuous rack & cooling draw'],
+            ['24.6 GW Signed', 'Long-term SMR & nuclear restart PPAs'],
+            ['1.18 PUE Floor', 'Direct-to-chip liquid cooling adoption']
+          ]
+        }
+      };
+
+      document.querySelectorAll('.dataset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ds = CHART_DATASETS[btn.dataset.dataset];
+          if (!ds) return;
+
+          document.querySelectorAll('.dataset-btn').forEach(b => {
+            b.className = 'dataset-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all';
+          });
+          btn.className = 'dataset-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-crimson text-white transition-all';
+
+          document.getElementById('chartMainTitle').textContent = ds.title;
+          document.getElementById('legendSeriesA').textContent = ds.seriesA;
+          document.getElementById('legendSeriesB').textContent = ds.seriesB;
+          document.getElementById('legendTrendTag').textContent = ds.trendTag;
+
+          ds.yLabels.forEach((lbl, idx) => {
+            document.getElementById('yLabel' + idx).textContent = lbl;
+          });
+
+          ds.bars.forEach((b, idx) => {
+            const rectA = document.getElementById('barA' + idx);
+            const rectB = document.getElementById('barB' + idx);
+            const valTxt = document.getElementById('val' + idx);
+            rectA.setAttribute('y', b.aY);
+            rectA.setAttribute('height', b.aH);
+            rectB.setAttribute('y', b.bY);
+            rectB.setAttribute('height', b.bH);
+            valTxt.textContent = b.label;
+            valTxt.setAttribute('y', b.labelY);
+          });
+
+          document.getElementById('chartTrendSpline').setAttribute('d', ds.spline);
+
+          document.getElementById('calloutStat1').textContent = ds.callouts[0][0];
+          document.getElementById('calloutDesc1').textContent = ds.callouts[0][1];
+          document.getElementById('calloutStat2').textContent = ds.callouts[1][0];
+          document.getElementById('calloutDesc2').textContent = ds.callouts[1][1];
+          document.getElementById('calloutStat3').textContent = ds.callouts[2][0];
+          document.getElementById('calloutDesc3').textContent = ds.callouts[2][1];
+        });
+      });
+
+      // 4. 6 Art-Directed Bento Essays with Custom Geometric/Data SVG Header Illustrations
+      const ESSAYS = [
+        {
+          id: 'essay-inference-deflation',
+          folio: '42.02',
+          topic: 'AI Economics',
+          span: 'lg:col-span-7',
+          title: 'The Jevons Paradox of Token Deflation: Why 10x Cheaper Inference Tripled Enterprise Spend',
+          dek: 'Analyzing 1.4 trillion production API calls across 280 financial and logistics firms reveals elastic demand loops triggered once reasoning drops below $0.40 per million tokens.',
+          author: 'Nadia Al-Mansoor',
+          role: 'Econometrics Editor',
+          readTime: '14 min read',
+          artType: 'decay',
+          excerpt1: 'When William Stanley Jevons observed in 1865 that James Watt’s more fuel-efficient steam engine dramatically increased British coal consumption rather than curbing it, he articulated the foundational law of general-purpose infrastructure. Over the past twenty-four months, frontier LLM inference prices per equivalent benchmark score fell by 89 percent.',
+          excerpt2: 'Yet enterprise AI compute invoices across our cohort rose 3.1x. Tasks previously gated behind human review—synthetic contract auditing, continuous codebase refactoring, and multi-hop supply-chain bidding—crossed the unit-economic threshold simultaneously.'
+        },
+        {
+          id: 'essay-high-na-euv',
+          folio: '42.03',
+          topic: 'Semiconductors',
+          span: 'lg:col-span-5',
+          title: 'Inside High-NA EUV: The $380M Optics Machine Bending 13.5nm Light at Angstrom Scale',
+          dek: 'A mechanical anatomy of Zeiss anamorphic mirrors, tin-droplet laser plasmas, and why backside power delivery defines the 1.4nm foundry race.',
+          author: 'Kenji Watanabe',
+          role: 'Taipei & Eindhoven Correspondent',
+          readTime: '18 min read',
+          artType: 'wafer',
+          excerpt1: 'Inside a cleanroom forty kilometers southeast of Eindhoven, a mirror polished to picometer flatness reflects extreme ultraviolet photons generated by vaporizing molten tin droplets fifty thousand times per second with a high-power CO2 laser.',
+          excerpt2: 'Moving from 0.33 numerical aperture to 0.55 High-NA shrinks minimum printable pitch without quadruple-patterning masks, yet halves the reticle field size—forcing GPU architects to stitch multi-die chiplets across glass substrates.'
+        },
+        {
+          id: 'essay-hvdc-interconnects',
+          folio: '42.04',
+          topic: 'Energy & Compute',
+          span: 'lg:col-span-4',
+          title: 'Continental Copper: Mapping High-Voltage Direct Current Corridors & Grain-Oriented Steel',
+          dek: 'Why grain-oriented electrical steel (GOES) and 800kV HVDC converter valves are the hidden choke points of renewable-fed compute clusters.',
+          author: 'Clara Lindholm',
+          role: 'Infrastructure Cartographer',
+          readTime: '12 min read',
+          artType: 'grid',
+          excerpt1: 'Solar generation in the American Southwest now routinely clears below $22 per megawatt-hour at noon, yet transporting those electrons twelve hundred miles east without reactive AC losses demands high-voltage direct current corridors.',
+          excerpt2: 'Only seven specialized metallurgical mills globally produce the laser-scribed grain-oriented silicon steel laminations required inside multi-hundred-megavolt-ampere substation cores.'
+        },
+        {
+          id: 'essay-deterministic-interfaces',
+          folio: '42.05',
+          topic: 'Design Systems',
+          span: 'lg:col-span-4',
+          title: 'Beyond the Chat Box: Spatial Canvases, Provenance Graphs & Typographic Density',
+          dek: 'How software interfaces are recovering Swiss tabular rigor, inspectable state trees, and direct manipulation in an era of probabilistic models.',
+          author: 'Julianne Moreau',
+          role: 'Systems Design Critic',
+          readTime: '11 min read',
+          artType: 'swiss',
+          excerpt1: 'For three years, software design collapsed every specialized workflow into a single blinking text input. Financial analysts, aerospace CAD engineers, and radiologists were handed identical conversational threads stripped of spatial memory.',
+          excerpt2: 'A counter-reformation is underway: high-density inspectable canvases where probabilistic synthesis sits subordinate to deterministic tables, diffable timelines, and crisp typographic hierarchy.'
+        },
+        {
+          id: 'essay-packaging-glass-core',
+          folio: '42.06',
+          topic: 'Semiconductors',
+          span: 'lg:col-span-4',
+          title: 'CoWoS, HBM4 & Glass Substrates: The Post-Moore Economics of Advanced Packaging',
+          dek: 'Memory bandwidth—not raw FLOPS—now dictates training utilization. Inside the vertical stacking of 16-high HBM cubes and through-glass vias.',
+          author: 'Dr. Tae-Hyun Park',
+          role: 'Semiconductor Packaging Fellow',
+          readTime: '16 min read',
+          artType: 'hbm',
+          excerpt1: 'Modern frontier accelerators spend up to sixty percent of wall-clock cycles waiting for weights to traverse millimeters of silicon interposer between HBM stacks and tensor cores.',
+          excerpt2: 'Transitioning from organic resin substrates to ultra-flat borosilicate glass cores enables tenfold denser through-glass vias while eliminating thermal warpage across 120mm reticle packages.'
+        },
+        {
+          id: 'essay-sovereign-compute-balance',
+          folio: '42.07',
+          topic: 'AI Economics',
+          span: 'lg:col-span-12',
+          title: 'Tokens on the Balance of Payments: How Compute Exports Are Reshaping National Trade Ledgers',
+          dek: 'When energy-rich nations import lithography tools and export tokenized intelligence over submarine fiber, traditional customs accounting meets invisible digital manufacturing.',
+          author: 'Dr. Elena Rostova & Tariq Siddiqui',
+          role: 'Macroeconomics Desk',
+          readTime: '19 min read',
+          artType: 'fiber',
+          excerpt1: 'Historically, countries blessed with stranded hydro, geothermal, or flared natural gas exported aluminum ingots or liquefied methane—commodities heavy enough to require Panamax hulls. Today, a single 400-terabit subsea fiber pair carries billions of dollars of synthesized code and molecular simulations at two-thirds the speed of light in vacuum.',
+          excerpt2: 'We construct the first bilateral Token Trade Balance matrix across twenty-four OECD and Gulf economies, tracking how kilowatt-hours convert directly into tradable cognitive services.'
+        }
+      ];
+
+      function getEditorialSvg(type) {
+        switch (type) {
+          case 'decay':
+            return `<svg viewBox="0 0 360 130" class="w-full h-36" fill="none">
+              <line x1="24" y1="108" x2="336" y2="108" stroke="currentColor" stroke-opacity="0.2"/>
+              <path d="M30 22 C95 26, 130 88, 330 98" stroke="#1D4ED8" stroke-width="2.5"/>
+              <path d="M30 96 C120 90, 195 52, 330 20" stroke="#E11D48" stroke-width="2.5"/>
+              <circle cx="176" cy="68" r="5" fill="#E11D48"/>
+              <text x="38" y="38" font-family="JetBrains Mono" font-size="9" fill="#1D4ED8">COST / 1M TOKENS (-89%)</text>
+              <text x="206" y="32" font-family="JetBrains Mono" font-size="9" fill="#E11D48">TOTAL SPEND (3.1x)</text>
+            </svg>`;
+          case 'wafer':
+            return `<svg viewBox="0 0 360 130" class="w-full h-36" fill="none">
+              <circle cx="180" cy="65" r="50" stroke="#E11D48" stroke-width="1.8"/>
+              <circle cx="180" cy="65" r="36" stroke="#1D4ED8" stroke-width="1.2" stroke-dasharray="3 3"/>
+              <g stroke="currentColor" stroke-opacity="0.22" stroke-width="1">
+                <line x1="130" y1="49" x2="230" y2="49"/><line x1="130" y1="65" x2="230" y2="65"/><line x1="130" y1="81" x2="230" y2="81"/>
+                <line x1="164" y1="15" x2="164" y2="115"/><line x1="180" y1="15" x2="180" y2="115"/><line x1="196" y1="15" x2="196" y2="115"/>
+              </g>
+              <rect x="168" y="53" width="24" height="24" stroke="#E11D48" stroke-width="2"/>
+              <text x="246" y="68" font-family="JetBrains Mono" font-size="9" fill="currentColor" opacity="0.65">0.55 HIGH-NA</text>
+            </svg>`;
+          case 'grid':
+            return `<svg viewBox="0 0 320 130" class="w-full h-36" fill="none">
+              <circle cx="52" cy="65" r="14" stroke="#1D4ED8" stroke-width="2"/>
+              <circle cx="160" cy="36" r="11" stroke="#E11D48" stroke-width="2"/>
+              <circle cx="160" cy="94" r="11" stroke="#E11D48" stroke-width="2"/>
+              <circle cx="268" cy="65" r="16" stroke="#E11D48" stroke-width="2.2"/>
+              <line x1="66" y1="60" x2="149" y2="39" stroke="#1D4ED8" stroke-width="1.8"/>
+              <line x1="66" y1="70" x2="149" y2="91" stroke="#1D4ED8" stroke-width="1.8"/>
+              <line x1="171" y1="39" x2="252" y2="60" stroke="#E11D48" stroke-width="1.8" stroke-dasharray="4 3"/>
+              <line x1="171" y1="91" x2="252" y2="70" stroke="#E11D48" stroke-width="1.8"/>
+              <text x="122" y="68" font-family="JetBrains Mono" font-size="8.5" fill="currentColor" opacity="0.65">800kV HVDC</text>
+            </svg>`;
+          case 'swiss':
+            return `<svg viewBox="0 0 320 130" class="w-full h-36" fill="none">
+              <rect x="28" y="20" width="264" height="90" rx="4" stroke="currentColor" stroke-opacity="0.28"/>
+              <line x1="108" y1="20" x2="108" y2="110" stroke="currentColor" stroke-opacity="0.28"/>
+              <rect x="40" y="32" width="56" height="12" fill="#E11D48"/>
+              <rect x="40" y="52" width="44" height="8" fill="currentColor" fill-opacity="0.2"/>
+              <rect x="122" y="32" width="156" height="30" stroke="#1D4ED8" stroke-width="1.6"/>
+              <rect x="122" y="70" width="74" height="28" fill="#1D4ED8" fill-opacity="0.18"/>
+              <rect x="204" y="70" width="74" height="28" stroke="#E11D48" stroke-width="1.4"/>
+            </svg>`;
+          case 'hbm':
+            return `<svg viewBox="0 0 320 130" class="w-full h-36" fill="none">
+              <rect x="42" y="96" width="236" height="12" rx="2" fill="#1D4ED8"/>
+              <rect x="64" y="78" width="54" height="14" rx="2" stroke="#E11D48" stroke-width="1.8"/>
+              <rect x="64" y="60" width="54" height="14" rx="2" stroke="#E11D48" stroke-width="1.8"/>
+              <rect x="64" y="42" width="54" height="14" rx="2" stroke="#E11D48" stroke-width="1.8"/>
+              <rect x="134" y="50" width="118" height="42" rx="3" fill="#E11D48" fill-opacity="0.14" stroke="#E11D48" stroke-width="2"/>
+              <text x="193" y="75" text-anchor="middle" font-family="JetBrains Mono" font-size="9.5" fill="#E11D48">COMPUTE DIE</text>
+              <text x="91" y="33" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="currentColor" opacity="0.7">16H HBM4</text>
+            </svg>`;
+          default:
+            return `<svg viewBox="0 0 680 120" class="w-full h-32" fill="none">
+              <path d="M30 88 Q 190 18, 340 68 T 650 34" stroke="#1D4ED8" stroke-width="2.4" fill="none"/>
+              <path d="M30 62 Q 210 108, 360 48 T 650 78" stroke="#E11D48" stroke-width="2.2" stroke-dasharray="5 4" fill="none"/>
+              <circle cx="30" cy="88" r="4.5" fill="#1D4ED8"/><circle cx="340" cy="68" r="5" fill="#E11D48"/><circle cx="650" cy="34" r="4.5" fill="#1D4ED8"/>
+              <text x="48" y="32" font-family="JetBrains Mono" font-size="9.5" fill="currentColor" opacity="0.65">SUBSEA TOKEN EXPORT CORRIDORS // GW-TO-FLOPS PARITY</text>
+            </svg>`;
+        }
+      }
+
+      // Bookmark State (1 bookmarked by default so counter badge is immediately meaningful)
+      const bookmarkedIds = new Set(['essay-inference-deflation']);
+      let activeTopic = 'all';
+      let searchQuery = '';
+      let savedOnlyMode = false;
+
+      const bentoGrid = document.getElementById('bentoEssayGrid');
+      const savedCountBadge = document.getElementById('savedCountBadge');
+      const essayCountLabel = document.getElementById('essayCountLabel');
+      const resetFilterBtn = document.getElementById('resetFilterBtn');
+
+      function updateSavedBadge() {
+        savedCountBadge.textContent = bookmarkedIds.size;
+      }
+
+      function renderEssays() {
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = ESSAYS.filter(e => {
+          if (savedOnlyMode && !bookmarkedIds.has(e.id)) return false;
+          if (activeTopic !== 'all' && e.topic !== activeTopic) return false;
+          if (q && !(
+            e.title.toLowerCase().includes(q) ||
+            e.dek.toLowerCase().includes(q) ||
+            e.author.toLowerCase().includes(q) ||
+            e.topic.toLowerCase().includes(q)
+          )) return false;
+          return true;
+        });
+
+        essayCountLabel.textContent = `Showing ${filtered.length} of ${ESSAYS.length} essays`;
+        if (activeTopic !== 'all' || q || savedOnlyMode) {
+          resetFilterBtn.classList.remove('hidden');
+        } else {
+          resetFilterBtn.classList.add('hidden');
+        }
+
+        if (filtered.length === 0) {
+          bentoGrid.innerHTML = `
+            <div class="lg:col-span-12 rounded-2xl editorial-surface hairline-border p-12 text-center space-y-3">
+              <div class="font-serif text-2xl">No essays match your current filter</div>
+              <p class="text-xs text-[var(--text-muted)]">Try clearing your search query or switching back to All Essays.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const isSingleOrFiltered = activeTopic !== 'all' || q || savedOnlyMode;
+
+        bentoGrid.innerHTML = filtered.map(e => {
+          const isSaved = bookmarkedIds.has(e.id);
+          const colSpan = isSingleOrFiltered ? 'lg:col-span-6' : e.span;
+          return `
+            <article class="${colSpan} rounded-2xl editorial-card p-6 flex flex-col justify-between">
+              <div>
+                <!-- Header Metadata & Bookmark Button -->
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded editorial-surface hairline-border font-mono text-xs font-semibold uppercase tracking-wider text-crimson">${e.topic}</span>
+                    <span class="font-mono text-[12.5px] text-[var(--text-muted)]">FOLIO ${e.folio}</span>
+                  </div>
+                  <button
+                    type="button"
+                    data-bookmark="${e.id}"
+                    class="bookmark-btn p-1.5 rounded-lg editorial-surface hairline-border ${isSaved ? 'text-crimson border-crimson/50' : 'text-[var(--text-muted)] hover:text-crimson'} transition-colors"
+                    aria-label="Bookmark essay"
+                    title="${isSaved ? 'Saved in Reading List' : 'Save to Reading List'}"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Custom Data/Geometric SVG Art Header -->
+                <div class="rounded-xl editorial-surface hairline-border px-3 py-2 mb-5">
+                  ${getEditorialSvg(e.artType)}
+                </div>
+
+                <!-- Headline & Dek -->
+                <h3 class="font-serif font-semibold text-2xl leading-snug">
+                  <button type="button" data-open-essay="${e.id}" class="text-left hover:text-crimson transition-colors">
+                    ${e.title}
+                  </button>
+                </h3>
+                <p class="text-sm text-[var(--text-secondary)] mt-2.5 leading-relaxed">
+                  ${e.dek}
+                </p>
+              </div>
+
+              <!-- Byline & Read Time Footer -->
+              <div class="mt-6 pt-4 hairline-t flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-xs font-bold">${e.author}</div>
+                  <div class="font-mono text-xs text-[var(--text-muted)]">${e.role}</div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-[var(--text-secondary)]">${e.readTime}</span>
+                  <button
+                    type="button"
+                    data-open-essay="${e.id}"
+                    class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-cobalt dark:text-cobaltBright hover:underline"
+                  >
+                    <span>Read</span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        // Bind Bookmark Toggles
+        bentoGrid.querySelectorAll('.bookmark-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.bookmark;
+            if (bookmarkedIds.has(id)) {
+              bookmarkedIds.delete(id);
+            } else {
+              bookmarkedIds.add(id);
+            }
+            updateSavedBadge();
+            renderEssays();
+          });
+        });
+
+        // Bind Essay Excerpt Reader Modal
+        bentoGrid.querySelectorAll('[data-open-essay]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const essay = ESSAYS.find(item => item.id === btn.dataset.openEssay);
+            if (essay) openReaderModal(essay);
+          });
+        });
+      }
+
+      // Topic Filter Buttons
+      function setActiveTopicButton(topic) {
+        document.querySelectorAll('.topic-btn').forEach(b => {
+          if (b.dataset.topic === topic && !savedOnlyMode) {
+            b.className = 'topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs bg-ink text-paper dark:bg-paper dark:text-ink transition-colors';
+          } else {
+            b.className = 'topic-btn shrink-0 px-3 py-1 rounded-md font-sans font-semibold text-xs text-[var(--text-secondary)] hover:text-crimson transition-colors';
+          }
+        });
+      }
+
+      document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          savedOnlyMode = false;
+          activeTopic = btn.dataset.topic;
+          setActiveTopicButton(activeTopic);
+          renderEssays();
+          document.getElementById('essays').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      document.querySelectorAll('.footer-topic-link').forEach(link => {
+        link.addEventListener('click', () => {
+          savedOnlyMode = false;
+          activeTopic = link.dataset.jumpTopic;
+          setActiveTopicButton(activeTopic);
+          renderEssays();
+        });
+      });
+
+      // Saved Bookmarks Filter Button in Masthead
+      document.getElementById('savedFilterBtn').addEventListener('click', () => {
+        savedOnlyMode = !savedOnlyMode;
+        setActiveTopicButton(activeTopic);
+        renderEssays();
+        document.getElementById('essays').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      // Lead Cover Bookmark Toggle
+      const leadBookmarkBtn = document.getElementById('leadBookmarkBtn');
+      let leadSaved = false;
+      leadBookmarkBtn.addEventListener('click', () => {
+        leadSaved = !leadSaved;
+        if (leadSaved) {
+          bookmarkedIds.add('cover-terawatt-decade');
+          leadBookmarkBtn.classList.add('text-crimson');
+          leadBookmarkBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+        } else {
+          bookmarkedIds.delete('cover-terawatt-decade');
+          leadBookmarkBtn.classList.remove('text-crimson');
+          leadBookmarkBtn.querySelector('svg').setAttribute('fill', 'none');
+        }
+        updateSavedBadge();
+      });
+
+      // Search Input Binding (Desktop + Mobile)
+      const searchDesktop = document.getElementById('essaySearchInput');
+      const searchMobile = document.getElementById('essaySearchInputMobile');
+      function handleSearch(val) {
+        searchQuery = val;
+        renderEssays();
+      }
+      searchDesktop.addEventListener('input', (e) => {
+        searchMobile.value = e.target.value;
+        handleSearch(e.target.value);
+      });
+      searchMobile.addEventListener('input', (e) => {
+        searchDesktop.value = e.target.value;
+        handleSearch(e.target.value);
+      });
+
+      resetFilterBtn.addEventListener('click', () => {
+        activeTopic = 'all';
+        searchQuery = '';
+        savedOnlyMode = false;
+        searchDesktop.value = '';
+        searchMobile.value = '';
+        setActiveTopicButton('all');
+        renderEssays();
+      });
+
+      // 5. Reader Excerpt Modal Logic
+      const readerModal = document.getElementById('readerModal');
+      function openReaderModal(item) {
+        document.getElementById('readerModalKicker').textContent = `${item.topic} // FOLIO ${item.folio} · ${item.readTime}`;
+        document.getElementById('readerModalTitle').textContent = item.title;
+        document.getElementById('readerModalByline').textContent = `By ${item.author} (${item.role}) · Meridian Issue No. 42`;
+        document.getElementById('readerModalBody1').textContent = item.excerpt1;
+        document.getElementById('readerModalBody2').textContent = item.excerpt2;
+        readerModal.classList.remove('hidden');
+      }
+
+      document.getElementById('readCoverModalBtn').addEventListener('click', () => {
+        openReaderModal({
+          topic: 'COVER INVESTIGATION',
+          folio: '42.01',
+          readTime: '22 min read',
+          title: 'The Terawatt Compute Decade: Mapping Global AI Infrastructure CapEx 2020–2030',
+          author: 'Dr. Elena Rostova & Marcus Vance',
+          role: 'Meridian Macro & Grid Desk',
+          excerpt1: 'Between 2020 and 2026, capital expenditure across the six largest hyperscalers quadrupled from $84 billion to $312 billion annually. Yet our audit of 140 regional transmission queues shows megawatt interconnection—not wafer allocation—is now setting the pace of frontier cluster deployment.',
+          excerpt2: 'By 2030, non-silicon physical plant—345kV switchgear, closed-loop liquid heat exchangers, and dedicated nuclear or geothermal generation—will absorb nearly forty cents of every dollar spent on artificial intelligence infrastructure.'
+        });
+      });
+
+      document.getElementById('closeReaderBtn').addEventListener('click', () => readerModal.classList.add('hidden'));
+      document.getElementById('readerBackdrop').addEventListener('click', () => readerModal.classList.add('hidden'));
+      document.getElementById('readerSubscribeCta').addEventListener('click', () => readerModal.classList.add('hidden'));
+
+      // 6. Membership Tier Selection + Newsletter Instant Confirmation
+      let chosenTier = 'Reader Free ($0)';
+      const selectedTierHint = document.getElementById('selectedTierHint');
+      const newsletterEmail = document.getElementById('newsletterEmail');
+
+      document.querySelectorAll('.select-tier-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          chosenTier = btn.dataset.tier;
+          selectedTierHint.textContent = `Selected Plan: ${chosenTier} · Enter your institutional or personal email to activate.`;
+          document.getElementById('newsletterBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          newsletterEmail.focus();
+        });
+      });
+
+      document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = newsletterEmail.value.trim();
+        if (!email) return;
+        document.getElementById('newsletterForm').classList.add('hidden');
+        const confirmBox = document.getElementById('newsletterConfirmation');
+        document.getElementById('newsletterConfirmText').textContent =
+          `Registered ${email} under ${chosenTier}. Issue No. 42 & Sunday Macro Index dispatches are now active.`;
+        confirmBox.classList.remove('hidden');
+      });
+
+      // Initialize
+      updateSavedBadge();
+      renderEssays();
+    })();
+  </script>
+</body>
+</html>

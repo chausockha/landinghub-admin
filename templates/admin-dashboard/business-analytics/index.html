@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clarity BI — 09. Business Analytics, KPI &amp; Reports</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#6C55F9',
+              dark: '#5841E8',
+              soft: '#F1EEFF',
+            },
+            rail: '#171D30',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(135deg, #EAEEFA 0%, #F3F5FC 50%, #E9EEF9 100%);
+      color: #1E293B;
+      min-height: 100vh;
+      margin: 0;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    html.dark body {
+      background: linear-gradient(135deg, #0B0F1D 0%, #11172B 100%);
+      color: #F1F5F9;
+    }
+    .app-shell {
+      background: #F8FAFD;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 24px 60px -18px rgba(15, 23, 42, 0.10), 0 4px 16px rgba(15, 23, 42, 0.03);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    html.dark .app-shell {
+      background: #0F1526;
+      border-color: rgba(51, 65, 85, 0.65);
+      box-shadow: 0 28px 70px -18px rgba(0, 0, 0, 0.65);
+    }
+    .bi-card {
+      background: #FFFFFF;
+      border: 1px solid #E9EEF5;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.025);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.25s ease;
+    }
+    .bi-card:hover {
+      border-color: #D8E0EE;
+      box-shadow: 0 10px 26px -8px rgba(108, 85, 249, 0.10);
+    }
+    html.dark .bi-card {
+      background: #161E33;
+      border-color: rgba(71, 85, 105, 0.4);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+    html.dark .bi-card:hover {
+      border-color: rgba(124, 92, 250, 0.5);
+    }
+    .rail-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      transition: all 0.2s ease;
+    }
+    .rail-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .rail-btn.active {
+      background: #6C55F9;
+      color: #FFFFFF;
+      box-shadow: 0 8px 20px rgba(108, 85, 249, 0.45);
+    }
+    .rail-btn.active::before {
+      content: '';
+      position: absolute;
+      left: -15px;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      border-radius: 0 4px 4px 0;
+      background: #A78BFA;
+    }
+    @keyframes drawLine {
+      from { stroke-dashoffset: 1200; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .kinetic-line {
+      stroke-dasharray: 1200;
+      animation: drawLine 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes growBar {
+      from { transform: scaleY(0.08); }
+      to   { transform: scaleY(1); }
+    }
+    .bar-grow {
+      transform-origin: bottom;
+      animation: growBar 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .donut-seg {
+      transition: stroke-dasharray 0.7s cubic-bezier(0.22, 1, 0.36, 1), stroke-width 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+    }
+    .donut-seg:hover {
+      stroke-width: 24;
+    }
+    .progress-fill {
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .search-highlight {
+      outline: 2px solid #6C55F9;
+      box-shadow: 0 0 0 4px rgba(108, 85, 249, 0.15);
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-3">
+
+  <!-- Outer Rounded BI Workspace Frame -->
+  <div class="app-shell max-w-[1520px] mx-auto rounded-[24px] overflow-hidden flex">
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         SLIM DARK-NAVY ICON SIDEBAR (#171D30)
+    ════════════════════════════════════════════════════════════════════ -->
+    <aside class="w-[74px] bg-rail flex-shrink-0 flex flex-col items-center justify-between py-5 select-none">
+      <div class="flex flex-col items-center gap-6">
+        <!-- Brand 2x2 Bento Mark -->
+        <button onclick="showToast('Clarity BI Enterprise · Workspace v4.2')" class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#7C63FA] to-[#5B42F3] flex items-center justify-center shadow-lg shadow-indigo-500/30 cursor-pointer" title="Clarity Analytics">
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="4" y="4" width="6.5" height="6.5" rx="2"/>
+            <rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/>
+            <rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/>
+            <circle cx="16.75" cy="16.75" r="3.25"/>
+          </svg>
+        </button>
+
+        <!-- Primary Navigation -->
+        <nav class="flex flex-col items-center gap-3 mt-1">
+          <button data-nav="overview" onclick="switchNav(this, 'overview')" class="rail-btn active cursor-pointer" title="Business Overview">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/>
+              <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/>
+              <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/>
+              <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>
+            </svg>
+          </button>
+
+          <button data-nav="charts" onclick="switchNav(this, 'charts')" class="rail-btn cursor-pointer" title="Analytics Charts">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><path d="M8 16v-5"/><path d="M13 16V8"/><path d="M18 16v-3"/>
+            </svg>
+          </button>
+
+          <button data-nav="customers" onclick="switchNav(this, 'customers')" class="rail-btn cursor-pointer" title="Customers">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </button>
+
+          <button data-nav="reports" onclick="switchNav(this, 'reports')" class="rail-btn cursor-pointer" title="Reports">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+          </button>
+
+          <button data-nav="targets" onclick="switchNav(this, 'targets')" class="rail-btn cursor-pointer" title="Annual Targets">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            </svg>
+          </button>
+
+          <button data-nav="billing" onclick="switchNav(this, 'billing')" class="rail-btn cursor-pointer" title="Billing & Payouts">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M16 12h2"/>
+            </svg>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Help + Dark Theme / Settings -->
+      <div class="flex flex-col items-center gap-2.5">
+        <button data-nav="help" onclick="switchNav(this, 'help')" class="rail-btn cursor-pointer" title="Help Center">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+        <button onclick="toggleTheme()" class="rail-btn cursor-pointer" title="Toggle Dark / Light Theme">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         MAIN ANALYTICS CONTENT COLUMN
+    ════════════════════════════════════════════════════════════════════ -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- TOP BAR -->
+      <header class="bg-white dark:bg-[#131B2E] border-b border-slate-200/80 dark:border-slate-800 px-6 py-2.5 flex flex-wrap items-center justify-between gap-4">
+        <!-- Workspace Dropdown -->
+        <div class="flex items-center gap-2">
+          <button onclick="cycleWorkspace()" class="flex items-center gap-2 font-display text-lg font-bold text-slate-800 dark:text-white hover:text-brand transition cursor-pointer">
+            <span id="workspaceLabel">Analytics</span>
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- Search Reports Input -->
+        <div class="relative flex-1 max-w-md min-w-[220px]">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input
+            id="reportSearch"
+            oninput="handleSearchReports(this.value)"
+            type="text"
+            placeholder="Search reports, KPIs, or revenue sources..."
+            class="w-full rounded-xl bg-[#F3F5FA] dark:bg-slate-800/80 pl-10 pr-4 py-2 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand/30"
+          />
+        </div>
+
+        <!-- Right Controls: Year Overview + Bell + Avatar -->
+        <div class="flex items-center gap-3">
+          <button onclick="toggleComparisonLine()" id="yearOverviewBtn" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-brand/40 transition cursor-pointer">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Year overview</span>
+          </button>
+
+          <button onclick="showToast('All 4 quarterly KPI targets are tracking on or above plan (+16.8% YoY)')" class="relative w-9 h-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 transition cursor-pointer" title="Notifications">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900"></span>
+          </button>
+
+          <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-[#EAE5FF] dark:bg-indigo-500/30 text-[#6C55F9] dark:text-indigo-200 flex items-center justify-center cursor-pointer" title="Switch Theme">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="8.5" r="3.5"/>
+              <path d="M5.5 19.5c0-3.2 2.9-5.5 6.5-5.5s6.5 2.3 6.5 5.5"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN WORKSPACE BODY -->
+      <main class="flex-1 px-6 py-3.5 space-y-3.5">
+
+        <div id="defaultDashboardView" class="space-y-3.5">
+        <!-- SUB-HEADER: BUSINESS OVERVIEW + YEAR SELECTOR + EXPORT -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 id="pageHeading" class="font-display text-[22px] sm:text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
+              Business overview
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Revenue, customers and conversion
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            <!-- Interactive Year Selector -->
+            <div class="relative inline-flex items-center">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <select
+                id="yearSelect"
+                onchange="changeYearDataset(this.value)"
+                class="appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-8 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-brand cursor-pointer"
+              >
+                <option value="2025" selected>2025</option>
+                <option value="2024">2024</option>
+                <option value="2026">2026 (Forecast)</option>
+              </select>
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute right-3 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+
+            <!-- Export Report CTA -->
+            <button
+              onclick="exportReportCsv()"
+              class="inline-flex items-center gap-2 rounded-xl bg-brand hover:bg-brand-dark text-white px-4 py-2 text-xs font-semibold shadow-md shadow-indigo-500/25 transition cursor-pointer"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Export</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ROW 1: 4 CLEAN KPI CARDS WITH KINETIC SPARKLINES
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+
+          <!-- KPI 1: Total Revenue -->
+          <div data-search="total revenue sales income" class="bi-card p-4 flex items-end justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="w-6 h-6 rounded-lg bg-[#F1EEFF] dark:bg-indigo-500/20 text-[#6C55F9] flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h2"/></svg>
+                </span>
+                <span>Total revenue</span>
+              </div>
+              <p id="kpiRev" class="font-display text-2xl sm:text-[26px] font-extrabold text-slate-800 dark:text-white tracking-tight mt-2">
+                $284,600
+              </p>
+              <div class="flex items-center gap-2 mt-2">
+                <span id="kpiRevDelta" class="rounded-md bg-emerald-50 dark:bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">+16.8%</span>
+                <span class="text-xs text-slate-400">vs last year</span>
+              </div>
+            </div>
+
+            <svg class="w-24 h-12 flex-shrink-0 overflow-visible" viewBox="0 0 96 48">
+              <defs>
+                <linearGradient id="sparkGrad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6C55F9" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#6C55F9" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M4 40 L16 33 L26 37 L38 27 L49 31 L62 20 L74 24 L92 10 L92 46 L4 46 Z" fill="url(#sparkGrad1)"/>
+              <path class="kinetic-line" d="M4 40 L16 33 L26 37 L38 27 L49 31 L62 20 L74 24 L92 10" fill="none" stroke="#6C55F9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="92" cy="10" r="2.8" fill="#6C55F9"/>
+            </svg>
+          </div>
+
+          <!-- KPI 2: Paid Orders -->
+          <div data-search="paid orders transactions checkout" class="bi-card p-4 flex items-end justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="w-6 h-6 rounded-lg bg-cyan-50 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                </span>
+                <span>Paid orders</span>
+              </div>
+              <p id="kpiOrders" class="font-display text-2xl sm:text-[26px] font-extrabold text-slate-800 dark:text-white tracking-tight mt-2">
+                8,460
+              </p>
+              <div class="flex items-center gap-2 mt-2">
+                <span id="kpiOrdersDelta" class="rounded-md bg-emerald-50 dark:bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">+12.4%</span>
+                <span class="text-xs text-slate-400">vs last year</span>
+              </div>
+            </div>
+
+            <svg class="w-24 h-12 flex-shrink-0 overflow-visible" viewBox="0 0 96 48">
+              <defs>
+                <linearGradient id="sparkGrad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0EA5E9" stop-opacity="0.20"/>
+                  <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M4 41 L18 36 L30 38 L44 29 L58 30 L74 20 L92 11 L92 46 L4 46 Z" fill="url(#sparkGrad2)"/>
+              <path class="kinetic-line" d="M4 41 L18 36 L30 38 L44 29 L58 30 L74 20 L92 11" fill="none" stroke="#0EA5E9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="92" cy="11" r="2.8" fill="#0EA5E9"/>
+            </svg>
+          </div>
+
+          <!-- KPI 3: New Customers -->
+          <div data-search="new customers users signups acquisition" class="bi-card p-4 flex items-end justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+                </span>
+                <span>New customers</span>
+              </div>
+              <p id="kpiCust" class="font-display text-2xl sm:text-[26px] font-extrabold text-slate-800 dark:text-white tracking-tight mt-2">
+                2,940
+              </p>
+              <div class="flex items-center gap-2 mt-2">
+                <span id="kpiCustDelta" class="rounded-md bg-emerald-50 dark:bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">+9.3%</span>
+                <span class="text-xs text-slate-400">vs last year</span>
+              </div>
+            </div>
+
+            <svg class="w-24 h-12 flex-shrink-0 overflow-visible" viewBox="0 0 96 48">
+              <defs>
+                <linearGradient id="sparkGrad3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M4 42 L20 38 L35 34 L50 30 L66 24 L80 18 L92 12 L92 46 L4 46 Z" fill="url(#sparkGrad3)"/>
+              <path class="kinetic-line" d="M4 42 L20 38 L35 34 L50 30 L66 24 L80 18 L92 12" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="92" cy="12" r="2.8" fill="#F59E0B"/>
+            </svg>
+          </div>
+
+          <!-- KPI 4: Conversion Rate -->
+          <div data-search="conversion rate funnel cvr" class="bi-card p-4 flex items-end justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m15 9 5-5"/></svg>
+                </span>
+                <span>Conversion rate</span>
+              </div>
+              <p id="kpiCvr" class="font-display text-2xl sm:text-[26px] font-extrabold text-slate-800 dark:text-white tracking-tight mt-2">
+                3.82%
+              </p>
+              <div class="flex items-center gap-2 mt-2">
+                <span id="kpiCvrDelta" class="rounded-md bg-emerald-50 dark:bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">+0.42 pp</span>
+                <span class="text-xs text-slate-400">vs last year</span>
+              </div>
+            </div>
+
+            <svg class="w-24 h-12 flex-shrink-0 overflow-visible" viewBox="0 0 96 48">
+              <defs>
+                <linearGradient id="sparkGrad4" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M4 41 L18 34 L30 36 L45 27 L58 29 L74 18 L92 11 L92 46 L4 46 Z" fill="url(#sparkGrad4)"/>
+              <path class="kinetic-line" d="M4 41 L18 34 L30 36 L45 27 L58 29 L74 18 L92 11" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="92" cy="11" r="2.8" fill="#10B981"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ROW 2: REVENUE TREND (8 COLS) + REVENUE BY CHANNEL DONUT (4 COLS)
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-3.5 items-stretch">
+
+          <!-- Left: Revenue Trend Dual-Curve Chart -->
+          <div data-search="revenue trend monthly chart this year last year" class="bi-card p-4 sm:px-5 xl:col-span-8 flex flex-col justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-1">
+              <h2 class="font-display text-base font-bold text-slate-800 dark:text-white">Revenue trend</h2>
+
+              <div class="flex items-center gap-5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#6C55F9]"></span>
+                  This year
+                </span>
+                <button onclick="toggleComparisonLine()" class="inline-flex items-center gap-2 hover:text-slate-800 dark:hover:text-white cursor-pointer">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#CBD5E1]"></span>
+                  Last year
+                </button>
+                <button onclick="showToast('Tip: Hover or click any month on the Revenue Trend curve to inspect exact figures')" class="text-slate-400 hover:text-slate-600 cursor-pointer" title="Chart Options">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Interactive 12-Month Dual Smooth Spline SVG -->
+            <div class="relative w-full">
+              <svg id="revTrendSvg" viewBox="0 0 780 214" class="w-full h-44 overflow-visible select-none"></svg>
+            </div>
+          </div>
+
+          <!-- Right: Revenue by Channel Donut -->
+          <div data-search="revenue by channel direct search referrals social attribution" class="bi-card p-4 sm:px-5 xl:col-span-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="font-display text-base font-bold text-slate-800 dark:text-white">Revenue by channel</h2>
+              <button onclick="resetChannelHighlight()" class="text-slate-400 hover:text-slate-600 cursor-pointer" title="Reset Channel Selection">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-5 my-auto">
+              <!-- Multi-Segment SVG Donut -->
+              <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+                <svg id="channelDonutSvg" viewBox="0 0 160 160" class="w-36 h-36 -rotate-90 overflow-visible"></svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                  <span id="donutCenterVal" class="font-display text-xl font-extrabold text-slate-800 dark:text-white">$285k</span>
+                  <span id="donutCenterLbl" class="text-xs font-medium text-slate-400 mt-0.5">Revenue</span>
+                </div>
+              </div>
+
+              <!-- Channel Legend + Annual Total -->
+              <div class="flex-1 w-full space-y-2.5 text-xs">
+                <div id="channelLegendRows" class="space-y-2.5"></div>
+                <div class="pt-2.5 mt-2.5 border-t border-slate-100 dark:border-slate-700/70 flex items-center justify-between">
+                  <span class="text-slate-400 font-medium">Annual total</span>
+                  <span id="channelAnnualTotal" class="font-display text-sm font-bold text-slate-800 dark:text-white">$284,600</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ROW 3: ORDERS BY QUARTER + ANNUAL TARGETS + REVENUE SOURCES
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+
+          <!-- Card 1: Orders by Quarter (4 cols) -->
+          <div data-search="orders by quarter q1 q2 q3 q4 seasonal" class="bi-card p-4 sm:px-5 lg:col-span-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-slate-800 dark:text-white">Orders by quarter</h3>
+              <div class="flex items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#6C55F9]"></span>
+                  <span id="qtrLegendCurr">2025</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#DCE3F0]"></span>
+                  <span id="qtrLegendPrev">2024</span>
+                </span>
+              </div>
+            </div>
+
+            <div id="quarterBarsWrap" class="grid grid-cols-4 gap-3 items-end h-32 pt-2 px-1"></div>
+          </div>
+
+          <!-- Card 2: Annual Targets (4 cols) -->
+          <div data-search="annual targets goals okr revenue orders customers" class="bi-card p-4 sm:px-5 lg:col-span-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-slate-800 dark:text-white">Annual targets</h3>
+              <button onclick="showToast('Annual OKR Attainment: 88.7% weighted average across 3 pillars')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </button>
+            </div>
+
+            <div id="annualTargetsWrap" class="space-y-3 my-auto"></div>
+          </div>
+
+          <!-- Card 3: Revenue Sources Report Table (4 cols) -->
+          <div data-search="revenue sources subscriptions services downloads product yoy" class="bi-card p-4 sm:px-5 lg:col-span-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-slate-800 dark:text-white">Revenue sources</h3>
+              <button onclick="exportReportCsv()" class="text-slate-400 hover:text-slate-600 cursor-pointer" title="Download Sources CSV">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-100 dark:border-slate-700/70 text-xs font-medium text-slate-400">
+                    <th class="pb-2 font-medium">Product</th>
+                    <th class="pb-2 font-medium text-right">Revenue</th>
+                    <th class="pb-2 font-medium text-right">YoY</th>
+                  </tr>
+                </thead>
+                <tbody id="revSourcesBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+        </div>
+
+        <!-- SUB-PAGE VIEW CONTAINER -->
+        <div id="tabSubpageView" class="hidden space-y-3.5"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notification Pill -->
+  <div id="biToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 rounded-xl bg-slate-900 text-white px-4 py-2.5 text-xs font-semibold shadow-xl flex items-center gap-2.5">
+    <span class="w-2 h-2 rounded-full bg-[#6C55F9]"></span>
+    <span id="biToastMsg">Report updated</span>
+  </div>
+
+  <script>
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const DATASETS = {
+      '2025': {
+        kpiRev: '$284,600', kpiRevDelta: '+16.8%',
+        kpiOrders: '8,460', kpiOrdersDelta: '+12.4%',
+        kpiCust: '2,940', kpiCustDelta: '+9.3%',
+        kpiCvr: '3.82%', kpiCvrDelta: '+0.42 pp',
+        currSeries: [16.8, 19.6, 18.9, 22.4, 20.6, 24.3, 23.8, 26.9, 25.1, 28.4, 28.1, 30.3],
+        prevSeries: [14.1, 16.3, 15.7, 18.8, 17.9, 20.1, 20.4, 22.3, 21.8, 24.6, 24.2, 26.8],
+        donutShort: '$285k',
+        annualTotal: '$284,600',
+        channels: [
+          { name: 'Direct', pct: 42, amount: '$119.5k', color: '#6C55F9' },
+          { name: 'Search', pct: 28, amount: '$79.7k', color: '#24B5A8' },
+          { name: 'Referrals', pct: 18, amount: '$51.2k', color: '#5A9CF8' },
+          { name: 'Social', pct: 12, amount: '$34.2k', color: '#F5A638' },
+        ],
+        quarters: [
+          { q: 'Q1', prev: 1.48, curr: 1.76 },
+          { q: 'Q2', prev: 1.66, curr: 1.93 },
+          { q: 'Q3', prev: 1.92, curr: 2.24 },
+          { q: 'Q4', prev: 2.18, curr: 2.53 },
+        ],
+        qCurrLbl: '2025', qPrevLbl: '2024',
+        targets: [
+          { label: 'Revenue', stat: '$284.6k / $320k', pct: 89, color: '#6C55F9' },
+          { label: 'Orders', stat: '8,460 / 10,000', pct: 85, color: '#24B5A8' },
+          { label: 'Customers', stat: '2,940 / 3,200', pct: 92, color: '#F5A638' },
+        ],
+        sources: [
+          { name: 'Subscriptions', rev: '$178,400', yoy: '+18.6%', tone: 'violet' },
+          { name: 'Services', rev: '$68,300', yoy: '+14.2%', tone: 'teal' },
+          { name: 'Downloads', rev: '$37,900', yoy: '+13.1%', tone: 'amber' },
+        ],
+      },
+      '2024': {
+        kpiRev: '$243,660', kpiRevDelta: '+11.2%',
+        kpiOrders: '7,526', kpiOrdersDelta: '+8.9%',
+        kpiCust: '2,690', kpiCustDelta: '+7.4%',
+        kpiCvr: '3.40%', kpiCvrDelta: '+0.28 pp',
+        currSeries: [14.1, 16.3, 15.7, 18.8, 17.9, 20.1, 20.4, 22.3, 21.8, 24.6, 24.2, 26.8],
+        prevSeries: [12.0, 13.8, 13.5, 15.9, 15.4, 17.2, 17.6, 19.1, 18.9, 21.0, 21.4, 23.2],
+        donutShort: '$244k',
+        annualTotal: '$243,660',
+        channels: [
+          { name: 'Direct', pct: 40, amount: '$97.5k', color: '#6C55F9' },
+          { name: 'Search', pct: 30, amount: '$73.1k', color: '#24B5A8' },
+          { name: 'Referrals', pct: 19, amount: '$46.3k', color: '#5A9CF8' },
+          { name: 'Social', pct: 11, amount: '$26.8k', color: '#F5A638' },
+        ],
+        quarters: [
+          { q: 'Q1', prev: 1.29, curr: 1.48 },
+          { q: 'Q2', prev: 1.45, curr: 1.66 },
+          { q: 'Q3', prev: 1.68, curr: 1.92 },
+          { q: 'Q4', prev: 1.90, curr: 2.18 },
+        ],
+        qCurrLbl: '2024', qPrevLbl: '2023',
+        targets: [
+          { label: 'Revenue', stat: '$243.7k / $260k', pct: 94, color: '#6C55F9' },
+          { label: 'Orders', stat: '7,526 / 8,500', pct: 89, color: '#24B5A8' },
+          { label: 'Customers', stat: '2,690 / 3,000', pct: 90, color: '#F5A638' },
+        ],
+        sources: [
+          { name: 'Subscriptions', rev: '$150,420', yoy: '+14.1%', tone: 'violet' },
+          { name: 'Services', rev: '$59,810', yoy: '+9.8%', tone: 'teal' },
+          { name: 'Downloads', rev: '$33,430', yoy: '+8.4%', tone: 'amber' },
+        ],
+      },
+      '2026': {
+        kpiRev: '$338,900', kpiRevDelta: '+19.1%',
+        kpiOrders: '9,820', kpiOrdersDelta: '+16.1%',
+        kpiCust: '3,410', kpiCustDelta: '+16.0%',
+        kpiCvr: '4.18%', kpiCvrDelta: '+0.36 pp',
+        currSeries: [20.4, 22.8, 23.5, 26.2, 25.8, 28.9, 29.4, 31.6, 30.8, 33.5, 34.2, 36.4],
+        prevSeries: [16.8, 19.6, 18.9, 22.4, 20.6, 24.3, 23.8, 26.9, 25.1, 28.4, 28.1, 30.3],
+        donutShort: '$339k',
+        annualTotal: '$338,900',
+        channels: [
+          { name: 'Direct', pct: 45, amount: '$152.5k', color: '#6C55F9' },
+          { name: 'Search', pct: 27, amount: '$91.5k', color: '#24B5A8' },
+          { name: 'Referrals', pct: 17, amount: '$57.6k', color: '#5A9CF8' },
+          { name: 'Social', pct: 11, amount: '$37.3k', color: '#F5A638' },
+        ],
+        quarters: [
+          { q: 'Q1', prev: 1.76, curr: 2.12 },
+          { q: 'Q2', prev: 1.93, curr: 2.34 },
+          { q: 'Q3', prev: 2.24, curr: 2.58 },
+          { q: 'Q4', prev: 2.53, curr: 2.78 },
+        ],
+        qCurrLbl: '2026F', qPrevLbl: '2025',
+        targets: [
+          { label: 'Revenue', stat: '$338.9k / $350k', pct: 97, color: '#6C55F9' },
+          { label: 'Orders', stat: '9,820 / 10,500', pct: 94, color: '#24B5A8' },
+          { label: 'Customers', stat: '3,410 / 3,600', pct: 95, color: '#F5A638' },
+        ],
+        sources: [
+          { name: 'Subscriptions', rev: '$218,500', yoy: '+22.5%', tone: 'violet' },
+          { name: 'Services', rev: '$78,200', yoy: '+14.5%', tone: 'teal' },
+          { name: 'Downloads', rev: '$42,200', yoy: '+11.3%', tone: 'amber' },
+        ],
+      },
+    };
+
+    let activeYear = '2025';
+    let selectedMonthIdx = 11; // Defaults to Dec ($30.3k) matching reference
+    let showLastYearLine = true;
+    const WORKSPACES = ['Analytics', 'Executive BI', 'Revenue Ops'];
+    let wsIdx = 0;
+
+    // Smooth Catmull-Rom -> Cubic Bezier SVG path helper
+    function buildSmoothPath(points) {
+      if (!points.length) return '';
+      let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i === 0 ? i : i - 1];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    function renderRevenueTrend() {
+      const svg = document.getElementById('revTrendSvg');
+      const data = DATASETS[activeYear];
+      const maxVal = activeYear === '2026' ? 40 : 35;
+      const leftPad = 48;
+      const rightPad = 20;
+      const topPad = 24;
+      const bottomY = 186;
+      const usableW = 780 - leftPad - rightPad;
+      const usableH = bottomY - topPad;
+
+      const mapPts = (arr) =>
+        arr.map((v, idx) => ({
+          x: leftPad + (idx / (arr.length - 1)) * usableW,
+          y: bottomY - (v / maxVal) * usableH,
+          val: v,
+          m: MONTHS[idx],
+        }));
+
+      const currPts = mapPts(data.currSeries);
+      const prevPts = mapPts(data.prevSeries);
+      const currPath = buildSmoothPath(currPts);
+      const prevPath = buildSmoothPath(prevPts);
+      const areaPath = `${currPath} L ${currPts[currPts.length - 1].x.toFixed(1)} ${bottomY} L ${currPts[0].x.toFixed(1)} ${bottomY} Z`;
+
+      const yTicks = [0, 10, 20, 30];
+      const gridMarkup = yTicks
+        .map((t) => {
+          const y = (bottomY - (t / maxVal) * usableH).toFixed(1);
+          const lbl = t === 0 ? '$0' : `$${t}k`;
+          return `
+            <line x1="${leftPad}" y1="${y}" x2="${780 - rightPad}" y2="${y}" stroke="currentColor" class="text-slate-100 dark:text-slate-800" stroke-width="1"/>
+            <text x="${leftPad - 10}" y="${Number(y) + 4}" text-anchor="end" class="fill-slate-400 text-[12px] font-medium">${lbl}</text>
+          `;
+        })
+        .join('');
+
+      const activePt = currPts[selectedMonthIdx];
+      const badgeW = 94;
+      const badgeX = Math.min(Math.max(activePt.x - badgeW - 6, leftPad), 780 - rightPad - badgeW);
+      const badgeY = Math.max(activePt.y - 36, 2);
+
+      const monthLabels = currPts
+        .map(
+          (pt, idx) => `
+          <text x="${pt.x.toFixed(1)}" y="208" text-anchor="middle" class="${idx === selectedMonthIdx ? 'fill-[#6C55F9] font-bold' : 'fill-slate-400 font-medium'} text-[12px] cursor-pointer" onclick="selectMonth(${idx})">${pt.m}</text>
+          <rect x="${(pt.x - 24).toFixed(1)}" y="${topPad}" width="48" height="${usableH + 24}" fill="transparent" class="cursor-pointer" onmouseenter="selectMonth(${idx})" onclick="selectMonth(${idx})"/>
+        `
+        )
+        .join('');
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="revAreaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6C55F9" stop-opacity="0.20"/>
+            <stop offset="85%" stop-color="#6C55F9" stop-opacity="0.02"/>
+            <stop offset="100%" stop-color="#6C55F9" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="pillShadow" x="-20%" y="-20%" width="140%" height="150%">
+            <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#6C55F9" flood-opacity="0.32"/>
+          </filter>
+        </defs>
+
+        ${gridMarkup}
+
+        <path d="${areaPath}" fill="url(#revAreaFill)"/>
+
+        ${
+          showLastYearLine
+            ? `<path d="${prevPath}" fill="none" stroke="#B6C2D9" stroke-width="2" stroke-dasharray="5 5" stroke-linecap="round"/>`
+            : ''
+        }
+
+        <path id="mainRevCurve" class="kinetic-line" d="${currPath}" fill="none" stroke="#6C55F9" stroke-width="2.8" stroke-linecap="round"/>
+
+        <!-- Live Kinetic Dataflow Particle -->
+        <circle r="3.5" fill="#6C55F9" opacity="0.85">
+          <animateMotion dur="5.5s" repeatCount="indefinite" path="${currPath}" />
+        </circle>
+
+        <!-- Active Month Vertical Guide & Callout Pill -->
+        <line x1="${activePt.x.toFixed(1)}" y1="${activePt.y.toFixed(1)}" x2="${activePt.x.toFixed(1)}" y2="${bottomY}" stroke="#A5B4FC" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <circle cx="${activePt.x.toFixed(1)}" cy="${activePt.y.toFixed(1)}" r="5" fill="#6C55F9" stroke="#FFFFFF" stroke-width="2.5"/>
+
+        <g filter="url(#pillShadow)">
+          <rect x="${badgeX.toFixed(1)}" y="${badgeY.toFixed(1)}" width="${badgeW}" height="26" rx="8" fill="#6C55F9"/>
+          <text x="${(badgeX + badgeW / 2).toFixed(1)}" y="${(badgeY + 17).toFixed(1)}" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">${activePt.m} · $${activePt.val.toFixed(1)}k</text>
+        </g>
+
+        ${monthLabels}
+      `;
+    }
+
+    function selectMonth(idx) {
+      if (selectedMonthIdx === idx) return;
+      selectedMonthIdx = idx;
+      renderRevenueTrend();
+    }
+
+    function renderDonutAndChannels() {
+      const data = DATASETS[activeYear];
+      const svg = document.getElementById('channelDonutSvg');
+      const legendWrap = document.getElementById('channelLegendRows');
+      document.getElementById('donutCenterVal').textContent = data.donutShort;
+      document.getElementById('donutCenterLbl').textContent = 'Revenue';
+      document.getElementById('channelAnnualTotal').textContent = data.annualTotal;
+
+      const radius = 58;
+      const circum = 2 * Math.PI * radius;
+      const gap = 4.5;
+      let offsetAcc = 0;
+
+      svg.innerHTML = data.channels
+        .map((ch, i) => {
+          const segLen = Math.max((ch.pct / 100) * circum - gap, 4);
+          const dashOffset = -offsetAcc;
+          offsetAcc += (ch.pct / 100) * circum;
+          return `
+            <circle
+              class="donut-seg"
+              cx="80" cy="80" r="${radius}"
+              fill="none"
+              stroke="${ch.color}"
+              stroke-width="20"
+              stroke-dasharray="${segLen.toFixed(1)} ${circum.toFixed(1)}"
+              stroke-dashoffset="${dashOffset.toFixed(1)}"
+              onmouseenter="previewChannel(${i})"
+              onclick="previewChannel(${i})"
+            />
+          `;
+        })
+        .join('');
+
+      legendWrap.innerHTML = data.channels
+        .map(
+          (ch, i) => `
+          <button onclick="previewChannel(${i})" onmouseenter="previewChannel(${i})" class="w-full flex items-center justify-between py-0.5 hover:opacity-80 transition cursor-pointer text-left">
+            <span class="inline-flex items-center gap-2.5 text-slate-600 dark:text-slate-300 font-medium">
+              <span class="w-2.5 h-2.5 rounded-[3px]" style="background:${ch.color}"></span>
+              <span>${ch.name}</span>
+            </span>
+            <span class="font-bold text-slate-800 dark:text-white">${ch.pct}%</span>
+          </button>
+        `
+        )
+        .join('');
+    }
+
+    function previewChannel(idx) {
+      const ch = DATASETS[activeYear].channels[idx];
+      document.getElementById('donutCenterVal').textContent = ch.amount;
+      document.getElementById('donutCenterLbl').textContent = `${ch.name} (${ch.pct}%)`;
+    }
+
+    function resetChannelHighlight() {
+      const data = DATASETS[activeYear];
+      document.getElementById('donutCenterVal').textContent = data.donutShort;
+      document.getElementById('donutCenterLbl').textContent = 'Revenue';
+    }
+
+    function renderQuarterBars() {
+      const data = DATASETS[activeYear];
+      document.getElementById('qtrLegendCurr').textContent = data.qCurrLbl;
+      document.getElementById('qtrLegendPrev').textContent = data.qPrevLbl;
+
+      const maxQ = 2.9;
+      const wrap = document.getElementById('quarterBarsWrap');
+      wrap.innerHTML = data.quarters
+        .map((item) => {
+          const prevH = Math.round((item.prev / maxQ) * 92);
+          const currH = Math.round((item.curr / maxQ) * 92);
+          return `
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">${item.curr.toFixed(2)}k</span>
+              <div class="flex items-end gap-1.5 h-24">
+                <div class="bar-grow w-4 sm:w-5 rounded-t-md bg-[#E2E8F3] dark:bg-slate-700" style="height:${prevH}px" title="${data.qPrevLbl}: ${item.prev}k"></div>
+                <div class="bar-grow w-4 sm:w-5 rounded-t-md bg-[#6C55F9] hover:bg-[#5841E8] transition cursor-pointer" style="height:${currH}px" onclick="showToast('${item.q} ${data.qCurrLbl}: ${(item.curr * 1000).toLocaleString()} paid orders')" title="${data.qCurrLbl}: ${item.curr}k"></div>
+              </div>
+              <span class="text-xs font-medium text-slate-400">${item.q}</span>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function renderAnnualTargets() {
+      const data = DATASETS[activeYear];
+      const wrap = document.getElementById('annualTargetsWrap');
+      wrap.innerHTML = data.targets
+        .map(
+          (t) => `
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="font-medium text-slate-600 dark:text-slate-300">${t.label}</span>
+              <div class="flex items-center gap-3">
+                <span class="text-slate-400">${t.stat}</span>
+                <span class="font-bold text-slate-800 dark:text-white w-8 text-right">${t.pct}%</span>
+              </div>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div class="progress-fill h-full rounded-full" style="width:${t.pct}%; background:${t.color}"></div>
+            </div>
+          </div>
+        `
+        )
+        .join('');
+    }
+
+    function renderRevenueSources() {
+      const data = DATASETS[activeYear];
+      const toneStyles = {
+        violet: {
+          bg: 'bg-[#F1EEFF] dark:bg-indigo-500/20 text-[#6C55F9]',
+          svg: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>',
+        },
+        teal: {
+          bg: 'bg-teal-50 dark:bg-teal-500/20 text-teal-600 dark:text-teal-300',
+          svg: '<circle cx="9" cy="9" r="3"/><circle cx="15" cy="15" r="3"/><path d="m11.5 11.5 1 1"/>',
+        },
+        amber: {
+          bg: 'bg-amber-50 dark:bg-amber-500/20 text-amber-500',
+          svg: '<path d="M12 4v11"/><polyline points="8 11 12 15 16 11"/><path d="M5 19h14"/>',
+        },
+      };
+
+      const tbody = document.getElementById('revSourcesBody');
+      tbody.innerHTML = data.sources
+        .map((s) => {
+          const st = toneStyles[s.tone];
+          return `
+            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+              <td class="py-2.5">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg ${st.bg} flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${st.svg}</svg>
+                  </span>
+                  <span class="font-medium text-slate-700 dark:text-slate-200 text-xs sm:text-sm">${s.name}</span>
+                </div>
+              </td>
+              <td class="py-2.5 text-right font-bold text-slate-800 dark:text-white text-xs sm:text-sm">${s.rev}</td>
+              <td class="py-2.5 text-right font-bold text-emerald-600 dark:text-emerald-400 text-xs">${s.yoy}</td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    function changeYearDataset(yr) {
+      activeYear = yr;
+      const d = DATASETS[yr];
+      document.getElementById('kpiRev').textContent = d.kpiRev;
+      document.getElementById('kpiRevDelta').textContent = d.kpiRevDelta;
+      document.getElementById('kpiOrders').textContent = d.kpiOrders;
+      document.getElementById('kpiOrdersDelta').textContent = d.kpiOrdersDelta;
+      document.getElementById('kpiCust').textContent = d.kpiCust;
+      document.getElementById('kpiCustDelta').textContent = d.kpiCustDelta;
+      document.getElementById('kpiCvr').textContent = d.kpiCvr;
+      document.getElementById('kpiCvrDelta').textContent = d.kpiCvrDelta;
+
+      renderRevenueTrend();
+      renderDonutAndChannels();
+      renderQuarterBars();
+      renderAnnualTargets();
+      renderRevenueSources();
+      showToast(`Loaded ${yr} Business Analytics dataset`);
+    }
+
+    function toggleComparisonLine() {
+      showLastYearLine = !showLastYearLine;
+      renderRevenueTrend();
+      showToast(showLastYearLine ? 'Showing Last Year benchmark curve' : 'Hidden Last Year benchmark curve');
+    }
+
+    const BI_SUBPAGES = {
+      charts: {
+        title: 'Analytics Charts & Attribution',
+        subtitle: 'Multi-touch channel velocity, funnel drop-off and cohort conversion lift',
+        cta: 'Export Attribution CSV',
+        kpis: [
+          { label: 'Blended ROAS', val: '4.68x', delta: '+0.64x YoY', color: '#6C55F9' },
+          { label: 'Organic Session Share', val: '54.2%', delta: '+6.1% YoY', color: '#0EA5E9' },
+          { label: 'Avg. Order Value', val: '$142.80', delta: '+8.4% YoY', color: '#10B981' },
+          { label: 'Attribution Confidence', val: '96.4%', delta: '+2.1 pp', color: '#F59E0B' }
+        ],
+        chartTitle: 'Channel Conversion Efficiency (%)',
+        bars: [
+          { lbl: 'Direct', v: 88, txt: '4.8%' },
+          { lbl: 'Search', v: 74, txt: '4.1%' },
+          { lbl: 'Referral', v: 66, txt: '3.6%' },
+          { lbl: 'Partner', v: 58, txt: '3.2%' },
+          { lbl: 'Social', v: 45, txt: '2.4%' }
+        ],
+        tableTitle: 'Campaign Attribution Breakdown',
+        cols: ['Channel Source', 'Sessions', 'Conv. Rate', 'Attributed Rev', 'Action'],
+        rows: [
+          ['Direct Enterprise', '48,210', '4.82%', '$119,500', 'Inspect'],
+          ['Organic Search SEO', '39,640', '4.10%', '$79,700', 'Inspect'],
+          ['Partner Referrals', '21,880', '3.64%', '$51,200', 'Inspect'],
+          ['Paid Social Retarget', '18,450', '2.41%', '$22,800', 'Inspect'],
+          ['Product Newsletter', '11,920', '3.95%', '$11,400', 'Inspect']
+        ]
+      },
+      customers: {
+        title: 'Customers & Cohort Retention',
+        subtitle: 'Enterprise account expansion, NRR cohorts and lifecycle health scores',
+        cta: 'Sync CRM Segment',
+        kpis: [
+          { label: 'Active Accounts', val: '2,940', delta: '+9.3% YoY', color: '#6C55F9' },
+          { label: 'Net Dollar Retention', val: '118.4%', delta: '+4.2 pp', color: '#10B981' },
+          { label: 'Gross Monthly Churn', val: '1.14%', delta: '-0.28 pp', color: '#0EA5E9' },
+          { label: 'Enterprise NPS', val: '72', delta: '+6 pts', color: '#F59E0B' }
+        ],
+        chartTitle: '12-Month Cohort Retention Curve',
+        bars: [
+          { lbl: 'M1', v: 96, txt: '96%' },
+          { lbl: 'M3', v: 91, txt: '91%' },
+          { lbl: 'M6', v: 87, txt: '87%' },
+          { lbl: 'M9', v: 85, txt: '85%' },
+          { lbl: 'M12', v: 84, txt: '84%' }
+        ],
+        tableTitle: 'Top Enterprise Customer Accounts',
+        cols: ['Account Name', 'Plan Tier', 'Seats', 'Annual ARR', 'Health'],
+        rows: [
+          ['Northstar Logistics', 'Enterprise Plus', '185', '$42,800', 'Healthy'],
+          ['Vanguard Cloud Labs', 'Enterprise', '120', '$31,200', 'Healthy'],
+          ['Meridian Health Group', 'Enterprise', '94', '$26,400', 'Expanding'],
+          ['Kestrel FinTech Corp', 'Scale Annual', '68', '$18,900', 'Healthy'],
+          ['Solstice Retail BI', 'Scale Annual', '52', '$14,600', 'Review']
+        ]
+      },
+      reports: {
+        title: 'Executive Financial Reports',
+        subtitle: 'Audited board packs, GAAP revenue recognition and scheduled CSV exports',
+        cta: 'Generate Board Pack',
+        kpis: [
+          { label: 'Published Reports', val: '48', delta: '12 Automated', color: '#6C55F9' },
+          { label: 'Recognized ARR', val: '$341.5k', delta: '+17.9% YoY', color: '#10B981' },
+          { label: 'Deferred Revenue', val: '$64.2k', delta: '+11.2% QoQ', color: '#0EA5E9' },
+          { label: 'Audit Accuracy', val: '99.98%', delta: 'SOX Ready', color: '#F59E0B' }
+        ],
+        chartTitle: 'Quarterly Recognized Revenue ($k)',
+        bars: [
+          { lbl: 'Q1 24', v: 58, txt: '$58k' },
+          { lbl: 'Q2 24', v: 64, txt: '$64k' },
+          { lbl: 'Q3 24', v: 72, txt: '$72k' },
+          { lbl: 'Q4 24', v: 81, txt: '$81k' },
+          { lbl: 'Q1 25', v: 90, txt: '$90k' }
+        ],
+        tableTitle: 'Scheduled & Audited Statements',
+        cols: ['Report Title', 'Cadence', 'Owner', 'Last Run', 'Download'],
+        rows: [
+          ['Q4 Executive Board Deck', 'Quarterly', 'FP&A Team', '2 hrs ago', 'Download CSV'],
+          ['Monthly SaaS Metrics Ledger', 'Monthly', 'RevOps', 'Yesterday', 'Download CSV'],
+          ['Channel Attribution Audit', 'Weekly', 'Growth BI', 'Jan 08, 2025', 'Download CSV'],
+          ['Customer Cohort LTV Study', 'Monthly', 'Data Science', 'Jan 05, 2025', 'Download CSV'],
+          ['Tax & VAT Settlement Pack', 'Quarterly', 'Controller', 'Jan 02, 2025', 'Download CSV']
+        ]
+      },
+      targets: {
+        title: 'Annual Targets & Company OKRs',
+        subtitle: 'Departmental quota attainment, Q1–Q4 pacing milestones and stretch goals',
+        cta: 'Recalculate Pacing',
+        kpis: [
+          { label: 'Weighted Attainment', val: '88.7%', delta: '+4.5% vs Plan', color: '#6C55F9' },
+          { label: 'Revenue Target', val: '$284.6k', delta: '89% of $320k', color: '#10B981' },
+          { label: 'Logo Acquisition', val: '2,940', delta: '92% of 3,200', color: '#0EA5E9' },
+          { label: 'Win-Rate Quota', val: '31.4%', delta: '+2.8 pp Beat', color: '#F59E0B' }
+        ],
+        chartTitle: 'OKR Pillar Completion (%)',
+        bars: [
+          { lbl: 'ARR', v: 89, txt: '89%' },
+          { lbl: 'Orders', v: 85, txt: '85%' },
+          { lbl: 'Signups', v: 92, txt: '92%' },
+          { lbl: 'NRR', v: 95, txt: '95%' },
+          { lbl: 'Margin', v: 84, txt: '84%' }
+        ],
+        tableTitle: '2025 Strategic OKR Milestones',
+        cols: ['OKR Objective', 'Lead', 'Target', 'Current', 'Status'],
+        rows: [
+          ['Expand Enterprise Direct ARR', 'VP Sales', '$320,000', '$284,600', 'On Track'],
+          ['Scale Paid Checkout Volume', 'Growth Lead', '10,000', '8,460', 'On Track'],
+          ['Reduce Onboarding Time < 4d', 'CS Director', '3.5 Days', '3.2 Days', 'Achieved'],
+          ['Boost Self-Serve Funnel CVR', 'Product PLG', '4.00%', '3.82%', 'On Track'],
+          ['Launch EMEA Multi-Currency', 'Platform Eng', '100% Live', '90% Ready', 'In Review']
+        ]
+      },
+      billing: {
+        title: 'Billing, Invoices & Payouts',
+        subtitle: 'Stripe & wire settlement schedules, subscription MRR and payout preferences',
+        cta: 'Trigger Instant Payout',
+        kpis: [
+          { label: 'Available Payout', val: '$38,420', delta: 'Next: Friday', color: '#6C55F9' },
+          { label: 'Subscription MRR', val: '$24,850', delta: '+18.6% YoY', color: '#10B981' },
+          { label: 'Collection Rate', val: '99.2%', delta: '+0.4% Retry', color: '#0EA5E9' },
+          { label: 'Processing Fees', val: '1.82%', delta: '-0.15% Blended', color: '#F59E0B' }
+        ],
+        chartTitle: 'Monthly Settlement Volume ($k)',
+        bars: [
+          { lbl: 'Aug', v: 68, txt: '$22k' },
+          { lbl: 'Sep', v: 74, txt: '$24k' },
+          { lbl: 'Oct', v: 82, txt: '$27k' },
+          { lbl: 'Nov', v: 86, txt: '$28k' },
+          { lbl: 'Dec', v: 93, txt: '$30k' }
+        ],
+        tableTitle: 'Recent Settlement & Payout Ledger',
+        cols: ['Settlement ID', 'Destination', 'Method', 'Amount', 'Receipt'],
+        rows: [
+          ['STL-2025-089', 'Silicon Valley Commercial ••4821', 'ACH Express', '$18,450.00', 'Receipt'],
+          ['STL-2025-088', 'Mercury Treasury Vault ••9014', 'FedWire', '$24,120.00', 'Receipt'],
+          ['STL-2025-087', 'Stripe USD Clearing ••2210', 'Auto Sweep', '$15,890.00', 'Receipt'],
+          ['STL-2025-086', 'EMEA SEPA Euro Account ••7741', 'SEPA Instant', '$11,340.00', 'Receipt'],
+          ['STL-2025-085', 'Mercury Treasury Vault ••9014', 'ACH Express', '$19,600.00', 'Receipt']
+        ]
+      },
+      help: {
+        title: 'Help Center & BI Documentation',
+        subtitle: 'KPI formula definitions, warehouse sync settings and analyst concierge',
+        cta: 'Run Warehouse Diagnostics',
+        isSettings: true,
+        kpis: [
+          { label: 'Warehouse Sync', val: '99.99%', delta: 'Snowflake Live', color: '#10B981' },
+          { label: 'Data Freshness', val: '42 sec', delta: 'Real-time CDC', color: '#6C55F9' },
+          { label: 'API Webhook SLA', val: '18 ms', delta: 'Zero Drops', color: '#0EA5E9' },
+          { label: 'Support Response', val: '< 8 min', delta: 'Enterprise SLA', color: '#F59E0B' }
+        ],
+        chartTitle: 'Pipeline Query Latency (ms)',
+        bars: [
+          { lbl: 'Ingest', v: 42, txt: '18ms' },
+          { lbl: 'Transform', v: 64, txt: '31ms' },
+          { lbl: 'Rollup', v: 52, txt: '24ms' },
+          { lbl: 'Cache', v: 28, txt: '9ms' },
+          { lbl: 'Export', v: 48, txt: '21ms' }
+        ]
+      }
+    };
+
+    function renderBiSubpage(key) {
+      const cfg = BI_SUBPAGES[key];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const kpiHtml = cfg.kpis.map((k) => `
+        <div class="bi-card p-4 flex items-end justify-between gap-3">
+          <div>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${k.label}</p>
+            <p class="font-display text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight mt-1.5">${k.val}</p>
+            <span class="inline-block mt-2 rounded-md bg-emerald-50 dark:bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">${k.delta}</span>
+          </div>
+          <span class="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-sm" style="background:${k.color}">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          </span>
+        </div>
+      `).join('');
+
+      const svgBars = cfg.bars.map((b, i) => {
+        const x = 44 + i * 68;
+        const h = Math.round((b.v / 100) * 124);
+        const y = 156 - h;
+        return `
+          <g class="cursor-pointer" onclick="showToast('${cfg.chartTitle} — ${b.lbl}: ${b.txt}')">
+            <rect x="${x}" y="28" width="38" height="128" rx="8" fill="currentColor" class="text-slate-100 dark:text-slate-800"/>
+            <rect x="${x}" y="${y}" width="38" height="${h}" rx="8" fill="#6C55F9" class="bar-grow"/>
+            <text x="${x + 19}" y="${y - 7}" text-anchor="middle" font-size="12" font-weight="700" class="fill-slate-700 dark:fill-slate-200">${b.txt}</text>
+            <text x="${x + 19}" y="178" text-anchor="middle" font-size="12" font-weight="500" class="fill-slate-400">${b.lbl}</text>
+          </g>
+        `;
+      }).join('');
+
+      const rightPanelHtml = cfg.isSettings
+        ? `
+          <div class="bi-card p-5 lg:col-span-7 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-base font-bold text-slate-800 dark:text-white">Attribution &amp; Governance Controls</h3>
+              <span class="rounded-lg bg-brand/10 text-brand px-2.5 py-1 text-xs font-semibold">Workspace v4.2</span>
+            </div>
+            <div class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-semibold text-slate-800 dark:text-white">Multi-Touch W-Shaped Attribution</p>
+                  <p class="text-xs text-slate-400 mt-0.5">Weight first touch 30%, lead creation 30%, opportunity close 40%</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated W-Shaped Attribution setting')" class="h-4 w-4 accent-[#6C55F9] cursor-pointer"/>
+              </label>
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-semibold text-slate-800 dark:text-white">Automated Weekly Executive Digest</p>
+                  <p class="text-xs text-slate-400 mt-0.5">Dispatch PDF + CSV KPI snapshot every Monday at 08:00 UTC</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated Weekly Digest schedule')" class="h-4 w-4 accent-[#6C55F9] cursor-pointer"/>
+              </label>
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-semibold text-slate-800 dark:text-white">Anomaly Variance Alerts (&gt; 8% Delta)</p>
+                  <p class="text-xs text-slate-400 mt-0.5">Notify Slack #revops-bi when daily conversion deviates from 30d mean</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated Anomaly Variance alert threshold')" class="h-4 w-4 accent-[#6C55F9] cursor-pointer"/>
+              </label>
+              <div class="pt-3 flex items-center justify-between gap-3">
+                <span class="text-xs text-slate-500 dark:text-slate-400">KPI Formula Reference: YoY = (Current - Prior) / Prior</span>
+                <button onclick="showToast('Saved Clarity BI Governance Settings')" class="rounded-xl bg-brand hover:bg-brand-dark text-white px-4 py-2 text-xs font-semibold cursor-pointer">Save Preferences</button>
+              </div>
+            </div>
+          </div>
+        `
+        : `
+          <div class="bi-card p-5 lg:col-span-7 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-display text-base font-bold text-slate-800 dark:text-white">${cfg.tableTitle}</h3>
+              <span class="text-xs font-medium text-slate-400">5 active records</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-100 dark:border-slate-800 text-xs font-medium text-slate-400">
+                    <th class="pb-2.5">${cfg.cols[0]}</th>
+                    <th class="pb-2.5">${cfg.cols[1]}</th>
+                    <th class="pb-2.5">${cfg.cols[2]}</th>
+                    <th class="pb-2.5 text-right">${cfg.cols[3]}</th>
+                    <th class="pb-2.5 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
+                  ${cfg.rows.map((r) => `
+                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                      <td class="py-2.5 font-semibold text-slate-800 dark:text-white">${r[0]}</td>
+                      <td class="py-2.5 text-slate-500 dark:text-slate-400">${r[1]}</td>
+                      <td class="py-2.5 font-medium text-slate-700 dark:text-slate-300">${r[2]}</td>
+                      <td class="py-2.5 text-right font-bold text-slate-800 dark:text-white">${r[3]}</td>
+                      <td class="py-2.5 text-right">
+                        <button onclick="showToast('${r[4]}: ${r[0]} (${r[3]})')" class="rounded-lg bg-[#F1EEFF] dark:bg-indigo-500/20 text-[#6C55F9] dark:text-indigo-300 px-2.5 py-1 text-xs font-semibold hover:opacity-80 cursor-pointer">${r[4]}</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+      container.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <button onclick="returnToOverview()" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-brand transition cursor-pointer">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+                <span>← Overview</span>
+              </button>
+              <h1 class="font-display text-xl sm:text-2xl font-bold text-slate-800 dark:text-white tracking-tight">${cfg.title}</h1>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">${cfg.subtitle}</p>
+          </div>
+          <button onclick="showToast('${cfg.cta} completed for ${activeYear}')" class="inline-flex items-center gap-2 rounded-xl bg-brand hover:bg-brand-dark text-white px-4 py-2 text-xs font-semibold shadow-md shadow-indigo-500/25 transition cursor-pointer">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>${cfg.cta}</span>
+          </button>
+        </div>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+          ${kpiHtml}
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+          <div class="bi-card p-5 lg:col-span-5 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-slate-800 dark:text-white">${cfg.chartTitle}</h3>
+              <span class="text-xs font-semibold text-brand">${activeYear} Live</span>
+            </div>
+            <svg viewBox="0 0 400 190" class="w-full h-48 overflow-visible select-none">
+              <line x1="28" y1="156" x2="384" y2="156" stroke="currentColor" class="text-slate-200 dark:text-slate-700" stroke-width="1"/>
+              ${svgBars}
+            </svg>
+          </div>
+          ${rightPanelHtml}
+        </section>
+      `;
+    }
+
+    function returnToOverview() {
+      const firstBtn = document.querySelector('.rail-btn[data-nav="overview"]');
+      switchNav(firstBtn, 'overview');
+    }
+
+    function switchNav(btn, navKey) {
+      document.querySelectorAll('.rail-btn[data-nav]').forEach((b) => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+
+      if (!navKey || navKey === 'overview') {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+        document.getElementById('pageHeading').textContent = 'Business overview';
+        showToast('Switched view: Business overview');
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderBiSubpage(navKey);
+        showToast(`Switched view: ${BI_SUBPAGES[navKey].title}`);
+      }
+    }
+
+    function cycleWorkspace() {
+      wsIdx = (wsIdx + 1) % WORKSPACES.length;
+      document.getElementById('workspaceLabel').textContent = WORKSPACES[wsIdx];
+      showToast(`Workspace switched to ${WORKSPACES[wsIdx]}`);
+    }
+
+    function handleSearchReports(query) {
+      const q = query.trim().toLowerCase();
+      document.querySelectorAll('[data-search]').forEach((card) => {
+        if (!q) {
+          card.classList.remove('search-highlight');
+          card.style.opacity = '1';
+          return;
+        }
+        const match = card.getAttribute('data-search').includes(q);
+        card.classList.toggle('search-highlight', match);
+        card.style.opacity = match ? '1' : '0.42';
+      });
+    }
+
+    function exportReportCsv() {
+      const d = DATASETS[activeYear];
+      showToast(`Exported Clarity_BI_${activeYear}_Report.csv (${d.annualTotal} total revenue)`);
+    }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      showToast(isDark ? 'Dark Executive Mode enabled' : 'Clean Light BI Mode enabled');
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('biToast');
+      document.getElementById('biToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+      }, 2600);
+    }
+
+    // Initial Boot
+    renderRevenueTrend();
+    renderDonutAndChannels();
+    renderQuarterBars();
+    renderAnnualTargets();
+    renderRevenueSources();
+  </script>
+</body>
+</html>

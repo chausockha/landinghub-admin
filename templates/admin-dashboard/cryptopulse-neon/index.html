@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoPulse — Futuristic Neon-Glass Web3 &amp; Crypto Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Space Grotesk"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        }
+      }
+    };
+  </script>
+  <style>
+    html { font-size: 16px; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #040613;
+      background-image:
+        radial-gradient(ellipse 55% 45% at 22% 18%, rgba(34, 211, 238, 0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 45% at 78% 24%, rgba(168, 85, 247, 0.16) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 50% at 48% 85%, rgba(59, 130, 246, 0.14) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 35% at 82% 78%, rgba(236, 72, 153, 0.12) 0%, transparent 65%);
+      color: #F8FAFC;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Signature Holographic Iridescent Neon-Glass Card */
+    .neon-card {
+      position: relative;
+      border-radius: 18px;
+      background:
+        linear-gradient(160deg, rgba(14, 20, 48, 0.88) 0%, rgba(8, 12, 30, 0.92) 100%) padding-box,
+        linear-gradient(135deg, rgba(34, 211, 238, 0.72) 0%, rgba(99, 102, 241, 0.55) 38%, rgba(236, 72, 153, 0.68) 72%, rgba(34, 211, 238, 0.65) 100%) border-box;
+      border: 1.5px solid transparent;
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow:
+        0 16px 38px -10px rgba(3, 5, 18, 0.8),
+        0 0 24px -6px rgba(99, 102, 241, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+    }
+    .neon-card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 20px 44px -10px rgba(3, 5, 18, 0.9),
+        0 0 32px -4px rgba(34, 211, 238, 0.32),
+        0 0 28px -6px rgba(236, 72, 153, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    /* Specular Horizon Glint on Top Edge */
+    .neon-card::before {
+      content: '';
+      position: absolute;
+      top: -1.5px;
+      left: 16%;
+      right: 24%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(165, 243, 252, 0.95), rgba(244, 114, 182, 0.85), transparent);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .cyber-input {
+      background: rgba(12, 18, 42, 0.85);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 12px;
+      color: #F8FAFC;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cyber-input:focus {
+      outline: none;
+      border-color: #22D3EE;
+      box-shadow: 0 0 16px rgba(34, 211, 238, 0.28);
+    }
+
+    .rail-icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .rail-icon-btn:hover,
+    .rail-icon-btn.active {
+      background: rgba(34, 211, 238, 0.14);
+      border-color: rgba(34, 211, 238, 0.45);
+      color: #67E8F9;
+      box-shadow: 0 0 16px rgba(34, 211, 238, 0.25);
+    }
+
+    .tf-pill-active {
+      background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(147, 197, 253, 0.55);
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.55);
+    }
+
+    .place-order-btn {
+      background: linear-gradient(90deg, rgba(30, 41, 88, 0.95) 0%, rgba(67, 56, 202, 0.9) 50%, rgba(126, 34, 206, 0.88) 100%);
+      border: 1px solid rgba(165, 243, 252, 0.45);
+      box-shadow: 0 0 24px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.22s ease;
+    }
+    .place-order-btn:hover {
+      border-color: #22D3EE;
+      box-shadow: 0 0 32px rgba(34, 211, 238, 0.5), 0 0 24px rgba(236, 72, 153, 0.35);
+      transform: translateY(-1px);
+    }
+
+    @keyframes neonDraw {
+      from { stroke-dashoffset: 1400; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .neon-wave-draw {
+      stroke-dasharray: 1400;
+      animation: neonDraw 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-4">
+
+  <div class="max-w-[1560px] mx-auto space-y-3.5">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TOP FUTURISTIC HEADER BAR
+    ══════════════════════════════════════════════════════════════════ -->
+    <header class="flex flex-wrap items-center justify-between gap-4 px-2 pb-2.5 border-b border-indigo-500/20">
+      <!-- Brand + LIVE Indicator -->
+      <div class="flex items-center gap-3.5">
+        <div class="h-10 w-10 rounded-full border-2 border-cyan-400/80 bg-cyan-500/10 flex items-center justify-center shadow-[0_0_18px_rgba(34,211,238,0.45)]">
+          <span class="font-display text-lg font-bold text-cyan-300">C</span>
+        </div>
+        <span class="font-display text-xl font-bold tracking-tight text-white">CryptoPulse</span>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-500/15 border border-rose-500/35 px-2.5 py-0.5 text-xs font-mono font-bold text-rose-300">
+          <span class="h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
+          LIVE
+        </span>
+      </div>
+
+      <!-- Center Search -->
+      <div class="relative flex-1 max-w-md min-w-[220px]">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input
+          id="tokenSearch"
+          oninput="filterHoldingsTable()"
+          type="text"
+          placeholder="Search token, pair, or wallet..."
+          class="cyber-input w-full pl-10 pr-4 py-2 text-sm placeholder:text-slate-400"
+        />
+      </div>
+
+      <!-- Right Network Selector + Notifications + Profile -->
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <select
+            id="networkSelect"
+            onchange="switchChain(this.value)"
+            class="cyber-input px-3.5 py-2 text-xs font-semibold text-cyan-100 cursor-pointer"
+          >
+            <option value="Ethereum Mainnet">Ethereum Mainnet (12 gwei)</option>
+            <option value="Arbitrum One">Arbitrum One (0.1 gwei)</option>
+            <option value="Solana Mainnet">Solana Mainnet (400ms)</option>
+            <option value="Base L2">Base Mainnet (0.05 gwei)</option>
+          </select>
+        </div>
+
+        <button onclick="showPulseToast('Whale Alert: 420 BTC moved off Coinbase Institutional')" class="cyber-input relative h-10 w-10 flex items-center justify-center text-slate-200 hover:text-cyan-300 cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-cyan-400"></span>
+        </button>
+
+        <div class="h-10 w-10 rounded-xl border border-indigo-400/40 bg-gradient-to-br from-cyan-500/30 to-purple-600/40 flex items-center justify-center text-xs font-bold text-white">
+          CP
+        </div>
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         WORKSPACE BODY: FLOATING ICON RAIL + NEON-GLASS BENTO MATRIX
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="flex gap-4 items-start">
+
+      <!-- LEFT FLOATING VERTICAL ICON RAIL -->
+      <aside class="flex neon-card p-2 flex-col items-center gap-2 select-none flex-shrink-0">
+        <button data-rail="Portfolio Telemetry" onclick="selectRail(this, 'Portfolio Telemetry')" class="rail-icon-btn active" title="Portfolio Telemetry">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 12h6m6 0h6M12 3v6m0 6v6"/></svg>
+        </button>
+        <button data-rail="Alpha Launchpad" onclick="selectRail(this, 'Alpha Launchpad')" class="rail-icon-btn" title="Alpha Launchpad">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+        </button>
+        <button data-rail="Orderbook Analytics" onclick="selectRail(this, 'Orderbook Analytics')" class="rail-icon-btn" title="Orderbook Analytics">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </button>
+        <button data-rail="Hardware Vaults" onclick="selectRail(this, 'Hardware Vaults')" class="rail-icon-btn" title="Hardware Vaults">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h.01"/></svg>
+        </button>
+        <button data-rail="Cross-Chain Bridge" onclick="selectRail(this, 'Cross-Chain Bridge')" class="rail-icon-btn" title="Cross-Chain Bridge">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+        <button data-rail="Global Liquidity" onclick="selectRail(this, 'Global Liquidity')" class="rail-icon-btn" title="Global Liquidity">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </button>
+        <button data-rail="Gas & Slippage Config" onclick="selectRail(this, 'Gas & Slippage Config')" class="rail-icon-btn" title="Gas & Slippage Config">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+        </button>
+      </aside>
+
+      <!-- MAIN BENTO GRID -->
+      <div class="flex-1 space-y-3.5 min-w-0">
+
+        <div id="defaultDashboardView" class="space-y-3.5">
+        <!-- ROW 1: 4 NEON-RIM KPI CARDS (3 + 2 + 3 + 4 = 12 COLS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 gap-3.5">
+
+          <!-- KPI 1: Portfolio Value -->
+          <div class="neon-card p-4 xl:col-span-3 flex flex-col justify-between">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-300">Portfolio Value</p>
+            <p id="pulseTotalVal" class="font-display text-2xl sm:text-[28px] font-bold text-white tracking-tight mt-1">
+              $128,450.25
+            </p>
+            <p class="text-xs font-mono text-cyan-300 mt-1">+$3,580.40 (24h Net)</p>
+          </div>
+
+          <!-- KPI 2: 24H PNL with Glowing Spark Arrow -->
+          <div class="neon-card p-4 xl:col-span-2 flex flex-col justify-between relative overflow-hidden">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-300">24H PNL</p>
+            <p class="font-display text-2xl sm:text-[28px] font-bold text-emerald-300 drop-shadow-[0_0_12px_rgba(52,211,153,0.55)] mt-1">
+              +2.87%
+            </p>
+            <div class="flex items-center justify-between mt-1">
+              <span class="text-xs text-slate-400">24H Alpha</span>
+              <svg class="w-16 h-5 overflow-visible" viewBox="0 0 70 24">
+                <path d="M 4 20 Q 26 18, 44 12 T 64 4" fill="none" stroke="#34D399" stroke-width="2.4" stroke-linecap="round"/>
+                <polyline points="56 3 65 4 63 12" fill="none" stroke="#34D399" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- KPI 3: Asset Allocation -->
+          <div class="neon-card p-4 xl:col-span-3 flex flex-col justify-between">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-300">Asset Allocation</p>
+            <div class="mt-1">
+              <p class="font-display text-lg font-bold text-white">
+                BTC <span class="text-cyan-300">45%</span> <span class="text-slate-500">/</span> ETH <span class="text-indigo-300">30%</span>
+              </p>
+              <p class="text-xs font-mono text-slate-300 mt-0.5">SOL &amp; USDT Reserve: 25%</p>
+            </div>
+            <div class="mt-2 flex gap-1.5 h-2">
+              <div class="rounded-full bg-cyan-400" style="width: 45%"></div>
+              <div class="rounded-full bg-indigo-400" style="width: 30%"></div>
+              <div class="rounded-full bg-pink-500" style="width: 25%"></div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Risk Level + Semi-Circle Neon Gauge (63) -->
+          <div class="neon-card p-4 xl:col-span-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-300">Risk Level</p>
+              <p class="font-display text-2xl font-bold text-white mt-1">Moderate</p>
+              <p class="text-xs text-slate-400 mt-0.5">Sharpe 2.14 · Delta Hedged</p>
+            </div>
+
+            <svg viewBox="0 0 150 92" class="w-32 h-20 overflow-visible flex-shrink-0">
+              <defs>
+                <linearGradient id="riskNeonGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#F43F5E" />
+                  <stop offset="50%" stop-color="#FBBF24" />
+                  <stop offset="100%" stop-color="#6366F1" />
+                </linearGradient>
+              </defs>
+              <path d="M 18 78 A 56 56 0 0 1 132 78" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="13" stroke-linecap="round"/>
+              <path d="M 18 78 A 56 56 0 0 1 132 78" fill="none" stroke="url(#riskNeonGrad)" stroke-width="13" stroke-linecap="round" stroke-dasharray="122 200"/>
+              <text x="75" y="74" text-anchor="middle" fill="#FFFFFF" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="700">63</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ROW 2: HERO NEON WAVEFORM CHART (8 COLS) + WATCHLIST & INSTANT TRADE (4 COLS) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-3.5 items-stretch">
+
+          <!-- Center Hero: BTC / USD Magenta-to-Cyan Neon Chart -->
+          <div class="neon-card p-4 sm:p-5 xl:col-span-8 flex flex-col justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <h2 id="heroPairHeading" class="font-display text-xl font-bold text-white tracking-tight">BTC / USD</h2>
+                <span id="heroLivePricePill" class="rounded-lg bg-cyan-400/15 border border-cyan-400/35 px-2.5 py-0.5 font-mono text-xs font-bold text-cyan-300">
+                  $67,760.45
+                </span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-5 text-xs font-mono text-slate-300">
+                <span>High: <strong id="heroHigh" class="text-white">$68,420</strong></span>
+                <span>Low: <strong id="heroLow" class="text-white">$65,850</strong></span>
+                <span>Volume: <strong id="heroVol" class="text-cyan-300">1.25B</strong></span>
+              </div>
+            </div>
+
+            <!-- High-Frequency Neon Magenta -> Cyan -> Violet Waveform + Volume Needles -->
+            <div class="my-2 relative">
+              <svg id="cryptoHeroSvg" viewBox="0 0 780 250" class="w-full h-48 overflow-visible"></svg>
+            </div>
+
+            <!-- Centered Timeframe Selector Bar -->
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="switchCryptoTf('1H', this)" class="ctf-btn rounded-lg px-4 py-1 text-xs font-mono font-bold text-slate-300 hover:text-white cursor-pointer">1H</button>
+              <button onclick="switchCryptoTf('1D', this)" class="ctf-btn tf-pill-active rounded-lg px-4 py-1 text-xs font-mono font-bold cursor-pointer">1D</button>
+              <button onclick="switchCryptoTf('1W', this)" class="ctf-btn rounded-lg px-4 py-1 text-xs font-mono font-bold text-slate-300 hover:text-white cursor-pointer">1W</button>
+              <button onclick="switchCryptoTf('1M', this)" class="ctf-btn rounded-lg px-4 py-1 text-xs font-mono font-bold text-slate-300 hover:text-white cursor-pointer">1M</button>
+              <button onclick="switchCryptoTf('1Y', this)" class="ctf-btn rounded-lg px-4 py-1 text-xs font-mono font-bold text-slate-300 hover:text-white cursor-pointer">1Y</button>
+            </div>
+          </div>
+
+          <!-- Right Column: Watchlist + Instant Trade -->
+          <div class="xl:col-span-4 flex flex-col gap-3.5">
+
+            <!-- Watchlist Card -->
+            <div class="neon-card p-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Watchlist</h3>
+
+              <div class="divide-y divide-indigo-500/15 text-sm">
+                <button onclick="selectCryptoPair('BTC / USD', 'BTC', 67760.45, '$68,420', '$65,850', '1.25B')" class="w-full py-2 flex items-center justify-between hover:bg-white/5 px-2 rounded-lg transition cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-full bg-amber-500 text-slate-950 font-mono text-xs font-extrabold flex items-center justify-center">B</span>
+                    <span class="font-semibold text-white">Bitcoin</span>
+                  </div>
+                  <div class="flex items-center gap-3 font-mono text-xs">
+                    <span class="font-bold text-white">$67,760</span>
+                    <span class="font-bold text-emerald-400">+1.35%</span>
+                  </div>
+                </button>
+
+                <button onclick="selectCryptoPair('ETH / USD', 'ETH', 3450.80, '$3,520', '$3,380', '840M')" class="w-full py-2 flex items-center justify-between hover:bg-white/5 px-2 rounded-lg transition cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-full bg-indigo-500 text-white font-mono text-xs font-extrabold flex items-center justify-center">E</span>
+                    <span class="font-semibold text-white">Ethereum</span>
+                  </div>
+                  <div class="flex items-center gap-3 font-mono text-xs">
+                    <span class="font-bold text-white">$3,450.80</span>
+                    <span class="font-bold text-emerald-400">+0.79%</span>
+                  </div>
+                </button>
+
+                <button onclick="selectCryptoPair('SOL / USD', 'SOL', 185.30, '$192.40', '$181.10', '412M')" class="w-full py-2 flex items-center justify-between hover:bg-white/5 px-2 rounded-lg transition cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-full bg-gradient-to-tr from-purple-500 to-emerald-400 text-slate-950 font-mono text-xs font-extrabold flex items-center justify-center">S</span>
+                    <span class="font-semibold text-white">Solana</span>
+                  </div>
+                  <div class="flex items-center gap-3 font-mono text-xs">
+                    <span class="font-bold text-white">$185.30</span>
+                    <span class="font-bold text-rose-400">-0.35%</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Instant Trade Card -->
+            <div class="neon-card p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2.5">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Instant Trade</h3>
+                  <span id="tradeEstUsd" class="font-mono text-xs text-cyan-300">≈ $33,880.22</span>
+                </div>
+
+                <!-- BUY / SELL Neon Tabs -->
+                <div class="grid grid-cols-2 gap-2.5 mb-2.5">
+                  <button id="tabBuy" onclick="setTradeMode('BUY')" class="rounded-xl border border-cyan-400 bg-cyan-400/15 py-2 text-xs font-bold text-cyan-200 shadow-[0_0_16px_rgba(34,211,238,0.28)] cursor-pointer">
+                    BUY
+                  </button>
+                  <button id="tabSell" onclick="setTradeMode('SELL')" class="rounded-xl border border-indigo-500/30 bg-slate-900/60 py-2 text-xs font-bold text-slate-400 hover:text-white cursor-pointer">
+                    SELL
+                  </button>
+                </div>
+
+                <!-- Amount Row -->
+                <div class="cyber-input px-3.5 py-2 flex items-center justify-between gap-2">
+                  <span class="text-xs font-medium text-slate-400">Amount</span>
+                  <div class="flex items-center gap-2">
+                    <input
+                      id="tradeAmtInput"
+                      type="number"
+                      step="0.1"
+                      min="0.01"
+                      value="0.5"
+                      oninput="updateTradeEstimate()"
+                      class="bg-transparent text-right font-mono text-sm font-bold text-white w-20 focus:outline-none"
+                    />
+                    <span id="tradeSymUnit" class="font-mono text-xs font-bold text-cyan-300">BTC</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onclick="submitCryptoOrder()"
+                class="mt-3 w-full place-order-btn rounded-xl py-2.5 text-sm font-display font-bold text-white cursor-pointer"
+              >
+                Place Order
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ROW 3: MY HOLDINGS (5 COLS) + RECENT TRANSACTIONS (3 COLS) + LATEST NEWS (4 COLS) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+
+          <!-- My Holdings -->
+          <div class="neon-card p-4 lg:col-span-5">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">My Holdings</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-indigo-500/20 text-xs font-semibold text-slate-400">
+                    <th class="pb-2">ASSET</th>
+                    <th class="pb-2">HOLDINGS</th>
+                    <th class="pb-2">PRICE</th>
+                    <th class="pb-2 text-right">24H CHANGE</th>
+                  </tr>
+                </thead>
+                <tbody id="holdingsRows" class="divide-y divide-indigo-500/15 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div class="neon-card p-4 lg:col-span-3 flex flex-col">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">Recent Transactions</h3>
+            <div id="recentTxList" class="space-y-3 text-xs flex-1"></div>
+          </div>
+
+          <!-- Latest News -->
+          <div class="neon-card p-4 lg:col-span-4 flex flex-col">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">Latest News</h3>
+            <div class="space-y-3 text-xs text-slate-200">
+              <div onclick="showPulseToast('Reading: Institutional Spot ETF Inflows Top $1.4B')" class="flex items-start gap-2.5 hover:text-cyan-300 transition cursor-pointer">
+                <svg class="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Crypto Market Surges to New Institutional Highs</span>
+              </div>
+              <div onclick="showPulseToast('Reading: Multi-Asset Staking ETF Filing Update')" class="flex items-start gap-2.5 hover:text-cyan-300 transition cursor-pointer">
+                <svg class="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>SEC Reviews New Multi-Chain ETF Proposals</span>
+              </div>
+              <div onclick="showPulseToast('Reading: APAC Web3 Treasury Settlement Report')" class="flex items-start gap-2.5 hover:text-cyan-300 transition cursor-pointer">
+                <svg class="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Blockchain Adoption in Asia Grows +48% YoY</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        </div>
+
+        <!-- SUB-PAGE VIEW CONTAINER -->
+        <div id="tabSubpageView" class="hidden space-y-3.5"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="pulseToast" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="neon-card px-5 py-3.5 flex items-center gap-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#22D3EE]"></span>
+      <span id="pulseToastMsg" class="text-sm font-semibold text-white">Executed</span>
+    </div>
+  </div>
+
+  <script>
+    let activeSym = 'BTC';
+    let activeUnitPrice = 67760.45;
+    let tradeMode = 'BUY';
+    let portfolioVal = 128450.25;
+
+    let myHoldings = [
+      { sym: 'BTC', name: 'Bitcoin', badge: 'B', color: '#F59E0B', qty: 1.25, price: 67760.45, chg: '+2.15%' },
+      { sym: 'ETH', name: 'Ethereum', badge: 'E', color: '#6366F1', qty: 8.40, price: 3450.80, chg: '+0.82%' },
+      { sym: 'USDC', name: 'USDC', badge: 'U', color: '#0EA5E9', qty: 15200, price: 1.00, chg: '0.00%' },
+    ];
+
+    let recentTxs = [
+      { label: 'Bought 0.5 BTC', usd: '$33,880.20' },
+      { label: 'Sold 2.0 ETH', usd: '$6,901.60' },
+      { label: 'Received 5,500 USDC', usd: '$5,500.00' },
+    ];
+
+    // High-resolution crypto price trajectory (dip -> breakout rally -> consolidation peak)
+    let wavePoints = [
+      48, 52, 44, 49, 41, 38, 42, 35, 39, 31, 28, 34, 24, 29, 21, 26, 32, 30, 36, 33,
+      39, 44, 48, 62, 58, 68, 72, 65, 69, 63, 66, 71, 68, 76, 84, 79, 86, 81, 74, 78,
+      71, 76, 82, 88, 83, 91
+    ];
+
+    function renderNeonWaveform() {
+      const svg = document.getElementById('cryptoHeroSvg');
+      const W = 780, H = 270, padL = 18, padR = 18, padT = 18, padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const mapX = i => padL + (i / (wavePoints.length - 1)) * plotW;
+      const mapY = v => padT + plotH - (v / 100) * plotH;
+
+      const linePath = wavePoints.map((v, i) => `${i === 0 ? 'M' : 'L'} ${mapX(i).toFixed(1)} ${mapY(v).toFixed(1)}`).join(' ');
+      const areaPath = `${linePath} L ${mapX(wavePoints.length - 1)} ${padT + plotH} L ${padL} ${padT + plotH} Z`;
+
+      let html = `
+        <defs>
+          <linearGradient id="neonStrokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#A855F7" />
+            <stop offset="28%" stop-color="#F43F5E" />
+            <stop offset="56%" stop-color="#22D3EE" />
+            <stop offset="82%" stop-color="#34D399" />
+            <stop offset="100%" stop-color="#C084FC" />
+          </linearGradient>
+          <linearGradient id="neonAreaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#EC4899" stop-opacity="0.18" />
+            <stop offset="55%" stop-color="#22D3EE" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#6366F1" stop-opacity="0.02" />
+          </linearGradient>
+          <filter id="cyberGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+      `;
+
+      // Subtle Cyber Grid
+      [0.2, 0.45, 0.7, 0.95].forEach(r => {
+        const y = padT + plotH * r;
+        html += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(99,102,241,0.14)" stroke-width="1" />`;
+      });
+
+      // Bottom Fine Volume Needles
+      wavePoints.forEach((v, i) => {
+        const x = mapX(i);
+        const vh = 12 + ((v * 17 + i * 11) % 38);
+        const vColor = i < 20 ? '#EC4899' : (i < 36 ? '#22D3EE' : '#818CF8');
+        html += `<line x1="${x.toFixed(1)}" y1="${padT + plotH}" x2="${x.toFixed(1)}" y2="${padT + plotH - vh}" stroke="${vColor}" stroke-opacity="0.32" stroke-width="2" />`;
+      });
+
+      // Time Labels
+      ['08:00', '11:00', '14:00', '17:00', '20:00', '23:00', 'LIVE'].forEach((t, idx) => {
+        const tx = padL + (idx / 6) * plotW;
+        html += `<text x="${tx}" y="${H - 8}" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="12">${t}</text>`;
+      });
+
+      // Area + Glowing Multi-Color Price Curve + Gliding Photon
+      html += `
+        <path d="${areaPath}" fill="url(#neonAreaGrad)" />
+        <path d="${linePath}" fill="none" stroke="url(#neonStrokeGrad)" stroke-width="3" stroke-linejoin="round" filter="url(#cyberGlow)" class="neon-wave-draw" />
+        <circle r="4.5" fill="#FFFFFF" filter="url(#cyberGlow)">
+          <animateMotion dur="5.2s" repeatCount="indefinite" path="${linePath}" />
+        </circle>
+      `;
+
+      svg.innerHTML = html;
+    }
+
+    function filterHoldingsTable() {
+      const q = document.getElementById('tokenSearch').value.trim().toLowerCase();
+      const tbody = document.getElementById('holdingsRows');
+      const rows = myHoldings.filter(h => !q || h.name.toLowerCase().includes(q) || h.sym.toLowerCase().includes(q));
+
+      tbody.innerHTML = rows.map(h => {
+        const isPos = h.chg.startsWith('+');
+        const chgCls = h.chg === '0.00%' ? 'text-rose-300' : (isPos ? 'text-emerald-400' : 'text-rose-400');
+        return `
+          <tr class="hover:bg-white/5 transition">
+            <td class="py-3 font-semibold text-white">
+              <div class="flex items-center gap-2.5">
+                <span class="h-6 w-6 rounded-full text-xs font-mono font-extrabold flex items-center justify-center text-slate-950" style="background:${h.color}">${h.badge}</span>
+                <span>${h.name}</span>
+              </div>
+            </td>
+            <td class="py-3 font-mono text-xs text-slate-200">${h.qty.toLocaleString()} ${h.sym}</td>
+            <td class="py-3 font-mono text-xs font-semibold text-white">$${h.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            <td class="py-3 font-mono text-xs font-bold text-right ${chgCls}">${h.chg}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderRecentTxs() {
+      document.getElementById('recentTxList').innerHTML = recentTxs.slice(0, 4).map(t => `
+        <div class="flex items-center justify-between py-2 border-b border-indigo-500/15">
+          <span class="text-slate-200 font-medium">${t.label}</span>
+          <span class="font-mono font-bold text-white">${t.usd}</span>
+        </div>
+      `).join('');
+    }
+
+    function selectCryptoPair(pairTitle, sym, price, high, low, vol) {
+      activeSym = sym;
+      activeUnitPrice = price;
+      document.getElementById('heroPairHeading').textContent = pairTitle;
+      document.getElementById('heroLivePricePill').textContent = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('heroHigh').textContent = high;
+      document.getElementById('heroLow').textContent = low;
+      document.getElementById('heroVol').textContent = vol;
+      document.getElementById('tradeSymUnit').textContent = sym;
+      wavePoints = wavePoints.map(v => Math.max(18, Math.min(94, v + Math.round(Math.random() * 14 - 7))));
+      renderNeonWaveform();
+      updateTradeEstimate();
+    }
+
+    function switchCryptoTf(tf, btn) {
+      document.querySelectorAll('.ctf-btn').forEach(b => {
+        b.className = 'ctf-btn rounded-lg px-4 py-1.5 text-xs font-mono font-bold text-slate-300 hover:text-white cursor-pointer';
+      });
+      btn.className = 'ctf-btn tf-pill-active rounded-lg px-4 py-1.5 text-xs font-mono font-bold cursor-pointer';
+      wavePoints = wavePoints.map(v => Math.max(16, Math.min(95, v + Math.round(Math.random() * 16 - 8))));
+      renderNeonWaveform();
+    }
+
+    function setTradeMode(mode) {
+      tradeMode = mode;
+      const b = document.getElementById('tabBuy');
+      const s = document.getElementById('tabSell');
+      if (mode === 'BUY') {
+        b.className = 'rounded-xl border border-cyan-400 bg-cyan-400/15 py-2.5 text-xs font-bold text-cyan-200 shadow-[0_0_16px_rgba(34,211,238,0.28)] cursor-pointer';
+        s.className = 'rounded-xl border border-indigo-500/30 bg-slate-900/60 py-2.5 text-xs font-bold text-slate-400 hover:text-white cursor-pointer';
+      } else {
+        s.className = 'rounded-xl border border-pink-500 bg-pink-500/15 py-2.5 text-xs font-bold text-pink-200 shadow-[0_0_16px_rgba(236,72,153,0.28)] cursor-pointer';
+        b.className = 'rounded-xl border border-indigo-500/30 bg-slate-900/60 py-2.5 text-xs font-bold text-slate-400 hover:text-white cursor-pointer';
+      }
+    }
+
+    function updateTradeEstimate() {
+      const amt = Math.max(0.01, parseFloat(document.getElementById('tradeAmtInput').value) || 0);
+      const est = amt * activeUnitPrice;
+      document.getElementById('tradeEstUsd').textContent = '≈ $' + est.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function submitCryptoOrder() {
+      const amt = Math.max(0.01, parseFloat(document.getElementById('tradeAmtInput').value) || 0.1);
+      const usd = amt * activeUnitPrice;
+      portfolioVal += (tradeMode === 'BUY' ? usd * 0.02 : -usd * 0.01);
+      document.getElementById('pulseTotalVal').textContent = '$' + portfolioVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const item = myHoldings.find(h => h.sym === activeSym);
+      if (item) {
+        item.qty = Math.max(0, +(item.qty + (tradeMode === 'BUY' ? amt : -amt)).toFixed(3));
+      }
+      recentTxs.unshift({
+        label: `${tradeMode === 'BUY' ? 'Bought' : 'Sold'} ${amt} ${activeSym}`,
+        usd: '$' + usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      });
+      filterHoldingsTable();
+      renderRecentTxs();
+      showPulseToast(`${tradeMode} ${amt} ${activeSym} Executed on On-Chain Router!`);
+    }
+
+    function switchChain(chain) {
+      showPulseToast('Switched RPC Node to ' + chain);
+    }
+
+    const CRYPTO_SUBPAGES = {
+      'Alpha Launchpad': {
+        subtitle: 'Curated Web3 token generation events, staking allocations and early-bird vesting tiers',
+        cta: 'Commit Staking Tier',
+        kpis: [
+          { lbl: 'Active IDO Pools', val: '4 Live', sub: '$18.4M Committed', accent: 'text-cyan-300' },
+          { lbl: 'Your Allocation Tier', val: 'Tier 3 · Cyber', sub: '2.5x Guaranteed Weight', accent: 'text-emerald-300' },
+          { lbl: 'Avg. Launch ROI', val: '+342%', sub: '30D Realized ATH', accent: 'text-pink-300' },
+          { lbl: 'Locked CP Stake', val: '45,000 CP', sub: 'APR 18.4% Boosted', accent: 'text-indigo-300' }
+        ],
+        chartTitle: 'IDO Pool Oversubscription Progress (%)',
+        pts: [28, 44, 52, 68, 76, 89, 95],
+        xLabels: ['T-6h', 'T-5h', 'T-4h', 'T-3h', 'T-2h', 'T-1h', 'NOW'],
+        tableTitle: 'Upcoming & Live Token Launchpad Pools',
+        cols: ['Protocol', 'Chain', 'Raise Goal', 'Oversubscribed', 'Action'],
+        rows: [
+          ['HyperZK Rollup (HZK)', 'Ethereum', '$4,500,000', '380%', 'Commit USDC'],
+          ['AetherGPU Compute (AGPU)', 'Solana', '$2,800,000', '245%', 'Commit USDC'],
+          ['OmniLiquid Restake (OMNI)', 'Arbitrum', '$3,200,000', '190%', 'Commit USDC'],
+          ['PulsePerp DEX (PPRP)', 'Base L2', '$1,900,000', '142%', 'Whitelist'],
+          ['ZeroMesh Oracle (ZMSH)', 'Ethereum', '$5,000,000', 'Opens 14h', 'Remind Me']
+        ]
+      },
+      'Orderbook Analytics': {
+        subtitle: 'Aggregated L2 CLOB liquidity walls, perp funding rates and whale tape imbalance',
+        cta: 'Snapshot L2 Depth',
+        kpis: [
+          { lbl: 'Bid / Ask Imbalance', val: '+18.4% Bid', sub: '$42.6M within 1%', accent: 'text-emerald-300' },
+          { lbl: '8H Perp Funding', val: '+0.0112%', sub: 'Annualized 12.2%', accent: 'text-cyan-300' },
+          { lbl: 'Open Interest (BTC)', val: '$19.84B', sub: '+4.6% 24h Delta', accent: 'text-indigo-300' },
+          { lbl: '24H Short Liquidations', val: '$64.2M', sub: 'Binance + Hyperliquid', accent: 'text-pink-300' }
+        ],
+        chartTitle: 'Cumulative Bid / Ask Market Depth Curve',
+        pts: [88, 76, 62, 40, 58, 74, 92],
+        xLabels: ['-2.0%', '-1.0%', '-0.5%', 'MID', '+0.5%', '+1.0%', '+2.0%'],
+        tableTitle: 'Live Institutional Liquidity Walls',
+        cols: ['Venue', 'Pair', 'Price Level', 'Wall Size', 'Signal'],
+        rows: [
+          ['Coinbase Institutional', 'BTC / USD', '$67,200.00', '185.4 BTC', 'Strong Bid'],
+          ['Hyperliquid Perp', 'BTC / USDC', '$67,450.00', '142.0 BTC', 'Bid Absorb'],
+          ['Binance Spot', 'BTC / USDT', '$68,500.00', '210.8 BTC', 'Ask Wall'],
+          ['Kraken Pro', 'ETH / USD', '$3,410.00', '1,840 ETH', 'Bid Support'],
+          ['OKX Perpetual', 'SOL / USDT', '$190.00', '48,500 SOL', 'Ask Cap']
+        ]
+      },
+      'Hardware Vaults': {
+        subtitle: 'Multi-sig cold storage custody, MPC threshold signers and air-gapped policy locks',
+        cta: 'Verify Cold Proof',
+        kpis: [
+          { lbl: 'Cold Vault Custody', val: '$98,400.00', sub: '76.6% of Net Worth', accent: 'text-cyan-300' },
+          { lbl: 'Multi-Sig Quorum', val: '3 of 5 Keys', sub: 'Ledger + GridPlus', accent: 'text-emerald-300' },
+          { lbl: 'Time-Lock Delay', val: '24 Hours', sub: 'Guardian Active', accent: 'text-indigo-300' },
+          { lbl: 'Active Allowances', val: '2 Verified', sub: '0 High-Risk Spenders', accent: 'text-pink-300' }
+        ],
+        chartTitle: 'Cold vs Hot Custody Reserve Ratio',
+        pts: [72, 74, 75, 76, 78, 77, 79],
+        xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        tableTitle: 'Connected Hardware Signers & Vaults',
+        cols: ['Vault / Device', 'Scheme', 'Balance', 'Last Heartbeat', 'Action'],
+        rows: [
+          ['Alpha Gnosis Safe #01', '3-of-5 Multi-Sig', '1.05 BTC ($71.1k)', '12 mins ago', 'Ping Key'],
+          ['Ledger Flex Cold #A', 'BIP-39 Passphrase', '6.20 ETH ($21.4k)', '2 hrs ago', 'Ping Key'],
+          ['GridPlus Lattice1', 'Hardware HSM', '5,900 USDC', 'Online Now', 'Inspect'],
+          ['Solana Squads v4 Vault', '2-of-3 Multisig', '48.5 SOL ($8.9k)', '1 day ago', 'Inspect'],
+          ['Emergency Recovery Key', 'Offline Shamir', '$0.00 Standby', 'Verified', 'Audit']
+        ]
+      },
+      'Cross-Chain Bridge': {
+        subtitle: 'Zero-slippage canonical & intent bridges across Ethereum, Arbitrum, Base and Solana',
+        cta: 'Initiate Fast Bridge',
+        kpis: [
+          { lbl: '24H Bridged Vol', val: '$14,250', sub: 'Zero Failed Hops', accent: 'text-cyan-300' },
+          { lbl: 'Median Fill Time', val: '11.4 sec', sub: 'Intent Solver Relay', accent: 'text-emerald-300' },
+          { lbl: 'Avg. Bridge Fee', val: '$0.42', sub: 'L2 Blob Optimized', accent: 'text-indigo-300' },
+          { lbl: 'Supported Chains', val: '9 Networks', sub: 'EVM + SVM Canonical', accent: 'text-pink-300' }
+        ],
+        chartTitle: 'Cross-Chain Solver Fill Speed (Seconds)',
+        pts: [32, 26, 22, 19, 16, 14, 11],
+        xLabels: ['Eth->Arb', 'Arb->Base', 'Base->Opt', 'Eth->Sol', 'Sol->Arb', 'Base->Eth', 'Fastest'],
+        tableTitle: 'Recent Cross-Chain Bridge Transfers',
+        cols: ['Route', 'Asset', 'Solver Protocol', 'Settlement', 'Receipt'],
+        rows: [
+          ['Ethereum -> Arbitrum', '4.00 ETH', 'Across Intent v3', '9 secs · Done', 'Explorer'],
+          ['Arbitrum -> Solana', '5,500 USDC', 'Wormhole CCTP', '14 secs · Done', 'Explorer'],
+          ['Base L2 -> Ethereum', '1.25 ETH', 'Superbridge', '18 secs · Done', 'Explorer'],
+          ['Solana -> Base L2', '2,400 USDC', 'deBridge DLN', '8 secs · Done', 'Explorer'],
+          ['Ethereum -> Base L2', '0.25 WBTC', 'Canonical L2', '42 secs · Done', 'Explorer']
+        ]
+      },
+      'Global Liquidity': {
+        subtitle: 'Concentrated AMM LP positions, DeFi yield vaults and impermanent loss telemetry',
+        cta: 'Harvest All Rewards',
+        kpis: [
+          { lbl: 'Active LP Capital', val: '$34,680', sub: '4 Concentrated Pools', accent: 'text-cyan-300' },
+          { lbl: 'Unclaimed Fees', val: '$486.90', sub: '+$62.40 Today', accent: 'text-emerald-300' },
+          { lbl: 'Net Blended APY', val: '24.8%', sub: 'Real Fee Yield', accent: 'text-pink-300' },
+          { lbl: 'Range Efficiency', val: '94.2%', sub: 'All Pools In-Range', accent: 'text-indigo-300' }
+        ],
+        chartTitle: '7-Day Cumulative LP Fee Yield ($)',
+        pts: [28, 38, 49, 61, 72, 84, 94],
+        xLabels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'Today'],
+        tableTitle: 'Active DeFi Liquidity Pool Positions',
+        cols: ['Pool / DEX', 'Fee Tier', 'TVL Share', 'Net APY', 'Claim'],
+        rows: [
+          ['WBTC / ETH · Uniswap v3', '0.05%', '$14,200', '21.4% APY', 'Claim $194'],
+          ['SOL / USDC · Orca Whirl', '0.04%', '$8,950', '34.2% APY', 'Claim $168'],
+          ['ETH / wstETH · Curve', '0.01%', '$6,800', '9.8% APY', 'Claim $52'],
+          ['AERO / USDC · Aerodrome', '0.30%', '$4,730', '41.6% APY', 'Claim $72'],
+          ['sUSDe Yield · Ethena', 'Vault', '$5,000', '17.5% APY', 'Compound']
+        ]
+      },
+      'Gas & Slippage Config': {
+        subtitle: 'MEV-protected private RPC endpoints, priority gas ceilings and slippage guardrails',
+        cta: 'Save Execution Profile',
+        isSettings: true,
+        kpis: [
+          { lbl: 'Ethereum Base Fee', val: '11.8 gwei', sub: 'Swap ~$1.42 USD', accent: 'text-cyan-300' },
+          { lbl: 'Max Slippage Cap', val: '0.50%', sub: 'Auto-Revert Guard', accent: 'text-emerald-300' },
+          { lbl: 'MEV Blocker', val: 'Flashbots', sub: '0 Sandwich Hits', accent: 'text-indigo-300' },
+          { lbl: 'RPC Node Latency', val: '14 ms', sub: 'Alchemy Dedicated', accent: 'text-pink-300' }
+        ],
+        chartTitle: '24-Hour Gwei Base Fee Curve',
+        pts: [64, 48, 36, 52, 74, 44, 32],
+        xLabels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'LIVE']
+      }
+    };
+
+    function renderCryptoSubpage(section) {
+      const cfg = CRYPTO_SUBPAGES[section];
+      if (!cfg) return;
+      const box = document.getElementById('tabSubpageView');
+
+      const W = 440, H = 175, padL = 24, padR = 24, padT = 20, padB = 30;
+      const pW = W - padL - padR, pH = H - padT - padB;
+      const mapX = (i) => padL + (i / (cfg.pts.length - 1)) * pW;
+      const mapY = (v) => padT + pH - (v / 100) * pH;
+      const pathD = cfg.pts.map((v, i) => `${i === 0 ? 'M' : 'L'} ${mapX(i).toFixed(1)} ${mapY(v).toFixed(1)}`).join(' ');
+      const areaD = `${pathD} L ${mapX(cfg.pts.length - 1).toFixed(1)} ${padT + pH} L ${padL} ${padT + pH} Z`;
+
+      const rightCard = cfg.isSettings
+        ? `
+          <div class="neon-card p-5 lg:col-span-7 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-300">On-Chain Execution &amp; MEV Guardrails</h3>
+              <span class="rounded-lg bg-emerald-500/15 border border-emerald-400/30 px-2.5 py-0.5 font-mono text-xs text-emerald-300">Flashbots Protect ON</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="cyber-input p-3.5">
+                <label class="block text-slate-400 mb-1.5">Max Slippage Tolerance (%)</label>
+                <input type="number" step="0.1" value="0.5" onchange="showPulseToast('Slippage tolerance updated to ' + this.value + '%')" class="bg-transparent font-mono text-sm font-bold text-white w-full focus:outline-none"/>
+              </div>
+              <div class="cyber-input p-3.5">
+                <label class="block text-slate-400 mb-1.5">Priority Gas Tip (Gwei)</label>
+                <input type="number" step="0.5" value="1.5" onchange="showPulseToast('Priority fee updated to ' + this.value + ' gwei')" class="bg-transparent font-mono text-sm font-bold text-cyan-300 w-full focus:outline-none"/>
+              </div>
+            </div>
+            <div class="divide-y divide-indigo-500/20 text-xs">
+              <label class="py-2.5 flex items-center justify-between cursor-pointer">
+                <span class="text-slate-200 font-medium">Private Mempool Routing (Zero Front-Running)</span>
+                <input type="checkbox" checked onchange="showPulseToast('Toggled Private Mempool Routing')" class="h-4 w-4 accent-cyan-400 cursor-pointer"/>
+              </label>
+              <label class="py-2.5 flex items-center justify-between cursor-pointer">
+                <span class="text-slate-200 font-medium">Auto-Revoke Unused Token Approvals (&gt; 30 Days)</span>
+                <input type="checkbox" checked onchange="showPulseToast('Toggled Auto-Revoke Guard')" class="h-4 w-4 accent-cyan-400 cursor-pointer"/>
+              </label>
+              <label class="py-2.5 flex items-center justify-between cursor-pointer">
+                <span class="text-slate-200 font-medium">Simulate Transaction Bundle Before Hardware Sign</span>
+                <input type="checkbox" checked onchange="showPulseToast('Toggled Pre-Sign Bundle Simulation')" class="h-4 w-4 accent-cyan-400 cursor-pointer"/>
+              </label>
+            </div>
+            <button onclick="showPulseToast('Saved Gas, Slippage & Private RPC Configuration')" class="place-order-btn rounded-xl py-2.5 px-4 text-xs font-display font-bold text-white cursor-pointer">Apply Router Settings</button>
+          </div>
+        `
+        : `
+          <div class="neon-card p-5 lg:col-span-7 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">${cfg.tableTitle}</h3>
+              <span class="font-mono text-xs text-cyan-300">REAL-TIME FEED</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-indigo-500/20 text-xs font-semibold text-slate-400">
+                    <th class="pb-2.5">${cfg.cols[0]}</th>
+                    <th class="pb-2.5">${cfg.cols[1]}</th>
+                    <th class="pb-2.5">${cfg.cols[2]}</th>
+                    <th class="pb-2.5">${cfg.cols[3]}</th>
+                    <th class="pb-2.5 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-500/15 text-xs sm:text-sm">
+                  ${cfg.rows.map((r) => `
+                    <tr class="hover:bg-white/5 transition">
+                      <td class="py-2.5 font-semibold text-white">${r[0]}</td>
+                      <td class="py-2.5 text-slate-300">${r[1]}</td>
+                      <td class="py-2.5 font-mono text-cyan-200">${r[2]}</td>
+                      <td class="py-2.5 font-mono font-bold text-emerald-400">${r[3]}</td>
+                      <td class="py-2.5 text-right">
+                        <button onclick="showPulseToast('${r[4]} -> ${r[0]}')" class="rounded-lg border border-cyan-400/40 bg-cyan-400/15 px-2.5 py-1 text-xs font-mono font-bold text-cyan-200 hover:bg-cyan-400/25 cursor-pointer">${r[4]}</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+      box.innerHTML = `
+        <div class="neon-card p-4 sm:px-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <button onclick="returnToCryptoOverview()" class="cyber-input px-3 py-1.5 text-xs font-semibold text-cyan-300 hover:border-cyan-400 inline-flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+                <span>← Overview</span>
+              </button>
+              <h1 class="font-display text-xl font-bold text-white tracking-tight">${section}</h1>
+            </div>
+            <p class="text-xs text-slate-300 mt-1.5">${cfg.subtitle}</p>
+          </div>
+          <button onclick="showPulseToast('${cfg.cta} executed on-chain')" class="place-order-btn rounded-xl px-4 py-2 text-xs font-display font-bold text-white cursor-pointer">
+            ${cfg.cta}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+          ${cfg.kpis.map((k) => `
+            <div class="neon-card p-4 flex flex-col justify-between">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-300">${k.lbl}</p>
+              <p class="font-display text-2xl font-bold text-white mt-1.5">${k.val}</p>
+              <p class="text-xs font-mono ${k.accent} mt-1">${k.sub}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+          <div class="neon-card p-5 lg:col-span-5 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">${cfg.chartTitle}</h3>
+              <span class="font-mono text-xs text-pink-300">LIVE TELEMETRY</span>
+            </div>
+            <svg viewBox="0 0 ${W} ${H}" class="w-full h-44 overflow-visible">
+              <defs>
+                <linearGradient id="subNeonArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.30"/>
+                  <stop offset="100%" stop-color="#EC4899" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <line x1="${padL}" y1="${padT + pH}" x2="${W - padR}" y2="${padT + pH}" stroke="rgba(99,102,241,0.25)" stroke-width="1"/>
+              <path d="${areaD}" fill="url(#subNeonArea)"/>
+              <path d="${pathD}" fill="none" stroke="#22D3EE" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" class="neon-wave-draw"/>
+              ${cfg.pts.map((v, i) => `
+                <circle cx="${mapX(i).toFixed(1)}" cy="${mapY(v).toFixed(1)}" r="3.5" fill="#EC4899" stroke="#FFFFFF" stroke-width="1.5"/>
+                <text x="${mapX(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#94A3B8" font-family="JetBrains Mono, monospace" font-size="12">${cfg.xLabels[i]}</text>
+              `).join('')}
+            </svg>
+          </div>
+          ${rightCard}
+        </div>
+      `;
+    }
+
+    function returnToCryptoOverview() {
+      const btn = document.querySelector('.rail-icon-btn[data-rail="Portfolio Telemetry"]');
+      selectRail(btn, 'Portfolio Telemetry');
+    }
+
+    function selectRail(btn, section) {
+      document.querySelectorAll('.rail-icon-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+      if (section === 'Portfolio Telemetry') {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderCryptoSubpage(section);
+      }
+      showPulseToast('Active Module: ' + section);
+    }
+
+    let pTimer = null;
+    function showPulseToast(msg) {
+      const el = document.getElementById('pulseToast');
+      document.getElementById('pulseToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      el.classList.add('opacity-100', 'translate-y-0');
+      if (pTimer) clearTimeout(pTimer);
+      pTimer = setTimeout(() => {
+        el.classList.remove('opacity-100', 'translate-y-0');
+        el.classList.add('opacity-0', 'translate-y-3');
+      }, 2400);
+    }
+
+    renderNeonWaveform();
+    filterHoldingsTable();
+    renderRecentTxs();
+  </script>
+</body>
+</html>

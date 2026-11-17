@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="card21" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="55%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="#F4F6FA"/>
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="148" height="450" fill="#FFFFFF"/>
+  <line x1="148" y1="0" x2="148" y2="450" stroke="#E2E8F0"/>
+  <rect x="16" y="80" width="116" height="28" rx="8" fill="#EFF6FF"/>
+  <rect x="28" y="91" width="68" height="6" rx="3" fill="#1D4ED8"/>
+  <rect x="28" y="126" width="58" height="6" rx="3" fill="#64748B"/>
+  <rect x="28" y="152" width="72" height="6" rx="3" fill="#64748B"/>
+  <rect x="28" y="178" width="62" height="6" rx="3" fill="#64748B"/>
+  <!-- Header -->
+  <text x="774" y="84" text-anchor="end" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#64748B">Financial Cards + Transactions + Cashflow</text>
+
+  <!-- Metallic Bank Card -->
+  <rect x="172" y="104" width="268" height="156" rx="18" fill="url(#card21)"/>
+  <rect x="194" y="132" width="32" height="24" rx="5" fill="#FBBF24" fill-opacity="0.88"/>
+  <text x="368" y="142" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="#93C5FD">INFINITE</text>
+  <text x="194" y="196" font-family="monospace" font-size="15" font-weight="700" fill="#FFFFFF">4829  ••••  ••••  9014</text>
+  <text x="194" y="232" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#CBD5E1">CLAIRE MOREAU</text>
+  <text x="372" y="232" font-family="monospace" font-size="11" fill="#CBD5E1">08/29</text>
+
+  <!-- Balance + Cashflow Chart -->
+  <rect x="454" y="104" width="324" height="156" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="474" y="130" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#64748B">TOTAL AVAILABLE BALANCE</text>
+  <text x="474" y="158" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="800" fill="#0F172A">$184,620.50</text>
+  <!-- Income vs Spend Dual Bars -->
+  <g transform="translate(474, 174)">
+    <rect x="0" y="26" width="14" height="44" rx="4" fill="#1D4ED8"/><rect x="17" y="42" width="14" height="28" rx="4" fill="#CBD5E1"/>
+    <rect x="52" y="18" width="14" height="52" rx="4" fill="#1D4ED8"/><rect x="69" y="38" width="14" height="32" rx="4" fill="#CBD5E1"/>
+    <rect x="104" y="12" width="14" height="58" rx="4" fill="#1D4ED8"/><rect x="121" y="34" width="14" height="36" rx="4" fill="#CBD5E1"/>
+    <rect x="156" y="6" width="14" height="64" rx="4" fill="#059669"/><rect x="173" y="30" width="14" height="40" rx="4" fill="#CBD5E1"/>
+    <rect x="208" y="2" width="14" height="68" rx="4" fill="#1D4ED8"/><rect x="225" y="28" width="14" height="42" rx="4" fill="#CBD5E1"/>
+  </g>
+
+  <!-- Transactions Ledger -->
+  <rect x="172" y="274" width="606" height="156" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="194" y="302" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0F172A">Recent Transactions</text>
+  <circle cx="204" cy="332" r="11" fill="#ECFDF5"/><text x="224" y="336" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Stripe Merchant Settlement</text><text x="682" y="336" font-family="monospace" font-size="12" font-weight="700" fill="#059669">+$18,400.00</text>
+  <line x1="192" y1="352" x2="758" y2="352" stroke="#F1F5F9"/>
+  <circle cx="204" cy="372" r="11" fill="#EFF6FF"/><text x="224" y="376" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Amazon Web Services Cloud</text><text x="688" y="376" font-family="monospace" font-size="12" font-weight="700" fill="#0F172A">-$2,140.00</text>
+  <line x1="192" y1="392" x2="758" y2="392" stroke="#F1F5F9"/>
+  <circle cx="204" cy="410" r="11" fill="#FEF2F2"/><text x="224" y="414" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Apple Store Corporate Hardware</text><text x="688" y="414" font-family="monospace" font-size="12" font-weight="700" fill="#0F172A">-$1,999.00</text>
+</svg>

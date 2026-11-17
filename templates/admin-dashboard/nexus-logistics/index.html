@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ORBITAL FREIGHT — Global Multimodal Supply Chain &amp; Autonomous Fleet OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            daylight: '#F3F5F8',
+            maritime: '#0F172A',
+            cobalt: '#2563EB',
+            signalOrange: '#EA580C',
+            emeraldSafe: '#059669',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #F3F5F8;
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 65% 50% at 12% 4%, rgba(37, 99, 235, 0.06), transparent 70%),
+        radial-gradient(ellipse 55% 45% at 90% 10%, rgba(234, 88, 12, 0.05), transparent 65%),
+        linear-gradient(180deg, #F6F8FB 0%, #EFF2F7 100%);
+      background-attachment: fixed;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .arch-glass {
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 18px 42px -10px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(148, 163, 184, 0.18);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    .arch-glass:hover {
+      box-shadow: 0 22px 48px -12px rgba(15, 23, 42, 0.10), 0 0 0 1px rgba(148, 163, 184, 0.26);
+    }
+    .arch-sidebar {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 12px 0 36px -14px rgba(15, 23, 42, 0.06);
+    }
+    .arch-topbar {
+      background: rgba(243, 245, 248, 0.84);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    }
+    @keyframes routeDash {
+      to {
+        stroke-dashoffset: -56;
+      }
+    }
+    .corridor-arc {
+      stroke-dasharray: 7 6;
+      animation: routeDash 2.1s linear infinite;
+    }
+    .iot-stream-dash {
+      stroke-dasharray: 6 6;
+      animation: routeDash 1.7s linear infinite;
+    }
+    @keyframes radarPing {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.85;
+      }
+      100% {
+        transform: scale(2.3);
+        opacity: 0;
+      }
+    }
+    .port-pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: radarPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .iot-stage-card {
+      transition: all 0.2s ease;
+    }
+    .iot-stage-card.active {
+      background: #FFFFFF;
+      border-color: #2563EB;
+      box-shadow: 0 14px 30px -10px rgba(37, 99, 235, 0.18), 0 0 0 1px rgba(37, 99, 235, 0.25);
+    }
+    .sidebar-collapsed .sidebar-text {
+      display: none;
+    }
+    .sidebar-collapsed .sidebar-brand-wrap {
+      justify-content: center;
+    }
+    .sidebar-collapsed .nav-btn {
+      justify-content: center;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F3F5F8;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.28);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex text-maritime selection:bg-cobalt/15 selection:text-cobalt">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 bg-slate-900/35 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleMobileNav()"></div>
+
+  <!-- Collapsible Frosted Daylight Sidebar -->
+  <aside id="sidebar" class="arch-sidebar fixed lg:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 flex flex-col justify-between transition-all duration-300 -translate-x-full lg:translate-x-0">
+    <div>
+      <!-- Brand Header -->
+      <div class="h-16 px-4 flex items-center justify-between border-b border-slate-200/80 sidebar-brand-wrap">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-maritime text-white flex items-center justify-center shrink-0 shadow-md shadow-slate-900/15">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(-24 12 12)"></ellipse>
+              <circle cx="17.5" cy="9.5" r="1.6" fill="#EA580C" stroke="none"></circle>
+            </svg>
+          </div>
+          <div class="sidebar-text truncate">
+            <div class="font-display font-bold tracking-tight text-sm text-maritime leading-none">ORBITAL FREIGHT</div>
+            <div class="font-mono text-xs text-slate-500 tracking-widest uppercase mt-1">Multimodal OS 6.2</div>
+          </div>
+        </div>
+        <button onclick="toggleSidebar()" title="Collapse Sidebar" class="hidden lg:flex w-7 h-7 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 items-center justify-center text-slate-500 hover:text-maritime transition">
+          <svg id="sidebarChevron" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Sidebar Links -->
+      <div class="p-3 space-y-1">
+        <div class="sidebar-text px-3 pt-2 pb-1.5 text-xs font-mono uppercase tracking-widest text-slate-400">Operations Grid</div>
+
+        <button data-nav="Command Tower" onclick="activateNav(this, 'Command Tower')" class="nav-btn w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-cobalt text-white shadow-md shadow-cobalt/20 transition">
+          <span class="flex items-center gap-3 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            <span class="sidebar-text truncate">Command Tower</span>
+          </span>
+          <span id="cmdLiveBadge" class="sidebar-text font-mono text-xs px-1.5 py-0.5 rounded bg-white/20 text-white">LIVE</span>
+        </button>
+
+        <button data-nav="Live Corridors" onclick="activateNav(this, 'Live Corridors')" class="nav-btn w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-maritime hover:bg-slate-100/80 transition">
+          <span class="flex items-center gap-3 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <circle cx="6" cy="19" r="3"></circle>
+              <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path>
+              <circle cx="18" cy="5" r="3"></circle>
+            </svg>
+            <span class="sidebar-text truncate">Live Corridors</span>
+          </span>
+          <span class="sidebar-text font-mono text-xs px-1.5 py-0.5 rounded bg-orange-50 text-signalOrange border border-orange-200">14</span>
+        </button>
+
+        <button data-nav="EV Autonomous Fleet" onclick="activateNav(this, 'EV Autonomous Fleet')" class="nav-btn w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-maritime hover:bg-slate-100/80 transition">
+          <span class="flex items-center gap-3 min-w-0">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <rect x="1" y="3" width="15" height="13" rx="2"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <span class="sidebar-text truncate">EV Autonomous Fleet</span>
+          </span>
+          <span class="sidebar-text font-mono text-xs text-emeraldSafe font-semibold">91.4%</span>
+        </button>
+
+        <button data-nav="Cold-Chain IoT" onclick="activateNav(this, 'Cold-Chain IoT')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-maritime hover:bg-slate-100/80 transition">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+          </svg>
+          <span class="sidebar-text truncate">Cold-Chain IoT</span>
+        </button>
+
+        <button data-nav="Warehouse Robotics" onclick="activateNav(this, 'Warehouse Robotics')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-maritime hover:bg-slate-100/80 transition">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <span class="sidebar-text truncate">Warehouse Robotics</span>
+        </button>
+
+        <button data-nav="Customs" onclick="activateNav(this, 'Customs')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-maritime hover:bg-slate-100/80 transition">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span class="sidebar-text truncate">Customs</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Satellite & Port Telemetry Status Footer -->
+    <div class="p-3 border-t border-slate-200/80">
+      <div class="sidebar-text rounded-xl p-3 bg-slate-50/90 border border-slate-200/80 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[12.5px] font-semibold text-maritime flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emeraldSafe animate-pulse"></span>
+            LEO AIS Mesh Online
+          </span>
+          <span class="font-mono text-xs text-cobalt font-semibold">42ms</span>
+        </div>
+        <div class="text-[12.5px] text-slate-500 leading-snug">
+          312 Vessels · 1,140 L4 EV Tractors · 0 Thermal Breaches
+        </div>
+      </div>
+      <div class="mt-2.5 flex items-center gap-2.5 px-2 py-1">
+        <div class="w-8 h-8 rounded-full bg-maritime text-white flex items-center justify-center font-display font-bold text-xs shrink-0">
+          MK
+        </div>
+        <div class="sidebar-text min-w-0">
+          <div class="text-xs font-semibold text-maritime truncate">Marcus Lindqvist</div>
+          <div class="text-[12.5px] text-slate-500 truncate">VP Global Network Ops</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Topbar with Corridor Filter & Container Search -->
+    <header class="arch-topbar sticky top-0 z-30 h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <button onclick="toggleMobileNav()" class="lg:hidden w-9 h-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-maritime">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="navTitleDisplay" class="font-display font-bold text-base sm:text-lg text-maritime truncate">Command Tower</span>
+          <span class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-emerald-50 text-emeraldSafe border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emeraldSafe"></span>
+            UTC 10:50 · ZERO PORT CONGESTION ALERTS
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 sm:gap-3.5">
+        <!-- Corridor Filter Pills -->
+        <div class="hidden md:flex items-center p-1 rounded-xl bg-slate-200/65 border border-slate-300/60" role="group" aria-label="Corridor Filter">
+          <button onclick="setCorridor('All Global')" data-corridor="All Global" class="corridor-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-maritime shadow-sm transition">All Global</button>
+          <button onclick="setCorridor('Trans-Pacific')" data-corridor="Trans-Pacific" class="corridor-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition">Trans-Pacific</button>
+          <button onclick="setCorridor('Asia–Europe')" data-corridor="Asia–Europe" class="corridor-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition">Asia–Europe</button>
+          <button onclick="setCorridor('North America')" data-corridor="North America" class="corridor-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition">North America</button>
+        </div>
+
+        <!-- Container Search -->
+        <div class="relative">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="globalContainerSearch"
+            type="text"
+            oninput="syncManifestSearch(this.value)"
+            placeholder="Search container ID (ORBU-...)"
+            class="pl-9 pr-3 py-1.5 rounded-xl bg-white border border-slate-200/90 text-xs font-mono text-maritime placeholder:text-slate-400 focus:outline-none focus:border-cobalt w-44 sm:w-60 shadow-sm"
+          />
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Corridor Selector -->
+    <div class="md:hidden px-4 pt-3">
+      <select onchange="setCorridor(this.value)" class="w-full rounded-xl bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-maritime">
+        <option value="All Global">Corridor: All Global</option>
+        <option value="Trans-Pacific">Corridor: Trans-Pacific</option>
+        <option value="Asia–Europe">Corridor: Asia–Europe</option>
+        <option value="North America">Corridor: North America</option>
+      </select>
+    </div>
+
+    <!-- Main Dashboard Canvas -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 space-y-6 max-w-[1600px] w-full mx-auto">
+
+      <div id="defaultDashboardView" class="space-y-6">
+      <!-- HERO ROW: Interactive Global SVG Shipping & Air Corridor Map + Architectural Glass Visual Banner -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+        <!-- Interactive Global SVG Corridor Map Bento (8 cols) -->
+        <div class="xl:col-span-8 arch-glass rounded-2xl p-6 flex flex-col justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold uppercase tracking-wider bg-cobalt/10 text-cobalt">Multimodal AIS + ADS-B Vector Grid</span>
+                <span id="activeCorridorPill" class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-orange-50 text-signalOrange border border-orange-200">All Global Corridors</span>
+              </div>
+              <h1 class="font-display text-xl sm:text-2xl font-bold text-maritime mt-1">
+                Live Global Maritime &amp; Autonomous Air-Sea Corridor Map
+              </h1>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-mono text-slate-500">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-signalOrange"></span>
+                Active Transit Vector
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-cobalt"></span>
+                Deep-Water Hub
+              </span>
+            </div>
+          </div>
+
+          <!-- Interactive Global Corridor Map SVG -->
+          <div class="relative rounded-2xl bg-gradient-to-b from-[#E9EEF5] to-[#DFE6F0] border border-slate-300/60 overflow-hidden p-2 sm:p-3">
+            <svg id="corridorMapSvg" class="w-full h-[255px] sm:h-[290px]" viewBox="0 0 920 360" fill="none">
+              <defs>
+                <pattern id="latLonGrid" width="46" height="45" patternUnits="userSpaceOnUse">
+                  <path d="M 46 0 L 0 0 0 45" fill="none" stroke="rgba(15, 23, 42, 0.05)" stroke-width="1"/>
+                </pattern>
+                <filter id="orangeGlow" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="3" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Precision Coordinate Grid -->
+              <rect width="920" height="360" fill="url(#latLonGrid)"/>
+
+              <!-- Stylized Minimalist World Continents Silhouette -->
+              <!-- North America -->
+              <path d="M 78 68 L 195 58 L 248 96 L 236 154 L 188 186 L 154 205 L 116 172 L 74 118 Z" fill="#CBD5E1" fill-opacity="0.72" stroke="#94A3B8" stroke-width="1"/>
+              <!-- South America -->
+              <path d="M 196 218 L 256 232 L 274 282 L 240 342 L 208 334 L 192 268 Z" fill="#CBD5E1" fill-opacity="0.65" stroke="#94A3B8" stroke-width="1"/>
+              <!-- Europe -->
+              <path d="M 412 64 L 516 52 L 542 98 L 496 136 L 424 134 L 398 98 Z" fill="#CBD5E1" fill-opacity="0.75" stroke="#94A3B8" stroke-width="1"/>
+              <!-- Africa -->
+              <path d="M 418 152 L 518 150 L 552 214 L 516 312 L 466 316 L 434 242 L 406 192 Z" fill="#CBD5E1" fill-opacity="0.65" stroke="#94A3B8" stroke-width="1"/>
+              <!-- Asia -->
+              <path d="M 548 58 L 762 62 L 812 128 L 768 198 L 694 226 L 626 196 L 562 146 Z" fill="#CBD5E1" fill-opacity="0.75" stroke="#94A3B8" stroke-width="1"/>
+              <!-- Australia -->
+              <path d="M 726 258 L 818 254 L 832 308 L 762 324 L 718 296 Z" fill="#CBD5E1" fill-opacity="0.65" stroke="#94A3B8" stroke-width="1"/>
+
+              <!-- CORRIDOR ARCS: Shenzhen (742,162) -> Singapore (692,226) -> Rotterdam (446,102) -> New York (224,126) + Trans-Pacific LA (118,148) -->
+
+              <!-- Route 1: Asia-Europe (Shenzhen -> Singapore -> Rotterdam) -->
+              <g id="arcAsiaEurope" class="transition-opacity duration-300">
+                <path id="pathSzSgRtm" d="M 742 162 Q 726 204 692 226 C 605 268, 492 198, 446 102" stroke="rgba(37, 99, 235, 0.25)" stroke-width="4" fill="none"/>
+                <path d="M 742 162 Q 726 204 692 226 C 605 268, 492 198, 446 102" stroke="#EA580C" stroke-width="2.4" class="corridor-arc" fill="none"/>
+                <circle r="4.5" fill="#EA580C" filter="url(#orangeGlow)">
+                  <animateMotion dur="5.2s" repeatCount="indefinite" path="M 742 162 Q 726 204 692 226 C 605 268, 492 198, 446 102"/>
+                </circle>
+                <circle r="4" fill="#2563EB">
+                  <animateMotion dur="5.2s" begin="2.6s" repeatCount="indefinite" path="M 742 162 Q 726 204 692 226 C 605 268, 492 198, 446 102"/>
+                </circle>
+              </g>
+
+              <!-- Route 2: North Atlantic & North America (Rotterdam -> New York -> Los Angeles EV Rail) -->
+              <g id="arcNorthAmerica" class="transition-opacity duration-300">
+                <path d="M 446 102 Q 335 66 224 126 L 118 148" stroke="rgba(37, 99, 235, 0.25)" stroke-width="4" fill="none"/>
+                <path d="M 446 102 Q 335 66 224 126 L 118 148" stroke="#2563EB" stroke-width="2.4" class="corridor-arc" fill="none"/>
+                <circle r="4.5" fill="#2563EB">
+                  <animateMotion dur="4.4s" repeatCount="indefinite" path="M 446 102 Q 335 66 224 126 L 118 148"/>
+                </circle>
+              </g>
+
+              <!-- Route 3: Trans-Pacific Air & Ultra-Fast Sea Arc (Shenzhen -> Los Angeles / New York) -->
+              <g id="arcTransPacific" class="transition-opacity duration-300">
+                <path d="M 742 162 C 610 34, 285 36, 118 148" stroke="rgba(234, 88, 12, 0.20)" stroke-width="3.5" fill="none"/>
+                <path d="M 742 162 C 610 34, 285 36, 118 148" stroke="#EA580C" stroke-width="2.2" class="corridor-arc" fill="none"/>
+                <circle r="4.5" fill="#EA580C" filter="url(#orangeGlow)">
+                  <animateMotion dur="4.8s" begin="1.1s" repeatCount="indefinite" path="M 742 162 C 610 34, 285 36, 118 148"/>
+                </circle>
+              </g>
+
+              <!-- CLICKABLE PORT HUB TELEMETRY NODES -->
+              <!-- Shenzhen -->
+              <g onclick="selectPort('shenzhen')" class="cursor-pointer">
+                <circle cx="742" cy="162" r="11" fill="rgba(234, 88, 12, 0.25)" class="port-pulse"/>
+                <circle cx="742" cy="162" r="6" fill="#EA580C" stroke="#FFFFFF" stroke-width="2"/>
+                <rect x="752" y="149" width="76" height="22" rx="6" fill="#0F172A" fill-opacity="0.88"/>
+                <text x="790" y="164" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono" font-size="10" font-weight="600">SHENZHEN</text>
+              </g>
+
+              <!-- Singapore -->
+              <g onclick="selectPort('singapore')" class="cursor-pointer">
+                <circle cx="692" cy="226" r="11" fill="rgba(37, 99, 235, 0.25)" class="port-pulse"/>
+                <circle cx="692" cy="226" r="6" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+                <rect x="702" y="216" width="80" height="22" rx="6" fill="#0F172A" fill-opacity="0.88"/>
+                <text x="742" y="231" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono" font-size="10" font-weight="600">SINGAPORE</text>
+              </g>
+
+              <!-- Rotterdam -->
+              <g onclick="selectPort('rotterdam')" class="cursor-pointer">
+                <circle cx="446" cy="102" r="11" fill="rgba(37, 99, 235, 0.25)" class="port-pulse"/>
+                <circle cx="446" cy="102" r="6" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+                <rect x="456" y="88" width="82" height="22" rx="6" fill="#0F172A" fill-opacity="0.88"/>
+                <text x="497" y="103" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono" font-size="10" font-weight="600">ROTTERDAM</text>
+              </g>
+
+              <!-- New York -->
+              <g onclick="selectPort('newyork')" class="cursor-pointer">
+                <circle cx="224" cy="126" r="11" fill="rgba(5, 150, 105, 0.25)" class="port-pulse"/>
+                <circle cx="224" cy="126" r="6" fill="#059669" stroke="#FFFFFF" stroke-width="2"/>
+                <rect x="234" y="115" width="76" height="22" rx="6" fill="#0F172A" fill-opacity="0.88"/>
+                <text x="272" y="130" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono" font-size="10" font-weight="600">NEW YORK</text>
+              </g>
+
+              <!-- Los Angeles -->
+              <g onclick="selectPort('losangeles')" class="cursor-pointer">
+                <circle cx="118" cy="148" r="9" fill="rgba(234, 88, 12, 0.22)" class="port-pulse"/>
+                <circle cx="118" cy="148" r="5.5" fill="#EA580C" stroke="#FFFFFF" stroke-width="2"/>
+                <rect x="30" y="138" width="80" height="20" rx="6" fill="#0F172A" fill-opacity="0.82"/>
+                <text x="70" y="152" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono" font-size="9.5" font-weight="600">PORT OF LA</text>
+              </g>
+            </svg>
+
+            <!-- Clickable Port Live Telemetry Overlay Bar -->
+            <div class="mt-2 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-cobalt/10 text-cobalt flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div>
+                  <div id="portNameLabel" class="font-display font-bold text-sm text-maritime">PSA Singapore Automated Megaport (SGSIN)</div>
+                  <div id="portSubLabel" class="font-mono text-[12.5px] text-slate-500">Click any hub on map · Automated AGV Quay Cranes: 48/48 Active</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-5 font-mono text-xs tabular-nums">
+                <div>
+                  <span class="text-slate-400 block text-xs">BERTH DWELL</span>
+                  <span id="portDwell" class="font-semibold text-maritime">4.2 hrs</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-xs">VESSEL SPEED</span>
+                  <span id="portKnots" class="font-semibold text-cobalt">21.4 kn</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-xs">REEFER TEMP</span>
+                  <span id="portTemp" class="font-semibold text-emeraldSafe">-18.4°C</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architectural Glass Visual Banner & Autonomous EV Dispatch Card (4 cols) -->
+        <div class="xl:col-span-4 arch-glass rounded-2xl overflow-hidden flex flex-col justify-between">
+          <!-- Embedded Architectural Glass Visual Art -->
+          <div class="relative h-48 overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-cobalt/80">
+            <img
+              src="/templates/assets/archglass-visual.jpg"
+              onerror="if(!this.dataset.rel){this.dataset.rel='1';this.src='../../assets/archglass-visual.jpg';}else{this.style.opacity='0';}"
+              alt="Orbital Freight Architectural Glass Control Tower"
+              class="w-full h-full object-cover object-center opacity-80 mix-blend-overlay scale-105"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-maritime/90 via-maritime/35 to-transparent"></div>
+
+            <div class="absolute top-4 left-4 right-4 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-white/90 text-maritime font-semibold shadow-sm">
+                Digital Twin Control
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono bg-emeraldSafe text-white font-semibold">
+                L4 AUTONOMOUS
+              </span>
+            </div>
+
+            <div class="absolute bottom-4 left-4 right-4 text-white">
+              <div class="font-mono text-[12.5px] text-slate-300">Shenzhen -> Singapore -> Rotterdam -> NY</div>
+              <h2 class="font-display text-lg font-bold leading-snug mt-0.5">Zero-Touch Intermodal Port &amp; EV Convoy Sync</h2>
+            </div>
+          </div>
+
+          <!-- Telemetry Metrics & Dispatch Trigger -->
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-xl p-3 bg-slate-50/90 border border-slate-200/80">
+                <div class="text-[12.5px] text-slate-500">EV Megawatt Chargers</div>
+                <div class="font-display font-bold text-lg text-maritime tabular-nums mt-0.5">142 / 148</div>
+                <div class="font-mono text-xs text-emeraldSafe mt-0.5">1.2 MW Peak Grid</div>
+              </div>
+              <div class="rounded-xl p-3 bg-slate-50/90 border border-slate-200/80">
+                <div class="text-[12.5px] text-slate-500">CO2e Saved (30d)</div>
+                <div class="font-display font-bold text-lg text-maritime tabular-nums mt-0.5">1,840 t</div>
+                <div class="font-mono text-xs text-cobalt mt-0.5">-34.2% vs Diesel</div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-600 font-medium">Rotterdam Gate-to-Autobahn Convoy #19</span>
+                <span class="font-mono text-xs font-semibold text-signalOrange tabular-nums">ETA 14m</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div class="h-full w-[84%] rounded-full bg-gradient-to-r from-cobalt to-signalOrange"></div>
+              </div>
+            </div>
+
+            <button onclick="triggerConvoyReroute()" class="w-full py-2.5 px-4 rounded-xl font-display font-semibold text-xs sm:text-sm text-white bg-maritime hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-md shadow-slate-900/10">
+              <svg class="w-4 h-4 text-signalOrange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              <span>Optimize Weather &amp; Berth Slot AI</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 SOFT-GLASS KPI CARDS WITH SPARKLINES -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <!-- KPI 1: Active Containers in Transit -->
+        <div class="arch-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slate-500">Active Containers in Transit</span>
+              <div id="kpiTeu" class="font-display text-2xl sm:text-[26px] font-bold text-maritime tabular-nums mt-1.5 tracking-tight">
+                4,280 TEU
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-blue-50 text-cobalt border border-blue-200">
+              +6.4%
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <span class="font-mono text-[12.5px] text-slate-500">99.4% RFID Locked</span>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <defs>
+                <linearGradient id="teuGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2563EB" stop-opacity="0.26"/>
+                  <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 31 L20 27 L38 28 L56 19 L74 17 L92 11 L110 6 L110 37 L2 37 Z" fill="url(#teuGrad)"/>
+              <path d="M2 31 L20 27 L38 28 L56 19 L74 17 L92 11 L110 6" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="110" cy="6" r="3" fill="#2563EB"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- KPI 2: On-Time Delivery SLA -->
+        <div class="arch-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slate-500">On-Time Delivery SLA</span>
+              <div id="kpiSla" class="font-display text-2xl sm:text-[26px] font-bold text-maritime tabular-nums mt-1.5 tracking-tight">
+                98.6%
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-emerald-50 text-emeraldSafe border border-emerald-200">
+              +2.1%
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <span class="font-mono text-[12.5px] text-slate-500">AI ETA +/- 18 min</span>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <defs>
+                <linearGradient id="slaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#059669" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#059669" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 29 L22 26 L42 22 L62 18 L82 12 L110 7 L110 37 L2 37 Z" fill="url(#slaGrad)"/>
+              <path d="M2 29 L22 26 L42 22 L62 18 L82 12 L110 7" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="110" cy="7" r="3" fill="#059669"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- KPI 3: Autonomous EV Fleet Charge -->
+        <div class="arch-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slate-500">Autonomous EV Fleet Charge</span>
+              <div id="kpiEv" class="font-display text-2xl sm:text-[26px] font-bold text-maritime tabular-nums mt-1.5 tracking-tight">
+                91.4%
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-orange-50 text-signalOrange border border-orange-200">
+              640 km Avg
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <span class="font-mono text-[12.5px] text-slate-500">1,140 Active Units</span>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <path d="M2 24 L20 18 L38 21 L56 13 L74 15 L92 10 L110 8" stroke="#EA580C" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="110" cy="8" r="3" fill="#EA580C"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- KPI 4: Cold-Chain Integrity -->
+        <div class="arch-glass rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-medium text-slate-500">Cold-Chain Integrity</span>
+              <div class="font-display text-xl sm:text-2xl font-bold text-maritime tabular-nums mt-1.5 tracking-tight">
+                <span class="font-mono">-18.4°C</span> <span class="text-sm font-semibold text-emeraldSafe">· 100% Safe</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold bg-emerald-50 text-emeraldSafe border border-emerald-200">
+              ISO 23412
+            </span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <span class="font-mono text-[12.5px] text-slate-500">Biopharma &amp; Reefer</span>
+            <svg class="w-28 h-10 overflow-visible" viewBox="0 0 112 38" fill="none">
+              <path d="M2 19 L22 18 L44 19 L66 18 L88 19 L110 18" stroke="#059669" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="110" cy="18" r="3" fill="#059669"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUPPLY CHAIN IOT DATA FLOW PIPELINE -->
+      <section class="arch-glass rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <span class="font-mono text-[12.5px] uppercase tracking-widest text-cobalt font-semibold">Kinetic Supply Chain Telemetry</span>
+            <h2 class="font-display text-lg sm:text-xl font-bold text-maritime mt-0.5">
+              End-to-End Supply Chain IoT Data Flow Pipeline
+            </h2>
+          </div>
+          <span class="font-mono text-xs text-slate-500">Select any stage to inspect live sensor &amp; customs automation feed</span>
+        </div>
+
+        <!-- Animated Kinetic SVG Data Stream -->
+        <div class="hidden lg:block px-6 mb-2">
+          <svg class="w-full h-14 overflow-visible" viewBox="0 0 1100 56" fill="none">
+            <defs>
+              <linearGradient id="iotPipeGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#2563EB"/>
+                <stop offset="52%" stop-color="#EA580C"/>
+                <stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+            </defs>
+            <path d="M 95 28 C 235 6, 305 50, 415 28 C 535 6, 605 50, 715 28 C 835 6, 905 50, 1005 28" stroke="#CBD5E1" stroke-width="3" fill="none"/>
+            <path d="M 95 28 C 235 6, 305 50, 415 28 C 535 6, 605 50, 715 28 C 835 6, 905 50, 1005 28" stroke="url(#iotPipeGrad)" stroke-width="2.4" class="iot-stream-dash" fill="none"/>
+
+            <!-- Flowing Signal Orange & Ocean Cobalt Packets -->
+            <circle r="5" fill="#EA580C">
+              <animateMotion dur="3.8s" repeatCount="indefinite" path="M 95 28 C 235 6, 305 50, 415 28 C 535 6, 605 50, 715 28 C 835 6, 905 50, 1005 28"/>
+            </circle>
+            <circle r="4.5" fill="#2563EB">
+              <animateMotion dur="3.8s" begin="1.25s" repeatCount="indefinite" path="M 95 28 C 235 6, 305 50, 415 28 C 535 6, 605 50, 715 28 C 835 6, 905 50, 1005 28"/>
+            </circle>
+            <circle r="4.5" fill="#059669">
+              <animateMotion dur="3.8s" begin="2.5s" repeatCount="indefinite" path="M 95 28 C 235 6, 305 50, 415 28 C 535 6, 605 50, 715 28 C 835 6, 905 50, 1005 28"/>
+            </circle>
+
+            <circle cx="95" cy="28" r="6.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2.5"/>
+            <circle cx="415" cy="28" r="6.5" fill="#FFFFFF" stroke="#EA580C" stroke-width="2.5"/>
+            <circle cx="715" cy="28" r="6.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2.5"/>
+            <circle cx="1005" cy="28" r="6.5" fill="#FFFFFF" stroke="#059669" stroke-width="2.5"/>
+          </svg>
+        </div>
+
+        <!-- 4 Clickable IoT Pipeline Stage Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button onclick="selectIotStage(0)" id="iotStage0" class="iot-stage-card active text-left rounded-xl p-4 bg-slate-50/90 border border-slate-200">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-semibold text-cobalt">STAGE 01</span>
+              <span class="font-mono text-[12.5px] text-emeraldSafe">4,820 scans/hr</span>
+            </div>
+            <div class="font-display font-bold text-sm text-maritime mt-2">01 Automated Port Crane RFID</div>
+            <div class="text-xs text-slate-500 mt-1 font-mono">Optical OCR + UWB Seal Lock</div>
+          </button>
+
+          <button onclick="selectIotStage(1)" id="iotStage1" class="iot-stage-card text-left rounded-xl p-4 bg-slate-50/90 border border-slate-200">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-semibold text-signalOrange">STAGE 02</span>
+              <span class="font-mono text-[12.5px] text-signalOrange">LEO Sat Sync</span>
+            </div>
+            <div class="font-display font-bold text-sm text-maritime mt-2">02 Satellite AIS &amp; Weather AI</div>
+            <div class="text-xs text-slate-500 mt-1 font-mono">Typhoon Swell Avoidance Routing</div>
+          </button>
+
+          <button onclick="selectIotStage(2)" id="iotStage2" class="iot-stage-card text-left rounded-xl p-4 bg-slate-50/90 border border-slate-200">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-semibold text-cobalt">STAGE 03</span>
+              <span class="font-mono text-[12.5px] text-cobalt">99.2% Pre-Cleared</span>
+            </div>
+            <div class="font-display font-bold text-sm text-maritime mt-2">03 Customs Zero-Touch Clearance</div>
+            <div class="text-xs text-slate-500 mt-1 font-mono">Electronic Bill of Ladingzk-EDI</div>
+          </button>
+
+          <button onclick="selectIotStage(3)" id="iotStage3" class="iot-stage-card text-left rounded-xl p-4 bg-slate-50/90 border border-slate-200">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-semibold text-emeraldSafe">STAGE 04</span>
+              <span class="font-mono text-[12.5px] text-emeraldSafe">L4 Platoon</span>
+            </div>
+            <div class="font-display font-bold text-sm text-maritime mt-2">04 Autonomous EV Last-Mile</div>
+            <div class="text-xs text-slate-500 mt-1 font-mono">Zero-Emission Dock Handoff</div>
+          </button>
+        </div>
+
+        <!-- Selected IoT Stage Live Inspector -->
+        <div class="mt-4 rounded-xl p-4 bg-slate-100/85 border border-slate-200/90 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+          <div class="md:col-span-2">
+            <div id="iotDetailTitle" class="font-display font-bold text-sm text-maritime">
+              01 Automated Port Crane RFID &amp; LiDAR Twistlock Telemetry
+            </div>
+            <p id="iotDetailDesc" class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Every 40ft high-cube container is scanned in 180ms during ship-to-shore gantry lift, verifying electronic e-Seal integrity, gross mass (SOLAS VGM), and reefer core temperature.
+            </p>
+          </div>
+          <div class="border-t md:border-t-0 md:border-l border-slate-300/70 pt-3 md:pt-0 md:pl-4">
+            <span class="text-[12.5px] text-slate-500 block">Packet Latency &amp; Uptime</span>
+            <span id="iotMetricA" class="font-mono font-semibold text-sm text-maritime tabular-nums mt-0.5 block">180ms Crane-to-Cloud · 99.99%</span>
+          </div>
+          <div class="border-t md:border-t-0 md:border-l border-slate-300/70 pt-3 md:pt-0 md:pl-4">
+            <span class="text-[12.5px] text-slate-500 block">Autonomous Exception Rate</span>
+            <span id="iotMetricB" class="font-mono font-semibold text-sm text-emeraldSafe tabular-nums mt-0.5 block">0.03% Manual Intervention</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS & MANIFEST ROW: Transit Volume & Fuel Savings Grouped Bar + Line SVG Chart + Live Shipment Manifest -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+        <!-- Transit Volume & EV Fuel Savings Grouped Bar + Line SVG Chart (5 cols) -->
+        <div class="xl:col-span-5 arch-glass rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-[12.5px] uppercase tracking-wider text-slate-500">Multimodal Efficiency</span>
+              <div class="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200">
+                <button onclick="setVolumePeriod('6M')" id="volBtn6M" class="px-2.5 py-0.5 rounded font-mono text-[12.5px] font-semibold bg-white text-maritime shadow-sm">6M</button>
+                <button onclick="setVolumePeriod('12M')" id="volBtn12M" class="px-2.5 py-0.5 rounded font-mono text-[12.5px] font-medium text-slate-500">12M</button>
+              </div>
+            </div>
+            <h2 class="font-display text-lg font-bold text-maritime mt-1">Transit Volume &amp; EV Fuel Savings</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Sea/Rail TEU throughput vs autonomous EV corridor diesel displacement</p>
+          </div>
+
+          <div class="my-4">
+            <svg id="barLineSvg" class="w-full h-[230px] overflow-visible" viewBox="0 0 440 220" fill="none"></svg>
+          </div>
+
+          <div class="pt-3 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-sm bg-cobalt inline-block"></span>
+                Ocean/Rail TEU
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-sm bg-slate-300 inline-block"></span>
+                Air Express
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-3 h-0.5 bg-signalOrange inline-block"></span>
+                Fuel Saved (%)
+              </span>
+            </div>
+            <span class="font-mono font-semibold text-emeraldSafe">+28.4% Fleet Efficiency</span>
+          </div>
+        </div>
+
+        <!-- Live Shipment Manifest Table (7 cols) -->
+        <div class="xl:col-span-7 arch-glass rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <span class="font-mono text-[12.5px] uppercase tracking-wider text-slate-500">Real-Time Container Telemetry</span>
+                <h2 class="font-display text-lg font-bold text-maritime mt-0.5">Live Shipment Manifest</h2>
+              </div>
+
+              <!-- Status Filter Buttons -->
+              <div class="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200">
+                <button onclick="setManifestStatus('All')" data-mstatus="All" class="mstatus-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-maritime shadow-sm transition">All</button>
+                <button onclick="setManifestStatus('On Schedule')" data-mstatus="On Schedule" class="mstatus-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition">On Schedule</button>
+                <button onclick="setManifestStatus('Weather Reroute')" data-mstatus="Weather Reroute" class="mstatus-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition">Weather Reroute</button>
+                <button onclick="setManifestStatus('Customs Cleared')" data-mstatus="Customs Cleared" class="mstatus-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition">Customs Cleared</button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 text-[12.5px] font-mono uppercase tracking-wider text-slate-400">
+                    <th class="py-2.5 pr-3">Container ID</th>
+                    <th class="py-2.5 px-3">Route Vector</th>
+                    <th class="py-2.5 px-3">Telemetry</th>
+                    <th class="py-2.5 px-3">ETA</th>
+                    <th class="py-2.5 pl-3 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="manifestTableBody" class="divide-y divide-slate-200/70 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
+            <span id="manifestCountLabel" class="font-mono">Showing 6 of 6 active tracked consignments</span>
+            <span class="font-mono text-cobalt font-medium">zk-eBL Verified</span>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="orbitalToast" class="hidden fixed bottom-6 right-6 z-50 arch-glass rounded-2xl px-4 py-3.5 flex items-center gap-3 max-w-md border-cobalt/30">
+      <div class="w-8 h-8 rounded-xl bg-cobalt/10 text-cobalt flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        </svg>
+      </div>
+      <div class="text-xs">
+        <div id="orbitalToastTitle" class="font-semibold text-maritime">Corridor AI Updated</div>
+        <div id="orbitalToastMsg" class="font-mono text-slate-500 mt-0.5">Berth allocation synchronized</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const portTelemetry = {
+      shenzhen: {
+        name: 'Shenzhen Yantian Automated Terminal (CNSZX)',
+        sub: 'South China Export Megahub · 62 Autonomous Quay Cranes Online',
+        dwell: '3.6 hrs',
+        knots: '22.1 kn',
+        temp: '-18.6°C'
+      },
+      singapore: {
+        name: 'PSA Singapore Tuas Automated Megaport (SGSIN)',
+        sub: 'Malacca Strait Transshipment Core · AGV Fleet 100% Operational',
+        dwell: '4.2 hrs',
+        knots: '21.4 kn',
+        temp: '-18.4°C'
+      },
+      rotterdam: {
+        name: 'Port of Rotterdam Maasvlakte II (NLRTM)',
+        sub: 'Hydrogen & Shore-Power Berth Grid · Zero-Touch EU Customs Gate',
+        dwell: '3.9 hrs',
+        knots: '19.8 kn',
+        temp: '-18.5°C'
+      },
+      newyork: {
+        name: 'Port of New York & New Jersey Maher Express (USNYC)',
+        sub: 'East Coast Intermodal EV Railhead · Direct L4 Freight Corridor',
+        dwell: '4.8 hrs',
+        knots: '20.2 kn',
+        temp: '-18.3°C'
+      },
+      losangeles: {
+        name: 'Port of Los Angeles TraPac Automated Berth (USLAX)',
+        sub: 'Trans-Pacific Autonomous EV Drayage Hub · 94% Megawatt Charged',
+        dwell: '4.5 hrs',
+        knots: '21.9 kn',
+        temp: '-18.4°C'
+      }
+    };
+
+    const corridorMetrics = {
+      'All Global': { teu: '4,280 TEU', sla: '98.6%', ev: '91.4%' },
+      'Trans-Pacific': { teu: '1,640 TEU', sla: '98.9%', ev: '93.2%' },
+      'Asia–Europe': { teu: '1,820 TEU', sla: '98.1%', ev: '90.1%' },
+      'North America': { teu: '820 TEU', sla: '99.3%', ev: '94.6%' }
+    };
+
+    const iotStages = [
+      {
+        title: '01 Automated Port Crane RFID & LiDAR Twistlock Telemetry',
+        desc: 'Every 40ft high-cube container is scanned in 180ms during ship-to-shore gantry lift, verifying electronic e-Seal integrity, gross mass (SOLAS VGM), and reefer core temperature.',
+        metricA: '180ms Crane-to-Cloud · 99.99%',
+        metricB: '0.03% Manual Intervention'
+      },
+      {
+        title: '02 LEO Satellite AIS & Ensemble Marine Weather Routing AI',
+        desc: 'Ingests synthetic aperture radar wave-height telemetry every 60 seconds, dynamically adjusting vessel propulsion RPM to bypass squalls and cut bunker fuel burn by 14.8%.',
+        metricA: '42ms Global LEO Link · 312 Vessels',
+        metricB: '-14.8% Marine Fuel Saved'
+      },
+      {
+        title: '03 Customs Zero-Touch Clearance (Cryptographic zk-eBL & HS Tariff AI)',
+        desc: 'Transmits pre-arrival electronic Bills of Lading and phytosanitary IoT cold-chain proofs 48 hours prior to berth, unlocking green-lane port exit without dockside dwell.',
+        metricA: '99.2% Pre-Arrival Cleared',
+        metricB: '< 4 min Gate Release'
+      },
+      {
+        title: '04 Autonomous L4 EV Last-Mile Platooning & Robotic Dock Handoff',
+        desc: 'Heavy-duty 800V autonomous electric tractors dispatch directly from automated rail/quay cranes to regional distribution centers synchronized with warehouse AMR dock doors.',
+        metricA: '1,140 L4 EV Tractors · 91.4% SoC',
+        metricB: '0 Emissions · 640 km Range'
+      }
+    ];
+
+    const volumeData = {
+      '6M': {
+        months: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+        seaTeu: [620, 665, 705, 740, 790, 845],
+        airTeu: [140, 152, 148, 165, 172, 184],
+        fuelSavedPct: [19, 21, 23, 25, 27, 29]
+      },
+      '12M': {
+        months: ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'],
+        seaTeu: [510, 560, 610, 665, 740, 845],
+        airTeu: [120, 130, 138, 152, 165, 184],
+        fuelSavedPct: [14, 17, 20, 22, 26, 29]
+      }
+    };
+
+    const shipments = [
+      { id: 'ORBU-884920-1', route: 'Shenzhen -> Rotterdam', corridor: 'Asia–Europe', telemetry: '21.2 kn · -18.5°C', eta: 'Nov 19 · 06:40', status: 'On Schedule' },
+      { id: 'ORBU-773104-6', route: 'Singapore -> Rotterdam', corridor: 'Asia–Europe', telemetry: '19.6 kn · -18.2°C', eta: 'Nov 18 · 14:15', status: 'Weather Reroute' },
+      { id: 'ORBU-910442-9', route: 'Shenzhen -> Port of LA', corridor: 'Trans-Pacific', telemetry: '22.4 kn · -18.6°C', eta: 'Nov 17 · 21:00', status: 'Customs Cleared' },
+      { id: 'ORBU-552819-3', route: 'Rotterdam -> New York', corridor: 'North America', telemetry: '20.5 kn · +4.1°C', eta: 'Nov 17 · 09:30', status: 'On Schedule' },
+      { id: 'ORBU-640198-8', route: 'Port of LA -> New York EV', corridor: 'North America', telemetry: '92 km/h · SoC 89%', eta: 'Nov 16 · 18:10', status: 'Customs Cleared' },
+      { id: 'ORBU-339015-4', route: 'Singapore -> Port of LA', corridor: 'Trans-Pacific', telemetry: '21.8 kn · -18.4°C', eta: 'Nov 20 · 11:45', status: 'On Schedule' }
+    ];
+
+    let activeCorridor = 'All Global';
+    let activeManifestStatus = 'All';
+    let manifestQuery = '';
+    let activeVolPeriod = '6M';
+
+    function selectPort(key) {
+      const p = portTelemetry[key];
+      if (!p) return;
+      document.getElementById('portNameLabel').textContent = p.name;
+      document.getElementById('portSubLabel').textContent = p.sub;
+      document.getElementById('portDwell').textContent = p.dwell;
+      document.getElementById('portKnots').textContent = p.knots;
+      document.getElementById('portTemp').textContent = p.temp;
+    }
+
+    function setCorridor(corridor) {
+      activeCorridor = corridor;
+      document.querySelectorAll('.corridor-btn').forEach(btn => {
+        if (btn.dataset.corridor === corridor) {
+          btn.className = 'corridor-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-maritime shadow-sm transition';
+        } else {
+          btn.className = 'corridor-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition';
+        }
+      });
+
+      document.getElementById('activeCorridorPill').textContent = corridor === 'All Global' ? 'All Global Corridors' : corridor + ' Vector';
+      const m = corridorMetrics[corridor];
+      document.getElementById('kpiTeu').textContent = m.teu;
+      document.getElementById('kpiSla').textContent = m.sla;
+      document.getElementById('kpiEv').textContent = m.ev;
+
+      // Highlight matching SVG corridor arc
+      const asiaEu = document.getElementById('arcAsiaEurope');
+      const northAm = document.getElementById('arcNorthAmerica');
+      const transPac = document.getElementById('arcTransPacific');
+
+      asiaEu.style.opacity = (corridor === 'All Global' || corridor === 'Asia–Europe') ? '1' : '0.18';
+      northAm.style.opacity = (corridor === 'All Global' || corridor === 'North America') ? '1' : '0.18';
+      transPac.style.opacity = (corridor === 'All Global' || corridor === 'Trans-Pacific') ? '1' : '0.18';
+
+      renderManifest();
+    }
+
+    function selectIotStage(idx) {
+      for (let i = 0; i < 4; i++) {
+        document.getElementById('iotStage' + i).classList.toggle('active', i === idx);
+      }
+      const st = iotStages[idx];
+      document.getElementById('iotDetailTitle').textContent = st.title;
+      document.getElementById('iotDetailDesc').textContent = st.desc;
+      document.getElementById('iotMetricA').textContent = st.metricA;
+      document.getElementById('iotMetricB').textContent = st.metricB;
+    }
+
+    function setVolumePeriod(p) {
+      activeVolPeriod = p;
+      document.getElementById('volBtn6M').className = p === '6M'
+        ? 'px-2.5 py-0.5 rounded font-mono text-[12.5px] font-semibold bg-white text-maritime shadow-sm'
+        : 'px-2.5 py-0.5 rounded font-mono text-[12.5px] font-medium text-slate-500';
+      document.getElementById('volBtn12M').className = p === '12M'
+        ? 'px-2.5 py-0.5 rounded font-mono text-[12.5px] font-semibold bg-white text-maritime shadow-sm'
+        : 'px-2.5 py-0.5 rounded font-mono text-[12.5px] font-medium text-slate-500';
+      renderBarLineChart();
+    }
+
+    function renderBarLineChart() {
+      const svg = document.getElementById('barLineSvg');
+      const d = volumeData[activeVolPeriod];
+      const baseY = 188;
+      const topY = 24;
+      const maxBar = 900;
+
+      let html = '';
+      // Subtle horizontal guide lines
+      [35, 86, 137, 188].forEach(gy => {
+        html += `<line x1="20" y1="${gy}" x2="425" y2="${gy}" stroke="rgba(148,163,184,0.25)" stroke-dasharray="3 3"/>`;
+      });
+
+      const linePts = [];
+      d.months.forEach((m, i) => {
+        const groupX = 42 + i * 64;
+        const seaH = (d.seaTeu[i] / maxBar) * (baseY - topY);
+        const airH = (d.airTeu[i] / maxBar) * (baseY - topY);
+        const seaY = baseY - seaH;
+        const airY = baseY - airH;
+
+        html += `<rect x="${groupX}" y="${seaY.toFixed(1)}" width="16" height="${seaH.toFixed(1)}" rx="4" fill="#2563EB"/>`;
+        html += `<rect x="${groupX + 20}" y="${airY.toFixed(1)}" width="14" height="${airH.toFixed(1)}" rx="4" fill="#CBD5E1"/>`;
+        html += `<text x="${groupX + 17}" y="208" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono" font-size="10.5">${m}</text>`;
+
+        const ly = baseY - (d.fuelSavedPct[i] / 34) * (baseY - topY - 12);
+        linePts.push({ x: groupX + 17, y: ly, pct: d.fuelSavedPct[i] });
+      });
+
+      const pathD = linePts.map((p, idx) => (idx === 0 ? `M ${p.x} ${p.y.toFixed(1)}` : `L ${p.x} ${p.y.toFixed(1)}`)).join(' ');
+      html += `<path d="${pathD}" fill="none" stroke="#EA580C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      linePts.forEach(p => {
+        html += `<circle cx="${p.x}" cy="${p.y.toFixed(1)}" r="4" fill="#FFFFFF" stroke="#EA580C" stroke-width="2.2"/>`;
+        html += `<text x="${p.x}" y="${(p.y - 9).toFixed(1)}" text-anchor="middle" fill="#EA580C" font-family="JetBrains Mono" font-size="9.5" font-weight="600">${p.pct}%</text>`;
+      });
+
+      svg.innerHTML = html;
+    }
+
+    function setManifestStatus(status) {
+      activeManifestStatus = status;
+      document.querySelectorAll('.mstatus-btn').forEach(btn => {
+        if (btn.dataset.mstatus === status) {
+          btn.className = 'mstatus-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-maritime shadow-sm transition';
+        } else {
+          btn.className = 'mstatus-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-maritime transition';
+        }
+      });
+      renderManifest();
+    }
+
+    function syncManifestSearch(val) {
+      manifestQuery = (val || '').toLowerCase().trim();
+      renderManifest();
+    }
+
+    function renderManifest() {
+      const tbody = document.getElementById('manifestTableBody');
+      const filtered = shipments.filter(s => {
+        const matchCorridor = activeCorridor === 'All Global' || s.corridor === activeCorridor;
+        const matchStatus = activeManifestStatus === 'All' || s.status === activeManifestStatus;
+        const matchSearch = !manifestQuery || s.id.toLowerCase().includes(manifestQuery) || s.route.toLowerCase().includes(manifestQuery);
+        return matchCorridor && matchStatus && matchSearch;
+      });
+
+      document.getElementById('manifestCountLabel').textContent = `Showing ${filtered.length} of ${shipments.length} active tracked consignments`;
+
+      tbody.innerHTML = filtered.map(s => {
+        let pillClass = 'bg-emerald-50 text-emeraldSafe border-emerald-200';
+        let dotClass = 'bg-emeraldSafe';
+        if (s.status === 'Weather Reroute') {
+          pillClass = 'bg-orange-50 text-signalOrange border-orange-200';
+          dotClass = 'bg-signalOrange animate-pulse';
+        } else if (s.status === 'Customs Cleared') {
+          pillClass = 'bg-blue-50 text-cobalt border-blue-200';
+          dotClass = 'bg-cobalt';
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/90 transition">
+            <td class="py-3 pr-3 font-mono font-semibold text-xs text-maritime tabular-nums">${s.id}</td>
+            <td class="py-3 px-3">
+              <div class="font-medium text-maritime text-xs sm:text-sm">${s.route}</div>
+              <div class="font-mono text-xs text-slate-400">${s.corridor}</div>
+            </td>
+            <td class="py-3 px-3 font-mono text-xs text-slate-600 tabular-nums">${s.telemetry}</td>
+            <td class="py-3 px-3 font-mono text-xs text-maritime tabular-nums">${s.eta}</td>
+            <td class="py-3 pl-3 text-right">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-mono text-[12.5px] font-medium border ${pillClass}">
+                <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
+                ${s.status}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function triggerConvoyReroute() {
+      shipments[1].status = 'On Schedule';
+      shipments[1].eta = 'Nov 18 · 11:50';
+      renderManifest();
+      showOrbitalToast('AI Berth & Weather Optimization Complete', 'ORBU-773104-6 rerouted clear of squall; gained +2h 25m ETA');
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const chev = document.getElementById('sidebarChevron');
+      sb.classList.toggle('sidebar-collapsed');
+      if (sb.classList.contains('sidebar-collapsed')) {
+        sb.classList.remove('w-64');
+        sb.classList.add('w-20');
+        chev.style.transform = 'rotate(180deg)';
+      } else {
+        sb.classList.remove('w-20');
+        sb.classList.add('w-64');
+        chev.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function toggleMobileNav() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('mobileBackdrop').classList.toggle('hidden');
+    }
+
+    const orbitalSubpages = {
+      'Live Corridors': {
+        tag: 'LEO AIS + ADS-B VECTOR MESH',
+        subtitle: 'Real-time deep-water lane velocity, berth dwell optimization, and squall-avoidance routing across 14 global trade corridors.',
+        ctaLabel: 'Re-Optimize Berth Slots',
+        ctaToast: ['Global Berth Grid Synced', 'Dynamic crane slot allocation updated across 14 maritime & air lanes'],
+        kpis: [
+          { label: 'Active Trade Lanes', val: '14 Lanes', badge: '100% Open', tone: 'emerald', sub: 'Zero canal or strait blocks' },
+          { label: 'Mean Vessel Speed', val: '21.3 kn', badge: '+0.8 kn', tone: 'cobalt', sub: 'Eco-RPM weather assisted' },
+          { label: 'Avg Berth Dwell', val: '4.1 hrs', badge: '-38 min', tone: 'emerald', sub: 'Automated AGV quay transfer' },
+          { label: 'Weather Reroutes', val: '2 Active', badge: 'ETA Protected', tone: 'orange', sub: 'Typhoon swell bypass active' }
+        ],
+        chartTitle: 'Corridor Capacity Utilization & Transit Velocity',
+        chartSub: 'Live TEU allocation and schedule reliability across primary intermodal arteries',
+        bars: [
+          { label: 'Asia–Europe (Shenzhen -> Singapore -> Rotterdam)', pct: 89, meta: '1,820 TEU · 98.4% On-Time', grad: 'from-cobalt to-blue-500' },
+          { label: 'Trans-Pacific Express (Yantian -> Port of LA)', pct: 82, meta: '1,640 TEU · 98.9% On-Time', grad: 'from-signalOrange to-amber-500' },
+          { label: 'North Atlantic Bridge (Rotterdam -> NY/NJ)', pct: 74, meta: '820 TEU · 99.3% On-Time', grad: 'from-emeraldSafe to-teal-500' },
+          { label: 'Intra-Asia Feeder Mesh (SG -> Tokyo)', pct: 66, meta: '540 TEU · 99.5% On-Time', grad: 'from-cobalt to-emeraldSafe' }
+        ],
+        svgPoints: '12,126 92,114 172,102 252,96 332,76 412,62 488,44',
+        svgStroke: '#2563EB',
+        tableTitle: 'Active Maritime & Air-Sea Trade Lanes',
+        cols: ['Lane Code', 'Origin -> Destination Hub', 'Vessels / Flights', 'Berth Dwell', 'Slot Control'],
+        rows: [
+          { c1: 'AE-01', c2: 'Shenzhen -> Rotterdam Maasvlakte', c3: '18 Vessels · 21.2 kn', c4: '3.9 hrs', action: 'Lock Priority', done: 'Locked' },
+          { c1: 'TP-04', c2: 'Yantian -> Los Angeles TraPac', c3: '14 Vessels · 22.1 kn', c4: '4.5 hrs', action: 'Lock Priority', done: 'Locked' },
+          { c1: 'NA-02', c2: 'Rotterdam -> NY Maher Express', c3: '9 Vessels · 20.4 kn', c4: '4.8 hrs', action: 'Lock Priority', done: 'Locked' },
+          { c1: 'SG-07', c2: 'PSA Singapore -> Frankfurt Air-Sea', c3: '11 Cargo · Mach 0.84', c4: '1.6 hrs', action: 'Lock Priority', done: 'Locked' },
+          { c1: 'US-09', c2: 'Port of LA -> Chicago L4 EV Rail', c3: '42 Convoys · 92 km/h', c4: '0.8 hrs', action: 'Lock Priority', done: 'Locked' }
+        ]
+      },
+      'EV Autonomous Fleet': {
+        tag: '800V L4 HEAVY TRACTOR TELEMETRY',
+        subtitle: 'Autonomous drayage platooning, megawatt charging depot orchestration, and V2G peak-shaving across 1,140 electric tractors.',
+        ctaLabel: 'Balance Megawatt Grid',
+        ctaToast: ['Megawatt Chargers Balanced', 'Shifted 18 tractors to off-peak solar array at 94.2% fleet SoC'],
+        kpis: [
+          { label: 'Active L4 EV Units', val: '1,140', badge: '99.1% Up', tone: 'cobalt', sub: 'Zero driver disengagements' },
+          { label: 'Fleet Avg State of Charge', val: '91.4%', badge: '640 km Avg', tone: 'emerald', sub: '800V SiC solid-state packs' },
+          { label: 'MCS Chargers Online', val: '142 / 148', badge: '1.2 MW Peak', tone: 'orange', sub: '18-min 20%->85% turnaround' },
+          { label: '30d Diesel Displaced', val: '684,000 L', badge: '-1,840t CO2e', tone: 'emerald', sub: 'Verified Scope-1 ledger' }
+        ],
+        chartTitle: 'Regional EV Depot Charge Readiness & Platoon Load',
+        chartSub: 'Real-time battery state-of-charge and autonomous convoy dispatch utilization',
+        bars: [
+          { label: 'Rotterdam Maasvlakte Autobahn Hub', pct: 94, meta: '310 Units · 94% Avg SoC', grad: 'from-emeraldSafe to-teal-500' },
+          { label: 'Los Angeles Alameda EV Corridor', pct: 91, meta: '380 Units · 91% Avg SoC', grad: 'from-cobalt to-blue-500' },
+          { label: 'Newark I-95 Intermodal Depot', pct: 88, meta: '260 Units · 88% Avg SoC', grad: 'from-cobalt to-emeraldSafe' },
+          { label: 'Singapore Tuas AGV-EV Link', pct: 95, meta: '190 Units · 95% Avg SoC', grad: 'from-signalOrange to-amber-500' }
+        ],
+        svgPoints: '12,118 92,108 172,112 252,88 332,74 412,58 488,46',
+        svgStroke: '#059669',
+        tableTitle: 'Live Autonomous EV Convoy Telemetry',
+        cols: ['Convoy ID', 'Intermodal Corridor', 'Pack SoC / Range', 'LiDAR Status', 'Dispatch'],
+        rows: [
+          { c1: 'CVY-RTM-19', c2: 'Rotterdam Gate -> Duisburg Rail', c3: '93% · 665 km', c4: 'L4 Locked (4 Units)', action: 'Sync Platoon', done: 'Synced' },
+          { c1: 'CVY-LAX-08', c2: 'Port of LA -> Ontario Mega-DC', c3: '89% · 610 km', c4: 'L4 Locked (6 Units)', action: 'Sync Platoon', done: 'Synced' },
+          { c1: 'CVY-NYC-14', c2: 'Maher Berth -> Lehigh Valley', c3: '91% · 635 km', c4: 'L4 Locked (5 Units)', action: 'Sync Platoon', done: 'Synced' },
+          { c1: 'CVY-SIN-03', c2: 'Tuas Berth B12 -> Changi Cold Hub', c3: '96% · 690 km', c4: 'L4 Locked (3 Units)', action: 'Sync Platoon', done: 'Synced' },
+          { c1: 'CVY-SZX-22', c2: 'Yantian Quay -> Dongguan AMR Hub', c3: '87% · 595 km', c4: 'MCS Fast-Charge', action: 'Sync Platoon', done: 'Synced' }
+        ]
+      },
+      'Cold-Chain IoT': {
+        tag: 'ISO 23412 · BIOPHARMA REEFER MESH',
+        subtitle: 'Continuous multi-probe core temperature, humidity, and optical door-seal telemetry with cryptographic GDP audit proofs.',
+        ctaLabel: 'Export GDP Cold Certificate',
+        ctaToast: ['ISO 23412 Audit Signed', 'Exported 100% thermal compliance proof across 842 reefer containers'],
+        kpis: [
+          { label: 'Tracked Reefer Units', val: '842 TEU', badge: '100% Safe', tone: 'emerald', sub: 'Zero thermal excursions 90d' },
+          { label: 'Deep-Freeze Mean', val: '-18.4°C', badge: '+/- 0.2°C', tone: 'cobalt', sub: 'Dual-compressor redundancy' },
+          { label: 'Biopharma 2-8°C Vaults', val: '+4.1°C', badge: 'WHO GDP', tone: 'emerald', sub: 'mRNA & biologics certified' },
+          { label: 'e-Seal Tamper Alerts', val: '0 Breaches', badge: 'UWB Armed', tone: 'orange', sub: '60-sec satellite heartbeat' }
+        ],
+        chartTitle: 'Thermal Band Compliance by Cargo Classification',
+        chartSub: 'Real-time probe stability across cryogenic, deep-frozen, and chilled pharma corridors',
+        bars: [
+          { label: 'Cryogenic Biologics (-70°C Dry-Ice IoT)', pct: 100, meta: '94 Units · 100% Spec', grad: 'from-cobalt to-blue-500' },
+          { label: 'Deep-Freeze Marine Reefer (-18.5°C)', pct: 99, meta: '486 Units · 99.9% Spec', grad: 'from-emeraldSafe to-teal-500' },
+          { label: 'Clinical Pharma Chilled (+2°C to +8°C)', pct: 100, meta: '182 Units · 100% Spec', grad: 'from-cobalt to-emeraldSafe' },
+          { label: 'Controlled Atmosphere Produce (+12°C)', pct: 98, meta: '80 Units · RH 88% Locked', grad: 'from-signalOrange to-amber-500' }
+        ],
+        svgPoints: '12,84 92,82 172,85 252,83 332,84 412,82 488,83',
+        svgStroke: '#059669',
+        tableTitle: 'Active Cold-Chain Consignment Probes',
+        cols: ['Container ID', 'Cargo Class & Corridor', 'Core Temp / RH', 'Battery / Link', 'Verification'],
+        rows: [
+          { c1: 'ORBU-884920-1', c2: 'Biologics · Shenzhen -> Rotterdam', c3: '-18.5°C · 64% RH', c4: '98% · LEO Live', action: 'Verify Seal', done: 'Verified' },
+          { c1: 'ORBU-552819-3', c2: 'Clinical mRNA · Rotterdam -> NY', c3: '+4.1°C · 52% RH', c4: '96% · LEO Live', action: 'Verify Seal', done: 'Verified' },
+          { c1: 'ORBU-910442-9', c2: 'Frozen Marine · Yantian -> LA', c3: '-18.6°C · 66% RH', c4: '94% · Port 5G', action: 'Verify Seal', done: 'Verified' },
+          { c1: 'ORBU-339015-4', c2: 'Vaccines · Singapore -> LA', c3: '+3.8°C · 50% RH', c4: '99% · LEO Live', action: 'Verify Seal', done: 'Verified' },
+          { c1: 'ORBU-712044-2', c2: 'Cryo Cell Therapy · Zurich -> NY', c3: '-71.2°C · Dry-Ice', c4: '97% · ADS-B Air', action: 'Verify Seal', done: 'Verified' }
+        ]
+      },
+      'Warehouse Robotics': {
+        tag: 'AUTONOMOUS AMR & AS/RS FULFILLMENT',
+        subtitle: 'High-density cubic AS/RS shuttles, LiDAR autonomous mobile robots, and robotic container devanning across 8 mega-hubs.',
+        ctaLabel: 'Rebalance AMR Swarm',
+        ctaToast: ['AMR Swarm Rebalanced', 'Routed 64 autonomous pallet bots to high-velocity cross-dock bays'],
+        kpis: [
+          { label: 'Active AMR Robots', val: '2,460', badge: '99.4% Online', tone: 'cobalt', sub: 'Across 8 cross-dock hubs' },
+          { label: 'Pick & Sort Velocity', val: '18,400 / hr', badge: '+22.4%', tone: 'emerald', sub: 'Vision-guided suction arms' },
+          { label: 'Dock Turnaround', val: '16.4 min', badge: '-11 min', tone: 'emerald', sub: 'Automated EV trailer lock' },
+          { label: 'Cubic Storage Density', val: '93.8%', badge: 'Optimal', tone: 'orange', sub: 'AI slotting heat-mapped' }
+        ],
+        chartTitle: 'Fulfillment Hub Throughput & Robotic Bay Load',
+        chartSub: 'Hourly pallet devanning and autonomous cross-dock sortation efficiency',
+        bars: [
+          { label: 'Rotterdam Europort Automated Cross-Dock', pct: 92, meta: '5,420 picks/hr · 620 AMRs', grad: 'from-cobalt to-blue-500' },
+          { label: 'Ontario Inland Empire Robotic Mega-DC', pct: 88, meta: '4,980 picks/hr · 580 AMRs', grad: 'from-signalOrange to-amber-500' },
+          { label: 'PSA Tuas High-Bay Cold AS/RS', pct: 85, meta: '4,110 picks/hr · 490 AMRs', grad: 'from-emeraldSafe to-teal-500' },
+          { label: 'Newark Secaucus Express Sort Hub', pct: 79, meta: '3,890 picks/hr · 410 AMRs', grad: 'from-cobalt to-emeraldSafe' }
+        ],
+        svgPoints: '12,130 92,115 172,98 252,89 332,72 412,56 488,40',
+        svgStroke: '#EA580C',
+        tableTitle: 'Robotic Fulfillment Zone Telemetry',
+        cols: ['Hub Zone', 'Robotics Architecture', 'Throughput', 'Fault Rate', 'Swarm Action'],
+        rows: [
+          { c1: 'NLRTM · Bay A1-A8', c2: '620 LiDAR AMRs + Auto-Devanning', c3: '5,420 units/hr', c4: '0.01% Nominal', action: 'Calibrate', done: 'Calibrated' },
+          { c1: 'USONT · Cube Grid 4', c2: 'High-Density Shuttle AS/RS', c3: '4,980 units/hr', c4: '0.02% Nominal', action: 'Calibrate', done: 'Calibrated' },
+          { c1: 'SGSIN · Cryo Vault 2', c2: '-20°C Rated Autonomous Cranes', c3: '4,110 units/hr', c4: '0.00% Zero-Fault', action: 'Calibrate', done: 'Calibrated' },
+          { c1: 'USNYC · Cross-Dock E', c2: 'Vision Robotic Singulator Arms', c3: '3,890 units/hr', c4: '0.02% Nominal', action: 'Calibrate', done: 'Calibrated' },
+          { c1: 'CNSZX · Export Gate', c2: 'AGV Straddle Carrier Mesh', c3: '6,120 units/hr', c4: '0.01% Nominal', action: 'Calibrate', done: 'Calibrated' }
+        ]
+      },
+      'Customs': {
+        tag: 'ZK-EBL & ZERO-TOUCH TARIFF ENGINE',
+        subtitle: 'Pre-arrival electronic Bills of Lading, automated HS code classification, and green-lane customs release 48h before vessel berth.',
+        ctaLabel: 'Transmit Pre-Arrival Batch',
+        ctaToast: ['EDI / zk-eBL Batch Cleared', 'Pre-cleared 38 incoming containers with CBP ACE & EU ICS2'],
+        kpis: [
+          { label: 'Pre-Arrival Cleared', val: '99.2%', badge: '48h Early', tone: 'emerald', sub: 'CBP ACE, EU ICS2 & SG TradeNet' },
+          { label: 'Port Gate Release', val: '3.8 min', badge: 'Green Lane', tone: 'cobalt', sub: 'Zero dockside paper holds' },
+          { label: 'HS AI Accuracy', val: '99.84%', badge: 'Audited', tone: 'emerald', sub: 'Auto duty drawback capture' },
+          { label: 'Pending Inspections', val: '3 Filings', badge: 'Docs Ready', tone: 'orange', sub: 'Phytosanitary cert attached' }
+        ],
+        chartTitle: 'Customs Authority Automated Clearance SLA',
+        chartSub: 'Percentage of consignments granted zero-dwell green-lane exit prior to vessel arrival',
+        bars: [
+          { label: 'Singapore TradeNet & Maritime Port Auth', pct: 100, meta: '1,120 Filings · 99.8% Instant', grad: 'from-emeraldSafe to-teal-500' },
+          { label: 'EU ICS2 Rotterdam Douane Smart Gate', pct: 99, meta: '1,480 Filings · 99.3% Instant', grad: 'from-cobalt to-blue-500' },
+          { label: 'US CBP ACE Automated Broker Interface', pct: 98, meta: '1,090 Filings · 98.7% Instant', grad: 'from-cobalt to-emeraldSafe' },
+          { label: 'China GACC Shenzhen Single-Window', pct: 99, meta: '590 Filings · 99.1% Instant', grad: 'from-signalOrange to-amber-500' }
+        ],
+        svgPoints: '12,122 92,106 172,94 252,80 332,66 412,52 488,38',
+        svgStroke: '#2563EB',
+        tableTitle: 'Electronic Bill of Lading & Customs Declarations',
+        cols: ['Declaration ID', 'Regime & Port Entry', 'HS Tariff / Duty', 'zk-eBL Proof', 'Clearance'],
+        rows: [
+          { c1: 'ACE-99402-US', c2: 'US CBP · Port of Los Angeles', c3: 'HS 8542.31 · $0 Duty', c4: 'zk-Proof #8841', action: 'Sign Release', done: 'Released' },
+          { c1: 'ICS2-77318-NL', c2: 'EU Douane · Rotterdam Maasvlakte', c3: 'HS 3002.15 · Bonded', c4: 'zk-Proof #8839', action: 'Sign Release', done: 'Released' },
+          { c1: 'TNET-61049-SG', c2: 'SG Customs · Tuas Free Trade Zone', c3: 'HS 8507.60 · Transship', c4: 'zk-Proof #8835', action: 'Sign Release', done: 'Released' },
+          { c1: 'ACE-99388-NY', c2: 'US CBP · Newark Maher Terminal', c3: 'HS 9018.19 · $14,200', c4: 'zk-Proof #8830', action: 'Sign Release', done: 'Released' },
+          { c1: 'GACC-44810-CN', c2: 'China GACC · Shenzhen Yantian', c3: 'HS 8471.50 · Export Cleared', c4: 'zk-Proof #8824', action: 'Sign Release', done: 'Released' }
+        ]
+      }
+    };
+
+    function returnToCommandTower() {
+      const homeBtn = document.querySelector('.nav-btn[data-nav="Command Tower"]');
+      if (homeBtn) activateNav(homeBtn, 'Command Tower');
+    }
+
+    function handleOrbitalSubAction(btn, section, code, doneLabel) {
+      btn.textContent = doneLabel;
+      btn.className = 'px-3 py-1.5 rounded-xl font-mono text-xs font-semibold bg-emerald-50 text-emeraldSafe border border-emerald-200 transition';
+      showOrbitalToast(section + ' Action Confirmed', code + ' -> ' + doneLabel + ' synced across LEO mesh');
+    }
+
+    function renderOrbitalSubpage(title) {
+      const cfg = orbitalSubpages[title];
+      if (!cfg) return;
+      const el = document.getElementById('tabSubpageView');
+
+      const kpisHtml = cfg.kpis.map(k => {
+        const pill = k.tone === 'emerald'
+          ? 'bg-emerald-50 text-emeraldSafe border-emerald-200'
+          : k.tone === 'orange'
+            ? 'bg-orange-50 text-signalOrange border-orange-200'
+            : 'bg-blue-50 text-cobalt border-blue-200';
+        return `
+          <div class="arch-glass rounded-2xl p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-medium text-slate-500">${k.label}</span>
+                <div class="font-display text-2xl font-bold text-maritime tabular-nums mt-1.5 tracking-tight">${k.val}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-md font-mono text-xs font-semibold border ${pill}">${k.badge}</span>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/80 font-mono text-xs text-slate-500">${k.sub}</div>
+          </div>
+        `;
+      }).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-medium text-maritime">${b.label}</span>
+            <span class="font-mono text-slate-500 tabular-nums">${b.meta}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-200/80 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r ${b.grad}" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-slate-50/90 transition">
+          <td class="py-3.5 pr-3 font-mono font-semibold text-xs text-maritime tabular-nums">${r.c1}</td>
+          <td class="py-3.5 px-3 text-xs font-medium text-maritime">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono text-xs text-slate-600 tabular-nums">${r.c3}</td>
+          <td class="py-3.5 px-3 font-mono text-xs font-semibold text-cobalt tabular-nums">${r.c4}</td>
+          <td class="py-3.5 pl-3 text-right">
+            <button onclick="handleOrbitalSubAction(this, '${title}', '${r.c1}', '${r.done}')" class="px-3 py-1.5 rounded-xl font-mono text-xs font-semibold bg-white hover:bg-cobalt text-maritime hover:text-white border border-slate-200 hover:border-cobalt shadow-sm transition">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      el.innerHTML = `
+        <section class="arch-glass rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="returnToCommandTower()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold text-maritime bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition">
+                <svg class="w-3.5 h-3.5 text-cobalt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <span>Overview</span>
+              </button>
+              <span class="px-2.5 py-1 rounded-md font-mono text-xs font-semibold bg-cobalt/10 text-cobalt">${cfg.tag}</span>
+            </div>
+            <h1 class="font-display text-2xl font-bold text-maritime pt-1">${title}</h1>
+            <p class="text-sm text-slate-600 max-w-2xl">${cfg.subtitle}</p>
+          </div>
+          <button onclick="showOrbitalToast('${cfg.ctaToast[0]}', '${cfg.ctaToast[1]}')" class="self-start sm:self-center inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-display font-semibold text-xs sm:text-sm text-white bg-maritime hover:bg-slate-800 shadow-md transition shrink-0">
+            <svg class="w-4 h-4 text-signalOrange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>${cfg.ctaLabel}</span>
+          </button>
+        </section>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          ${kpisHtml}
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-5 arch-glass rounded-2xl p-6 flex flex-col justify-between space-y-5">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-widest text-cobalt font-semibold">Network Vector Telemetry</span>
+              <h2 class="font-display text-lg font-bold text-maritime mt-1">${cfg.chartTitle}</h2>
+              <p class="text-xs text-slate-500 mt-1">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50/90 border border-slate-200/80 p-4">
+              <svg class="w-full h-36 overflow-visible" viewBox="0 0 500 150" fill="none">
+                <defs>
+                  <linearGradient id="orbitalSubGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${cfg.svgStroke}" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="${cfg.svgStroke}" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="12" y1="35" x2="488" y2="35" stroke="rgba(148,163,184,0.3)" stroke-dasharray="3 3"/>
+                <line x1="12" y1="85" x2="488" y2="85" stroke="rgba(148,163,184,0.3)" stroke-dasharray="3 3"/>
+                <line x1="12" y1="132" x2="488" y2="132" stroke="rgba(148,163,184,0.45)"/>
+                <polygon points="${cfg.svgPoints} 488,132 12,132" fill="url(#orbitalSubGrad)"/>
+                <polyline points="${cfg.svgPoints}" fill="none" stroke="${cfg.svgStroke}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="12" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">00:00</text>
+                <text x="230" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">12:00</text>
+                <text x="452" y="147" fill="#0F172A" font-family="JetBrains Mono" font-size="12">NOW</text>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="xl:col-span-7 arch-glass rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <span class="font-mono text-xs uppercase tracking-widest text-emeraldSafe font-semibold">Live Dispatch Feed</span>
+                  <h2 class="font-display text-lg font-bold text-maritime mt-0.5">${cfg.tableTitle}</h2>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg font-mono text-xs bg-emerald-50 text-emeraldSafe border border-emerald-200">LEO Synced</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[560px]">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-xs font-mono uppercase tracking-wider text-slate-400">
+                      <th class="py-2.5 pr-3">${cfg.cols[0]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[1]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[2]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[3]}</th>
+                      <th class="py-2.5 pl-3 text-right">${cfg.cols[4]}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200/70">
+                    ${rowsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-mono text-slate-500">
+              <span>42ms LEO Satellite Telemetry Heartbeat</span>
+              <span class="text-cobalt font-semibold">ISO 28000 Supply Chain Secure</span>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function activateNav(btn, title) {
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('font-semibold', 'bg-cobalt', 'text-white', 'shadow-md', 'shadow-cobalt/20');
+        b.classList.add('font-medium', 'text-slate-600', 'hover:text-maritime', 'hover:bg-slate-100/80');
+      });
+      btn.classList.remove('font-medium', 'text-slate-600', 'hover:text-maritime', 'hover:bg-slate-100/80');
+      btn.classList.add('font-semibold', 'bg-cobalt', 'text-white', 'shadow-md', 'shadow-cobalt/20');
+
+      const cmdBadge = document.getElementById('cmdLiveBadge');
+      if (cmdBadge) {
+        cmdBadge.className = title === 'Command Tower'
+          ? 'sidebar-text font-mono text-xs px-1.5 py-0.5 rounded bg-white/20 text-white'
+          : 'sidebar-text font-mono text-xs px-1.5 py-0.5 rounded bg-blue-50 text-cobalt border border-blue-200';
+      }
+
+      document.getElementById('navTitleDisplay').textContent = title;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (title === 'Command Tower') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        renderBarLineChart();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderOrbitalSubpage(title);
+      }
+
+      if (window.innerWidth < 1024 && !document.getElementById('sidebar').classList.contains('-translate-x-full')) {
+        toggleMobileNav();
+      }
+    }
+
+    let orbitalToastTimeout = null;
+    function showOrbitalToast(title, msg) {
+      const el = document.getElementById('orbitalToast');
+      document.getElementById('orbitalToastTitle').textContent = title;
+      document.getElementById('orbitalToastMsg').textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(orbitalToastTimeout);
+      orbitalToastTimeout = setTimeout(() => el.classList.add('hidden'), 4200);
+    }
+
+    // Initialize
+    renderBarLineChart();
+    renderManifest();
+  </script>
+</body>
+</html>

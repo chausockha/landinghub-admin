@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ecomora — 13. E-commerce Admin, Sales KPI &amp; Product Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            limeAccent: '#A3F746',
+            coralAccent: '#FF645A',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: #ECEEF4;
+      color: #111317;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    html.dark body {
+      background: #090A0F;
+      color: #F4F4F5;
+    }
+    .outer-frame {
+      background: #F3F4F8;
+      border: 1px solid #E2E5EE;
+      box-shadow: 0 26px 65px -18px rgba(15, 23, 42, 0.12);
+    }
+    html.dark .outer-frame {
+      background: #11131A;
+      border-color: #27272A;
+      box-shadow: 0 26px 65px -18px rgba(0, 0, 0, 0.75);
+    }
+    .inner-canvas {
+      background: #FFFFFF;
+      border: 1px solid #ECEEF3;
+    }
+    html.dark .inner-canvas {
+      background: #161821;
+      border-color: #27272A;
+    }
+    .eco-card {
+      background: #F7F7F8;
+      border: 1px solid #EFEFF2;
+      border-radius: 22px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .eco-card:hover {
+      border-color: #DFDFE5;
+      box-shadow: 0 10px 26px -12px rgba(17, 19, 23, 0.08);
+    }
+    html.dark .eco-card {
+      background: #1E212D;
+      border-color: #2E3244;
+    }
+    .top-nav-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.85rem 0.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #6B7280;
+      transition: color 0.18s ease;
+    }
+    .top-nav-btn:hover {
+      color: #111317;
+    }
+    html.dark .top-nav-btn {
+      color: #9CA3AF;
+    }
+    html.dark .top-nav-btn:hover {
+      color: #FFFFFF;
+    }
+    .top-nav-btn.active {
+      color: #111317;
+      font-weight: 700;
+    }
+    html.dark .top-nav-btn.active {
+      color: #FFFFFF;
+    }
+    .top-nav-btn.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2.5px;
+      border-radius: 2px;
+      background: #111317;
+    }
+    html.dark .top-nav-btn.active::after {
+      background: #A3F746;
+    }
+    @keyframes capsuleRise {
+      from { transform: scaleY(0.15); }
+      to   { transform: scaleY(1); }
+    }
+    .capsule-grow {
+      transform-origin: bottom;
+      animation: capsuleRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .eco-donut-seg {
+      transition: stroke-width 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+    }
+    .eco-donut-seg:hover {
+      stroke-width: 24;
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-3">
+
+  <!-- Outer Soft Alabaster Frame -->
+  <div class="outer-frame max-w-[1520px] mx-auto rounded-[28px] px-4 sm:px-6 pt-1 pb-4">
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         TOPBAR NAVIGATION (ZERO SIDEBAR ARCHITECTURE)
+    ════════════════════════════════════════════════════════════════════ -->
+    <header class="flex flex-wrap items-center justify-between gap-4 px-2 border-b border-zinc-200/75 dark:border-zinc-800">
+      <!-- Brand Logo -->
+      <div onclick="returnToEcoOverview()" class="flex items-center gap-2.5 py-2.5 select-none cursor-pointer">
+        <div class="w-7 h-7 rounded-full bg-[#111317] dark:bg-limeAccent text-white dark:text-zinc-950 flex items-center justify-center font-display font-extrabold text-sm italic">
+          e
+        </div>
+        <span class="font-display text-lg font-extrabold tracking-tight text-zinc-900 dark:text-white">Ecomora</span>
+      </div>
+
+      <!-- Center Horizontal Navigation -->
+      <nav class="flex flex-wrap items-center gap-4 lg:gap-7">
+        <button data-eco-tab="Dashboard" onclick="switchEcoNav(this, 'Dashboard')" class="top-nav-btn active cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+          <span>Dashboard</span>
+        </button>
+
+        <button data-eco-tab="Products" onclick="switchEcoNav(this, 'Products')" class="top-nav-btn cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/></svg>
+          <span>Products</span>
+        </button>
+
+        <button data-eco-tab="Purchases" onclick="switchEcoNav(this, 'Purchases')" class="top-nav-btn cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span>Purchases</span>
+        </button>
+
+        <button data-eco-tab="Customers" onclick="switchEcoNav(this, 'Customers')" class="top-nav-btn cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          <span>Customers</span>
+        </button>
+
+        <button data-eco-tab="Analytics" onclick="switchEcoNav(this, 'Analytics')" class="top-nav-btn cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          <span>Analytics</span>
+        </button>
+
+        <button data-eco-tab="Settings" onclick="switchEcoNav(this, 'Settings')" class="top-nav-btn cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <!-- Right Theme Toggle + User Profile -->
+      <div class="flex items-center gap-2.5 py-2">
+        <button onclick="toggleEcoDark()" class="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-limeAccent hover:border-zinc-400 transition cursor-pointer" title="Toggle Dark / Light Mode" aria-label="Toggle Dark or Light Mode">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <button onclick="showEcoToast('Signed in: Andriano Darwin · Store Owner')" class="flex items-center gap-2.5 cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-amber-700 text-white text-xs font-bold flex items-center justify-center">
+            AD
+          </div>
+          <span class="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-200 hidden sm:inline">Andriano Darwin</span>
+          <svg class="w-3.5 h-3.5 text-zinc-400 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         INNER PURE-WHITE DASHBOARD CANVAS
+    ════════════════════════════════════════════════════════════════════ -->
+    <main class="inner-canvas mt-3 rounded-[24px] p-4 sm:p-5">
+      <div id="defaultDashboardView" class="space-y-4">
+
+      <!-- SUB-HEADER: TITLE + SEARCH + EXPORT PILLS -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h1 id="ecoHeading" class="font-display text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+          Dashboard
+        </h1>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="relative w-52 sm:w-64">
+            <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input
+              id="ecoSearchInput"
+              oninput="renderTableSection()"
+              type="text"
+              placeholder="Search product or order..."
+              class="w-full rounded-full bg-[#F5F6F8] dark:bg-zinc-800 pl-9 pr-4 py-1.5 text-xs text-zinc-700 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+            />
+          </div>
+
+          <button onclick="showEcoToast('Exported Ecomora_Orders_2025.csv (4,218 rows)')" class="inline-flex items-center gap-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-950 hover:text-white px-4 py-1.5 text-xs font-semibold transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Export CSV</span>
+          </button>
+
+          <button onclick="showEcoToast('Downloaded Q1_Ecommerce_Executive_Report.pdf')" class="inline-flex items-center gap-1.5 rounded-full border border-zinc-400 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-zinc-950 hover:text-white px-4 py-1.5 text-xs font-semibold transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download Report</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           ROW 1: STACKED SALES KPIS (3 COLS) + HATCHED CAPSULE BAR CHART (4 COLS) + CALLOUT DONUT (5 COLS)
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+
+        <!-- Left Column (3.5 -> 3 cols): Two Stacked KPI Cards -->
+        <div class="lg:col-span-3 flex flex-col gap-3.5 justify-between">
+          <!-- KPI Top: Total Products Sales -->
+          <div class="eco-card p-4 flex-1 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Products Sales</p>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="font-display text-2xl sm:text-[26px] font-extrabold text-zinc-900 dark:text-white tracking-tight">202,324</span>
+                  <span class="inline-flex items-center gap-0.5 rounded-full bg-limeAccent px-2 py-0.5 text-xs font-extrabold text-zinc-950">
+                    <span>+10%</span>
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-200 flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m7 14 3-3 3 3 4-4"/></svg>
+              </div>
+            </div>
+
+            <button onclick="setTableTab('orders')" class="pt-2.5 mt-2 border-t border-zinc-200/70 dark:border-zinc-700/70 flex items-center justify-between text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:opacity-75 cursor-pointer">
+              <span class="underline underline-offset-4">View Sales Details</span>
+              <span>→</span>
+            </button>
+          </div>
+
+          <!-- KPI Bottom: Total Volume Of Products -->
+          <div class="eco-card p-4 flex-1 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Volume Of Products</p>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="font-display text-2xl sm:text-[26px] font-extrabold text-zinc-900 dark:text-white tracking-tight">123,726</span>
+                  <span class="inline-flex items-center gap-0.5 rounded-full bg-coralAccent px-2 py-0.5 text-xs font-bold text-white">
+                    <span>-12%</span>
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 7l10 10"/><path d="M17 7v10H7"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-200 flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 9l2-5h14l2 5"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>
+              </div>
+            </div>
+
+            <button onclick="setTableTab('products')" class="pt-2.5 mt-2 border-t border-zinc-200/70 dark:border-zinc-700/70 flex items-center justify-between text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:opacity-75 cursor-pointer">
+              <span class="underline underline-offset-4">View All Products</span>
+              <span>→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Center Column (4 cols): Total Products Sales $500,324 Hatched + Black Capsule Chart -->
+        <div class="eco-card p-4 sm:px-5 lg:col-span-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Products Sales</p>
+                <div class="flex items-center gap-2.5 mt-1">
+                  <span id="capsuleHeroAmount" class="font-display text-2xl sm:text-[28px] font-extrabold text-zinc-900 dark:text-white tracking-tight">$500,324</span>
+                  <span class="inline-flex items-center gap-0.5 rounded-full bg-limeAccent px-2 py-0.5 text-xs font-extrabold text-zinc-950"><span>+45%</span><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>
+                </div>
+              </div>
+
+              <button onclick="showEcoToast('Revenue vs Profit Margin: 68.4% Gross Margin')" class="w-9 h-9 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 cursor-pointer">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-end gap-4 text-xs text-zinc-500 mt-2">
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#111317] dark:bg-white"></span>Total Revenue</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-300"></span>Total Profit</span>
+            </div>
+          </div>
+
+          <div class="mt-2">
+            <svg id="capsuleBarSvg" viewBox="0 0 380 185" class="w-full h-44 overflow-visible select-none"></svg>
+          </div>
+        </div>
+
+        <!-- Right Column (5 cols): Total Sales Statistics Segmented Donut with Corner Callouts -->
+        <div class="eco-card p-4 sm:px-5 lg:col-span-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display text-sm sm:text-base font-bold text-zinc-900 dark:text-white">Total Sales Statistics</h2>
+            <select onchange="switchStatsPeriod(this.value)" class="rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-200 focus:outline-none cursor-pointer">
+              <option value="Monthly">Monthly</option>
+              <option value="Quarterly">Quarterly</option>
+              <option value="Annual">Annual</option>
+            </select>
+          </div>
+
+          <!-- Donut + 4 Corner Callouts -->
+          <div class="relative grid grid-cols-3 items-center my-1">
+            <!-- Left Callouts -->
+            <div class="space-y-9 text-xs">
+              <div>
+                <p class="inline-flex items-center gap-1.5 text-zinc-400"><span class="w-2 h-2 rounded-full bg-zinc-200"></span>Furniture</p>
+                <p class="font-display text-sm font-extrabold text-zinc-900 dark:text-white mt-0.5">89,532</p>
+              </div>
+              <div>
+                <p class="inline-flex items-center gap-1.5 text-zinc-400"><span class="w-2 h-2 rounded-full bg-zinc-300"></span>Electronics</p>
+                <p class="font-display text-sm font-extrabold text-zinc-900 dark:text-white mt-0.5">90,231</p>
+              </div>
+            </div>
+
+            <!-- Center Segmented Donut -->
+            <div class="relative w-36 h-36 mx-auto flex items-center justify-center">
+              <svg id="ecoStatsDonut" viewBox="0 0 160 160" class="w-36 h-36 -rotate-90 overflow-visible"></svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                <span id="ecoDonutVal" class="font-display text-base font-extrabold text-zinc-900 dark:text-white">23,324</span>
+                <span class="mt-0.5 inline-flex items-center gap-0.5 rounded-full bg-limeAccent px-2 py-0.5 text-xs font-extrabold text-zinc-950"><span>+45%</span><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>
+              </div>
+            </div>
+
+            <!-- Right Callouts -->
+            <div class="space-y-9 text-xs text-right">
+              <div>
+                <p class="inline-flex items-center justify-end gap-1.5 text-zinc-500"><span class="w-2 h-2 rounded-full bg-[#111317] dark:bg-limeAccent"></span>Shoes</p>
+                <p class="font-display text-sm font-extrabold text-zinc-900 dark:text-white mt-0.5">188,500</p>
+              </div>
+              <div>
+                <p class="inline-flex items-center justify-end gap-1.5 text-zinc-400"><span class="w-2 h-2 rounded-full bg-zinc-400"></span>Clothes</p>
+                <p class="font-display text-sm font-extrabold text-zinc-900 dark:text-white mt-0.5">88,865</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center pt-1">
+            <p class="text-xs text-zinc-400">Total Number of Sales</p>
+            <p id="totalSalesBigCount" class="font-display text-xl font-extrabold text-zinc-900 dark:text-white mt-0.5">3,440,031</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           ROW 2: RECENT ORDERS / PRODUCT TABLE (8 COLS) + TOP SELLING PRODUCTS (4 COLS)
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+
+        <!-- Left (8 cols): Recent Orders & Product Inventory Table -->
+        <div class="eco-card p-4 sm:px-5 lg:col-span-8 flex flex-col justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div>
+              <div class="flex items-center gap-3">
+                <h2 id="tableSectionTitle" class="font-display text-base font-bold text-zinc-900 dark:text-white">Recent Orders</h2>
+                <div class="inline-flex rounded-full bg-white dark:bg-zinc-800 p-0.5 border border-zinc-200/80 dark:border-zinc-700 text-xs font-semibold">
+                  <button id="btnTabOrders" onclick="setTableTab('orders')" class="rounded-full bg-zinc-900 text-white px-2.5 py-0.5 cursor-pointer">Orders</button>
+                  <button id="btnTabProducts" onclick="setTableTab('products')" class="rounded-full text-zinc-500 px-2.5 py-0.5 cursor-pointer">Products</button>
+                </div>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5">Keep track of recent order data and product inventory.</p>
+            </div>
+
+            <button onclick="toggleOrdersProducts()" class="rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-900 hover:text-white transition cursor-pointer">
+              View All →
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead id="ecoTableHead"></thead>
+              <tbody id="ecoTableBody" class="divide-y divide-zinc-200/60 dark:divide-zinc-700/60 text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right (4 cols): Top Selling Products + Step-Cap Bar Chart -->
+        <div class="eco-card p-4 sm:px-5 lg:col-span-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="font-display text-sm sm:text-base font-bold text-zinc-900 dark:text-white">Top Selling Products</h2>
+            <span class="rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">Monthly ▾</span>
+          </div>
+
+          <!-- Featured Product Spotlight Card -->
+          <div onclick="cycleFeaturedProduct()" class="rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-700 p-3 flex items-center justify-between gap-3 shadow-sm cursor-pointer hover:border-zinc-400 transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-[#F4F5F7] dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
+                <!-- Crisp Smartwatch Vector Illustration -->
+                <svg class="w-7 h-7 text-zinc-900 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="7" y="6" width="10" height="12" rx="3" fill="currentColor" fill-opacity="0.12"/><path d="M9 6V3h6v3"/><path d="M9 18v3h6v-3"/><polyline points="12 9.5 12 12 13.8 13.2"/></svg>
+              </div>
+              <div class="truncate">
+                <p id="spotProdName" class="text-xs font-bold text-zinc-900 dark:text-white truncate">Apple Watch Series 10 46mm GPS</p>
+                <p id="spotProdMeta" class="text-xs text-zinc-400 mt-0.5">Brand: <strong class="text-zinc-700 dark:text-zinc-200">Apple</strong> · 10.2k Stock Available</p>
+                <p id="spotProdPrice" class="font-display text-xs font-extrabold text-zinc-900 dark:text-white mt-0.5">$799.00</p>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1 flex-shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-900 dark:bg-limeAccent"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+            </div>
+          </div>
+
+          <!-- Step-Cap Daily Sales Columns (Tue / Wed / Thu / Fri) -->
+          <div class="grid grid-cols-4 gap-3 items-end h-28 pt-4 px-2">
+            <div class="flex flex-col items-center gap-1.5">
+              <div class="w-full h-7 border-t-[3px] border-zinc-900 dark:border-limeAccent bg-gradient-to-b from-zinc-200/65 to-transparent dark:from-zinc-700/50 flex items-start justify-center pt-1">
+                <span class="text-xs font-semibold text-zinc-500">840</span>
+              </div>
+              <span class="text-xs font-medium text-zinc-500">Tue</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-1.5">
+              <div class="w-full h-14 border-t-[3px] border-zinc-900 dark:border-limeAccent bg-gradient-to-b from-zinc-200/75 to-transparent dark:from-zinc-700/50 flex items-center justify-center">
+                <span class="text-xs font-bold text-zinc-800 dark:text-white">2000</span>
+              </div>
+              <span class="text-xs font-medium text-zinc-500">Wed</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-1.5">
+              <div class="w-full h-20 border-t-[3px] border-zinc-900 dark:border-limeAccent bg-gradient-to-b from-zinc-200/75 to-transparent dark:from-zinc-700/50 flex items-start justify-center pt-1.5">
+                <span class="text-xs font-semibold text-zinc-500">6000</span>
+              </div>
+              <span class="text-xs font-medium text-zinc-500">Thu</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-1.5">
+              <div class="w-full h-10 border-t-[3px] border-zinc-900 dark:border-limeAccent bg-gradient-to-b from-zinc-200/65 to-transparent dark:from-zinc-700/50 flex items-start justify-center pt-1.5">
+                <span class="text-xs font-semibold text-zinc-500">1200</span>
+              </div>
+              <span class="text-xs font-medium text-zinc-500">Fri</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      </div>
+      <div id="tabSubpageView" class="hidden"></div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="ecoToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 rounded-full bg-zinc-950 text-white px-4 py-2 text-xs font-semibold shadow-xl flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-limeAccent"></span>
+    <span id="ecoToastMsg">Updated</span>
+  </div>
+
+  <script>
+    const CAPSULE_MONTHS = [
+      { m: 'Jan', rev: 3400, cap: 7000 },
+      { m: 'Feb', rev: 2800, cap: 6200 },
+      { m: 'Mar', rev: 4000, cap: 5800 },
+      { m: 'May', rev: 2300, cap: 5000 },
+      { m: 'Apr', rev: 4800, cap: 6300 },
+    ];
+
+    const DONUT_CATEGORIES = [
+      { name: 'Shoes', val: '188,500', pct: 41, color: '#141229' },
+      { name: 'Clothes', val: '88,865', pct: 20, color: '#B7BAC2' },
+      { name: 'Electronics', val: '90,231', pct: 20, color: '#D3D5DC' },
+      { name: 'Furniture', val: '89,532', pct: 19, color: '#EAEBEF' },
+    ];
+
+    const ORDERS = [
+      { id: '#202523', product: 'AirPods Pro Max', date: '28 Mar 2025', payment: 'Mastercard', amount: '$1,230.00', status: 'In Progress', bg: 'bg-emerald-100 text-emerald-700' },
+      { id: '#202522', product: 'Summer Clothes', date: '27 Mar 2025', payment: 'PayPal', amount: '$3,112.00', status: 'Complete', bg: 'bg-amber-100 text-amber-700' },
+      { id: '#202521', product: 'Nike Shoes', date: '26 Mar 2025', payment: 'Mastercard', amount: '$1,211.00', status: 'Waiting', bg: 'bg-sky-100 text-sky-700' },
+      { id: '#202520', product: 'Front Table Oak', date: '25 Mar 2025', payment: 'Visa', amount: '$4,212.00', status: 'In Progress', bg: 'bg-zinc-200 text-zinc-700' },
+    ];
+
+    const PRODUCTS_TABLE = [
+      { sku: 'SKU-AP99', product: 'AirPods Pro Max', category: 'Electronics', stock: '418 pcs', price: '$549.00', status: 'In Stock' },
+      { sku: 'SKU-AW10', product: 'Apple Watch Series 10', category: 'Wearables', stock: '10,200 pcs', price: '$799.00', status: 'Best Seller' },
+      { sku: 'SKU-NK42', product: 'Nike Air Zoom Shoes', category: 'Shoes', stock: '1,290 pcs', price: '$189.00', status: 'In Stock' },
+      { sku: 'SKU-FT08', product: 'Minimalist Oak Table', category: 'Furniture', stock: '64 pcs', price: '$620.00', status: 'Low Stock' },
+    ];
+
+    const SPOTLIGHTS = [
+      { name: 'Apple Watch Series 10 46mm GPS', meta: 'Brand: Apple · 10.2k Stock Available', price: '$799.00' },
+      { name: 'AirPods Pro Max Spatial Audio', meta: 'Brand: Apple · 4.8k Stock Available', price: '$549.00' },
+      { name: 'Nike ZoomX Alphafly Next%', meta: 'Brand: Nike · 2.9k Stock Available', price: '$285.00' },
+    ];
+
+    let activeTableMode = 'orders';
+    let spotIdx = 0;
+
+    function renderCapsuleChart() {
+      const svg = document.getElementById('capsuleBarSvg');
+      const leftX = 38;
+      const botY = 174;
+      const topY = 14;
+      const h = botY - topY;
+      const maxV = 7500;
+
+      const yLabels = [1000, 2000, 3000, 4000, 5000, 6000, 7000]
+        .map((v) => {
+          const y = (botY - (v / maxV) * h).toFixed(1);
+          return `<text x="30" y="${Number(y) + 4}" text-anchor="end" class="fill-zinc-400 text-[12px]">${v}</text>`;
+        })
+        .join('');
+
+      const bars = CAPSULE_MONTHS.map((d, i) => {
+        const x = 52 + i * 64;
+        const barW = 48;
+        const totalH = (d.cap / maxV) * h;
+        const revH = (d.rev / maxV) * h;
+        const topCapY = botY - totalH;
+        const revY = botY - revH;
+
+        return `
+          <g class="capsule-grow cursor-pointer" onclick="showEcoToast('${d.m}: $${(d.rev * 100).toLocaleString()} Revenue')">
+            <!-- Diagonal Striped Upper Capsule -->
+            <rect x="${x}" y="${topCapY.toFixed(1)}" width="${barW}" height="${totalH.toFixed(1)}" rx="14" fill="url(#diagHatch)"/>
+            <!-- Numeric Readout Above Solid Black Bar -->
+            <text x="${x + barW / 2}" y="${(revY - 5).toFixed(1)}" text-anchor="middle" class="fill-zinc-500 text-[12px] font-medium">${d.rev}</text>
+            <!-- Solid Black Revenue Capsule -->
+            <rect x="${x}" y="${revY.toFixed(1)}" width="${barW}" height="${revH.toFixed(1)}" rx="13" fill="#121316"/>
+            <!-- Bottom Month Pill -->
+            <rect x="${x + 9}" y="${(botY - 19).toFixed(1)}" width="30" height="15" rx="7.5" fill="#2A2C32"/>
+            <text x="${x + barW / 2}" y="${(botY - 8.5).toFixed(1)}" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="600">${d.m}</text>
+          </g>
+        `;
+      }).join('');
+
+      svg.innerHTML = `
+        <defs>
+          <pattern id="diagHatch" width="7" height="7" patternTransform="rotate(42 0 0)" patternUnits="userSpaceOnUse">
+            <rect width="7" height="7" fill="#ECEEF2"/>
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#D5D8E0" stroke-width="2.5"/>
+          </pattern>
+        </defs>
+        ${yLabels}
+        ${bars}
+      `;
+    }
+
+    function renderEcoDonut() {
+      const svg = document.getElementById('ecoStatsDonut');
+      const r = 58;
+      const circum = 2 * Math.PI * r;
+      const gap = 4;
+      let acc = 0;
+
+      svg.innerHTML = DONUT_CATEGORIES.map((c) => {
+        const seg = (c.pct / 100) * circum - gap;
+        const off = -acc;
+        acc += (c.pct / 100) * circum;
+        return `
+          <circle
+            class="eco-donut-seg"
+            cx="80" cy="80" r="${r}"
+            fill="none"
+            stroke="${c.color}"
+            stroke-width="20"
+            stroke-dasharray="${seg.toFixed(1)} ${circum.toFixed(1)}"
+            stroke-dashoffset="${off.toFixed(1)}"
+            onmouseenter="document.getElementById('ecoDonutVal').textContent='${c.val}'"
+            onmouseleave="document.getElementById('ecoDonutVal').textContent='23,324'"
+          />
+        `;
+      }).join('');
+    }
+
+    function renderTableSection() {
+      const q = document.getElementById('ecoSearchInput').value.trim().toLowerCase();
+      const thead = document.getElementById('ecoTableHead');
+      const tbody = document.getElementById('ecoTableBody');
+
+      if (activeTableMode === 'orders') {
+        thead.innerHTML = `
+          <tr class="border-b border-zinc-200/70 dark:border-zinc-700 text-xs font-medium text-zinc-400">
+            <th class="pb-2 font-medium">Order Id</th>
+            <th class="pb-2 font-medium">Product Name</th>
+            <th class="pb-2 font-medium">Date</th>
+            <th class="pb-2 font-medium">Payment</th>
+            <th class="pb-2 font-medium">Amount</th>
+            <th class="pb-2 font-medium">Status</th>
+            <th class="pb-2 font-medium text-right">Action</th>
+          </tr>
+        `;
+
+        const rows = ORDERS.filter(
+          (o) =>
+            !q ||
+            o.id.toLowerCase().includes(q) ||
+            o.product.toLowerCase().includes(q) ||
+            o.payment.toLowerCase().includes(q)
+        );
+
+        tbody.innerHTML = rows
+          .map((o, idx) => {
+            const stCls =
+              o.status === 'Complete'
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                : o.status === 'Waiting'
+                ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300'
+                : 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300';
+
+            return `
+              <tr class="hover:bg-white/80 dark:hover:bg-zinc-800/60 transition">
+                <td class="py-2.5 font-semibold text-zinc-700 dark:text-zinc-200">${o.id}</td>
+                <td class="py-2.5">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-lg ${o.bg} flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      ${o.product.slice(0, 1)}
+                    </span>
+                    <span class="font-semibold text-zinc-800 dark:text-white">${o.product}</span>
+                  </div>
+                </td>
+                <td class="py-2.5 text-zinc-500 dark:text-zinc-400">${o.date}</td>
+                <td class="py-2.5 text-zinc-600 dark:text-zinc-300">${o.payment}</td>
+                <td class="py-2.5 font-bold text-zinc-800 dark:text-white">${o.amount}</td>
+                <td class="py-2.5">
+                  <button onclick="cycleOrderStatus(${idx})" class="rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer ${stCls}">
+                    ${o.status}
+                  </button>
+                </td>
+                <td class="py-2.5 text-right text-zinc-500 font-bold tracking-widest cursor-pointer" onclick="showEcoToast('Order ${o.id} invoice opened')">•••</td>
+              </tr>
+            `;
+          })
+          .join('');
+      } else {
+        thead.innerHTML = `
+          <tr class="border-b border-zinc-200/70 dark:border-zinc-700 text-xs font-medium text-zinc-400">
+            <th class="pb-2 font-medium">SKU</th>
+            <th class="pb-2 font-medium">Product Name</th>
+            <th class="pb-2 font-medium">Category</th>
+            <th class="pb-2 font-medium">Available Stock</th>
+            <th class="pb-2 font-medium">Unit Price</th>
+            <th class="pb-2 font-medium text-right">Inventory Status</th>
+          </tr>
+        `;
+
+        const rows = PRODUCTS_TABLE.filter(
+          (p) => !q || p.product.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+        );
+
+        tbody.innerHTML = rows
+          .map(
+            (p) => `
+            <tr class="hover:bg-white/80 dark:hover:bg-zinc-800/60 transition">
+              <td class="py-2.5 font-mono font-semibold text-zinc-600 dark:text-zinc-300">${p.sku}</td>
+              <td class="py-2.5 font-bold text-zinc-900 dark:text-white">${p.product}</td>
+              <td class="py-2.5 text-zinc-500">${p.category}</td>
+              <td class="py-2.5 font-semibold text-zinc-700 dark:text-zinc-200">${p.stock}</td>
+              <td class="py-2.5 font-bold text-zinc-900 dark:text-white">${p.price}</td>
+              <td class="py-2.5 text-right">
+                <span class="rounded-full bg-limeAccent px-2.5 py-0.5 text-xs font-extrabold text-zinc-950">${p.status}</span>
+              </td>
+            </tr>
+          `
+          )
+          .join('');
+      }
+    }
+
+    function cycleOrderStatus(idx) {
+      const states = ['In Progress', 'Complete', 'Waiting'];
+      const curr = states.indexOf(ORDERS[idx].status);
+      ORDERS[idx].status = states[(curr + 1) % states.length];
+      renderTableSection();
+      showEcoToast(`Order ${ORDERS[idx].id} → ${ORDERS[idx].status}`);
+    }
+
+    function setTableTab(mode) {
+      activeTableMode = mode;
+      document.getElementById('tableSectionTitle').textContent = mode === 'orders' ? 'Recent Orders' : 'Product Inventory';
+      document.getElementById('btnTabOrders').className =
+        mode === 'orders'
+          ? 'rounded-full bg-zinc-900 text-white px-2.5 py-0.5 cursor-pointer'
+          : 'rounded-full text-zinc-500 px-2.5 py-0.5 cursor-pointer';
+      document.getElementById('btnTabProducts').className =
+        mode === 'products'
+          ? 'rounded-full bg-zinc-900 text-white px-2.5 py-0.5 cursor-pointer'
+          : 'rounded-full text-zinc-500 px-2.5 py-0.5 cursor-pointer';
+      renderTableSection();
+    }
+
+    function toggleOrdersProducts() {
+      setTableTab(activeTableMode === 'orders' ? 'products' : 'orders');
+    }
+
+    function cycleFeaturedProduct() {
+      spotIdx = (spotIdx + 1) % SPOTLIGHTS.length;
+      const s = SPOTLIGHTS[spotIdx];
+      document.getElementById('spotProdName').textContent = s.name;
+      document.getElementById('spotProdMeta').textContent = s.meta;
+      document.getElementById('spotProdPrice').textContent = s.price;
+      showEcoToast(`Spotlight: ${s.name}`);
+    }
+
+    function switchStatsPeriod(val) {
+      const map = { Monthly: '3,440,031', Quarterly: '9,812,400', Annual: '38,490,120' };
+      document.getElementById('totalSalesBigCount').textContent = map[val] || '3,440,031';
+      showEcoToast(`Sales Statistics: ${val}`);
+    }
+
+    const ECO_SUBPAGES = {
+      Products: {
+        title: 'Product Catalog & Warehouse Stock',
+        subtitle: 'Manage active SKUs, warehouse replenishment thresholds, and gross unit margins',
+        badge: '418 Active SKUs',
+        badgeCls: 'bg-limeAccent text-zinc-950',
+        ctaLabel: 'Add New SKU',
+        ctaToast: 'Opened new SKU draft in Ecomora Catalog Studio',
+        kpis: [
+          { label: 'Active Catalog SKUs', val: '418', pill: '+14 New', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Across 4 core categories' },
+          { label: 'Warehouse Units Available', val: '123,726', pill: '+6.4%', pillCls: 'bg-limeAccent text-zinc-950', sub: '98.9% barcode accuracy' },
+          { label: 'Low Stock Alerts', val: '9 SKUs', pill: 'Restock', pillCls: 'bg-coralAccent text-white', sub: 'Below 75-unit threshold' },
+          { label: 'Catalog Gross Margin', val: '68.4%', pill: '+2.1%', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Weighted by sell-through' }
+        ],
+        visualTitle: 'Category Sell-Through & Stock Health',
+        visualSub: 'Inventory velocity across flagship Ecomora departments',
+        bars: [
+          { label: 'Footwear & Performance Shoes', val: '188,500 sold', pct: 86, detail: '94% in-stock rate' },
+          { label: 'Spatial Audio & Wearables', val: '90,231 sold', pct: 74, detail: '10.6k units ready' },
+          { label: 'Seasonal Capsule Apparel', val: '88,865 sold', pct: 68, detail: 'Spring drop active' },
+          { label: 'Minimalist Oak Furniture', val: '89,532 sold', pct: 56, detail: 'Lead time 4 days' }
+        ],
+        tableTitle: 'Flagship SKU Inventory Matrix',
+        columns: ['SKU', 'Product Name', 'Available Stock', 'Price', 'Status', 'Action'],
+        rows: [
+          { c1: 'SKU-AW10', c2: 'Apple Watch Series 10 46mm', stock: 10200, c4: '$799.00', status: 'Best Seller', btn: 'Restock +100' },
+          { c1: 'SKU-AP99', c2: 'AirPods Pro Max USB-C', stock: 418, c4: '$549.00', status: 'In Stock', btn: 'Restock +100' },
+          { c1: 'SKU-NK42', c2: 'Nike ZoomX Alphafly Next%', stock: 1290, c4: '$285.00', status: 'Fast Mover', btn: 'Restock +100' },
+          { c1: 'SKU-FT08', c2: 'Minimalist Solid Oak Desk', stock: 64, c4: '$620.00', status: 'Low Stock', btn: 'Restock +100' },
+          { c1: 'SKU-MC19', c2: 'Heavyweight Merino Overshirt', stock: 845, c4: '$195.00', status: 'In Stock', btn: 'Restock +100' }
+        ]
+      },
+      Purchases: {
+        title: 'Purchases, Checkout & Fulfillment',
+        subtitle: 'Live order settlement stream, carrier manifests, and return authorizations',
+        badge: '98.2% On-Time Dispatch',
+        badgeCls: 'bg-limeAccent text-zinc-950',
+        ctaLabel: 'Export Manifest CSV',
+        ctaToast: 'Exported Ecomora_Fulfillment_Manifest_2025.csv',
+        kpis: [
+          { label: '30-Day Completed Orders', val: '14,820', pill: '+18%', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Avg 1.9 items per cart' },
+          { label: 'Gross Merchandise Value', val: '$500,324', pill: '+45%', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Settled via Stripe & PayPal' },
+          { label: 'Awaiting Carrier Pickup', val: '42', pill: '12 Express', pillCls: 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900', sub: 'DHL + FedEx Priority' },
+          { label: 'Return / Refund Rate', val: '0.8%', pill: '-0.3%', pillCls: 'bg-coralAccent text-white', sub: 'Well below 2.5% benchmark' }
+        ],
+        visualTitle: 'Fulfillment Stage Velocity',
+        visualSub: 'Real-time order pipeline from payment capture to doorstep delivery',
+        bars: [
+          { label: '1. Payment Captured & Fraud Cleared', val: '14,820', pct: 100, detail: '99.4% auth approval' },
+          { label: '2. Picked & Packed at Hub', val: '14,395', pct: 92, detail: 'Median 38m warehouse SLA' },
+          { label: '3. In Carrier Express Transit', val: '13,980', pct: 82, detail: 'Live GPS webhook active' },
+          { label: '4. Verified Doorstep Delivery', val: '13,603', pct: 76, detail: '4.92/5 delivery CSAT' }
+        ],
+        tableTitle: 'Recent Purchase Orders',
+        columns: ['Order ID', 'Customer & Item', 'Payment', 'Total', 'Fulfillment', 'Action'],
+        rows: [
+          { c1: '#202529', c2: 'Elena Rostova · Apple Watch S10', c3: 'Apple Pay', c4: '$799.00', status: 'Ready to Ship', btn: 'Print Label' },
+          { c1: '#202528', c2: 'Marcus Vance · AirPods Pro Max (x2)', c3: 'Mastercard', c4: '$1,098.00', status: 'In Transit', btn: 'Track Parcel' },
+          { c1: '#202527', c2: 'Sora Takahashi · Minimalist Oak Desk', c3: 'Visa', c4: '$620.00', status: 'Delivered', btn: 'Send Receipt' },
+          { c1: '#202526', c2: 'Liam OConnor · Nike ZoomX Alphafly', c3: 'PayPal', c4: '$285.00', status: 'In Transit', btn: 'Track Parcel' },
+          { c1: '#202525', c2: 'Chloe Laurent · Capsule Wardrobe Bundle', c3: 'Mastercard', c4: '$1,420.00', status: 'Delivered', btn: 'Send Receipt' }
+        ]
+      },
+      Customers: {
+        title: 'Customer Segments & Lifetime Value',
+        subtitle: 'Repeat buyer retention cohorts, VIP tier loyalty, and AOV expansion',
+        badge: '48,610 Active Buyers',
+        badgeCls: 'bg-limeAccent text-zinc-950',
+        ctaLabel: 'Export VIP Segment',
+        ctaToast: 'Exported 3,240 VIP Black Tier profiles to CSV',
+        kpis: [
+          { label: 'Registered Buyers', val: '48,610', pill: '+12.4%', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Verified opt-in profiles' },
+          { label: 'Repeat Purchase Rate', val: '41.8%', pill: '+5.2%', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Within 90-day window' },
+          { label: 'Average Order Value', val: '$164.50', pill: '+$14.20', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Boosted by cart bundles' },
+          { label: 'VIP Black Members', val: '3,240', pill: '34% of GMV', pillCls: 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900', sub: '>$1,200 annual spend' }
+        ],
+        visualTitle: 'Revenue Contribution by Loyalty Tier',
+        visualSub: 'Share of total GMV generated across buyer lifecycle segments',
+        bars: [
+          { label: 'VIP Black Tier (5+ Orders)', val: '$170,110', pct: 88, detail: '$482 avg LTV' },
+          { label: 'Repeat Loyalists (3–4 Orders)', val: '$145,090', pct: 74, detail: '$310 avg LTV' },
+          { label: 'Second-Purchase Converts', val: '$105,068', pct: 55, detail: '$218 avg LTV' },
+          { label: 'First-Time Storefront Guests', val: '$80,056', pct: 42, detail: '$136 initial cart' }
+        ],
+        tableTitle: 'Top Lifetime Value Buyers',
+        columns: ['Buyer', 'Tier', 'Orders', 'Lifetime Spend', 'Last Seen', 'Action'],
+        rows: [
+          { c1: 'Elena Rostova', c2: 'VIP Black', c3: '19 orders', c4: '$6,840.00', status: '2h ago', btn: 'Gift Early Drop' },
+          { c1: 'Marcus Vance', c2: 'VIP Black', c3: '14 orders', c4: '$5,120.00', status: '5h ago', btn: 'Gift Early Drop' },
+          { c1: 'Sora Takahashi', c2: 'VIP Black', c3: '12 orders', c4: '$4,490.00', status: 'Yesterday', btn: 'Gift Early Drop' },
+          { c1: 'Chloe Laurent', c2: 'Loyalist', c3: '9 orders', c4: '$3,280.00', status: '2d ago', btn: 'Send 15% Code' },
+          { c1: 'Liam OConnor', c2: 'Loyalist', c3: '8 orders', c4: '$2,715.00', status: '3d ago', btn: 'Send 15% Code' }
+        ]
+      },
+      Analytics: {
+        title: 'Storefront Funnel & Attribution Analytics',
+        subtitle: 'Session conversion velocity, channel ROAS, and cart recovery performance',
+        badge: '4.18% Checkout CVR',
+        badgeCls: 'bg-limeAccent text-zinc-950',
+        ctaLabel: 'Download Q1 Deck',
+        ctaToast: 'Downloaded Ecomora_Attribution_Analytics_Q1.pdf',
+        kpis: [
+          { label: 'Monthly Store Sessions', val: '612,400', pill: '+24%', pillCls: 'bg-limeAccent text-zinc-950', sub: '68% mobile storefront' },
+          { label: 'Add-to-Cart Rate', val: '11.6%', pill: '+1.4%', pillCls: 'bg-limeAccent text-zinc-950', sub: '71,038 active carts' },
+          { label: 'Checkout Conversion', val: '4.18%', pill: '+0.6%', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Express pay lift +19%' },
+          { label: 'Blended Paid ROAS', val: '4.8x', pill: '+0.9x', pillCls: 'bg-limeAccent text-zinc-950', sub: 'CAC payback in 18 days' }
+        ],
+        visualTitle: 'Storefront Conversion Funnel',
+        visualSub: 'Step-by-step shopping progression across 612.4k monthly sessions',
+        bars: [
+          { label: 'Product Detail Page Views', val: '428,680', pct: 92, detail: '70.0% of sessions' },
+          { label: 'Added Item to Bag', val: '71,038', pct: 58, detail: '11.6% add-to-cart' },
+          { label: 'Reached Express Checkout', val: '38,580', pct: 38, detail: '54.3% cart progression' },
+          { label: 'Completed Paid Order', val: '25,598', pct: 26, detail: '66.3% checkout completion' }
+        ],
+        tableTitle: 'Acquisition Channel Attribution',
+        columns: ['Traffic Channel', 'Sessions', 'Conv. Rate', 'Attributed GMV', 'ROAS', 'Action'],
+        rows: [
+          { c1: 'Direct & Branded Search', c2: '214,000', c3: '5.4%', c4: '$198,400', status: 'Organic', btn: 'Inspect Cohort' },
+          { c1: 'Instagram & TikTok Shop', c2: '168,500', c3: '3.9%', c4: '$124,800', status: '5.2x ROAS', btn: 'Boost Budget' },
+          { c1: 'Google Shopping PLA', c2: '118,200', c3: '4.1%', c4: '$96,200', status: '4.6x ROAS', btn: 'Boost Budget' },
+          { c1: 'VIP Email & SMS Flows', c2: '64,900', c3: '6.8%', c4: '$54,124', status: '18.4x ROI', btn: 'Inspect Flow' },
+          { c1: 'Creator Capsule Affiliates', c2: '46,800', c3: '3.2%', c4: '$26,800', status: '3.9x ROAS', btn: 'View Partners' }
+        ]
+      },
+      Settings: {
+        title: 'Store Configuration & Checkout Preferences',
+        subtitle: 'Manage payment gateways, automated warehouse rules, tax compliance, and fraud shield',
+        badge: 'Production Storefront Live',
+        badgeCls: 'bg-limeAccent text-zinc-950',
+        ctaLabel: 'Save Configuration',
+        ctaToast: 'Saved Ecomora global storefront configuration',
+        kpis: [
+          { label: 'Payment Gateways', val: 'Stripe + PayPal', pill: '99.99% Up', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Apple Pay & Link active' },
+          { label: 'Global Shipping Zones', val: '14 Markets', pill: 'DHL + FedEx', pillCls: 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900', sub: 'Duty-paid DDP enabled' },
+          { label: 'Automated Tax Engine', val: 'Synced', pill: 'US + EU VAT', pillCls: 'bg-limeAccent text-zinc-950', sub: 'Real-time nexus calculation' }
+        ],
+        visualTitle: 'Infrastructure & Checkout Diagnostics',
+        visualSub: 'Live storefront edge latency, webhook health, and PCI-DSS status',
+        bars: [
+          { label: 'Edge Storefront TTFB Speed', val: '42ms', pct: 95, detail: '99/100 Core Web Vitals' },
+          { label: 'Stripe Webhook Delivery', val: '99.98%', pct: 98, detail: 'Zero missed settlements' },
+          { label: 'Warehouse ERP Stock Sync', val: '15s cycle', pct: 90, detail: 'Bi-directional SKU lock' },
+          { label: '3DS2 Fraud Shield Score', val: '0.04%CB', pct: 86, detail: 'Chargeback guard optimal' }
+        ],
+        tableTitle: 'Storefront & Automation Controls',
+        toggles: [
+          { title: 'Express One-Click Checkout (Apple Pay & Link)', desc: 'Displays instant biometric checkout button on product and bag drawers', on: true },
+          { title: 'Automated Warehouse Purchase Order (< 75 units)', desc: 'Dispatches restock draft to preferred supplier when SKU dips below safety floor', on: true },
+          { title: 'Abandoned Bag SMS + Email Recovery Flow', desc: 'Sends personalized 10% incentive 45 minutes after high-intent checkout exit', on: true },
+          { title: 'Multi-Currency Local Price Rounding (EUR / GBP / JPY)', desc: 'Automatically formats duties and psychological .00 rounding by visitor GeoIP', on: false },
+          { title: 'Strict 3D-Secure Verification Above $500 Carts', desc: 'Requires issuer step-up authentication on high-value international orders', on: true }
+        ]
+      }
+    };
+
+    function restockEcoSubRow(idx) {
+      const rows = ECO_SUBPAGES.Products.rows;
+      if (!rows[idx]) return;
+      rows[idx].stock += 100;
+      rows[idx].status = 'In Stock';
+      renderEcoSubpage('Products');
+      showEcoToast(`Restocked ${rows[idx].c1} → ${rows[idx].stock.toLocaleString()} pcs available`);
+    }
+
+    function toggleEcoSetting(idx) {
+      const list = ECO_SUBPAGES.Settings.toggles;
+      if (!list[idx]) return;
+      list[idx].on = !list[idx].on;
+      renderEcoSubpage('Settings');
+      showEcoToast(`${list[idx].title}: ${list[idx].on ? 'Enabled' : 'Disabled'}`);
+    }
+
+    function renderEcoSubpage(tabKey) {
+      const data = ECO_SUBPAGES[tabKey];
+      const container = document.getElementById('tabSubpageView');
+      if (!data || !container) return;
+
+      const gridCols = data.kpis.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 xl:grid-cols-4';
+
+      const kpiHtml = data.kpis.map((k) => `
+        <div class="eco-card p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">${k.label}</span>
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-extrabold ${k.pillCls}">${k.pill}</span>
+          </div>
+          <p class="font-display text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight mt-2.5">${k.val}</p>
+          <p class="text-xs text-zinc-400 mt-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-700/70">${k.sub}</p>
+        </div>
+      `).join('');
+
+      const barsHtml = data.bars.map((b) => `
+        <div onclick="showEcoToast('${b.label}: ${b.val} (${b.detail})')" class="rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200/70 dark:border-zinc-700 p-3 cursor-pointer hover:border-zinc-400 transition">
+          <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+            <span class="font-bold text-zinc-800 dark:text-white">${b.label}</span>
+            <span class="font-semibold text-zinc-600 dark:text-zinc-300">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-zinc-200/80 dark:bg-zinc-700 overflow-hidden">
+            <div class="h-full rounded-full bg-[#111317] dark:bg-limeAccent transition-all duration-500" style="width:${b.pct}%"></div>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1">${b.detail}</p>
+        </div>
+      `).join('');
+
+      let rightContent = '';
+      if (data.toggles) {
+        rightContent = `
+          <div class="space-y-2.5">
+            ${data.toggles.map((t, idx) => `
+              <div onclick="toggleEcoSetting(${idx})" class="rounded-2xl bg-white dark:bg-zinc-800/80 border ${t.on ? 'border-zinc-300 dark:border-limeAccent/40' : 'border-zinc-200/70 dark:border-zinc-700'} p-3.5 flex items-center justify-between gap-4 cursor-pointer transition">
+                <div class="min-w-0">
+                  <p class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white">${t.title}</p>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">${t.desc}</p>
+                </div>
+                <button type="button" aria-pressed="${t.on}" class="w-11 h-6 rounded-full p-0.5 flex items-center flex-shrink-0 transition ${t.on ? 'bg-[#111317] dark:bg-limeAccent justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}">
+                  <span class="w-5 h-5 rounded-full ${t.on ? 'bg-white dark:bg-zinc-950' : 'bg-white'} shadow-sm"></span>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        rightContent = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-zinc-200/70 dark:border-zinc-700 text-xs font-medium text-zinc-400">
+                  <th class="pb-2.5 pr-2 font-medium">${data.columns[0]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[1]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[2]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[3]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[4]}</th>
+                  <th class="pb-2.5 pl-2 font-medium text-right">${data.columns[5]}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-200/60 dark:divide-zinc-700/60 text-xs">
+                ${data.rows.map((r, idx) => {
+                  const col3Val = r.stock !== undefined ? `${r.stock.toLocaleString()} pcs` : r.c3;
+                  const actCall = tabKey === 'Products'
+                    ? `restockEcoSubRow(${idx})`
+                    : `showEcoToast('${r.btn}: ${r.c1} (${r.c2.replace(/'/g, '')})')`;
+                  const pillClass = r.status === 'Low Stock'
+                    ? 'bg-coralAccent text-white'
+                    : 'bg-limeAccent/80 text-zinc-950';
+                  return `
+                    <tr class="hover:bg-white/80 dark:hover:bg-zinc-800/60 transition">
+                      <td class="py-3 pr-2 font-bold text-zinc-800 dark:text-zinc-100">${r.c1}</td>
+                      <td class="py-3 px-2 font-semibold text-zinc-800 dark:text-white">${r.c2}</td>
+                      <td class="py-3 px-2 text-zinc-600 dark:text-zinc-300">${col3Val}</td>
+                      <td class="py-3 px-2 font-bold text-zinc-900 dark:text-white">${r.c4}</td>
+                      <td class="py-3 px-2"><span class="rounded-full px-2.5 py-0.5 text-xs font-bold ${pillClass}">${r.status}</span></td>
+                      <td class="py-3 pl-2 text-right">
+                        <button onclick="${actCall}" class="rounded-full bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-950 hover:text-white dark:hover:bg-limeAccent dark:hover:text-zinc-950 px-3 py-1 text-xs font-semibold transition cursor-pointer">
+                          ${r.btn}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <!-- Sub-Page Header -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200/75 dark:border-zinc-800">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="returnToEcoOverview()" class="inline-flex items-center gap-1.5 rounded-full bg-[#F5F6F8] dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 px-3.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Overview</span>
+                </button>
+                <span class="rounded-full px-3 py-1 text-xs font-extrabold ${data.badgeCls}">${data.badge}</span>
+              </div>
+              <h1 class="font-display text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight pt-0.5">${data.title}</h1>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">${data.subtitle}</p>
+            </div>
+            <button onclick="showEcoToast('${data.ctaToast}')" class="inline-flex items-center gap-1.5 rounded-full bg-[#111317] dark:bg-limeAccent text-white dark:text-zinc-950 px-4 py-2 text-xs font-bold shadow-sm hover:opacity-90 transition cursor-pointer">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>${data.ctaLabel}</span>
+            </button>
+          </div>
+
+          <!-- Module KPI Row -->
+          <div class="grid grid-cols-1 ${gridCols} gap-3.5">
+            ${kpiHtml}
+          </div>
+
+          <!-- Visual Chart/Progress Block + Interactive 5-Row Table/Settings -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+            <div class="eco-card p-4 sm:px-5 lg:col-span-5 flex flex-col justify-between">
+              <div class="mb-3">
+                <h2 class="font-display text-base font-bold text-zinc-900 dark:text-white">${data.visualTitle}</h2>
+                <p class="text-xs text-zinc-400 mt-0.5">${data.visualSub}</p>
+              </div>
+              <div class="space-y-2.5 my-auto">
+                ${barsHtml}
+              </div>
+            </div>
+
+            <div class="eco-card p-4 sm:px-5 lg:col-span-7 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="font-display text-base font-bold text-zinc-900 dark:text-white">${data.tableTitle}</h2>
+                  <p class="text-xs text-zinc-400 mt-0.5">Live Ecomora store controls with instant toast feedback</p>
+                </div>
+                <span class="rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">Synced</span>
+              </div>
+              ${rightContent}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function returnToEcoOverview(silent = false) {
+      document.querySelectorAll('header nav .top-nav-btn').forEach((b) => {
+        b.classList.toggle('active', b.dataset.ecoTab === 'Dashboard');
+      });
+      document.getElementById('tabSubpageView').classList.add('hidden');
+      document.getElementById('defaultDashboardView').classList.remove('hidden');
+      if (!silent) showEcoToast('Returned to Ecomora Dashboard Overview');
+    }
+
+    function switchEcoNav(btn, tabKey) {
+      document.querySelectorAll('header nav .top-nav-btn').forEach((b) => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (tabKey === 'Dashboard') {
+        returnToEcoOverview(true);
+        showEcoToast('Ecomora Dashboard Overview');
+      } else {
+        document.getElementById('defaultDashboardView').classList.add('hidden');
+        const sub = document.getElementById('tabSubpageView');
+        sub.classList.remove('hidden');
+        renderEcoSubpage(tabKey);
+        showEcoToast(`Opened ${tabKey}`);
+      }
+    }
+
+    function toggleEcoDark() {
+      document.documentElement.classList.toggle('dark');
+      const dark = document.documentElement.classList.contains('dark');
+      showEcoToast(dark ? 'Ecomora Dark Mode enabled' : 'Ecomora Monochrome Light Mode enabled');
+    }
+
+    let ecoTimer = null;
+    function showEcoToast(msg) {
+      const el = document.getElementById('ecoToast');
+      document.getElementById('ecoToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(ecoTimer);
+      ecoTimer = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+      }, 2500);
+    }
+
+    // Boot
+    renderCapsuleChart();
+    renderEcoDonut();
+    renderTableSection();
+  </script>
+</body>
+</html>

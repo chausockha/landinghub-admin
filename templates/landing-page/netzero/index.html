@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NET ZERO — A Better Future Starts With Net Zero</title>
+  <meta name="description" content="Accelerating the transition toward a sustainable, low-carbon world through innovation, renewable energy, and collective climate action." />
+
+  <!-- Google Fonts: Plus Jakarta Sans + Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            body: ['Inter', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            nz: {
+              forest: '#174D38',
+              sage: '#A8C5A0',
+              lime: '#C5E86C',
+              bg: '#F7F8F2',
+              surface: '#FFFFFF',
+              charcoal: '#202A24',
+              muted: '#718078',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --color-primary: #174D38;
+      --color-secondary: #A8C5A0;
+      --color-accent: #C5E86C;
+      --color-bg: #F7F8F2;
+      --color-surface: #FFFFFF;
+      --color-text: #202A24;
+      --color-muted: #718078;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Lightweight Scroll-Triggered Reveal */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal-on-scroll {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#F7F8F2] text-[#202A24] antialiased selection:bg-[#174D38] selection:text-[#C5E86C]">
+
+  <!-- Skip to Main Content for Accessibility -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-[#174D38] focus:text-[#F7F8F2] focus:font-semibold">
+    Skip to main content
+  </a>
+
+  <!-- =========================================================================
+       A. NAVIGATION BAR (Minimal transparent sticky nav with blur on scroll)
+  ========================================================================== -->
+  <header id="site-navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 py-6">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between">
+      <!-- Brand Logo: NET ZERO -->
+      <a href="#home" class="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#174D38]">
+        <span class="w-8 h-8 rounded-full bg-[#174D38] flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#C5E86C]"></span>
+        </span>
+        <span class="text-lg font-extrabold tracking-[0.14em] text-[#202A24]">NET ZERO</span>
+      </a>
+
+      <!-- Desktop Links: Home, About, Our Impact, Solutions, Resources -->
+      <nav aria-label="Primary Navigation" class="hidden md:flex items-center gap-9">
+        <a href="#home" class="text-sm font-medium text-[#202A24]/80 hover:text-[#174D38] transition-colors">Home</a>
+        <a href="#about" class="text-sm font-medium text-[#202A24]/80 hover:text-[#174D38] transition-colors">About</a>
+        <a href="#impact" class="text-sm font-medium text-[#202A24]/80 hover:text-[#174D38] transition-colors">Our Impact</a>
+        <a href="#solutions" class="text-sm font-medium text-[#202A24]/80 hover:text-[#174D38] transition-colors">Solutions</a>
+        <a href="#resources" class="text-sm font-medium text-[#202A24]/80 hover:text-[#174D38] transition-colors">Resources</a>
+      </nav>
+
+      <!-- Primary CTA: Join the Movement -->
+      <div class="hidden md:flex items-center">
+        <a href="#cta" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#174D38] text-[#F7F8F2] text-sm font-semibold hover:bg-[#202A24] transition-colors duration-200">
+          <span>Join the Movement</span>
+          <!-- Lucide ArrowUpRight -->
+          <svg class="w-4 h-4 text-[#C5E86C]" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-nav-toggle" type="button" aria-label="Toggle Menu" aria-expanded="false" aria-controls="mobile-nav-drawer" class="md:hidden p-2.5 text-[#202A24] hover:text-[#174D38] cursor-pointer">
+        <svg id="icon-menu-open" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-nav-drawer" class="hidden md:hidden bg-[#F7F8F2] border-b border-[#202A24]/10 px-6 pt-4 pb-8 space-y-4 mt-4">
+      <nav class="flex flex-col space-y-3">
+        <a href="#home" class="mobile-nav-link text-base font-semibold text-[#202A24] py-1">Home</a>
+        <a href="#about" class="mobile-nav-link text-base font-semibold text-[#202A24] py-1">About</a>
+        <a href="#impact" class="mobile-nav-link text-base font-semibold text-[#202A24] py-1">Our Impact</a>
+        <a href="#solutions" class="mobile-nav-link text-base font-semibold text-[#202A24] py-1">Solutions</a>
+        <a href="#resources" class="mobile-nav-link text-base font-semibold text-[#202A24] py-1">Resources</a>
+      </nav>
+      <div class="pt-2">
+        <a href="#cta" class="mobile-nav-link w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#174D38] text-[#F7F8F2] text-sm font-semibold">
+          <span>Join the Movement</span>
+          <svg class="w-4 h-4 text-[#C5E86C]" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- =======================================================================
+         B. HERO SECTION
+    ======================================================================== -->
+    <section id="home" class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-[#F7F8F2]">
+      <!-- Subtle Organic Topographic Contour SVG Decoration -->
+      <svg class="absolute top-0 right-0 w-[640px] h-[640px] text-[#A8C5A0]/30 pointer-events-none select-none" viewBox="0 0 600 600" fill="none" aria-hidden="true">
+        <path d="M520 -40C420 80 560 220 430 340C300 460 140 380 40 540" stroke="currentColor" stroke-width="1.5" />
+        <path d="M580 10C470 120 590 260 460 390C330 520 180 440 80 590" stroke="currentColor" stroke-width="1" />
+        <circle cx="430" cy="340" r="4.5" fill="#174D38" fill-opacity="0.35" />
+      </svg>
+
+      <div class="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
+        <!-- Editorial Eyebrow -->
+        <div class="inline-flex flex-wrap items-center gap-3 pb-6 border-b border-[#202A24]/10 mb-8">
+          <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-widest bg-[#C5E86C] text-[#174D38]">
+            2050 Climate Initiative
+          </span>
+          <span class="text-xs sm:text-sm font-medium text-[#718078] tracking-wide">
+            Pathway to Global Carbon Neutrality &amp; Biosphere Stewardship
+          </span>
+        </div>
+
+        <!-- Oversized Editorial Headline + Supporting Description -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end mb-14 lg:mb-16">
+          <div class="lg:col-span-8">
+            <h1 class="text-4xl sm:text-6xl lg:text-[4.65rem] font-extrabold text-[#202A24] tracking-[-0.035em] leading-[1.03]">
+              A Better Future Starts With
+              <span class="text-[#174D38] underline decoration-[#C5E86C] decoration-4 underline-offset-8">Net Zero.</span>
+            </h1>
+          </div>
+
+          <div class="lg:col-span-4 space-y-7">
+            <p class="font-body text-base sm:text-lg text-[#718078] leading-relaxed">
+              Accelerating the transition toward a sustainable, low-carbon world through innovation, renewable energy, and collective climate action.
+            </p>
+
+            <!-- Primary & Secondary CTAs -->
+            <div class="flex flex-wrap items-center gap-4">
+              <a href="#about" class="inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#174D38] text-[#F7F8F2] text-sm font-semibold hover:bg-[#202A24] transition-colors duration-200">
+                <span>Explore Our Mission</span>
+                <svg class="w-4 h-4 text-[#C5E86C]" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7" />
+                </svg>
+              </a>
+
+              <a href="#impact" class="inline-flex items-center gap-2 px-6 py-3.5 border border-[#202A24]/20 text-[#202A24] text-sm font-semibold hover:border-[#174D38] hover:bg-white transition-colors duration-200">
+                <span>Discover Our Impact</span>
+                <svg class="w-4 h-4 text-[#174D38]" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 7l10 10M17 7v10H7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Large Immersive Nature Photograph + Small Carbon Reduction Statistic -->
+        <div class="relative overflow-hidden bg-[#174D38] group">
+          <div class="aspect-[16/9] sm:aspect-[21/9] w-full overflow-hidden">
+            <img
+              id="hero-parallax-img"
+              src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=2000&q=85"
+              alt="Misty evergreen mountain forest representing natural carbon sequestration"
+              class="w-full h-full object-cover object-center transform group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-[#202A24]/70 via-[#202A24]/15 to-transparent"></div>
+          </div>
+
+          <!-- Small Carbon Reduction Statistic Badge -->
+          <div class="relative sm:absolute sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-[#202A24] sm:bg-transparent p-6 sm:p-0">
+            <div class="bg-[#FFFFFF] text-[#202A24] p-5 sm:p-6 max-w-sm border-l-4 border-[#C5E86C] shadow-lg">
+              <div class="flex items-center justify-between gap-4 mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-[#718078]">
+                  Annual Carbon Intensity
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-[#C5E86C] text-[#174D38]">
+                  <!-- Lucide TrendingDown -->
+                  <svg class="w-3.5 h-3.5" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M23 18l-9.5-9.5-5 5L1 6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 18h6v-6" />
+                  </svg>
+                  -42.8% YoY
+                </span>
+              </div>
+              <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#174D38] font-mono">
+                184 gCO₂e / kWh
+              </div>
+              <p class="text-xs text-[#718078] mt-1 font-body">
+                Modeled reduction across participating clean-energy corridors (Illustrative benchmark).
+              </p>
+            </div>
+
+            <div class="hidden sm:block text-right text-[#F7F8F2]/90 text-xs tracking-wider uppercase font-mono bg-[#202A24]/65 backdrop-blur-sm px-4 py-2.5">
+              Temperate Biosphere Corridor &bull; 47.6062° N, 122.3321° W
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         C. IMPACT STATISTICS (Architectural Hairline Grid — Not Boxed Cards)
+    ======================================================================== -->
+    <section id="stats-section" aria-label="Impact Statistics" class="py-20 lg:py-24 bg-[#F7F8F2] border-y border-[#202A24]/10 reveal-on-scroll">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
+          <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#174D38]">
+            01 / Collective Progress Indicators
+          </span>
+          <span class="text-xs text-[#718078] italic font-body">
+            * Illustrative placeholder data for design demonstration — not verified real-world impact.
+          </span>
+        </div>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#202A24]/12 border-t border-b border-[#202A24]/10">
+          <!-- Metric 1: Carbon Emissions Reduced -->
+          <div class="py-8 sm:px-7 first:sm:pl-0 last:sm:pr-0 flex flex-col justify-between">
+            <div>
+              <dt class="text-xs font-bold uppercase tracking-wider text-[#718078]">Carbon Emissions Reduced</dt>
+              <dd class="mt-4 text-5xl lg:text-6xl font-extrabold tracking-tight text-[#174D38] tabular-nums">
+                <span class="stat-counter" data-target="14.8" data-decimals="1">14.8</span><span class="text-[#202A24]">M</span>
+              </dd>
+              <div class="mt-2 inline-block px-2.5 py-0.5 text-xs font-semibold bg-[#A8C5A0]/30 text-[#174D38]">
+                Metric Tons CO₂e (Illustrative)
+              </div>
+            </div>
+            <p class="mt-4 text-xs sm:text-sm text-[#718078] leading-relaxed font-body">
+              Cumulative modeled abatement across clean industrial transitions.
+            </p>
+          </div>
+
+          <!-- Metric 2: Renewable Energy Generated -->
+          <div class="py-8 sm:px-7 first:sm:pl-0 last:sm:pr-0 flex flex-col justify-between">
+            <div>
+              <dt class="text-xs font-bold uppercase tracking-wider text-[#718078]">Renewable Energy Generated</dt>
+              <dd class="mt-4 text-5xl lg:text-6xl font-extrabold tracking-tight text-[#174D38] tabular-nums">
+                <span class="stat-counter" data-target="9420" data-decimals="0">9,420</span>
+              </dd>
+              <div class="mt-2 inline-block px-2.5 py-0.5 text-xs font-semibold bg-[#A8C5A0]/30 text-[#174D38]">
+                Gigawatt-Hours (GWh)
+              </div>
+            </div>
+            <p class="mt-4 text-xs sm:text-sm text-[#718078] leading-relaxed font-body">
+              Utility-scale solar, wind, and microgrid capacity dispatched.
+            </p>
+          </div>
+
+          <!-- Metric 3: Trees Protected -->
+          <div class="py-8 sm:px-7 first:sm:pl-0 last:sm:pr-0 flex flex-col justify-between">
+            <div>
+              <dt class="text-xs font-bold uppercase tracking-wider text-[#718078]">Trees Protected</dt>
+              <dd class="mt-4 text-5xl lg:text-6xl font-extrabold tracking-tight text-[#174D38] tabular-nums">
+                <span class="stat-counter" data-target="4.2" data-decimals="1">4.2</span><span class="text-[#202A24]">M</span>
+              </dd>
+              <div class="mt-2 inline-block px-2.5 py-0.5 text-xs font-semibold bg-[#A8C5A0]/30 text-[#174D38]">
+                Native Canopy Trees
+              </div>
+            </div>
+            <p class="mt-4 text-xs sm:text-sm text-[#718078] leading-relaxed font-body">
+              High-integrity biosphere corridors under long-term stewardship.
+            </p>
+          </div>
+
+          <!-- Metric 4: Sustainable Projects -->
+          <div class="py-8 sm:px-7 first:sm:pl-0 last:sm:pr-0 flex flex-col justify-between">
+            <div>
+              <dt class="text-xs font-bold uppercase tracking-wider text-[#718078]">Sustainable Projects</dt>
+              <dd class="mt-4 text-5xl lg:text-6xl font-extrabold tracking-tight text-[#174D38] tabular-nums">
+                <span class="stat-counter" data-target="380" data-decimals="0">380</span><span class="text-[#202A24]">+</span>
+              </dd>
+              <div class="mt-2 inline-block px-2.5 py-0.5 text-xs font-semibold bg-[#A8C5A0]/30 text-[#174D38]">
+                Global Deployments
+              </div>
+            </div>
+            <p class="mt-4 text-xs sm:text-sm text-[#718078] leading-relaxed font-body">
+              Active infrastructure and grid-decarbonization programs worldwide.
+            </p>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         D. OUR MISSION (Editorial Split-Screen Layout)
+    ======================================================================== -->
+    <section id="about" class="py-24 lg:py-32 bg-[#FFFFFF] reveal-on-scroll">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+
+          <!-- Left Column (6 Cols): Large Environmental Photography -->
+          <div class="lg:col-span-6 lg:sticky lg:top-28">
+            <div class="relative overflow-hidden bg-[#174D38] group">
+              <div class="aspect-[4/5] w-full overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1400&q=85"
+                  alt="Clean wind energy turbines across lush green highlands"
+                  class="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+              </div>
+              <div className="bg-[#174D38] text-[#F7F8F2] p-6 flex items-center justify-between">
+                <div class="p-6 bg-[#174D38] text-[#F7F8F2] flex items-center justify-between">
+                  <div>
+                    <span class="text-xs uppercase tracking-widest text-[#A8C5A0] block">
+                      Field Monograph 04 — Clean Baseload
+                    </span>
+                    <p class="text-sm font-semibold mt-1">
+                      Harmonizing utility-scale renewable generation with watershed conservation.
+                    </p>
+                  </div>
+                  <span class="text-2xl font-extrabold text-[#C5E86C] font-mono ml-4">1.5°C</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column (6 Cols): Editorial Mission Narrative -->
+          <div class="lg:col-span-6 space-y-10">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#174D38] block mb-4">
+                02 / Our Mission
+              </span>
+              <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#202A24] tracking-[-0.025em] leading-[1.12]">
+                Decarbonizing industry without compromising ecological integrity.
+              </h2>
+              <p class="mt-6 font-body text-base sm:text-lg text-[#718078] leading-relaxed">
+                Reaching Net Zero requires more than distant pledges. It demands a structural transformation in how energy is generated, how materials are manufactured, and how natural carbon sinks are protected.
+              </p>
+            </div>
+
+            <!-- Editorial Pull Quote -->
+            <blockquote class="border-l-4 border-[#174D38] bg-[#F7F8F2] p-6">
+              <p class="text-lg font-semibold text-[#202A24] italic leading-relaxed">
+                “True climate leadership means replacing fossil intensity with clean electrification today—while restoring the living ecosystems that stabilize our atmosphere.”
+              </p>
+              <footer class="mt-3 text-xs font-bold uppercase tracking-wider text-[#174D38]">
+                — Net Zero Scientific Advisory Charter
+              </footer>
+            </blockquote>
+
+            <!-- 3 Editorial Pillars -->
+            <div class="divide-y divide-[#202A24]/12 border-t border-b border-[#202A24]/10">
+              <div class="py-6 grid grid-cols-12 gap-4 items-start">
+                <span class="col-span-2 text-sm font-extrabold text-[#174D38] font-mono pt-1">/01</span>
+                <div class="col-span-10">
+                  <h3 class="text-lg font-bold text-[#202A24]">Science-Aligned Carbon Reduction</h3>
+                  <p class="mt-2 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                    We prioritize direct operational abatement across Scope 1, 2, and 3 emissions before any reliance on external offsets, aligning every pathway with the 1.5°C threshold.
+                  </p>
+                </div>
+              </div>
+
+              <div class="py-6 grid grid-cols-12 gap-4 items-start">
+                <span class="col-span-2 text-sm font-extrabold text-[#174D38] font-mono pt-1">/02</span>
+                <div class="col-span-10">
+                  <h3 class="text-lg font-bold text-[#202A24]">Clean Energy Grid Transformation</h3>
+                  <p class="mt-2 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                    Replacing fossil-baseload dependence with 24/7 carbon-free energy procurement, utility-scale storage, and distributed renewable microgrids.
+                  </p>
+                </div>
+              </div>
+
+              <div class="py-6 grid grid-cols-12 gap-4 items-start">
+                <span class="col-span-2 text-sm font-extrabold text-[#174D38] font-mono pt-1">/03</span>
+                <div class="col-span-10">
+                  <h3 class="text-lg font-bold text-[#202A24]">Radical Environmental Responsibility</h3>
+                  <p class="mt-2 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                    Every climate metric is backed by auditable telemetry, transparent lifecycle assessments, and long-term ecological stewardship.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         E. OUR SOLUTIONS (Asymmetric 4-Card Bento Grid Layout)
+    ======================================================================== -->
+    <section id="solutions" class="py-24 lg:py-32 bg-[#F7F8F2] reveal-on-scroll">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <!-- Section Header -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end mb-14">
+          <div class="lg:col-span-7">
+            <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#174D38] block mb-4">
+              03 / Our Solutions
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-[#202A24] tracking-[-0.025em] leading-[1.08]">
+              Engineered systems for systemic decarbonization.
+            </h2>
+          </div>
+          <div class="lg:col-span-5">
+            <p class="font-body text-base text-[#718078] leading-relaxed">
+              Four interconnected pillars combining clean energy infrastructure, direct industrial abatement, low-carbon construction, and continuous emissions intelligence.
+            </p>
+          </div>
+        </div>
+
+        <!-- Bento Grid (12 Columns: 7+5 on Row 1, 5+7 on Row 2) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- Bento Card 1 (7 Cols): Renewable Energy -->
+          <article class="lg:col-span-7 bg-[#FFFFFF] text-[#202A24] border border-[#202A24]/10 p-8 sm:p-10 flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div>
+              <div class="flex items-center justify-between gap-4 mb-8">
+                <div class="w-12 h-12 flex items-center justify-center border border-[#202A24]/10 bg-[#F7F8F2] text-[#174D38]">
+                  <!-- Lucide Wind Icon -->
+                  <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.6 4.6A2 2 0 1 1 11 8H2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12.6 19.4A2 2 0 1 0 14 16H2" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#718078]">
+                  Clean Power Infrastructure
+                </span>
+              </div>
+
+              <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-between">
+                <span>Renewable Energy</span>
+                <svg class="w-5 h-5 text-[#174D38] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+                </svg>
+              </h3>
+
+              <p class="mt-4 font-body text-sm sm:text-base text-[#718078] leading-relaxed max-w-xl">
+                Accelerating utility-scale solar, offshore wind integration, and intelligent battery storage to deliver 24/7 carbon-free electricity for industrial and municipal grids.
+              </p>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-[#202A24]/10 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+              <div class="sm:col-span-7 overflow-hidden h-36 bg-[#174D38]">
+                <img
+                  src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80"
+                  alt="Utility-scale solar array installation"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div class="sm:col-span-5 bg-[#F7F8F2] p-4 border border-[#202A24]/10">
+                <span class="text-[12.5px] font-bold uppercase tracking-wider text-[#718078] block">
+                  Grid Carbon Intensity
+                </span>
+                <span class="text-2xl font-extrabold text-[#174D38] font-mono mt-1 block">
+                  -68.4% gCO₂/kWh
+                </span>
+                <span class="text-[12.5px] text-[#718078] mt-1 block">
+                  Solar + Wind + Storage Dispatch
+                </span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Bento Card 2 (5 Cols): Carbon Reduction (Forest Green Theme) -->
+          <article class="lg:col-span-5 bg-[#174D38] text-[#F7F8F2] border border-[#174D38] p-8 sm:p-10 flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div>
+              <div class="flex items-center justify-between gap-4 mb-8">
+                <div class="w-12 h-12 flex items-center justify-center border border-[#A8C5A0]/30 bg-[#202A24]/30 text-[#C5E86C]">
+                  <!-- Lucide TrendingDown Icon -->
+                  <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M23 18l-9.5-9.5-5 5L1 6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 18h6v-6" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#A8C5A0]">
+                  Industrial Decarbonization
+                </span>
+              </div>
+
+              <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-between">
+                <span>Carbon Reduction</span>
+                <svg class="w-5 h-5 text-[#C5E86C] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+                </svg>
+              </h3>
+
+              <p class="mt-4 font-body text-sm sm:text-base text-[#F7F8F2]/80 leading-relaxed">
+                Deep process electrification, green hydrogen thermal retrofits, and supply-chain abatement engineered to eliminate hard-to-abate emissions at the source.
+              </p>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-[#A8C5A0]/20 space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-[#A8C5A0] uppercase tracking-wider font-semibold">Abatement Efficiency</span>
+                <span class="font-mono font-bold text-[#C5E86C] text-base">92.4% Direct Capture</span>
+              </div>
+              <div class="grid grid-cols-5 gap-2 items-end h-20 pt-2" aria-hidden="true">
+                <div class="bg-[#A8C5A0]/30 h-full"></div>
+                <div class="bg-[#A8C5A0]/45 h-4/5"></div>
+                <div class="bg-[#A8C5A0]/65 h-3/5"></div>
+                <div class="bg-[#C5E86C]/80 h-2/5"></div>
+                <div class="bg-[#C5E86C] h-1/5"></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Bento Card 3 (5 Cols): Sustainable Infrastructure (Sage Theme) -->
+          <article class="lg:col-span-5 bg-[#A8C5A0]/25 text-[#202A24] border border-[#202A24]/10 p-8 sm:p-10 flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div>
+              <div class="flex items-center justify-between gap-4 mb-8">
+                <div class="w-12 h-12 flex items-center justify-center border border-[#202A24]/10 bg-[#F7F8F2] text-[#174D38]">
+                  <!-- Lucide Building2 Icon -->
+                  <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6h4M10 10h4M10 14h4M10 18h4" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#718078]">
+                  Low-Carbon Built Environment
+                </span>
+              </div>
+
+              <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-between">
+                <span>Sustainable Infrastructure</span>
+                <svg class="w-5 h-5 text-[#174D38] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+                </svg>
+              </h3>
+
+              <p class="mt-4 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                Net-zero architectural retrofits, low-embodied-carbon materials, and circular district heating systems designed for climate-resilient cities.
+              </p>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-[#202A24]/10">
+              <div class="flex items-center justify-between bg-[#FFFFFF] p-4 border border-[#202A24]/10">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-[#718078] block">
+                    Embodied Carbon Savings
+                  </span>
+                  <span class="text-xl font-extrabold text-[#174D38] font-mono mt-0.5 block">
+                    -41% vs. Baseline
+                  </span>
+                </div>
+                <svg class="w-20 h-12 text-[#174D38]" viewBox="0 0 80 48" fill="none" aria-hidden="true">
+                  <rect x="4" y="14" width="24" height="30" stroke="currentColor" stroke-width="1.5" />
+                  <rect x="32" y="6" width="28" height="38" stroke="currentColor" stroke-width="1.5" />
+                  <line x1="0" y1="44" x2="80" y2="44" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              </div>
+            </div>
+          </article>
+
+          <!-- Bento Card 4 (7 Cols): Carbon Monitoring -->
+          <article class="lg:col-span-7 bg-[#FFFFFF] text-[#202A24] border border-[#202A24]/10 p-8 sm:p-10 flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div>
+              <div class="flex items-center justify-between gap-4 mb-8">
+                <div class="w-12 h-12 flex items-center justify-center border border-[#202A24]/10 bg-[#F7F8F2] text-[#174D38]">
+                  <!-- Lucide Activity Icon -->
+                  <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <polyline stroke-linecap="round" stroke-linejoin="round" points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#718078]">
+                  Real-Time GHG Telemetry
+                </span>
+              </div>
+
+              <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-between">
+                <span>Carbon Monitoring</span>
+                <svg class="w-5 h-5 text-[#174D38] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+                </svg>
+              </h3>
+
+              <p class="mt-4 font-body text-sm sm:text-base text-[#718078] leading-relaxed max-w-xl">
+                Continuous sensor-driven accounting across Scope 1, 2, and 3 boundaries—transforming fragmented operational data into audit-ready climate intelligence.
+              </p>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-[#202A24]/10 space-y-3">
+              <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#718078]">
+                <span>Live Scope 1 / 2 / 3 Accounting Stream</span>
+                <span class="text-[#174D38] bg-[#C5E86C] px-2.5 py-0.5 font-mono">ISO 14064-1 / AR6</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <div class="bg-[#F7F8F2] p-3.5 border border-[#202A24]/10">
+                  <span class="text-[12.5px] text-[#718078] block">Scope 1 Direct</span>
+                  <strong class="text-sm font-extrabold text-[#202A24] font-mono">21.4% Share</strong>
+                </div>
+                <div class="bg-[#F7F8F2] p-3.5 border border-[#202A24]/10">
+                  <span class="text-[12.5px] text-[#718078] block">Scope 2 Grid Power</span>
+                  <strong class="text-sm font-extrabold text-[#174D38] font-mono">30.2% Share</strong>
+                </div>
+                <div class="bg-[#F7F8F2] p-3.5 border border-[#202A24]/10">
+                  <span class="text-[12.5px] text-[#718078] block">Scope 3 Value Chain</span>
+                  <strong class="text-sm font-extrabold text-[#202A24] font-mono">48.4% Share</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         F. HOW NET ZERO WORKS (3-Step Connected Infographic Process)
+    ======================================================================== -->
+    <section id="resources" class="py-24 lg:py-32 bg-[#FFFFFF] border-t border-[#202A24]/10 reveal-on-scroll">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="max-w-3xl mb-16 lg:mb-20">
+          <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#174D38] block mb-4">
+            04 / How Net Zero Works
+          </span>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-[#202A24] tracking-[-0.025em] leading-[1.08]">
+            A rigorous three-stage framework from baseline to neutrality.
+          </h2>
+        </div>
+
+        <div class="relative">
+          <!-- Connected Horizontal Line on Desktop -->
+          <div class="hidden lg:block absolute top-10 left-0 right-0 h-px bg-[#202A24]/15" aria-hidden="true"></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-10 relative z-10">
+            <!-- Step 1: Measure Carbon Footprint -->
+            <div class="flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-4 mb-8">
+                  <div class="w-20 h-20 bg-[#F7F8F2] border-2 border-[#174D38] flex flex-col items-center justify-center shrink-0">
+                    <span class="text-[12.5px] font-bold uppercase tracking-widest text-[#718078]">Step</span>
+                    <span class="text-xl font-extrabold text-[#174D38] font-mono">01</span>
+                  </div>
+                  <div class="w-12 h-12 bg-[#C5E86C]/35 flex items-center justify-center text-[#174D38]">
+                    <!-- Lucide Gauge -->
+                    <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m12 14 4-4" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.34 19a10 10 0 1 1 17.32 0" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#174D38] block">
+                  Comprehensive Scope 1, 2 &amp; 3 Baseline
+                </span>
+                <h3 class="mt-2 text-2xl font-extrabold text-[#202A24]">
+                  Measure Carbon Footprint
+                </h3>
+                <p class="mt-4 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                  Establish a rigorous, audit-grade inventory of direct facility emissions, purchased energy, and upstream/downstream value-chain activities using IPCC AR6 emission factors.
+                </p>
+              </div>
+              <div class="mt-8 pt-4 border-t border-[#202A24]/10 flex items-center justify-between text-xs font-semibold text-[#202A24]">
+                <span>Output: Verified GHG Inventory &amp; Hotspot Matrix</span>
+                <span class="w-2 h-2 rounded-full bg-[#174D38]"></span>
+              </div>
+            </div>
+
+            <!-- Step 2: Reduce Carbon Emissions -->
+            <div class="flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-4 mb-8">
+                  <div class="w-20 h-20 bg-[#F7F8F2] border-2 border-[#174D38] flex flex-col items-center justify-center shrink-0">
+                    <span class="text-[12.5px] font-bold uppercase tracking-widest text-[#718078]">Step</span>
+                    <span class="text-xl font-extrabold text-[#174D38] font-mono">02</span>
+                  </div>
+                  <div class="w-12 h-12 bg-[#C5E86C]/35 flex items-center justify-center text-[#174D38]">
+                    <!-- Lucide Zap -->
+                    <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                      <polygon stroke-linecap="round" stroke-linejoin="round" points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#174D38] block">
+                  Decarbonize Operations &amp; Energy Mix
+                </span>
+                <h3 class="mt-2 text-2xl font-extrabold text-[#202A24]">
+                  Reduce Carbon Emissions
+                </h3>
+                <p class="mt-4 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                  Execute high-impact abatement levers: transition to 100% renewable power procurement, electrify thermal processes, and re-engineer logistics for minimal carbon intensity.
+                </p>
+              </div>
+              <div class="mt-8 pt-4 border-t border-[#202A24]/10 flex items-center justify-between text-xs font-semibold text-[#202A24]">
+                <span>Output: Science-Based 2030/2050 Abatement Roadmap</span>
+                <span class="w-2 h-2 rounded-full bg-[#174D38]"></span>
+              </div>
+            </div>
+
+            <!-- Step 3: Offset Remaining Emissions -->
+            <div class="flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-4 mb-8">
+                  <div class="w-20 h-20 bg-[#F7F8F2] border-2 border-[#174D38] flex flex-col items-center justify-center shrink-0">
+                    <span class="text-[12.5px] font-bold uppercase tracking-widest text-[#718078]">Step</span>
+                    <span class="text-xl font-extrabold text-[#174D38] font-mono">03</span>
+                  </div>
+                  <div class="w-12 h-12 bg-[#C5E86C]/35 flex items-center justify-center text-[#174D38]">
+                    <!-- Lucide Trees -->
+                    <svg class="w-6 h-6" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10 10v.2A3 3 0 0 1 8.9 16v0H5v0h0a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16v6" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13 19v3" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#174D38] block">
+                  Permanent Carbon Removal &amp; Restoration
+                </span>
+                <h3 class="mt-2 text-2xl font-extrabold text-[#202A24]">
+                  Offset Remaining Emissions
+                </h3>
+                <p class="mt-4 font-body text-sm sm:text-base text-[#718078] leading-relaxed">
+                  Neutralize unavoidable residual emissions (&lt;10%) through verified nature-based reforestation, coastal blue carbon, and durable engineered carbon removal.
+                </p>
+              </div>
+              <div class="mt-8 pt-4 border-t border-[#202A24]/10 flex items-center justify-between text-xs font-semibold text-[#202A24]">
+                <span>Output: Net Zero Balance &amp; Retirement Registry</span>
+                <span class="w-2 h-2 rounded-full bg-[#174D38]"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         G. OUR IMPACT (Dark Immersive Section with Nature Photography + Charts)
+    ======================================================================== -->
+    <section id="impact" class="py-24 lg:py-32 bg-[#202A24] text-[#F7F8F2] overflow-hidden reveal-on-scroll">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end mb-16">
+          <div class="lg:col-span-7">
+            <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#C5E86C] block mb-4">
+              05 / Our Impact &amp; Trajectory
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-[#FFFFFF] tracking-[-0.025em] leading-[1.08]">
+              Measurable progress toward a net-zero biosphere.
+            </h2>
+          </div>
+          <div class="lg:col-span-5">
+            <p class="font-body text-base text-[#A8C5A0] leading-relaxed">
+              Tracking the structural decline in carbon intensity alongside the expansion of renewable generation and protected forest sinks. All figures represent illustrative scenario modeling.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+          <!-- Left 5 Cols: Large Nature Photography + Sequestration Progress -->
+          <div class="lg:col-span-5 flex flex-col justify-between bg-[#174D38] border border-[#A8C5A0]/20 overflow-hidden">
+            <div class="relative h-72 sm:h-80 overflow-hidden group">
+              <img
+                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=85"
+                alt="Old-growth forest canopy absorbing atmospheric carbon"
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#174D38] via-transparent to-transparent"></div>
+              <span class="absolute top-4 left-4 px-3 py-1 text-xs font-bold uppercase tracking-wider bg-[#202A24]/80 text-[#C5E86C]">
+                Biosphere Carbon Sink
+              </span>
+            </div>
+
+            <div class="p-8 space-y-6">
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wider text-[#A8C5A0]">
+                  Natural Sequestration Capacity
+                </div>
+                <div class="text-4xl font-extrabold text-[#FFFFFF] font-mono mt-2">
+                  3.2M tCO₂e / yr
+                </div>
+                <p class="font-body text-xs sm:text-sm text-[#A8C5A0]/90 mt-2 leading-relaxed">
+                  Modeled annual sequestration across protected temperate and mangrove reforestation corridors (Illustrative benchmark).
+                </p>
+              </div>
+
+              <div class="space-y-4 pt-4 border-t border-[#A8C5A0]/20">
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1.5">
+                    <span class="text-[#F7F8F2]">2030 Interim Decarbonization Target</span>
+                    <span class="text-[#C5E86C] font-mono">68% Achieved</span>
+                  </div>
+                  <div class="w-full h-2 bg-[#202A24]">
+                    <div class="h-full bg-[#C5E86C]" style="width: 68%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1.5">
+                    <span class="text-[#F7F8F2]">24/7 Clean Baseload Coverage</span>
+                    <span class="text-[#A8C5A0] font-mono">82% Grid Mix</span>
+                  </div>
+                  <div class="w-full h-2 bg-[#202A24]">
+                    <div class="h-full bg-[#A8C5A0]" style="width: 82%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 7 Cols: Clean Decarbonization Trajectory Visualization -->
+          <div class="lg:col-span-7 bg-[#174D38]/40 border border-[#A8C5A0]/20 p-8 sm:p-10 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#A8C5A0]/15">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-[#A8C5A0] block">
+                    Modeled Emissions Pathway (2020 – 2050)
+                  </span>
+                  <h3 class="text-xl sm:text-2xl font-bold text-[#FFFFFF] mt-1">
+                    Net Emissions Index vs. Unmitigated Baseline
+                  </h3>
+                </div>
+
+                <div class="flex items-center gap-5 text-xs">
+                  <span class="flex items-center gap-2 text-[#F7F8F2]">
+                    <span class="w-3 h-3 bg-[#C5E86C] inline-block"></span>
+                    Net Emissions Index
+                  </span>
+                  <span class="flex items-center gap-2 text-[#A8C5A0]">
+                    <span class="w-3 h-3 border border-[#A8C5A0] inline-block"></span>
+                    Unmitigated Baseline
+                  </span>
+                </div>
+              </div>
+
+              <!-- SVG Data Visualization -->
+              <div class="mt-8">
+                <svg viewBox="0 0 640 240" class="w-full h-auto" role="img" aria-label="Decarbonization trajectory chart from 2020 to 2050">
+                  <g class="text-[12.5px] fill-[#A8C5A0]/70 font-mono">
+                    <line x1="45" y1="25" x2="610" y2="25" stroke="#A8C5A0" stroke-opacity="0.15" />
+                    <text x="36" y="29" text-anchor="end">100%</text>
+
+                    <line x1="45" y1="90" x2="610" y2="90" stroke="#A8C5A0" stroke-opacity="0.15" />
+                    <text x="36" y="94" text-anchor="end">60%</text>
+
+                    <line x1="45" y1="155" x2="610" y2="155" stroke="#A8C5A0" stroke-opacity="0.15" />
+                    <text x="36" y="159" text-anchor="end">20%</text>
+
+                    <line x1="45" y1="195" x2="610" y2="195" stroke="#A8C5A0" stroke-opacity="0.4" />
+                    <text x="36" y="199" text-anchor="end">0%</text>
+                  </g>
+
+                  <!-- Dashed Unmitigated Baseline Line -->
+                  <polyline fill="none" stroke="#A8C5A0" stroke-width="1.75" stroke-dasharray="5,5" points="80,45 164,38 248,30 332,24 416,18 500,14 584,10" />
+
+                  <!-- 2020: 100% -->
+                  <g>
+                    <rect x="64" y="45" width="32" height="150" fill="#C5E86C" fill-opacity="0.85" />
+                    <text x="80" y="37" text-anchor="middle" class="text-xs font-mono font-bold fill-[#F7F8F2]">100%</text>
+                    <text x="80" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#A8C5A0]">2020</text>
+                  </g>
+                  <!-- 2025: 78% -->
+                  <g>
+                    <rect x="148" y="78" width="32" height="117" fill="#C5E86C" fill-opacity="0.85" />
+                    <text x="164" y="70" text-anchor="middle" class="text-xs font-mono font-bold fill-[#F7F8F2]">78%</text>
+                    <text x="164" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#A8C5A0]">2025</text>
+                  </g>
+                  <!-- 2030: 48% -->
+                  <g>
+                    <rect x="232" y="123" width="32" height="72" fill="#C5E86C" fill-opacity="0.85" />
+                    <text x="248" y="115" text-anchor="middle" class="text-xs font-mono font-bold fill-[#F7F8F2]">48%</text>
+                    <text x="248" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#A8C5A0]">2030</text>
+                  </g>
+                  <!-- 2035: 29% -->
+                  <g>
+                    <rect x="316" y="151" width="32" height="44" fill="#C5E86C" fill-opacity="0.85" />
+                    <text x="332" y="143" text-anchor="middle" class="text-xs font-mono font-bold fill-[#F7F8F2]">29%</text>
+                    <text x="332" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#A8C5A0]">2035</text>
+                  </g>
+                  <!-- 2040: 16% -->
+                  <g>
+                    <rect x="400" y="171" width="32" height="24" fill="#C5E86C" fill-opacity="0.85" />
+                    <text x="416" y="163" text-anchor="middle" class="text-xs font-mono font-bold fill-[#F7F8F2]">16%</text>
+                    <text x="416" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#A8C5A0]">2040</text>
+                  </g>
+                  <!-- 2045: 8% -->
+                  <g>
+                    <rect x="484" y="183" width="32" height="12" fill="#C5E86C" fill-opacity="0.85" />
+                    <text x="500" y="175" text-anchor="middle" class="text-xs font-mono font-bold fill-[#F7F8F2]">8%</text>
+                    <text x="500" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#A8C5A0]">2045</text>
+                  </g>
+                  <!-- 2050: 0% Net Zero -->
+                  <g>
+                    <rect x="568" y="191" width="32" height="4" fill="#C5E86C" />
+                    <text x="584" y="182" text-anchor="middle" class="text-xs font-mono font-bold fill-[#C5E86C]">0% NET ZERO</text>
+                    <text x="584" y="220" text-anchor="middle" class="text-[12.5px] font-mono font-semibold fill-[#C5E86C]">2050</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-5 border-t border-[#A8C5A0]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#A8C5A0]">
+              <span>Methodology: IPCC AR6 GWP-100 &bull; Science-Based Targets (1.5°C Pathway)</span>
+              <span class="italic">* Illustrative trajectory model for demonstration purposes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         H. CALL TO ACTION (Strong Forest-Green Background + Lime Accent)
+    ======================================================================== -->
+    <section id="cta" class="relative py-24 lg:py-32 bg-[#174D38] text-[#F7F8F2] overflow-hidden reveal-on-scroll">
+      <!-- Subtle Organic Decorative Rings -->
+      <svg class="absolute inset-y-0 right-0 h-full w-1/2 text-[#A8C5A0]/15 pointer-events-none select-none" viewBox="0 0 500 500" fill="none" aria-hidden="true">
+        <circle cx="420" cy="250" r="220" stroke="currentColor" stroke-width="1.5" />
+        <circle cx="420" cy="250" r="310" stroke="currentColor" stroke-width="1" />
+      </svg>
+
+      <div class="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
+        <div class="max-w-3xl">
+          <span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest bg-[#C5E86C] text-[#174D38] mb-6">
+            Collective Climate Action
+          </span>
+
+          <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#FFFFFF] tracking-[-0.03em] leading-[1.06]">
+            Together, We Can Build a Net Zero Future.
+          </h2>
+
+          <p class="mt-6 font-body text-lg sm:text-xl text-[#A8C5A0] leading-relaxed max-w-2xl">
+            Every action matters. Join the movement toward a cleaner and more sustainable planet.
+          </p>
+
+          <form id="cta-form" class="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-xl" novalidate>
+            <label for="cta-email-input" class="sr-only">Email address</label>
+            <input
+              id="cta-email-input"
+              type="email"
+              required
+              placeholder="Enter your email to partner with us..."
+              class="flex-1 px-5 py-4 bg-[#202A24]/60 border border-[#A8C5A0]/35 text-[#FFFFFF] placeholder:text-[#A8C5A0]/70 text-sm focus:outline-none focus:border-[#C5E86C]"
+            />
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#C5E86C] text-[#174D38] font-extrabold text-sm sm:text-base hover:bg-[#FFFFFF] transition-colors duration-200 cursor-pointer"
+            >
+              <span>Start Your Journey</span>
+              <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+
+          <p id="cta-feedback" class="hidden mt-4 text-sm font-medium text-[#C5E86C]" role="status">
+            ✓ Thank you for joining the Net Zero movement. Our sustainability brief has been sent to your inbox.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       I. FOOTER
+  ========================================================================== -->
+  <footer class="bg-[#202A24] text-[#F7F8F2] border-t border-[#A8C5A0]/15">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-20">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-[#A8C5A0]/15">
+
+        <!-- Brand Identity (4 Cols) -->
+        <div class="lg:col-span-4 space-y-5">
+          <a href="#home" class="inline-flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-[#174D38] border border-[#C5E86C]/40 flex items-center justify-center">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#C5E86C]"></span>
+            </span>
+            <span class="text-lg font-extrabold tracking-[0.14em] text-[#FFFFFF]">NET ZERO</span>
+          </a>
+          <p class="font-body text-sm text-[#A8C5A0] leading-relaxed max-w-sm">
+            Advancing global decarbonization through clean energy infrastructure, verified carbon accounting, and high-integrity biosphere restoration.
+          </p>
+          <div class="flex flex-wrap items-center gap-2.5 pt-2">
+            <a href="#home" class="px-3 py-1.5 text-xs font-semibold border border-[#A8C5A0]/25 text-[#A8C5A0] hover:text-[#C5E86C] hover:border-[#C5E86C] transition-colors">LinkedIn</a>
+            <a href="#home" class="px-3 py-1.5 text-xs font-semibold border border-[#A8C5A0]/25 text-[#A8C5A0] hover:text-[#C5E86C] hover:border-[#C5E86C] transition-colors">X / Twitter</a>
+            <a href="#home" class="px-3 py-1.5 text-xs font-semibold border border-[#A8C5A0]/25 text-[#A8C5A0] hover:text-[#C5E86C] hover:border-[#C5E86C] transition-colors">GitHub</a>
+            <a href="#home" class="px-3 py-1.5 text-xs font-semibold border border-[#A8C5A0]/25 text-[#A8C5A0] hover:text-[#C5E86C] hover:border-[#C5E86C] transition-colors">Annual Report</a>
+          </div>
+        </div>
+
+        <!-- Quick Navigation (2 Cols) -->
+        <div class="lg:col-span-2 space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-[#C5E86C]">Navigation</h3>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#home" class="text-[#A8C5A0] hover:text-[#FFFFFF] transition-colors">Home</a></li>
+            <li><a href="#about" class="text-[#A8C5A0] hover:text-[#FFFFFF] transition-colors">About</a></li>
+            <li><a href="#impact" class="text-[#A8C5A0] hover:text-[#FFFFFF] transition-colors">Our Impact</a></li>
+            <li><a href="#solutions" class="text-[#A8C5A0] hover:text-[#FFFFFF] transition-colors">Solutions</a></li>
+            <li><a href="#resources" class="text-[#A8C5A0] hover:text-[#FFFFFF] transition-colors">Resources</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Information Placeholders (3 Cols) -->
+        <div class="lg:col-span-3 space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-[#C5E86C]">Global Headquarters</h3>
+          <ul class="space-y-3 text-sm text-[#A8C5A0] font-body">
+            <li>240 Sustainability Way, Suite 800, Zurich &amp; San Francisco</li>
+            <li>climate-desk@netzero-initiative.org</li>
+            <li>+1 (415) 890-2050</li>
+            <li class="text-xs font-mono text-[#C5E86C]">ISO 14064-1 &bull; GHG Protocol Aligned</li>
+          </ul>
+        </div>
+
+        <!-- Newsletter Subscription (3 Cols) -->
+        <div class="lg:col-span-3 space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-[#C5E86C]">Climate Intelligence Dispatch</h3>
+          <p class="font-body text-xs text-[#A8C5A0] leading-relaxed">
+            Receive quarterly research on renewable grid parity, carbon removal standards, and policy updates.
+          </p>
+          <form id="newsletter-form" class="space-y-2.5" novalidate>
+            <label for="newsletter-input" class="sr-only">Email address</label>
+            <input
+              id="newsletter-input"
+              type="email"
+              required
+              placeholder="you@organization.org"
+              class="w-full px-4 py-3 bg-[#174D38]/50 border border-[#A8C5A0]/30 text-sm text-[#FFFFFF] placeholder:text-[#A8C5A0]/60 focus:outline-none focus:border-[#C5E86C]"
+            />
+            <button
+              type="submit"
+              class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#174D38] border border-[#C5E86C]/40 text-xs font-bold uppercase tracking-wider text-[#C5E86C] hover:bg-[#C5E86C] hover:text-[#174D38] transition-colors cursor-pointer"
+            >
+              <span>Subscribe to Dispatch</span>
+              <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10" />
+              </svg>
+            </button>
+          </form>
+          <p id="newsletter-feedback" class="hidden text-xs text-[#C5E86C]" role="status">
+            ✓ Subscribed to the quarterly dispatch.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Bottom Copyright -->
+      <div class="pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#718078]">
+        <p>&copy; 2026 NET ZERO Sustainability Initiative. All rights reserved.</p>
+        <div class="flex flex-wrap gap-6">
+          <a href="#home" class="hover:text-[#A8C5A0]">Privacy Policy</a>
+          <a href="#home" class="hover:text-[#A8C5A0]">Carbon Methodology</a>
+          <a href="#home" class="hover:text-[#A8C5A0]">Terms of Stewardship</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Scripts (Sticky Nav, Scroll Reveal, Count-up Animations, Forms) -->
+  <script>
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 1. Sticky Navbar Blur on Scroll
+    const navbar = document.getElementById('site-navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 24) {
+        navbar.classList.add('bg-[#F7F8F2]/90', 'backdrop-blur-md', 'border-b', 'border-[#202A24]/10', 'py-4');
+        navbar.classList.remove('py-6');
+      } else {
+        navbar.classList.remove('bg-[#F7F8F2]/90', 'backdrop-blur-md', 'border-b', 'border-[#202A24]/10', 'py-4');
+        navbar.classList.add('py-6');
+      }
+    }, { passive: true });
+
+    // 2. Mobile Navigation Drawer Toggle
+    const mobileToggle = document.getElementById('mobile-nav-toggle');
+    const mobileDrawer = document.getElementById('mobile-nav-drawer');
+    mobileToggle.addEventListener('click', () => {
+      const expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+      mobileToggle.setAttribute('aria-expanded', String(!expanded));
+      mobileDrawer.classList.toggle('hidden');
+    });
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileDrawer.classList.add('hidden');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // 3. Scroll-Triggered Reveal Animations
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    if (prefersReducedMotion) {
+      revealElements.forEach(el => el.classList.add('is-visible'));
+    } else {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealElements.forEach(el => revealObserver.observe(el));
+    }
+
+    // 4. Subtle Count-Up Animation for Impact Statistics
+    const statsSection = document.getElementById('stats-section');
+    const counters = document.querySelectorAll('.stat-counter');
+    let statsAnimated = false;
+
+    if (!prefersReducedMotion && statsSection) {
+      const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !statsAnimated) {
+            statsAnimated = true;
+            const duration = 1200;
+            const startTime = performance.now();
+
+            function updateCounters(now) {
+              const elapsed = now - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 3);
+
+              counters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target'));
+                const decimals = parseInt(counter.getAttribute('data-decimals') || '0', 10);
+                const current = target * eased;
+                counter.textContent = decimals > 0
+                  ? current.toFixed(decimals)
+                  : Math.round(current).toLocaleString('en-US');
+              });
+
+              if (progress < 1) {
+                requestAnimationFrame(updateCounters);
+              }
+            }
+            requestAnimationFrame(updateCounters);
+            statsObserver.disconnect();
+          }
+        });
+      }, { threshold: 0.25 });
+      statsObserver.observe(statsSection);
+    }
+
+    // 5. CTA & Newsletter Form Handlers
+    document.getElementById('cta-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('cta-email-input');
+      if (input.value.trim()) {
+        document.getElementById('cta-feedback').classList.remove('hidden');
+        input.value = '';
+      } else {
+        input.focus();
+      }
+    });
+
+    document.getElementById('newsletter-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('newsletter-input');
+      if (input.value.trim()) {
+        document.getElementById('newsletter-feedback').classList.remove('hidden');
+        input.value = '';
+      } else {
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>

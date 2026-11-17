@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <radialGradient id="glow" cx="25%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#F6F7FC" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(15,23,42,0.04)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="450" fill="#F6F7FC"/>
+  <rect width="800" height="450" fill="url(#grid)"/>
+  <rect width="800" height="450" fill="url(#glow)"/>
+
+  <!-- Topbar Safe Zone (Leaves top-left clear for Status + Premium overlay badges) -->
+  <rect x="360" y="24" width="404" height="32" rx="16" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.2"/>
+  <circle cx="382" cy="40" r="6" fill="#4F46E5"/>
+  <rect x="398" y="36" width="60" height="8" rx="4" fill="#0F172A" fill-opacity="0.75"/>
+  <rect x="480" y="37" width="42" height="6" rx="3" fill="#CBD5E1"/>
+  <rect x="534" y="37" width="42" height="6" rx="3" fill="#CBD5E1"/>
+  <rect x="688" y="30" width="64" height="20" rx="10" fill="#4F46E5"/>
+
+  <!-- Left Mini Sidebar Below Badge Safe Zone -->
+  <rect x="36" y="76" width="106" height="346" rx="18" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.2"/>
+  <rect x="50" y="96" width="78" height="22" rx="8" fill="#4F46E5" fill-opacity="0.14"/>
+  <rect x="54" y="132" width="68" height="7" rx="3.5" fill="#CBD5E1"/>
+  <rect x="54" y="152" width="60" height="7" rx="3.5" fill="#CBD5E1"/>
+  <rect x="54" y="172" width="70" height="7" rx="3.5" fill="#CBD5E1"/>
+  <rect x="54" y="192" width="52" height="7" rx="3.5" fill="#CBD5E1"/>
+
+  <!-- Bento Hero Card -->
+  <rect x="158" y="76" width="606" height="168" rx="20" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.2"/>
+  <rect x="184" y="96" width="122" height="20" rx="10" fill="#4F46E5" fill-opacity="0.12"/>
+  <circle cx="197" cy="106" r="3.5" fill="#4F46E5"/>
+  <text x="207" y="110" fill="#4F46E5" font-family="system-ui,sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8">SOFT GLASS + FLOW</text>
+  <text x="184" y="150" fill="#0F172A" font-family="system-ui,sans-serif" font-size="29" font-weight="800" letter-spacing="-0.7">LUMINA STUDIO</text>
+  <text x="184" y="174" fill="#64748B" font-family="system-ui,sans-serif" font-size="13.5" font-weight="500">EdTech · Adaptive AI Skill Analytics</text>
+
+  <!-- Mini Data Flow Nodes inside Hero -->
+  <line x1="196" y1="210" x2="540" y2="210" stroke="#4F46E5" stroke-width="2" stroke-dasharray="5 5"/>
+  <rect x="184" y="198" width="84" height="24" rx="7" fill="#4F46E5" fill-opacity="0.10" stroke="#4F46E5" stroke-opacity="0.35"/>
+  <rect x="304" y="198" width="84" height="24" rx="7" fill="#4F46E5" fill-opacity="0.10" stroke="#4F46E5" stroke-opacity="0.35"/>
+  <rect x="424" y="198" width="84" height="24" rx="7" fill="#0284C7" fill-opacity="0.14" stroke="#0284C7" stroke-opacity="0.4"/>
+
+  <circle cx="674" cy="160" r="50" fill="#4F46E5" fill-opacity="0.08"/>
+  <circle cx="674" cy="160" r="34" fill="none" stroke="#4F46E5" stroke-width="6.5" stroke-dasharray="165 220" stroke-linecap="round"/>
+  <text x="674" y="165" text-anchor="middle" fill="#0F172A" font-family="monospace" font-size="12.5" font-weight="700">98.4%</text>
+
+  <!-- Bottom Left Area Chart Bento -->
+  <rect x="158" y="258" width="386" height="164" rx="20" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.2"/>
+  <text x="184" y="286" fill="#64748B" font-family="monospace" font-size="10.5" font-weight="600">DATA VISUALIZATION STREAM</text>
+  <path d="M 184 388 C 235 380, 270 346, 318 352 C 366 358, 410 316, 462 322 C 494 326, 510 302, 524 296" fill="none" stroke="url(#accent)" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M 184 388 C 235 380, 270 346, 318 352 C 366 358, 410 316, 462 322 C 494 326, 510 302, 524 296 L 524 406 L 184 406 Z" fill="url(#accent)" fill-opacity="0.15"/>
+
+  <!-- Bottom Right Bar Matrix Bento -->
+  <rect x="560" y="258" width="204" height="164" rx="20" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.2"/>
+  <text x="582" y="286" fill="#64748B" font-family="monospace" font-size="10.5" font-weight="600">KPI TELEMETRY</text>
+  <text x="582" y="316" fill="#0F172A" font-family="system-ui,sans-serif" font-size="24" font-weight="800">+34.8%</text>
+  <rect x="582" y="368" width="20" height="38" rx="5" fill="#4F46E5" fill-opacity="0.25"/>
+  <rect x="612" y="352" width="20" height="54" rx="5" fill="#4F46E5" fill-opacity="0.45"/>
+  <rect x="642" y="338" width="20" height="68" rx="5" fill="#4F46E5" fill-opacity="0.68"/>
+  <rect x="672" y="348" width="20" height="58" rx="5" fill="#0284C7" fill-opacity="0.65"/>
+  <rect x="702" y="326" width="20" height="80" rx="5" fill="#4F46E5"/>
+</svg>

@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="hatch36" width="6" height="6" patternTransform="rotate(42 0 0)" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#ECEEF2"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#D4D7E0" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+  <!-- Outer Alabaster Frame -->
+  <rect width="800" height="450" fill="#ECEEF4"/>
+  <rect x="18" y="12" width="764" height="426" rx="22" fill="#F3F4F8" stroke="#E2E5EE"/>
+
+  <!-- Topbar Navigation (Badge-safe zone x < 430, y < 95 contains ZERO text) -->
+  <circle cx="44" cy="33" r="9" fill="#111317"/>
+  <line x1="258" y1="49" x2="318" y2="49" stroke="#111317" stroke-width="2.5"/>
+  <!-- Right Topbar Nav & Profile (x >= 450, safe) -->
+  <text x="470" y="37" fill="#6B7280" font-family="Inter, sans-serif" font-size="9.5" font-weight="600">Analytics</text>
+  <text x="536" y="37" fill="#6B7280" font-family="Inter, sans-serif" font-size="9.5" font-weight="600">Settings</text>
+  <circle cx="654" cy="33" r="9" fill="#27272A"/>
+  <text x="669" y="37" fill="#18181B" font-family="Inter, sans-serif" font-size="9.5" font-weight="600">Andriano Darwin</text>
+
+  <!-- Inner Pure White Canvas -->
+  <rect x="30" y="56" width="740" height="370" rx="18" fill="#FFFFFF"/>
+
+  <!-- Right Action Pills (x >= 440, safe from badges) -->
+  <rect x="440" y="68" width="118" height="22" rx="11" fill="#F5F6F8"/>
+  <rect x="566" y="68" width="84" height="22" rx="11" fill="#FFFFFF" stroke="#D4D4D8"/>
+  <text x="608" y="82" text-anchor="middle" fill="#18181B" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Export CSV</text>
+  <rect x="656" y="68" width="98" height="22" rx="11" fill="#FFFFFF" stroke="#A1A1AA"/>
+  <text x="705" y="82" text-anchor="middle" fill="#18181B" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Download Report</text>
+
+  <!-- Row 1 Left: 2 Stacked Matte Cards (All text y >= 118, 100% badge-safe) -->
+  <rect x="46" y="100" width="176" height="84" rx="14" fill="#F7F7F8"/>
+  <text x="60" y="118" fill="#71717A" font-family="Inter, sans-serif" font-size="8.5">Total Products Sales</text>
+  <text x="60" y="142" fill="#111317" font-family="Inter, sans-serif" font-size="18" font-weight="800">202,324</text>
+  <rect x="140" y="130" width="38" height="14" rx="7" fill="#A3F746"/>
+  <text x="159" y="140" text-anchor="middle" fill="#111317" font-family="Inter, sans-serif" font-size="7.5" font-weight="800">+10%</text>
+  <text x="60" y="172" fill="#18181B" font-family="Inter, sans-serif" font-size="8" font-weight="700">View Sales Details →</text>
+
+  <rect x="46" y="194" width="176" height="84" rx="14" fill="#F7F7F8"/>
+  <text x="60" y="212" fill="#71717A" font-family="Inter, sans-serif" font-size="8.5">Total Volume Of Products</text>
+  <text x="60" y="236" fill="#111317" font-family="Inter, sans-serif" font-size="18" font-weight="800">123,726</text>
+  <rect x="140" y="224" width="38" height="14" rx="7" fill="#FF645A"/>
+  <text x="159" y="234" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="7.5" font-weight="800">-12%</text>
+  <text x="60" y="266" fill="#18181B" font-family="Inter, sans-serif" font-size="8" font-weight="700">View All Products →</text>
+
+  <!-- Row 1 Center: Hatched + Black Capsule Bar Chart -->
+  <rect x="232" y="100" width="246" height="178" rx="14" fill="#F7F7F8"/>
+  <text x="246" y="118" fill="#71717A" font-family="Inter, sans-serif" font-size="8.5">Total Products Sales</text>
+  <text x="246" y="141" fill="#111317" font-family="Inter, sans-serif" font-size="19" font-weight="800">$500,324</text>
+  <rect x="342" y="128" width="40" height="15" rx="7.5" fill="#A3F746"/>
+  <text x="362" y="138" text-anchor="middle" fill="#111317" font-family="Inter, sans-serif" font-size="8" font-weight="800">+45%</text>
+
+  <!-- 5 Hatched + Solid Black Capsules -->
+  <rect x="256" y="166" width="32" height="100" rx="10" fill="url(#hatch36)"/>
+  <rect x="256" y="216" width="32" height="50" rx="10" fill="#121316"/>
+  <rect x="298" y="178" width="32" height="88" rx="10" fill="url(#hatch36)"/>
+  <rect x="298" y="226" width="32" height="40" rx="10" fill="#121316"/>
+  <rect x="340" y="184" width="32" height="82" rx="10" fill="url(#hatch36)"/>
+  <rect x="340" y="208" width="32" height="58" rx="10" fill="#121316"/>
+  <rect x="382" y="196" width="32" height="70" rx="10" fill="url(#hatch36)"/>
+  <rect x="382" y="232" width="32" height="34" rx="10" fill="#121316"/>
+  <rect x="424" y="176" width="32" height="90" rx="10" fill="url(#hatch36)"/>
+  <rect x="424" y="198" width="32" height="68" rx="10" fill="#121316"/>
+
+  <!-- Row 1 Right: Total Sales Statistics Donut -->
+  <rect x="488" y="100" width="266" height="178" rx="14" fill="#F7F7F8"/>
+  <text x="504" y="118" fill="#111317" font-family="Inter, sans-serif" font-size="10" font-weight="700">Total Sales Statistics</text>
+  <circle cx="621" cy="186" r="36" fill="none" stroke="#141229" stroke-width="13" stroke-dasharray="95 230" transform="rotate(-90 621 186)"/>
+  <circle cx="621" cy="186" r="36" fill="none" stroke="#B7BAC2" stroke-width="13" stroke-dasharray="55 230" stroke-dashoffset="-98" transform="rotate(-90 621 186)"/>
+  <circle cx="621" cy="186" r="36" fill="none" stroke="#D4D7E0" stroke-width="13" stroke-dasharray="70 230" stroke-dashoffset="-156" transform="rotate(-90 621 186)"/>
+  <text x="621" y="184" text-anchor="middle" fill="#111317" font-family="Inter, sans-serif" font-size="10.5" font-weight="800">23,324</text>
+  <rect x="603" y="190" width="36" height="12" rx="6" fill="#A3F746"/>
+  <text x="621" y="199" text-anchor="middle" fill="#111317" font-family="Inter, sans-serif" font-size="7" font-weight="800">+45%</text>
+  <text x="504" y="158" fill="#111317" font-family="Inter, sans-serif" font-size="9" font-weight="800">89,532</text>
+  <text x="738" y="158" text-anchor="end" fill="#111317" font-family="Inter, sans-serif" font-size="9" font-weight="800">188,500</text>
+  <text x="621" y="266" text-anchor="middle" fill="#111317" font-family="Inter, sans-serif" font-size="13" font-weight="800">3,440,031</text>
+
+  <!-- Row 2 Left: Recent Orders Table -->
+  <rect x="46" y="288" width="466" height="126" rx="14" fill="#F7F7F8"/>
+  <text x="62" y="308" fill="#111317" font-family="Inter, sans-serif" font-size="10.5" font-weight="800">Recent Orders</text>
+  <text x="62" y="336" fill="#3F3F46" font-family="Inter, sans-serif" font-size="9" font-weight="600">#202523   AirPods Pro Max</text>
+  <text x="366" y="336" fill="#111317" font-family="Inter, sans-serif" font-size="9" font-weight="700">$1,230.00</text>
+  <rect x="430" y="326" width="54" height="13" rx="6.5" fill="#DBEAFE"/>
+  <text x="457" y="335" text-anchor="middle" fill="#1D4ED8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">In Progress</text>
+
+  <text x="62" y="362" fill="#3F3F46" font-family="Inter, sans-serif" font-size="9" font-weight="600">#202522   Summer Clothes</text>
+  <text x="366" y="362" fill="#111317" font-family="Inter, sans-serif" font-size="9" font-weight="700">$3,112.00</text>
+  <rect x="430" y="352" width="54" height="13" rx="6.5" fill="#D1FAE5"/>
+  <text x="457" y="361" text-anchor="middle" fill="#047857" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Complete</text>
+
+  <text x="62" y="388" fill="#3F3F46" font-family="Inter, sans-serif" font-size="9" font-weight="600">#202521   Nike Shoes</text>
+  <text x="366" y="388" fill="#111317" font-family="Inter, sans-serif" font-size="9" font-weight="700">$1,211.00</text>
+  <rect x="430" y="378" width="54" height="13" rx="6.5" fill="#FFEDD5"/>
+  <text x="457" y="387" text-anchor="middle" fill="#C2410C" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Waiting</text>
+
+  <!-- Row 2 Right: Top Selling Products + Step-Cap Bars -->
+  <rect x="522" y="288" width="232" height="126" rx="14" fill="#F7F7F8"/>
+  <text x="536" y="308" fill="#111317" font-family="Inter, sans-serif" font-size="10" font-weight="800">Top Selling Products</text>
+  <rect x="536" y="316" width="204" height="38" rx="10" fill="#FFFFFF"/>
+  <rect x="544" y="322" width="26" height="26" rx="6" fill="#F4F4F5"/>
+  <text x="576" y="334" fill="#111317" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Apple Watch Series 10</text>
+  <text x="576" y="347" fill="#111317" font-family="Inter, sans-serif" font-size="8.5" font-weight="800">$799.00</text>
+
+  <line x1="544" y1="392" x2="578" y2="392" stroke="#111317" stroke-width="2.5"/>
+  <line x1="590" y1="378" x2="624" y2="378" stroke="#111317" stroke-width="2.5"/>
+  <line x1="636" y1="364" x2="670" y2="364" stroke="#111317" stroke-width="2.5"/>
+  <line x1="682" y1="384" x2="716" y2="384" stroke="#111317" stroke-width="2.5"/>
+  <text x="561" y="406" text-anchor="middle" fill="#71717A" font-family="Inter, sans-serif" font-size="8">Tue</text>
+  <text x="607" y="406" text-anchor="middle" fill="#71717A" font-family="Inter, sans-serif" font-size="8">Wed</text>
+  <text x="653" y="406" text-anchor="middle" fill="#71717A" font-family="Inter, sans-serif" font-size="8">Thu</text>
+  <text x="699" y="406" text-anchor="middle" fill="#71717A" font-family="Inter, sans-serif" font-size="8">Fri</text>
+</svg>

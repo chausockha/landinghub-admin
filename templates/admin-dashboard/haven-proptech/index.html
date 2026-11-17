@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAVEN PORTFOLIO — Architectural Real Estate Yield &amp; Smart Building Digital Twin OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Fraunces"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            travertine: '#F6F4EF',
+            espresso: '#1C1917',
+            warmStone: '#57534E',
+            bronze: '#B45309',
+            sage: '#3F6212',
+            slateBlue: '#1D4ED8',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-travertine: #F6F4EF;
+      --ink-espresso: #1C1917;
+      --stone-muted: #57534E;
+      --bronze-accent: #B45309;
+      --sage-arch: #3F6212;
+      --slate-blue: #1D4ED8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-travertine);
+      color: var(--ink-espresso);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 12% 6%, rgba(180, 83, 9, 0.065) 0%, transparent 42%),
+        radial-gradient(circle at 88% 12%, rgba(217, 119, 6, 0.05) 0%, transparent 38%),
+        radial-gradient(circle at 75% 88%, rgba(63, 98, 18, 0.045) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    .font-editorial {
+      font-family: 'Fraunces', Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Warm Frosted Alabaster Glass Cards */
+    .alabaster-glass {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(22px) saturate(145%);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      border: 1px solid rgba(255, 255, 255, 0.94);
+      box-shadow:
+        0 18px 42px -10px rgba(41, 37, 36, 0.08),
+        0 0 0 1px rgba(214, 211, 209, 0.55),
+        inset 0 1px 0 #FFFFFF;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .alabaster-hover:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 24px 48px -12px rgba(41, 37, 36, 0.12),
+        0 0 0 1px rgba(180, 83, 9, 0.28),
+        inset 0 1px 0 #FFFFFF;
+    }
+
+    /* Tactile Stone Well & Active Pill */
+    .stone-well {
+      background: rgba(238, 234, 226, 0.88);
+      border: 1px solid rgba(214, 211, 209, 0.72);
+      box-shadow: inset 0 2px 4px rgba(28, 25, 23, 0.045), 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .stone-pill-active {
+      background: #FFFFFF;
+      color: #1C1917;
+      border: 1px solid rgba(255, 255, 255, 0.98);
+      box-shadow:
+        0 6px 14px -4px rgba(41, 37, 36, 0.12),
+        0 0 0 1px rgba(214, 211, 209, 0.6),
+        inset 0 1px 0 #FFFFFF;
+    }
+
+    .bronze-btn {
+      background: linear-gradient(135deg, #292524 0%, #1C1917 55%, #44403C 100%);
+      color: #FAF9F6;
+      box-shadow:
+        0 12px 24px -6px rgba(28, 25, 23, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      transition: all 0.22s ease;
+    }
+
+    .bronze-btn:hover {
+      background: linear-gradient(135deg, #B45309 0%, #92400E 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px -6px rgba(180, 83, 9, 0.35);
+    }
+
+    /* Collapsible Warm-Glass Sidebar */
+    #sidebar {
+      width: 272px;
+      transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #sidebar.collapsed {
+      width: 84px;
+    }
+
+    #sidebar.collapsed .sidebar-label,
+    #sidebar.collapsed .sidebar-badge,
+    #sidebar.collapsed .sidebar-card-expanded {
+      display: none;
+    }
+
+    #sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #sidebar.collapsed .brand-wrap {
+      justify-content: center;
+    }
+
+    /* Animated BMS SVG Data Flow */
+    @keyframes bmsPacketFlow {
+      from {
+        stroke-dashoffset: 180;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .bms-stream-bronze {
+      stroke-dasharray: 10 14;
+      animation: bmsPacketFlow 3.6s linear infinite;
+    }
+
+    .bms-stream-sage {
+      stroke-dasharray: 8 18;
+      animation: bmsPacketFlow 2.7s linear infinite;
+    }
+
+    .bms-paused .bms-stream-bronze,
+    .bms-paused .bms-stream-sage {
+      animation-play-state: paused;
+    }
+
+    @keyframes warmPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.35;
+      }
+      50% {
+        transform: scale(1.16);
+        opacity: 0.1;
+      }
+    }
+
+    .bms-halo {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: warmPulse 2.8s ease-in-out infinite;
+    }
+
+    /* Custom Warm Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(87, 83, 78, 0.22);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(180, 83, 9, 0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-[#1C1917] selection:bg-amber-700/15 selection:text-amber-900">
+
+  <!-- Mobile Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 z-40 bg-stone-900/25 backdrop-blur-sm hidden lg:hidden" onclick="toggleMobileSidebar(false)"></div>
+
+  <div class="flex min-h-screen relative">
+    <!-- COLLAPSIBLE WARM-GLASS SIDEBAR -->
+    <aside id="sidebar" class="alabaster-glass fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 lg:h-screen flex flex-col justify-between -translate-x-full lg:translate-x-0 shrink-0 select-none">
+      <div class="p-4 flex flex-col gap-6">
+        <!-- Brand Architectural Crest -->
+        <div class="brand-wrap flex items-center justify-between px-1.5 pt-1">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-[#1C1917] text-[#FAF8F5] flex items-center justify-center shrink-0 shadow-md border border-stone-700">
+              <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M3 21h18"/>
+                <path d="M5 21V7l7-4 7 4v14"/>
+                <path d="M9 21v-8h6v8"/>
+                <line x1="9" y1="9" x2="15" y2="9"/>
+              </svg>
+            </div>
+            <div class="sidebar-label leading-tight">
+              <div class="font-editorial font-bold text-[16px] text-[#1C1917] tracking-tight">
+                HAVEN <span class="text-[#B45309] font-normal italic">Portfolio</span>
+              </div>
+              <div class="text-xs font-mono uppercase tracking-widest text-[#57534E]">Digital Twin OS</div>
+            </div>
+          </div>
+          <button onclick="toggleSidebarCollapse()" title="Collapse or expand sidebar" class="sidebar-label hidden lg:flex w-8 h-8 rounded-xl stone-well items-center justify-center text-[#57534E] hover:text-[#1C1917] transition">
+            <svg id="collapseChevron" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="space-y-1.5" aria-label="Portfolio Navigation">
+          <div class="sidebar-label px-3 pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Asset Intelligence</div>
+
+          <button data-nav="Portfolio Executive" onclick="selectNav(this, 'Portfolio Executive')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl stone-pill-active font-semibold text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-[#B45309]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="9" rx="1.5"/>
+                <rect x="14" y="3" width="7" height="5" rx="1.5"/>
+                <rect x="14" y="12" width="7" height="9" rx="1.5"/>
+                <rect x="3" y="16" width="7" height="5" rx="1.5"/>
+              </svg>
+              <span class="sidebar-label">Portfolio Executive</span>
+            </span>
+            <span class="sidebar-badge font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-[#B45309] border border-amber-600/20">18</span>
+          </button>
+
+          <button data-nav="Asset Digital Twin" onclick="selectNav(this, 'Asset Digital Twin')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-[#57534E] hover:text-[#1C1917] hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-[#57534E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+              <span class="sidebar-label">Asset Digital Twin</span>
+            </span>
+            <span class="sidebar-badge font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-lime-900/10 text-[#3F6212]">3D</span>
+          </button>
+
+          <button data-nav="Lease & Yield" onclick="selectNav(this, 'Lease & Yield')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-[#57534E] hover:text-[#1C1917] hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-[#57534E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              <span class="sidebar-label">Lease &amp; Yield</span>
+            </span>
+          </button>
+
+          <button data-nav="Smart BMS IoT" onclick="selectNav(this, 'Smart BMS IoT')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-[#57534E] hover:text-[#1C1917] hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-[#57534E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+              </svg>
+              <span class="sidebar-label">Smart BMS IoT</span>
+            </span>
+            <span class="sidebar-badge w-2 h-2 rounded-full bg-[#3F6212]"></span>
+          </button>
+
+          <button data-nav="Tenant Experience" onclick="selectNav(this, 'Tenant Experience')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-[#57534E] hover:text-[#1C1917] hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-[#57534E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span class="sidebar-label">Tenant Experience</span>
+            </span>
+          </button>
+
+          <button data-nav="Acquisitions" onclick="selectNav(this, 'Acquisitions')" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-[#57534E] hover:text-[#1C1917] hover:bg-white/70 font-medium text-[13.5px] transition-all">
+            <span class="flex items-center gap-3">
+              <svg class="w-[18px] h-[18px] shrink-0 text-[#57534E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+              </svg>
+              <span class="sidebar-label">Acquisitions</span>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom ESG / Net-Zero Telemetry + Managing Partner -->
+      <div class="p-4 space-y-3">
+        <div class="sidebar-card-expanded rounded-2xl p-3.5 bg-gradient-to-br from-[#FAF8F4] via-white to-[#F2EFE7] border border-stone-200/90 shadow-sm">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[12.5px] font-semibold text-[#1C1917] flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#3F6212] animate-pulse"></span>
+              GRESB 5-Star Net-Zero
+            </span>
+            <span class="font-mono text-[12.5px] font-bold text-[#3F6212]">-31.4%</span>
+          </div>
+          <p class="text-[12.5px] text-[#57534E] leading-relaxed mb-2.5">
+            Autonomous chiller &amp; louver trim active across <span class="font-mono font-semibold text-[#1C1917]">4.2M sq.ft</span>.
+          </p>
+          <div class="w-full h-1.5 rounded-full bg-stone-200 overflow-hidden">
+            <div class="h-full w-[89%] rounded-full bg-gradient-to-r from-[#3F6212] to-[#B45309]"></div>
+          </div>
+          <div class="flex justify-between mt-1.5 text-xs font-mono text-[#57534E]">
+            <span>Carbon Target</span>
+            <span>22.4 kgCO2/m²</span>
+          </div>
+        </div>
+
+        <button id="collapsedExpandBtn" onclick="toggleSidebarCollapse()" title="Expand sidebar" class="hidden w-full py-2.5 rounded-2xl stone-well items-center justify-center text-[#B45309] hover:bg-white transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-3 px-2 py-2 rounded-2xl bg-white/75 border border-white">
+          <div class="w-9 h-9 rounded-xl bg-[#1C1917] text-amber-400 font-editorial font-bold text-xs flex items-center justify-center shrink-0">
+            HA
+          </div>
+          <div class="sidebar-label min-w-0 flex-1">
+            <div class="text-xs font-semibold text-[#1C1917] truncate">Henrik Lindqvist</div>
+            <div class="text-[12.5px] text-[#57534E] truncate">Managing Partner · REIT</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT SHELL -->
+    <div class="flex-1 min-w-0 flex flex-col">
+      <!-- TOPBAR WITH GLOBAL REGION FILTER -->
+      <header class="sticky top-0 z-30 px-4 sm:px-7 py-3.5 bg-[#F6F4EF]/85 backdrop-blur-xl border-b border-stone-200/75">
+        <div class="max-w-[1540px] mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="toggleMobileSidebar(true)" class="lg:hidden w-10 h-10 rounded-2xl alabaster-glass flex items-center justify-center text-[#1C1917]" aria-label="Open menu">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>
+              </svg>
+            </button>
+
+            <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-[#57534E] pr-2 border-r border-stone-300/70">
+              <span>Haven Global Fund IV</span>
+              <svg class="w-3.5 h-3.5 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              <span id="activeBreadcrumb" class="font-semibold text-[#1C1917]">Portfolio Executive</span>
+            </div>
+
+            <!-- Interactive Global Region Filter -->
+            <div class="stone-well p-1 rounded-2xl flex items-center gap-1 overflow-x-auto max-w-full" role="tablist" aria-label="Global Region Filter">
+              <button onclick="switchRegion('all')" data-region="all" class="region-tab stone-pill-active px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">
+                All Global Assets
+              </button>
+              <button onclick="switchRegion('tokyo')" data-region="tokyo" class="region-tab px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#57534E] hover:text-[#1C1917] whitespace-nowrap transition-all">
+                Tokyo · Ginza
+              </button>
+              <button onclick="switchRegion('london')" data-region="london" class="region-tab px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#57534E] hover:text-[#1C1917] whitespace-nowrap transition-all">
+                London · Mayfair
+              </button>
+              <button onclick="switchRegion('newyork')" data-region="newyork" class="region-tab px-3.5 py-1.5 rounded-xl text-xs font-medium text-[#57534E] hover:text-[#1C1917] whitespace-nowrap transition-all">
+                New York · SoHo
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Investor Memo Action -->
+          <div class="flex items-center gap-2.5 ml-auto">
+            <div class="relative w-48 sm:w-60">
+              <svg class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                id="assetSearchInput"
+                type="text"
+                oninput="renderLeaseTable()"
+                placeholder="Search tenant, suite, asset..."
+                class="w-full pl-9 pr-8 py-2 rounded-2xl alabaster-glass text-xs text-[#1C1917] placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-700/25"
+              />
+              <kbd class="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs font-mono text-stone-400 bg-stone-100 rounded border border-stone-200">/</kbd>
+            </div>
+
+            <button onclick="triggerToast('LP Quarterly NOI & ESG Digital Twin Dossier generated.')" class="bronze-btn px-3.5 py-2 rounded-2xl text-xs font-semibold flex items-center gap-2 shrink-0">
+              <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <span class="hidden md:inline">LP Yield Dossier</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN BENTO CANVAS -->
+      <main class="flex-1 px-4 sm:px-7 py-6 max-w-[1540px] w-full mx-auto space-y-6">
+
+        <div id="defaultDashboardView" class="space-y-6">
+        <!-- 1. HERO ARCHITECTURAL GLASS SHOWCASE CARD -->
+        <section class="alabaster-glass rounded-[28px] p-5 sm:p-7 relative overflow-hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            <!-- Left 5 Cols: Embedded Architectural Glass Visual + Live Overlay -->
+            <div class="lg:col-span-5 relative rounded-[22px] overflow-hidden min-h-[280px] sm:min-h-[320px] bg-gradient-to-br from-stone-300 via-amber-100/60 to-stone-400 border border-white shadow-inner group">
+              <img
+                src="/templates/assets/archglass-visual.jpg"
+                onerror="this.onerror=null; this.src='../../assets/archglass-visual.jpg';"
+                alt="The Atrium Tower Architectural Facade"
+                class="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-700"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#1C1917]/80 via-[#1C1917]/20 to-transparent"></div>
+
+              <!-- Top Architectural Tag -->
+              <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
+                <span class="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[12.5px] font-semibold text-[#1C1917] flex items-center gap-1.5 shadow-sm">
+                  <span class="w-2 h-2 rounded-full bg-[#3F6212]"></span>
+                  BMS Twin · Live BACnet Sync
+                </span>
+                <span id="visualZoneTag" class="px-2.5 py-1 rounded-full bg-[#1C1917]/75 backdrop-blur-md font-mono text-xs text-amber-200 border border-white/15">
+                  ZONE · PENTHOUSE L30–32
+                </span>
+              </div>
+
+              <!-- Bottom Architectural Asset Caption -->
+              <div class="absolute bottom-3.5 left-3.5 right-3.5 p-4 rounded-2xl bg-white/90 backdrop-blur-xl border border-white shadow-lg">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <div class="text-xs font-mono uppercase tracking-[0.14em] text-[#B45309] font-semibold">Flagship Trophy Asset</div>
+                    <div class="font-editorial font-bold text-base text-[#1C1917]">THE ATRIUM TOWER</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-mono font-bold text-sm text-[#3F6212]">5.84% Cap</div>
+                    <div class="font-mono text-xs text-[#57534E]">612,000 sq.ft</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 7 Cols: Editorial Yield Header + Interactive Floor/Zone Selector & Live IoT Telemetry -->
+            <div class="lg:col-span-7 flex flex-col justify-between space-y-5">
+              <div class="space-y-2.5">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-700/20 text-[#B45309] font-mono text-[12.5px] font-semibold">
+                    THE ATRIUM TOWER · 98.4% Occupied · $2.14M Monthly NOI
+                  </span>
+                  <span class="px-2.5 py-1 rounded-full bg-lime-900/10 text-[#3F6212] font-mono text-[12.5px] font-semibold">
+                    LEED Platinum · WELL v2
+                  </span>
+                </div>
+
+                <h1 class="font-editorial font-bold text-2xl sm:text-[31px] text-[#1C1917] leading-[1.16]">
+                  Architectural Yield Meets Autonomous Climate Intelligence
+                </h1>
+                <p class="text-xs sm:text-sm text-[#57534E] leading-relaxed max-w-2xl">
+                  Inspect real-time environmental comfort, electrochromic facade tinting, and net lease yield by structural elevation zone across our flagship glass tower.
+                </p>
+              </div>
+
+              <!-- Interactive Floor / Zone Selector Pills -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-[12.5px] font-semibold uppercase tracking-wider text-[#57534E]">
+                  <span>Select Structural Elevation / BMS Zone</span>
+                  <span id="zoneTenantSummary" class="font-mono text-[#B45309] normal-case">Anchor: Sovereign Family Office</span>
+                </div>
+                <div class="stone-well p-1.5 rounded-2xl flex flex-wrap items-center gap-1.5" role="tablist">
+                  <button onclick="selectFloorZone('penthouse', this)" class="zone-pill stone-pill-active px-3.5 py-2 rounded-xl text-xs font-semibold transition-all">
+                    Penthouse
+                  </button>
+                  <button onclick="selectFloorZone('commercial', this)" class="zone-pill px-3.5 py-2 rounded-xl text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition-all">
+                    Commercial Floors 12–28
+                  </button>
+                  <button onclick="selectFloorZone('atrium', this)" class="zone-pill px-3.5 py-2 rounded-xl text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition-all">
+                    Retail Atrium
+                  </button>
+                  <button onclick="selectFloorZone('solar', this)" class="zone-pill px-3.5 py-2 rounded-xl text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition-all">
+                    Sub-Level Solar BMS
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live 4-Metric Zone Telemetry Strip -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="p-3.5 rounded-2xl bg-white/85 border border-stone-200/80 shadow-sm">
+                  <div class="flex items-center justify-between text-[12.5px] text-[#57534E]">
+                    <span>Zone Temp</span>
+                    <svg class="w-3.5 h-3.5 text-[#B45309]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                    </svg>
+                  </div>
+                  <div id="zoneTemp" class="font-mono font-bold text-lg text-[#1C1917] mt-1">21.4°C</div>
+                  <div id="zoneTempSub" class="text-xs font-mono text-[#3F6212] mt-0.5">Setpoint ±0.1°C</div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-white/85 border border-stone-200/80 shadow-sm">
+                  <div class="flex items-center justify-between text-[12.5px] text-[#57534E]">
+                    <span>Daylight Lux</span>
+                    <svg class="w-3.5 h-3.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="5"/>
+                      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    </svg>
+                  </div>
+                  <div id="zoneLux" class="font-mono font-bold text-lg text-[#1C1917] mt-1">640 lx</div>
+                  <div id="zoneLuxSub" class="text-xs font-mono text-[#57534E] mt-0.5">Glazing tint 18%</div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-white/85 border border-stone-200/80 shadow-sm">
+                  <div class="flex items-center justify-between text-[12.5px] text-[#57534E]">
+                    <span>Indoor Air AQI</span>
+                    <svg class="w-3.5 h-3.5 text-[#3F6212]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                    </svg>
+                  </div>
+                  <div id="zoneAqi" class="font-mono font-bold text-lg text-[#3F6212] mt-1">11 AQI</div>
+                  <div id="zoneAqiSub" class="text-xs font-mono text-[#57534E] mt-0.5">445 ppm CO2 · Pure</div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-white/85 border border-stone-200/80 shadow-sm">
+                  <div class="flex items-center justify-between text-[12.5px] text-[#57534E]">
+                    <span>Zone Net Yield</span>
+                    <svg class="w-3.5 h-3.5 text-[#1D4ED8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                      <polyline points="17 6 23 6 23 12"/>
+                    </svg>
+                  </div>
+                  <div id="zoneYield" class="font-mono font-bold text-lg text-[#B45309] mt-1">$194 / sf</div>
+                  <div id="zoneYieldSub" class="text-xs font-mono text-[#3F6212] mt-0.5">100% Leased · NNN</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 4 WARM-GLASS KPI CARDS WITH SPARKLINES -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5" aria-label="Portfolio KPIs">
+          <!-- KPI 1 -->
+          <article class="alabaster-glass alabaster-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-[#57534E]">Total Portfolio Valuation</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiValuation" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-[#1C1917]">$842.5M</span>
+                  <span id="kpiValuationDelta" class="font-mono text-[12.5px] font-semibold px-2 py-0.5 rounded-full bg-lime-900/10 text-[#3F6212]">+8.6%</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-amber-600/10 text-[#B45309] flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                  <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h6M9 13h6M9 17h6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-stone-200/80 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-[#57534E]">NAV mark-to-market Q2</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 26 C18 25, 34 20, 48 18 C64 16, 78 10, 94 5" stroke="#B45309" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="94" cy="5" r="3" fill="#B45309"/>
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 2 -->
+          <article class="alabaster-glass alabaster-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-[#57534E]">Net Operating Income</p>
+                <div class="flex items-baseline gap-2 mt-1.5">
+                  <span id="kpiNoi" class="font-mono font-bold text-2xl sm:text-[25px] tracking-tight text-[#1C1917]">$6.48M / mo</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-lime-900/10 text-[#3F6212] flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-stone-200/80 flex items-end justify-between gap-3">
+              <span id="kpiNoiSub" class="text-[12.5px] font-mono text-[#3F6212] font-semibold">+11.2% YoY cash yield</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 25 C20 22, 34 21, 50 15 C68 9, 80 8, 94 4" stroke="#3F6212" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="94" cy="4" r="3" fill="#3F6212"/>
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 3 -->
+          <article class="alabaster-glass alabaster-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-[#57534E]">Portfolio Occupancy</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiOccupancy" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-[#1C1917]">97.8%</span>
+                  <span class="font-mono text-[12.5px] font-semibold px-2 py-0.5 rounded-full bg-blue-600/10 text-[#1D4ED8]">+140 bps</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-blue-600/10 text-[#1D4ED8] flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-stone-200/80 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-[#57534E]">WALT 7.4 yrs weighted</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 18 C22 17, 40 14, 58 12 C74 10, 84 8, 94 7" stroke="#1D4ED8" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="94" cy="7" r="3" fill="#1D4ED8"/>
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 4 -->
+          <article class="alabaster-glass alabaster-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-medium text-[#57534E]">Smart BMS Energy Savings</p>
+                <div class="flex items-baseline gap-2.5 mt-1.5">
+                  <span id="kpiBmsSavings" class="font-mono font-bold text-2xl sm:text-[26px] tracking-tight text-[#3F6212]">-31.4% kWh</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-lime-900/10 text-[#3F6212] flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-stone-200/80 flex items-end justify-between gap-3">
+              <span class="text-[12.5px] text-[#57534E]">$1.92M annual OpEx saved</span>
+              <svg class="w-24 h-8 overflow-visible" viewBox="0 0 96 32" fill="none">
+                <path d="M2 6 C20 9, 36 14, 54 19 C70 23, 82 25, 94 27" stroke="#3F6212" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="94" cy="27" r="3" fill="#3F6212"/>
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <!-- 3. SMART BUILDING DIGITAL-TWIN DATA FLOW PIPELINE -->
+        <section id="bmsPipelineSection" class="alabaster-glass rounded-[28px] p-5 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-600/10 text-[#B45309] font-mono text-xs font-semibold uppercase tracking-wider">Autonomous BMS Loop</span>
+                <span class="text-xs text-[#57534E] font-mono">Click any node to inspect sensor load &amp; NOI recovery</span>
+              </div>
+              <h2 class="font-editorial font-bold text-xl text-[#1C1917] mt-1">Smart Building Digital-Twin Data Flow</h2>
+            </div>
+
+            <button onclick="toggleBmsStream()" class="px-3.5 py-1.5 rounded-xl stone-well text-xs font-semibold text-[#1C1917] hover:text-[#B45309] flex items-center gap-2 transition">
+              <span id="bmsDot" class="w-2 h-2 rounded-full bg-[#3F6212]"></span>
+              <span id="bmsToggleLabel">BACnet Telemetry Live</span>
+            </button>
+          </div>
+
+          <!-- Animated SVG Pipeline -->
+          <div class="w-full overflow-x-auto pb-2">
+            <div class="min-w-[820px]">
+              <svg class="w-full h-[132px]" viewBox="0 0 1120 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="warmPipeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#B45309"/>
+                    <stop offset="52%" stop-color="#3F6212"/>
+                    <stop offset="100%" stop-color="#1D4ED8"/>
+                  </linearGradient>
+                  <filter id="warmShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#1C1917" flood-opacity="0.12"/>
+                  </filter>
+                </defs>
+
+                <!-- Structural Conduit Base -->
+                <path d="M 130 66 L 990 66" stroke="#E7E5E4" stroke-width="8" stroke-linecap="round"/>
+                <path d="M 130 66 C 225 22, 325 22, 420 66 C 515 110, 605 110, 700 66 C 795 22, 895 22, 990 66" stroke="#ECE8DF" stroke-width="2.5" fill="none"/>
+
+                <!-- Warm Bronze & Sage Flowing Streams -->
+                <path class="bms-stream-bronze" d="M 130 66 L 990 66" stroke="url(#warmPipeGrad)" stroke-width="4" stroke-linecap="round"/>
+                <path class="bms-stream-sage" d="M 130 66 C 225 22, 325 22, 420 66 C 515 110, 605 110, 700 66 C 795 22, 895 22, 990 66" stroke="#3F6212" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.65"/>
+
+                <!-- Traveling Telemetry Packets -->
+                <circle r="5" fill="#B45309">
+                  <animateMotion dur="4.4s" repeatCount="indefinite" path="M 130 66 L 990 66"/>
+                </circle>
+                <circle r="4.5" fill="#3F6212">
+                  <animateMotion dur="5.4s" begin="1.5s" repeatCount="indefinite" path="M 130 66 C 225 22, 325 22, 420 66 C 515 110, 605 110, 700 66 C 795 22, 895 22, 990 66"/>
+                </circle>
+
+                <!-- Stage 01 -->
+                <g onclick="inspectBmsStage(0)" class="cursor-pointer">
+                  <circle id="bmsHalo0" cx="130" cy="66" r="34" fill="#B45309" opacity="0.22" class="bms-halo"/>
+                  <circle id="bmsNode0" cx="130" cy="66" r="26" fill="#B45309" stroke="#FFFFFF" stroke-width="3" filter="url(#warmShadow)"/>
+                  <text id="bmsTxt0" x="130" y="71" text-anchor="middle" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">01</text>
+                </g>
+
+                <!-- Stage 02 -->
+                <g onclick="inspectBmsStage(1)" class="cursor-pointer">
+                  <circle id="bmsHalo1" cx="420" cy="66" r="34" fill="#3F6212" opacity="0"/>
+                  <circle id="bmsNode1" cx="420" cy="66" r="26" fill="#FFFFFF" stroke="#3F6212" stroke-width="3" filter="url(#warmShadow)"/>
+                  <text id="bmsTxt1" x="420" y="71" text-anchor="middle" fill="#3F6212" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">02</text>
+                </g>
+
+                <!-- Stage 03 -->
+                <g onclick="inspectBmsStage(2)" class="cursor-pointer">
+                  <circle id="bmsHalo2" cx="700" cy="66" r="34" fill="#B45309" opacity="0"/>
+                  <circle id="bmsNode2" cx="700" cy="66" r="26" fill="#FFFFFF" stroke="#B45309" stroke-width="3" filter="url(#warmShadow)"/>
+                  <text id="bmsTxt2" x="700" y="71" text-anchor="middle" fill="#B45309" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">03</text>
+                </g>
+
+                <!-- Stage 04 -->
+                <g onclick="inspectBmsStage(3)" class="cursor-pointer">
+                  <circle id="bmsHalo3" cx="990" cy="66" r="34" fill="#1D4ED8" opacity="0"/>
+                  <circle id="bmsNode3" cx="990" cy="66" r="26" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="3" filter="url(#warmShadow)"/>
+                  <text id="bmsTxt3" x="990" y="71" text-anchor="middle" fill="#1D4ED8" font-family="JetBrains Mono, monospace" font-weight="700" font-size="13">04</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 4 Stage Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3.5 mt-2">
+            <button onclick="inspectBmsStage(0)" id="bmsCard0" class="text-left p-4 rounded-2xl bg-white border-2 border-[#B45309] shadow-md transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-[#B45309]">NODE 01</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded bg-amber-50 text-[#B45309]">500ms poll</span>
+              </div>
+              <div class="font-semibold text-sm text-[#1C1917]">4,800+ IoT Climate &amp; Occupancy Sensors</div>
+              <p class="text-xs text-[#57534E] mt-1">Millimeter-wave footfall, CO2, VOC &amp; solar facade irradiance.</p>
+            </button>
+
+            <button onclick="inspectBmsStage(1)" id="bmsCard1" class="text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-stone-200/90 transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-[#3F6212]">NODE 02</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded bg-lime-50 text-[#3F6212]">-31.4% kWh</span>
+              </div>
+              <div class="font-semibold text-sm text-[#1C1917]">Digital Twin HVAC Optimizer</div>
+              <p class="text-xs text-[#57534E] mt-1">Model-predictive chiller staging 45 mins ahead of thermal load.</p>
+            </button>
+
+            <button onclick="inspectBmsStage(2)" id="bmsCard2" class="text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-stone-200/90 transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-[#B45309]">NODE 03</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded bg-amber-50 text-[#B45309]">99.96% Up</span>
+              </div>
+              <div class="font-semibold text-sm text-[#1C1917]">Predictive Maintenance Engine</div>
+              <p class="text-xs text-[#57534E] mt-1">Acoustic vibration anomaly detection on elevators &amp; VAV dampers.</p>
+            </button>
+
+            <button onclick="inspectBmsStage(3)" id="bmsCard3" class="text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-stone-200/90 transition-all">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-[12.5px] font-bold text-[#1D4ED8]">NODE 04</span>
+                <span class="font-mono text-[12.5px] px-2 py-0.5 rounded bg-blue-50 text-[#1D4ED8]">Real-Time</span>
+              </div>
+              <div class="font-semibold text-sm text-[#1C1917]">Automated NOI &amp; ESG Ledger</div>
+              <p class="text-xs text-[#57534E] mt-1">Sub-metered NNN tenant recovery &amp; audited GRESB carbon reporting.</p>
+            </button>
+          </div>
+
+          <!-- Stage Telemetry Readout Bar -->
+          <div class="mt-4 p-4 rounded-2xl bg-[#FAF8F4] border border-stone-200/90 flex flex-wrap items-center justify-between gap-4">
+            <div class="max-w-2xl">
+              <div id="bmsInspTitle" class="font-mono text-[12.5px] font-bold text-[#B45309] uppercase">INSPECTING · 01 4,800+ IOT CLIMATE &amp; OCCUPANCY SENSORS</div>
+              <p id="bmsInspDesc" class="text-xs sm:text-[13px] text-[#57534E] mt-0.5">
+                Streams anonymous zone occupancy density and facade solar heat gain across 18 global properties via encrypted BACnet/SC gateways.
+              </p>
+            </div>
+            <div class="flex items-center gap-6">
+              <div>
+                <div class="text-xs uppercase tracking-wider text-stone-400 font-semibold">Energy Intensity</div>
+                <div id="bmsInspMetric1" class="font-mono font-bold text-base text-[#3F6212]">68.2 kWh/m²</div>
+              </div>
+              <div>
+                <div class="text-xs uppercase tracking-wider text-stone-400 font-semibold">Annual NOI Lift</div>
+                <div id="bmsInspMetric2" class="font-mono font-bold text-base text-[#B45309]">+$640K / yr</div>
+              </div>
+              <div>
+                <div class="text-xs uppercase tracking-wider text-stone-400 font-semibold">Active Endpoints</div>
+                <div id="bmsInspMetric3" class="font-mono font-bold text-base text-[#1C1917]">4,812 Online</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. RENTAL YIELD VS MARKET BENCHMARK CHART + FLAGSHIP PROPERTIES BENTO -->
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <!-- LEFT (7 COLS): Grouped Bar + Spline Chart -->
+          <div class="xl:col-span-7 alabaster-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-5">
+                <div>
+                  <h2 class="font-editorial font-bold text-xl text-[#1C1917]">Rental Yield vs Market Benchmark</h2>
+                  <p class="text-xs text-[#57534E] mt-0.5">Unlevered Net Property Yield (%) vs Prime CBRE Index &amp; Smart-BMS NOI Margin Spline</p>
+                </div>
+
+                <div class="stone-well p-1 rounded-xl flex items-center gap-1">
+                  <button onclick="switchYieldHorizon('annual', this)" class="horizon-tab stone-pill-active px-3 py-1 rounded-lg text-xs font-semibold transition">Annual</button>
+                  <button onclick="switchYieldHorizon('quarterly', this)" class="horizon-tab px-3 py-1 rounded-lg text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition">Quarterly</button>
+                </div>
+              </div>
+
+              <!-- Legend & Dynamic Hover Readout -->
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4 px-3.5 py-2.5 rounded-2xl bg-[#FAF8F4] border border-stone-200/80 text-xs">
+                <div class="flex flex-wrap items-center gap-4">
+                  <span class="flex items-center gap-1.5 font-medium text-[#1C1917]">
+                    <span class="w-3 h-3 rounded-sm bg-[#B45309] inline-block"></span>
+                    Haven Net Yield: <strong id="yieldReadoutHaven" class="font-mono text-[#B45309]">6.82%</strong>
+                  </span>
+                  <span class="flex items-center gap-1.5 font-medium text-[#57534E]">
+                    <span class="w-3 h-3 rounded-sm bg-stone-300 inline-block"></span>
+                    Prime Market Avg: <strong id="yieldReadoutMarket" class="font-mono text-[#1C1917]">4.95%</strong>
+                  </span>
+                  <span class="flex items-center gap-1.5 font-medium text-[#3F6212]">
+                    <span class="w-3 h-0.5 bg-[#3F6212] inline-block"></span>
+                    Spread Alpha: <strong id="yieldReadoutAlpha" class="font-mono">+187 bps</strong>
+                  </span>
+                </div>
+                <span id="yieldReadoutLabel" class="font-mono text-[12.5px] text-[#57534E]">Asset Class: Mixed-Use Trophy</span>
+              </div>
+
+              <!-- SVG Grouped Bar + Spline Chart -->
+              <div class="w-full">
+                <svg id="yieldChartSvg" class="w-full h-[265px] overflow-visible select-none" viewBox="0 0 680 260" fill="none">
+                  <!-- Gridlines -->
+                  <g stroke="#E7E5E4" stroke-dasharray="4 4" stroke-width="1">
+                    <line x1="46" y1="28" x2="656" y2="28"/>
+                    <line x1="46" y1="76" x2="656" y2="76"/>
+                    <line x1="46" y1="124" x2="656" y2="124"/>
+                    <line x1="46" y1="172" x2="656" y2="172"/>
+                    <line x1="46" y1="220" x2="656" y2="220" stroke-dasharray="0"/>
+                  </g>
+
+                  <!-- Y-Axis Labels -->
+                  <g fill="#78716C" font-family="JetBrains Mono, monospace" font-size="10.5">
+                    <text x="8" y="32">8.0%</text>
+                    <text x="8" y="80">6.5%</text>
+                    <text x="8" y="128">5.0%</text>
+                    <text x="8" y="176">3.5%</text>
+                    <text x="8" y="224">2.0%</text>
+                  </g>
+
+                  <!-- Bars + Spline Populated by JS -->
+                  <g id="yieldBarsGroup"></g>
+                  <path id="yieldSplinePath" stroke="#3F6212" stroke-width="2.8" stroke-linecap="round" fill="none" d=""/>
+                  <g id="yieldSplineDots"></g>
+                  <g id="yieldXLabels" fill="#57534E" font-family="JetBrains Mono, monospace" font-size="10.5"></g>
+                </svg>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 pt-4 mt-2 border-t border-stone-200/80">
+              <div>
+                <span class="text-[12.5px] text-[#57534E]">Portfolio Avg Cap Rate</span>
+                <div class="font-mono font-bold text-sm sm:text-base text-[#1C1917] mt-0.5">5.94% Unlevered</div>
+              </div>
+              <div>
+                <span class="text-[12.5px] text-[#57534E]">Rent Collection Velocity</span>
+                <div class="font-mono font-bold text-sm sm:text-base text-[#3F6212] mt-0.5">99.7% On-Time</div>
+              </div>
+              <div>
+                <span class="text-[12.5px] text-[#57534E]">Green Lease Premium</span>
+                <div class="font-mono font-bold text-sm sm:text-base text-[#B45309] mt-0.5">+$14.80 / sq.ft</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT (5 COLS): Flagship Properties Bento Cards -->
+          <div class="xl:col-span-5 alabaster-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h2 class="font-editorial font-bold text-xl text-[#1C1917]">Flagship Trophy Holdings</h2>
+                  <p class="text-xs text-[#57534E]">Live cap rate, occupancy &amp; BMS energy grade</p>
+                </div>
+                <span id="regionCountBadge" class="font-mono text-xs font-bold px-2.5 py-1 rounded-xl bg-amber-500/10 text-[#B45309]">4 Flagships</span>
+              </div>
+
+              <div id="flagshipCardsContainer" class="space-y-3"></div>
+            </div>
+
+            <div class="mt-4 pt-3.5 border-t border-stone-200/80 flex items-center justify-between text-xs">
+              <span class="text-[#57534E]">Debt Service Coverage Ratio (DSCR)</span>
+              <span class="font-mono font-bold text-[#3F6212]">2.84x · AAA Rated</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. LEASE RENEWAL & ASSET SCHEDULE TABLE WITH WORKING ASSET-TYPE FILTER -->
+        <section class="alabaster-glass rounded-[28px] p-5 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <h2 class="font-editorial font-bold text-xl text-[#1C1917]">Anchor Lease Rollover &amp; Yield Reversion Schedule</h2>
+              <p class="text-xs text-[#57534E] mt-0.5">Mark-to-market rent uplift opportunities paired with sub-metered BMS efficiency clauses</p>
+            </div>
+
+            <!-- Required Filter Pills: All, Commercial, Luxury Residential, Mixed-Use -->
+            <div class="stone-well p-1 rounded-xl flex flex-wrap items-center gap-1">
+              <button onclick="setAssetTypeFilter('All', this)" class="type-filter-btn stone-pill-active px-3 py-1.5 rounded-lg text-xs font-semibold transition">All</button>
+              <button onclick="setAssetTypeFilter('Commercial', this)" class="type-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition">Commercial</button>
+              <button onclick="setAssetTypeFilter('Luxury Residential', this)" class="type-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition">Luxury Residential</button>
+              <button onclick="setAssetTypeFilter('Mixed-Use', this)" class="type-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-[#57534E] hover:text-[#1C1917] transition">Mixed-Use</button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[800px]">
+              <thead>
+                <tr class="border-b border-stone-200/90 text-[12.5px] font-semibold uppercase tracking-wider text-[#57534E]">
+                  <th class="pb-3 pl-2">Property &amp; Suite</th>
+                  <th class="pb-3">Anchor Tenant</th>
+                  <th class="pb-3">Asset Class</th>
+                  <th class="pb-3">Leased Area</th>
+                  <th class="pb-3">Passing NOI / Reversion</th>
+                  <th class="pb-3">BMS Intensity</th>
+                  <th class="pb-3 text-right pr-2">Lease Action</th>
+                </tr>
+              </thead>
+              <tbody id="leaseTableBody" class="divide-y divide-stone-200/70 text-xs"></tbody>
+            </table>
+          </div>
+        </section>
+        </div>
+
+        <div id="tabSubpageView" class="hidden space-y-6"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Warm Alabaster Toast -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-3">
+    <div class="alabaster-glass px-4 py-3 rounded-2xl flex items-center gap-3 shadow-xl border border-amber-700/25 max-w-sm">
+      <div class="w-7 h-7 rounded-xl bg-[#1C1917] text-amber-400 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <p id="toastMessage" class="text-xs font-medium text-[#1C1917]"></p>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // HERO FLOOR / ZONE DIGITAL TWIN TELEMETRY
+    // =========================================================================
+    const FLOOR_ZONES = {
+      penthouse: {
+        tag: 'ZONE · PENTHOUSE L30–32',
+        tenant: 'Anchor: Sovereign Family Office',
+        temp: '21.4°C', tempSub: 'Setpoint ±0.1°C',
+        lux: '640 lx', luxSub: 'Glazing tint 18%',
+        aqi: '11 AQI', aqiSub: '445 ppm CO2 · Pure',
+        yield: '$194 / sf', yieldSub: '100% Leased · NNN'
+      },
+      commercial: {
+        tag: 'ZONE · COMMERCIAL L12–28',
+        tenant: 'Anchor: Quant Capital & Legal LLP',
+        temp: '20.8°C', tempSub: 'VAV Trim Optimal',
+        lux: '520 lx', luxSub: 'Glazing tint 42%',
+        aqi: '16 AQI', aqiSub: '510 ppm CO2 · Crisp',
+        yield: '$148 / sf', yieldSub: '98.6% Occupied'
+      },
+      atrium: {
+        tag: 'ZONE · RETAIL ATRIUM L01–03',
+        tenant: 'Anchor: Maison Horlogerie Flagship',
+        temp: '21.9°C', tempSub: 'Radiant Travertine Slab',
+        lux: '890 lx', luxSub: 'Skylight Louver 75%',
+        aqi: '19 AQI', aqiSub: '1,420 Footfall / hr',
+        yield: '$265 / sf', yieldSub: '+14.2% Turnover Rent'
+      },
+      solar: {
+        tag: 'ZONE · SUB-LEVEL SOLAR BMS B1–B3',
+        tenant: 'Plant: 1.8 MWh Thermal Ice + PV Grid',
+        temp: '16.2°C', tempSub: 'Heat-Pump COP 5.4',
+        lux: '310 lx', luxSub: 'Motion LED Array',
+        aqi: '09 AQI', aqiSub: 'HEPA MERV-16 Intake',
+        yield: '-34.8% kWh', yieldSub: '$62K / mo Peak Shave'
+      }
+    };
+
+    const REGION_DATA = {
+      all: {
+        valuation: '$842.5M', valuationDelta: '+8.6%',
+        noi: '$6.48M / mo', noiSub: '+11.2% YoY cash yield',
+        occupancy: '97.8%',
+        bmsSavings: '-31.4% kWh'
+      },
+      tokyo: {
+        valuation: '$294.0M', valuationDelta: '+10.4%',
+        noi: '$2.28M / mo', noiSub: '+13.6% YoY Ginza prime',
+        occupancy: '99.1%',
+        bmsSavings: '-34.2% kWh'
+      },
+      london: {
+        valuation: '$268.5M', valuationDelta: '+7.1%',
+        noi: '$1.96M / mo', noiSub: '+9.4% YoY Mayfair NNN',
+        occupancy: '97.2%',
+        bmsSavings: '-29.0% kWh'
+      },
+      newyork: {
+        valuation: '$280.0M', valuationDelta: '+8.2%',
+        noi: '$2.24M / mo', noiSub: '+10.8% YoY SoHo cast-iron',
+        occupancy: '97.4%',
+        bmsSavings: '-30.8% kWh'
+      }
+    };
+
+    const FLAGSHIP_HOLDINGS = [
+      { name: 'The Atrium Tower', region: 'newyork', city: 'New York · SoHo', type: 'Mixed-Use', noi: '$2.14M/mo', cap: '5.84%', occ: '98.4%', kwh: '64 kWh/m²' },
+      { name: 'Ginza Kengo Glass Pavilion', region: 'tokyo', city: 'Tokyo · Ginza 6-Chome', type: 'Commercial', noi: '$1.82M/mo', cap: '5.42%', occ: '99.4%', kwh: '59 kWh/m²' },
+      { name: 'Grosvenor Travertine House', region: 'london', city: 'London · Mayfair', type: 'Luxury Residential', noi: '$1.36M/mo', cap: '6.12%', occ: '97.1%', kwh: '71 kWh/m²' },
+      { name: 'Aoyama Timber & Light Lofts', region: 'tokyo', city: 'Tokyo · Minami-Aoyama', type: 'Luxury Residential', noi: '$1.16M/mo', cap: '6.28%', occ: '98.8%', kwh: '62 kWh/m²' }
+    ];
+
+    const LEASE_ROLLOVER = [
+      { asset: 'The Atrium Tower · L24–27', region: 'newyork', tenant: 'Vanguard Quantitative Partners', type: 'Commercial', sqft: '68,400 sq.ft', noi: '$940K · +16.4% MTM', bms: '61 kWh/m²', action: 'Execute +16% Renewal' },
+      { asset: 'Ginza Kengo Pavilion · L01–02', region: 'tokyo', tenant: 'Atelier Valmont Geneva', type: 'Mixed-Use', sqft: '24,200 sq.ft', noi: '$610K · +21.0% MTM', bms: '58 kWh/m²', action: 'Approve Green Rider' },
+      { asset: 'Grosvenor House · Penthouse A', region: 'london', tenant: 'Nordic Diplomatic Residence', type: 'Luxury Residential', sqft: '11,800 sq.ft', noi: '$285K · +9.5% MTM', bms: '69 kWh/m²', action: 'Lock 5-Yr Extension' },
+      { asset: 'The Atrium Tower · Retail Arcade', region: 'newyork', tenant: 'Kyoto Roastery & Gallery', type: 'Mixed-Use', sqft: '14,600 sq.ft', noi: '$340K · +14.2% MTM', bms: '66 kWh/m²', action: 'Review Turnover Clause' },
+      { asset: 'Mayfair Chancery Annex · L04–07', region: 'london', tenant: 'Ashford Sterling Private Bank', type: 'Commercial', sqft: '42,000 sq.ft', noi: '$590K · +12.8% MTM', bms: '70 kWh/m²', action: 'Execute +13% Renewal' },
+      { asset: 'Aoyama Light Lofts · Sky Villas', region: 'tokyo', tenant: 'Executive Corporate Suites', type: 'Luxury Residential', sqft: '29,500 sq.ft', noi: '$480K · +11.6% MTM', bms: '60 kWh/m²', action: 'Approve Green Rider' }
+    ];
+
+    const BMS_STAGES = [
+      {
+        title: 'INSPECTING · 01 4,800+ IOT CLIMATE & OCCUPANCY SENSORS',
+        desc: 'Streams anonymous zone occupancy density and facade solar heat gain across 18 global properties via encrypted BACnet/SC gateways.',
+        m1: '68.2 kWh/m²', m2: '+$640K / yr', m3: '4,812 Online'
+      },
+      {
+        title: 'INSPECTING · 02 DIGITAL TWIN HVAC OPTIMIZER',
+        desc: 'Runs thermodynamic simulation every 5 minutes—pre-cooling travertine thermal mass during off-peak solar tariff windows.',
+        m1: '59.4 kWh/m²', m2: '+$1.18M / yr', m3: '142 Chillers'
+      },
+      {
+        title: 'INSPECTING · 03 PREDICTIVE MAINTENANCE ENGINE',
+        desc: 'Detects bearing harmonics on high-speed elevators and VAV actuators 21 days prior to fault—slashing unplanned CapEx.',
+        m1: '99.96% Uptime', m2: '+$490K / yr', m3: '0 Open Faults'
+      },
+      {
+        title: 'INSPECTING · 04 AUTOMATED NOI & ESG LEDGER',
+        desc: 'Reconciles sub-metered tenant NNN utility recoveries directly into institutional LP waterfall reports and GRESB filings.',
+        m1: '100% Audited', m2: '+$1.92M Total', m3: 'GRESB 96/100'
+      }
+    ];
+
+    const YIELD_SERIES = {
+      annual: {
+        labels: ['2021', '2022', '2023', '2024', '2025', '2026E'],
+        haven: [5.40, 5.75, 6.12, 6.45, 6.68, 6.94],
+        market: [4.35, 4.50, 4.68, 4.82, 4.90, 4.98],
+        assetClass: ['Core Office', 'Prime Retail', 'Luxury Resi', 'Adaptive Reuse', 'Smart Trophy', 'Mixed-Use Trophy']
+      },
+      quarterly: {
+        labels: ['Q1 25', 'Q2 25', 'Q3 25', 'Q4 25', 'Q1 26', 'Q2 26'],
+        haven: [6.38, 6.52, 6.64, 6.75, 6.84, 6.96],
+        market: [4.78, 4.84, 4.88, 4.91, 4.94, 4.97],
+        assetClass: ['Tokyo Ginza', 'London Mayfair', 'NY SoHo', 'Tokyo Aoyama', 'Milan Brera', 'Global Fund IV']
+      }
+    };
+
+    let currentRegion = 'all';
+    let currentAssetType = 'All';
+    let currentHorizon = 'annual';
+
+    // =========================================================================
+    // SIDEBAR & MOBILE DRAWER
+    // =========================================================================
+    function toggleSidebarCollapse() {
+      const sb = document.getElementById('sidebar');
+      const chevron = document.getElementById('collapseChevron');
+      const expandBtn = document.getElementById('collapsedExpandBtn');
+      sb.classList.toggle('collapsed');
+      const collapsed = sb.classList.contains('collapsed');
+      chevron.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+      expandBtn.classList.toggle('hidden', !collapsed);
+      expandBtn.classList.toggle('flex', collapsed);
+    }
+
+    function toggleMobileSidebar(open) {
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('mobileBackdrop');
+      sb.classList.toggle('-translate-x-full', !open);
+      bd.classList.toggle('hidden', !open);
+    }
+
+    const HAVEN_SUBPAGES = {
+      'Asset Digital Twin': {
+        tag: 'BIM LOD-500 · LIVE BACNET TWIN',
+        subtitle: 'Structural elevation telemetry, electrochromic curtain-wall glazing tint, and travertine thermal-mass optimization across 18 trophy assets.',
+        ctaLabel: 'Calibrate Facade Tint',
+        ctaToast: 'Calibrated electrochromic facade tint across 4.2M sq.ft digital twin mesh.',
+        kpis: [
+          { label: 'Digital Twin Coverage', val: '4.2M sq.ft', badge: '18 Assets', tone: 'bronze', sub: '100% LIDAR & BIM synced' },
+          { label: 'Solar Heat Gain Cut', val: '-41.8%', badge: 'Auto-Glaze', tone: 'sage', sub: 'Dynamic south-west louvers' },
+          { label: 'Structural Health Sensors', val: '1,240', badge: '0 Drift', tone: 'blue', sub: 'Seismic & wind-damper live' },
+          { label: 'Twin Sync Latency', val: '480 ms', badge: 'BACnet/SC', tone: 'sage', sub: 'Encrypted edge gateways' }
+        ],
+        chartTitle: 'Structural Zone Thermal Load & Glazing Efficiency',
+        chartSub: 'Real-time solar irradiance rejection across primary architectural elevations',
+        bars: [
+          { label: 'The Atrium Tower · Sky Penthouse L30–32', pct: 95, meta: '21.4°C · 18% Tint · 11 AQI', grad: 'from-[#B45309] to-amber-500' },
+          { label: 'Ginza Kengo Pavilion · Double-Skin Curtain Wall', pct: 92, meta: '20.9°C · 34% Tint · 09 AQI', grad: 'from-[#3F6212] to-lime-700' },
+          { label: 'Grosvenor Travertine House · Atrium Skylight', pct: 88, meta: '21.6°C · 28% Tint · 13 AQI', grad: 'from-[#B45309] to-[#3F6212]' },
+          { label: 'Aoyama Timber Lofts · Passive Cross-Vent', pct: 91, meta: '21.1°C · 22% Tint · 10 AQI', grad: 'from-[#1D4ED8] to-blue-500' }
+        ],
+        svgPts: '14,126 94,114 174,102 254,86 334,74 414,56 486,42',
+        svgColor: '#B45309',
+        tableTitle: 'Active Building Digital Twin Nodes',
+        cols: ['Property & Elevation', 'Facade Architecture', 'Zone Temp / Lux', 'Energy Grade', 'Twin Control'],
+        rows: [
+          { c1: 'Atrium Tower · L30–32', c2: 'Triple-Silver Electrochromic', c3: '21.4°C · 640 lx', c4: 'LEED Platinum', action: 'Sync Twin', done: 'Synced' },
+          { c1: 'Ginza Pavilion · L01–14', c2: 'Kinetic Cedar & Low-E Glass', c3: '20.9°C · 590 lx', c4: 'CASBEE S-Rank', action: 'Sync Twin', done: 'Synced' },
+          { c1: 'Grosvenor House · Mayfair', c2: 'Heritage Portland & Acoustic', c3: '21.5°C · 520 lx', c4: 'BREEAM Outstanding', action: 'Sync Twin', done: 'Synced' },
+          { c1: 'Aoyama Timber Lofts', c2: 'Cross-Laminated Cypress Hybrid', c3: '21.2°C · 680 lx', c4: 'Net-Zero Verified', action: 'Sync Twin', done: 'Synced' },
+          { c1: 'SoHo Cast-Iron Annex', c2: 'Restored Arch + Smart VAV', c3: '21.0°C · 540 lx', c4: 'WELL v2 Gold', action: 'Sync Twin', done: 'Synced' }
+        ]
+      },
+      'Lease & Yield': {
+        tag: 'INSTITUTIONAL NNN WATERFALL',
+        subtitle: 'Weighted average lease expiry (7.4 yrs WALT), green-lease utility recovery riders, and mark-to-market reversion capture.',
+        ctaLabel: 'Model Rent Uplift',
+        ctaToast: 'Updated Q3 mark-to-market lease reversion waterfall (+15.8% blended uplift).',
+        kpis: [
+          { label: 'Passing Net NOI', val: '$77.8M / yr', badge: '+11.2% YoY', tone: 'sage', sub: '$6.48M monthly cash yield' },
+          { label: 'Portfolio WALT', val: '7.4 Yrs', badge: 'AAA Covenant', tone: 'bronze', sub: '99.7% on-time collection' },
+          { label: 'Reversion Spread', val: '+15.8%', badge: 'MTM Alpha', tone: 'sage', sub: 'On expiring 2026–27 roll' },
+          { label: 'Green Lease Riders', val: '94.2%', badge: '+$14.80/sf', tone: 'blue', sub: 'Sub-metered BMS recovery' }
+        ],
+        chartTitle: 'Lease Expiry Maturity Ladder & Reversion Capture',
+        chartSub: 'Contracted NNN base rent schedule with embedded CPI + green-rider escalations',
+        bars: [
+          { label: '2026–2027 Near-Term Reversion Tranche', pct: 32, meta: '11.4% GLA · +16.4% MTM Uplift', grad: 'from-[#B45309] to-amber-500' },
+          { label: '2028–2029 Mid-Cycle Core Rollover', pct: 58, meta: '24.8% GLA · +12.8% MTM Uplift', grad: 'from-[#3F6212] to-lime-700' },
+          { label: '2030+ Long-Dated Sovereign & Anchor NNN', pct: 92, meta: '63.8% GLA · CPI + 225 bps', grad: 'from-[#B45309] to-[#3F6212]' },
+          { label: 'Luxury Flagship Retail Turnover Clauses', pct: 78, meta: '100% Participating Gross', grad: 'from-[#1D4ED8] to-blue-500' }
+        ],
+        svgPts: '14,130 94,118 174,104 254,88 334,70 414,54 486,38',
+        svgColor: '#3F6212',
+        tableTitle: 'Upcoming Anchor Lease Renewals & Reversions',
+        cols: ['Suite & Property', 'Anchor Covenant', 'Passing Rent', 'MTM Reversion', 'Execution'],
+        rows: [
+          { c1: 'Atrium Tower · L24–27', c2: 'Vanguard Quant Partners', c3: '$148 / sq.ft NNN', c4: '+16.4% Uplift', action: 'Issue Term Sheet', done: 'Issued' },
+          { c1: 'Ginza Pavilion · L01–02', c2: 'Atelier Valmont Geneva', c3: '$265 / sq.ft NNN', c4: '+21.0% Uplift', action: 'Issue Term Sheet', done: 'Issued' },
+          { c1: 'Grosvenor · Penthouse A', c2: 'Nordic Diplomatic Mission', c3: '$194 / sq.ft NNN', c4: '+9.5% Uplift', action: 'Lock Extension', done: 'Locked' },
+          { c1: 'Mayfair Annex · L04–07', c2: 'Ashford Private Bank', c3: '$156 / sq.ft NNN', c4: '+12.8% Uplift', action: 'Issue Term Sheet', done: 'Issued' },
+          { c1: 'Aoyama Lofts · Villas', c2: 'Sovereign Exec Suites', c3: '$138 / sq.ft NNN', c4: '+11.6% Uplift', action: 'Lock Extension', done: 'Locked' }
+        ]
+      },
+      'Smart BMS IoT': {
+        tag: 'GRESB 5-STAR · NET-ZERO PLANT',
+        subtitle: 'Model-predictive chiller staging, sub-level thermal ice storage, and millimeter-wave occupancy HVAC trim.',
+        ctaLabel: 'Run Peak-Tariff Trim',
+        ctaToast: 'Activated thermal ice-storage discharge; shaved 1.4 MW peak grid draw.',
+        kpis: [
+          { label: 'Energy Intensity Cut', val: '-31.4% kWh', badge: '61 kWh/m²', tone: 'sage', sub: '$1.92M annual OpEx saved' },
+          { label: 'Active IoT Endpoints', val: '4,812', badge: '99.96% Up', tone: 'bronze', sub: 'CO2, VOC, lux & mmWave' },
+          { label: 'Heat-Pump Plant COP', val: '5.42 COP', badge: 'Optimal', tone: 'sage', sub: 'Geothermal + solar PV loop' },
+          { label: 'Open Mechanical Faults', val: '0 Critical', badge: '21d Predict', tone: 'blue', sub: 'Harmonic bearing telemetry' }
+        ],
+        chartTitle: 'Subsystem Energy Demand Reduction vs ASHRAE Baseline',
+        chartSub: 'Autonomous closed-loop kWh savings verified across commercial & residential towers',
+        bars: [
+          { label: 'Magnetic-Bearing Chiller & Ice-Bank Staging', pct: 91, meta: '-36.2% kWh · $840K/yr Saved', grad: 'from-[#3F6212] to-lime-700' },
+          { label: 'Occupancy-Driven VAV Fresh Air Modulation', pct: 84, meta: '-29.8% kWh · $520K/yr Saved', grad: 'from-[#B45309] to-amber-500' },
+          { label: 'Daylight-Harvesting DALI Circadian LED Grid', pct: 88, meta: '-34.0% kWh · $340K/yr Saved', grad: 'from-[#B45309] to-[#3F6212]' },
+          { label: 'Regenerative High-Speed Elevator Drives', pct: 76, meta: '-22.4% kWh · $220K/yr Saved', grad: 'from-[#1D4ED8] to-blue-500' }
+        ],
+        svgPts: '14,44 94,58 174,72 254,88 334,102 414,114 486,124',
+        svgColor: '#3F6212',
+        tableTitle: 'Autonomous Plant & BACnet Controller Loops',
+        cols: ['Plant Controller', 'Subsystem Scope', 'Current Load', 'Carbon Intensity', 'BMS Command'],
+        rows: [
+          { c1: 'BMS-NY-CH01', c2: 'Atrium Sub-Level Thermal Ice', c3: '410 kW (-38%)', c4: '18.4 kgCO2/m²', action: 'Optimize Loop', done: 'Optimized' },
+          { c1: 'BMS-TYO-PV04', c2: 'Ginza BIPV Curtain Solar Array', c3: '+285 kW Gen', c4: '16.9 kgCO2/m²', action: 'Optimize Loop', done: 'Optimized' },
+          { c1: 'BMS-LDN-AHU2', c2: 'Grosvenor HEPA MERV-16 Intake', c3: '190 kW (-29%)', c4: '22.1 kgCO2/m²', action: 'Optimize Loop', done: 'Optimized' },
+          { c1: 'BMS-TYO-GEO1', c2: 'Aoyama Ground-Source Heat Pump', c3: 'COP 5.6 Active', c4: '17.2 kgCO2/m²', action: 'Optimize Loop', done: 'Optimized' },
+          { c1: 'BMS-NY-ELV9', c2: 'Atrium Regenerative Lift Bank', c3: '94 kW Net Recov', c4: '19.8 kgCO2/m²', action: 'Optimize Loop', done: 'Optimized' }
+        ]
+      },
+      'Tenant Experience': {
+        tag: 'WELL V2 PLATINUM HOSPITALITY',
+        subtitle: 'Apple Wallet ultra-wideband suite access, individualized mobile climate preferences, and private architectural amenity booking.',
+        ctaLabel: 'Send Seasonal Briefing',
+        ctaToast: 'Delivered curated architectural & wellness digest to 142 executive tenant suites.',
+        kpis: [
+          { label: 'Tenant Renewal Intent', val: '96.8%', badge: '+74 NPS', tone: 'sage', sub: 'Top 1% institutional REIT' },
+          { label: 'Mobile UWB Key Active', val: '99.1%', badge: 'Zero Cards', tone: 'bronze', sub: 'Frictionless turnstile & lift' },
+          { label: 'Concierge SLA', val: '4.2 mins', badge: 'White-Glove', tone: 'blue', sub: 'Suite climate & hospitality' },
+          { label: 'Indoor Air Purity', val: '12 AQI Avg', badge: '450ppm CO2', tone: 'sage', sub: 'Continuous cognitive grade' }
+        ],
+        chartTitle: 'Executive Amenity & Wellness Space Utilization',
+        chartSub: 'Live occupancy and booking velocity across private tenant club floors',
+        bars: [
+          { label: 'Sky Conservatory & Private Boardrooms', pct: 92, meta: '92% Booked · 4.98 Satisfaction', grad: 'from-[#B45309] to-amber-500' },
+          { label: 'Travertine Thermal Spa & Lap Pool', pct: 79, meta: '79% Active · WELL Certified', grad: 'from-[#3F6212] to-lime-700' },
+          { label: 'Private Sommelier & Kyoto Tea Lounge', pct: 85, meta: '85% Evening Allocation', grad: 'from-[#B45309] to-[#3F6212]' },
+          { label: 'EV Valet & Autonomous Parcel Vaults', pct: 94, meta: '100% Zero-Wait Handoff', grad: 'from-[#1D4ED8] to-blue-500' }
+        ],
+        svgPts: '14,122 94,110 174,98 254,88 334,74 414,58 486,44',
+        svgColor: '#B45309',
+        tableTitle: 'Live Concierge & Suite Hospitality Requests',
+        cols: ['Tenant Suite', 'Request Category', 'Ambient Preset', 'SLA Timer', 'Concierge'],
+        rows: [
+          { c1: 'Sovereign Family Office · L31', c2: 'Private Boardroom + Acoustics', c3: '21.2°C · Warm 3000K', c4: '2m Elapsed', action: 'Fulfill VIP', done: 'Dispatched' },
+          { c1: 'Vanguard Quant · L25', c2: 'After-Hours Chiller Extension', c3: '20.5°C · Crisp Air', c4: 'Automated', action: 'Approve', done: 'Approved' },
+          { c1: 'Atelier Valmont · Gallery', c2: 'UV-Filtered Artwork Spotlights', c3: '21.8°C · 450 lx', c4: '3m Elapsed', action: 'Fulfill VIP', done: 'Dispatched' },
+          { c1: 'Nordic Residence · PH-A', c2: ' Diplomatic Valet & Lift Lock', c3: '21.6°C · Silent VAV', c4: 'Scheduled', action: 'Arm Access', done: 'Armed' },
+          { c1: 'Ashford Private Bank · L06', c2: 'Visitor UWB Digital Passes (8)', c3: '21.0°C · Standard', c4: 'Instant', action: 'Issue Passes', done: 'Issued' }
+        ]
+      },
+      'Acquisitions': {
+        tag: 'HAVEN GLOBAL FUND IV · PIPELINE',
+        subtitle: 'Off-market architectural trophy sourcing, deep-energy BMS retrofit underwriting, and unlevered IRR sensitivity modeling.',
+        ctaLabel: 'Export IC Deal Deck',
+        ctaToast: 'Compiled Investment Committee underwriting memo for 5 prime gateway targets.',
+        kpis: [
+          { label: 'Dry Powder Equity', val: '$310.0M', badge: 'Fund IV', tone: 'bronze', sub: '$780M levered buying power' },
+          { label: 'Target Unlevered IRR', val: '14.6%', badge: '+310 bps', tone: 'sage', sub: 'Via Smart-BMS green alpha' },
+          { label: 'Active Exclusivities', val: '3 Assets', badge: '$245M Vol', tone: 'blue', sub: 'Milan, Tokyo & Zurich' },
+          { label: 'Green CapEx Payback', val: '2.6 Yrs', badge: 'Proven', tone: 'sage', sub: 'Brown-to-green repricing' }
+        ],
+        chartTitle: 'Underwritten Yield-on-Cost vs Gateway Cap Rates',
+        chartSub: 'Value-creation bridge through autonomous BMS retrofit and luxury repositioning',
+        bars: [
+          { label: 'Palazzo Brera Stone Courtyard · Milan', pct: 90, meta: '€92M · 6.45% Stabilized Yield', grad: 'from-[#B45309] to-amber-500' },
+          { label: 'Marunouchi Glass Annex · Tokyo', pct: 86, meta: '$108M · 5.92% Stabilized Yield', grad: 'from-[#3F6212] to-lime-700' },
+          { label: 'Rue Saint-Honore Limestone · Paris', pct: 82, meta: '€78M · 6.18% Stabilized Yield', grad: 'from-[#B45309] to-[#3F6212]' },
+          { label: 'Bahnhofstrasse Heritage Bank · Zurich', pct: 77, meta: 'CHF 64M · 5.65% Stabilized Yield', grad: 'from-[#1D4ED8] to-blue-500' }
+        ],
+        svgPts: '14,128 94,114 174,100 254,84 334,68 414,52 486,38',
+        svgColor: '#1D4ED8',
+        tableTitle: 'Investment Committee Underwriting Pipeline',
+        cols: ['Target Property', 'Gateway Market', 'Est. Basis', 'Projected IRR', 'IC Stage'],
+        rows: [
+          { c1: 'Palazzo Brera Courtyard', c2: 'Milan · Brera Design Dist.', c3: '$99.4M Off-Market', c4: '15.2% IRR', action: 'Advance IC', done: 'Final IC' },
+          { c1: 'Marunouchi Glass Annex', c2: 'Tokyo · Chiyoda Prime', c3: '$108.0M Exclusivity', c4: '14.4% IRR', action: 'Advance IC', done: 'Final IC' },
+          { c1: '248 Rue Saint-Honore', c2: 'Paris · 1st Arrondissement', c3: '$84.2M Due Diligence', c4: '14.9% IRR', action: 'Advance IC', done: 'LOI Signed' },
+          { c1: 'Bahnhofstrasse Vaults', c2: 'Zurich · Paradeplatz', c3: '$72.5M Technical BIM', c4: '13.8% IRR', action: 'Advance IC', done: 'LOI Signed' },
+          { c1: 'Tribeca Cast-Iron Loft', c2: 'New York · Hudson Sq', c3: '$64.0M Screening', c4: '15.6% IRR', action: 'Advance IC', done: 'Underwritten' }
+        ]
+      }
+    };
+
+    function returnToPortfolioExec() {
+      const homeBtn = document.querySelector('.nav-item[data-nav="Portfolio Executive"]');
+      if (homeBtn) selectNav(homeBtn, 'Portfolio Executive');
+    }
+
+    function handleHavenSubAction(btn, msg, doneLabel) {
+      btn.textContent = doneLabel;
+      btn.className = 'px-3 py-1.5 rounded-xl bg-lime-900/10 text-[#3F6212] border border-lime-800/20 text-xs font-semibold transition';
+      triggerToast(msg);
+    }
+
+    function renderHavenSubpage(title) {
+      const cfg = HAVEN_SUBPAGES[title];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const kpisHtml = cfg.kpis.map(k => {
+        const pill = k.tone === 'sage'
+          ? 'bg-lime-900/10 text-[#3F6212]'
+          : k.tone === 'blue'
+            ? 'bg-blue-600/10 text-[#1D4ED8]'
+            : 'bg-amber-500/10 text-[#B45309]';
+        return `
+          <article class="alabaster-glass alabaster-hover rounded-[24px] p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-xs font-medium text-[#57534E]">${k.label}</p>
+                <div class="font-mono font-bold text-2xl tracking-tight text-[#1C1917] mt-1.5">${k.val}</div>
+              </div>
+              <span class="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${pill}">${k.badge}</span>
+            </div>
+            <div class="mt-4 pt-3 border-t border-stone-200/80 text-xs text-[#57534E]">${k.sub}</div>
+          </article>
+        `;
+      }).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div class="p-3 rounded-2xl bg-white/85 border border-stone-200/80 shadow-sm space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-[#1C1917] truncate pr-2">${b.label}</span>
+            <span class="font-mono text-[#B45309] font-semibold shrink-0">${b.meta}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-stone-200/80 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r ${b.grad}" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-white/65 transition-colors">
+          <td class="py-3.5 pl-2 font-semibold text-[#1C1917]">${r.c1}</td>
+          <td class="py-3.5 text-[#57534E] font-medium">${r.c2}</td>
+          <td class="py-3.5 font-mono text-[#1C1917]">${r.c3}</td>
+          <td class="py-3.5 font-mono font-semibold text-[#3F6212]">${r.c4}</td>
+          <td class="py-3.5 text-right pr-2">
+            <button onclick="handleHavenSubAction(this, '${r.action} confirmed for ${r.c1}.', '${r.done}')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#1C1917] text-[#1C1917] hover:text-white border border-stone-300/80 shadow-sm text-xs font-semibold transition">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <section class="alabaster-glass rounded-[28px] p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="returnToPortfolioExec()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl stone-well text-xs font-semibold text-[#1C1917] hover:text-[#B45309] transition">
+                <svg class="w-3.5 h-3.5 text-[#B45309]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Overview</span>
+              </button>
+              <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-700/20 text-[#B45309] font-mono text-xs font-semibold">${cfg.tag}</span>
+            </div>
+            <h1 class="font-editorial font-bold text-2xl text-[#1C1917] pt-1">${title}</h1>
+            <p class="text-sm text-[#57534E] max-w-2xl">${cfg.subtitle}</p>
+          </div>
+          <button onclick="triggerToast('${cfg.ctaToast}')" class="self-start sm:self-center bronze-btn px-4 py-2.5 rounded-2xl text-xs font-semibold inline-flex items-center gap-2 shrink-0">
+            <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span>${cfg.ctaLabel}</span>
+          </button>
+        </section>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          ${kpisHtml}
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-5 alabaster-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between space-y-5">
+            <div>
+              <span class="font-mono text-xs font-semibold uppercase tracking-wider text-[#B45309]">Architectural Telemetry</span>
+              <h2 class="font-editorial font-bold text-xl text-[#1C1917] mt-1">${cfg.chartTitle}</h2>
+              <p class="text-xs text-[#57534E] mt-0.5">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-2xl bg-[#FAF8F4] border border-stone-200/80 p-4">
+              <svg class="w-full h-36 overflow-visible" viewBox="0 0 500 150" fill="none">
+                <defs>
+                  <linearGradient id="havenSubGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${cfg.svgColor}" stop-opacity="0.24"/>
+                    <stop offset="100%" stop-color="${cfg.svgColor}" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="14" y1="35" x2="486" y2="35" stroke="#E7E5E4" stroke-dasharray="4 4"/>
+                <line x1="14" y1="85" x2="486" y2="85" stroke="#E7E5E4" stroke-dasharray="4 4"/>
+                <line x1="14" y1="132" x2="486" y2="132" stroke="#D6D3D1"/>
+                <polygon points="${cfg.svgPts} 486,132 14,132" fill="url(#havenSubGrad)"/>
+                <polyline points="${cfg.svgPts}" fill="none" stroke="${cfg.svgColor}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="14" y="147" fill="#78716C" font-family="JetBrains Mono" font-size="12">Q1</text>
+                <text x="238" y="147" fill="#78716C" font-family="JetBrains Mono" font-size="12">Q3</text>
+                <text x="448" y="147" fill="#1C1917" font-family="JetBrains Mono" font-size="12">2026E</text>
+              </svg>
+            </div>
+            <div class="space-y-2.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="xl:col-span-7 alabaster-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <span class="font-mono text-xs font-semibold uppercase tracking-wider text-[#3F6212]">Portfolio Schedule</span>
+                  <h2 class="font-editorial font-bold text-xl text-[#1C1917] mt-0.5">${cfg.tableTitle}</h2>
+                </div>
+                <span class="px-2.5 py-1 rounded-xl bg-amber-500/10 text-[#B45309] font-mono text-xs font-bold">GRESB 5-Star</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[560px]">
+                  <thead>
+                    <tr class="border-b border-stone-200/90 text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+                      <th class="pb-3 pl-2">${cfg.cols[0]}</th>
+                      <th class="pb-3">${cfg.cols[1]}</th>
+                      <th class="pb-3">${cfg.cols[2]}</th>
+                      <th class="pb-3">${cfg.cols[3]}</th>
+                      <th class="pb-3 text-right pr-2">${cfg.cols[4]}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-stone-200/70 text-xs">
+                    ${rowsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-stone-200/80 flex items-center justify-between text-xs font-mono text-[#57534E]">
+              <span>Haven Global Fund IV · AAA DSCR 2.84x</span>
+              <span class="text-[#3F6212] font-semibold">BACnet/SC Verified</span>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function selectNav(btn, title) {
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('stone-pill-active', 'font-semibold');
+        el.classList.add('text-[#57534E]', 'font-medium');
+        const svg = el.querySelector('svg');
+        if (svg) {
+          svg.classList.remove('text-[#B45309]');
+          svg.classList.add('text-[#57534E]');
+        }
+      });
+      btn.classList.add('stone-pill-active', 'font-semibold');
+      btn.classList.remove('text-[#57534E]', 'font-medium');
+      const activeSvg = btn.querySelector('svg');
+      if (activeSvg) {
+        activeSvg.classList.remove('text-[#57534E]');
+        activeSvg.classList.add('text-[#B45309]');
+      }
+      document.getElementById('activeBreadcrumb').textContent = title;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (title === 'Portfolio Executive') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        renderYieldChart();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderHavenSubpage(title);
+      }
+
+      toggleMobileSidebar(false);
+    }
+
+    // =========================================================================
+    // HERO FLOOR / ZONE SELECTOR
+    // =========================================================================
+    function selectFloorZone(zoneKey, btn) {
+      const z = FLOOR_ZONES[zoneKey];
+      document.querySelectorAll('.zone-pill').forEach(b => {
+        b.classList.remove('stone-pill-active', 'font-semibold');
+        b.classList.add('text-[#57534E]', 'font-medium');
+      });
+      btn.classList.add('stone-pill-active', 'font-semibold');
+      btn.classList.remove('text-[#57534E]', 'font-medium');
+
+      document.getElementById('visualZoneTag').textContent = z.tag;
+      document.getElementById('zoneTenantSummary').textContent = z.tenant;
+      document.getElementById('zoneTemp').textContent = z.temp;
+      document.getElementById('zoneTempSub').textContent = z.tempSub;
+      document.getElementById('zoneLux').textContent = z.lux;
+      document.getElementById('zoneLuxSub').textContent = z.luxSub;
+      document.getElementById('zoneAqi').textContent = z.aqi;
+      document.getElementById('zoneAqiSub').textContent = z.aqiSub;
+      document.getElementById('zoneYield').textContent = z.yield;
+      document.getElementById('zoneYieldSub').textContent = z.yieldSub;
+    }
+
+    // =========================================================================
+    // BMS PIPELINE INTERACTION
+    // =========================================================================
+    function inspectBmsStage(idx) {
+      const s = BMS_STAGES[idx];
+      document.getElementById('bmsInspTitle').textContent = s.title;
+      document.getElementById('bmsInspDesc').textContent = s.desc;
+      document.getElementById('bmsInspMetric1').textContent = s.m1;
+      document.getElementById('bmsInspMetric2').textContent = s.m2;
+      document.getElementById('bmsInspMetric3').textContent = s.m3;
+
+      const colors = ['#B45309', '#3F6212', '#B45309', '#1D4ED8'];
+      for (let i = 0; i < 4; i++) {
+        const card = document.getElementById('bmsCard' + i);
+        const node = document.getElementById('bmsNode' + i);
+        const halo = document.getElementById('bmsHalo' + i);
+        const txt = document.getElementById('bmsTxt' + i);
+
+        if (i === idx) {
+          card.className = 'text-left p-4 rounded-2xl bg-white border-2 border-[#B45309] shadow-md transition-all';
+          node.setAttribute('fill', colors[i]);
+          node.setAttribute('stroke', '#FFFFFF');
+          halo.setAttribute('opacity', '0.22');
+          halo.classList.add('bms-halo');
+          txt.setAttribute('fill', '#FFFFFF');
+        } else {
+          card.className = 'text-left p-4 rounded-2xl bg-white/65 hover:bg-white border border-stone-200/90 transition-all';
+          node.setAttribute('fill', '#FFFFFF');
+          node.setAttribute('stroke', colors[i]);
+          halo.setAttribute('opacity', '0');
+          halo.classList.remove('bms-halo');
+          txt.setAttribute('fill', colors[i]);
+        }
+      }
+    }
+
+    function toggleBmsStream() {
+      const sec = document.getElementById('bmsPipelineSection');
+      const dot = document.getElementById('bmsDot');
+      const lbl = document.getElementById('bmsToggleLabel');
+      sec.classList.toggle('bms-paused');
+      const paused = sec.classList.contains('bms-paused');
+      dot.className = paused ? 'w-2 h-2 rounded-full bg-[#B45309]' : 'w-2 h-2 rounded-full bg-[#3F6212]';
+      lbl.textContent = paused ? 'Telemetry Paused' : 'BACnet Telemetry Live';
+    }
+
+    // =========================================================================
+    // GROUPED BAR + SPLINE CHART RENDERER
+    // =========================================================================
+    function renderYieldChart() {
+      const d = YIELD_SERIES[currentHorizon];
+      const barsGroup = document.getElementById('yieldBarsGroup');
+      const dotsGroup = document.getElementById('yieldSplineDots');
+      const labelsGroup = document.getElementById('yieldXLabels');
+      barsGroup.innerHTML = '';
+      dotsGroup.innerHTML = '';
+      labelsGroup.innerHTML = '';
+
+      const xStart = 92;
+      const xEnd = 616;
+      const yBottom = 220;
+      const yTop = 28;
+      const step = (xEnd - xStart) / (d.labels.length - 1);
+
+      const valToY = (v) => yBottom - ((v - 2.0) / 6.0) * (yBottom - yTop);
+      const splinePts = [];
+
+      d.labels.forEach((lbl, i) => {
+        const cx = xStart + i * step;
+        const hVal = d.haven[i];
+        const mVal = d.market[i];
+        const yHaven = valToY(hVal);
+        const yMarket = valToY(mVal);
+
+        // Market Benchmark Bar
+        const mRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        mRect.setAttribute('x', cx - 22);
+        mRect.setAttribute('y', yMarket);
+        mRect.setAttribute('width', '19');
+        mRect.setAttribute('height', yBottom - yMarket);
+        mRect.setAttribute('rx', '5');
+        mRect.setAttribute('fill', '#D6D3D1');
+
+        // Haven Yield Bar
+        const hRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        hRect.setAttribute('x', cx + 2);
+        hRect.setAttribute('y', yHaven);
+        hRect.setAttribute('width', '19');
+        hRect.setAttribute('height', yBottom - yHaven);
+        hRect.setAttribute('rx', '5');
+        hRect.setAttribute('fill', '#B45309');
+
+        // Hover Hit Target
+        const hit = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        hit.setAttribute('x', cx - 36);
+        hit.setAttribute('y', 24);
+        hit.setAttribute('width', '72');
+        hit.setAttribute('height', '205');
+        hit.setAttribute('fill', 'transparent');
+        hit.setAttribute('class', 'cursor-pointer');
+
+        hit.addEventListener('mouseenter', () => {
+          document.getElementById('yieldReadoutHaven').textContent = hVal.toFixed(2) + '%';
+          document.getElementById('yieldReadoutMarket').textContent = mVal.toFixed(2) + '%';
+          const bps = Math.round((hVal - mVal) * 100);
+          document.getElementById('yieldReadoutAlpha').textContent = '+' + bps + ' bps';
+          document.getElementById('yieldReadoutLabel').textContent = `${lbl} · ${d.assetClass[i]}`;
+        });
+
+        barsGroup.appendChild(mRect);
+        barsGroup.appendChild(hRect);
+        barsGroup.appendChild(hit);
+
+        // Spline point slightly above Haven bar representing NOI Smart-BMS Margin Yield
+        const spY = yHaven - 10;
+        splinePts.push({ x: cx + 11.5, y: spY });
+
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', cx + 11.5);
+        dot.setAttribute('cy', spY);
+        dot.setAttribute('r', '4.2');
+        dot.setAttribute('fill', '#FFFFFF');
+        dot.setAttribute('stroke', '#3F6212');
+        dot.setAttribute('stroke-width', '2.4');
+        dotsGroup.appendChild(dot);
+
+        const xText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        xText.setAttribute('x', cx);
+        xText.setAttribute('y', 244);
+        xText.setAttribute('text-anchor', 'middle');
+        xText.textContent = lbl;
+        labelsGroup.appendChild(xText);
+      });
+
+      let pathD = `M ${splinePts[0].x} ${splinePts[0].y}`;
+      for (let i = 0; i < splinePts.length - 1; i++) {
+        const p0 = splinePts[i];
+        const p1 = splinePts[i + 1];
+        const midX = (p0.x + p1.x) / 2;
+        pathD += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+      document.getElementById('yieldSplinePath').setAttribute('d', pathD);
+    }
+
+    function switchYieldHorizon(horizon, btn) {
+      currentHorizon = horizon;
+      document.querySelectorAll('.horizon-tab').forEach(b => {
+        b.classList.remove('stone-pill-active', 'font-semibold');
+        b.classList.add('text-[#57534E]', 'font-medium');
+      });
+      btn.classList.add('stone-pill-active', 'font-semibold');
+      btn.classList.remove('text-[#57534E]', 'font-medium');
+      renderYieldChart();
+    }
+
+    // =========================================================================
+    // FLAGSHIP CARDS & LEASE RENEWAL TABLE
+    // =========================================================================
+    function renderFlagships() {
+      const filtered = FLAGSHIP_HOLDINGS.filter(f => currentRegion === 'all' || f.region === currentRegion);
+      document.getElementById('regionCountBadge').textContent = `${filtered.length} Flagship${filtered.length > 1 ? 's' : ''}`;
+      const container = document.getElementById('flagshipCardsContainer');
+      container.innerHTML = filtered.map(item => `
+        <div class="p-3.5 rounded-2xl bg-white/85 border border-stone-200/80 hover:border-[#B45309]/40 transition flex items-center justify-between gap-3 shadow-sm">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-editorial font-bold text-sm text-[#1C1917] truncate">${item.name}</span>
+              <span class="px-2 py-0.5 rounded-md bg-stone-100 text-xs font-mono text-[#57534E]">${item.type}</span>
+            </div>
+            <div class="text-[12.5px] text-[#57534E] mt-0.5">${item.city} · <span class="font-mono text-[#3F6212]">${item.kwh}</span></div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="font-mono font-bold text-xs text-[#1C1917]">${item.noi}</div>
+            <div class="font-mono text-xs text-[#B45309]">${item.cap} Cap · ${item.occ}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderLeaseTable() {
+      const q = (document.getElementById('assetSearchInput').value || '').trim().toLowerCase();
+      const rows = LEASE_ROLLOVER.filter(r => {
+        const matchRegion = currentRegion === 'all' || r.region === currentRegion;
+        const matchType = currentAssetType === 'All' || r.type === currentAssetType;
+        const matchQuery = !q ||
+          r.asset.toLowerCase().includes(q) ||
+          r.tenant.toLowerCase().includes(q) ||
+          r.type.toLowerCase().includes(q);
+        return matchRegion && matchType && matchQuery;
+      });
+
+      const tbody = document.getElementById('leaseTableBody');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-[#57534E] text-xs">No properties or leases match the selected region &amp; asset class filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        let pillStyle = 'bg-amber-500/10 text-[#B45309] border-amber-600/20';
+        if (r.type === 'Luxury Residential') pillStyle = 'bg-lime-900/10 text-[#3F6212] border-lime-800/20';
+        if (r.type === 'Mixed-Use') pillStyle = 'bg-blue-600/10 text-[#1D4ED8] border-blue-600/20';
+
+        return `
+          <tr class="hover:bg-white/65 transition-colors">
+            <td class="py-3.5 pl-2 font-semibold text-[#1C1917]">${r.asset}</td>
+            <td class="py-3.5 text-[#57534E] font-medium">${r.tenant}</td>
+            <td class="py-3.5">
+              <span class="px-2.5 py-1 rounded-full text-[12.5px] font-semibold border ${pillStyle}">${r.type}</span>
+            </td>
+            <td class="py-3.5 font-mono text-[#1C1917]">${r.sqft}</td>
+            <td class="py-3.5 font-mono font-semibold text-[#3F6212]">${r.noi}</td>
+            <td class="py-3.5 font-mono text-[#57534E]">${r.bms}</td>
+            <td class="py-3.5 text-right pr-2">
+              <button onclick="triggerToast('${r.action} queued for ${r.tenant}.')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#1C1917] text-[#1C1917] hover:text-white border border-stone-300/80 shadow-sm text-[12.5px] font-semibold transition">
+                ${r.action}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function setAssetTypeFilter(type, btn) {
+      currentAssetType = type;
+      document.querySelectorAll('.type-filter-btn').forEach(b => {
+        b.classList.remove('stone-pill-active', 'font-semibold');
+        b.classList.add('text-[#57534E]', 'font-medium');
+      });
+      btn.classList.add('stone-pill-active', 'font-semibold');
+      btn.classList.remove('text-[#57534E]', 'font-medium');
+      renderLeaseTable();
+    }
+
+    function switchRegion(regionKey) {
+      currentRegion = regionKey;
+      const rd = REGION_DATA[regionKey];
+
+      document.querySelectorAll('.region-tab').forEach(tab => {
+        const active = tab.getAttribute('data-region') === regionKey;
+        tab.classList.toggle('stone-pill-active', active);
+        tab.classList.toggle('font-semibold', active);
+        tab.classList.toggle('text-[#57534E]', !active);
+      });
+
+      document.getElementById('kpiValuation').textContent = rd.valuation;
+      document.getElementById('kpiValuationDelta').textContent = rd.valuationDelta;
+      document.getElementById('kpiNoi').textContent = rd.noi;
+      document.getElementById('kpiNoiSub').textContent = rd.noiSub;
+      document.getElementById('kpiOccupancy').textContent = rd.occupancy;
+      document.getElementById('kpiBmsSavings').textContent = rd.bmsSavings;
+
+      renderFlagships();
+      renderLeaseTable();
+    }
+
+    // =========================================================================
+    // TOAST & KEYBOARD SHORTCUT
+    // =========================================================================
+    let toastTimer = null;
+    function triggerToast(msg) {
+      const c = document.getElementById('toastContainer');
+      document.getElementById('toastMessage').textContent = msg;
+      c.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        c.classList.add('opacity-0', 'translate-y-3');
+      }, 3200);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        document.getElementById('assetSearchInput').focus();
+      }
+    });
+
+    // Initial Render
+    renderYieldChart();
+    renderFlagships();
+    renderLeaseTable();
+  </script>
+</body>
+</html>

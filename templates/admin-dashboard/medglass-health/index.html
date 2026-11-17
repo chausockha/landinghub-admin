@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AETHER MED — Clinical AI Command &amp; Patient Bio-Telemetry Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            pearl: '#F2F7FB',
+            navyClin: '#0F172A',
+            cerulean: '#0284C7',
+            vitalTeal: '#0D9488',
+            alertRose: '#E11D48',
+            slateClin: '#475569'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --canvas-pearl: #F2F7FB;
+      --navy: #0F172A;
+      --cerulean: #0284C7;
+      --teal: #0D9488;
+      --rose: #E11D48;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--canvas-pearl);
+      background-image:
+        radial-gradient(circle at 12% 10%, rgba(2, 132, 199, 0.09) 0%, rgba(2, 132, 199, 0) 44%),
+        radial-gradient(circle at 88% 15%, rgba(13, 148, 136, 0.08) 0%, rgba(13, 148, 136, 0) 42%),
+        radial-gradient(circle at 50% 92%, rgba(2, 132, 199, 0.06) 0%, rgba(2, 132, 199, 0) 50%);
+      background-attachment: fixed;
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Pillowy Frosted Pearl Glass Bento Card */
+    .pearl-glass {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 18px 44px -10px rgba(14, 116, 144, 0.08),
+        0 2px 8px rgba(15, 23, 42, 0.03),
+        inset 0 1px 0 #FFFFFF;
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.26s ease;
+    }
+
+    .pearl-glass-hover:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 24px 52px -10px rgba(14, 116, 144, 0.13),
+        0 6px 16px rgba(15, 23, 42, 0.05),
+        inset 0 1px 0 #FFFFFF;
+    }
+
+    /* Apple-Inspired Soft Recessed Tray */
+    .clinical-tray {
+      background: rgba(242, 247, 251, 0.82);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow:
+        inset 0 2px 5px rgba(15, 23, 42, 0.04),
+        0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    /* Tactile Cerulean Action Button */
+    .cerulean-btn {
+      background: linear-gradient(180deg, #0390D8 0%, #0284C7 100%);
+      color: #FFFFFF;
+      box-shadow:
+        0 10px 22px -6px rgba(2, 132, 199, 0.38),
+        0 2px 6px rgba(2, 132, 199, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .cerulean-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 14px 26px -6px rgba(2, 132, 199, 0.48),
+        0 4px 10px rgba(2, 132, 199, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    /* Collapsible Frosted Rail Sidebar */
+    #sidebar {
+      width: 280px;
+      transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.rail-collapsed #sidebar {
+      width: 84px;
+    }
+    body.rail-collapsed .rail-label,
+    body.rail-collapsed .rail-footer-card {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      pointer-events: none;
+      display: none;
+    }
+    body.rail-collapsed .rail-item {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    body.rail-collapsed #railCollapseIcon {
+      transform: rotate(180deg);
+    }
+
+    #workspaceShell {
+      margin-left: 280px;
+      transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.rail-collapsed #workspaceShell {
+      margin-left: 84px;
+    }
+
+    @media (max-width: 1023px) {
+      #sidebar {
+        transform: translateX(-105%);
+        width: 262px !important;
+      }
+      body.mobile-rail-open #sidebar {
+        transform: translateX(0);
+      }
+      #workspaceShell,
+      body.rail-collapsed #workspaceShell {
+        margin-left: 0 !important;
+      }
+    }
+
+    .rail-item {
+      transition: all 0.2s ease;
+    }
+    .rail-item.active {
+      background: linear-gradient(135deg, #0F172A 0%, #0284C7 140%);
+      color: #FFFFFF;
+      box-shadow:
+        0 10px 22px -6px rgba(15, 23, 42, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .rail-item:not(.active):hover {
+      background: rgba(2, 132, 199, 0.07);
+      color: #0284C7;
+    }
+
+    /* Hero Bio-Glass 3D Tilt & Specular Sheen */
+    .bio-hero-perspective {
+      perspective: 1200px;
+    }
+    #bioHeroCard {
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out, box-shadow 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    #bioHeroSpecular {
+      pointer-events: none;
+      background: radial-gradient(500px circle at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, 0.38), transparent 62%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #bioHeroCard:hover #bioHeroSpecular {
+      opacity: 1;
+    }
+
+    /* Live Animated SVG ECG Sinus Rhythm Waveform */
+    @keyframes ecgSweep {
+      0% {
+        stroke-dashoffset: 560;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+    .ecg-live-trace {
+      stroke-dasharray: 560;
+      animation: ecgSweep 3.2s linear infinite;
+    }
+
+    /* Clinical AI Data Flow Stream */
+    @keyframes fhirStream {
+      to {
+        stroke-dashoffset: -44;
+      }
+    }
+    .fhir-conduit {
+      stroke-dasharray: 7 7;
+      animation: fhirStream 1.5s linear infinite;
+    }
+
+    .clin-node {
+      cursor: pointer;
+    }
+    .clin-node .clin-node-box {
+      transition: stroke 0.24s ease, stroke-width 0.24s ease, filter 0.24s ease;
+    }
+    .clin-node.active-clin-node .clin-node-box {
+      stroke: #0284C7;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 10px 18px rgba(2, 132, 199, 0.2));
+    }
+    .clin-node .clin-node-halo {
+      opacity: 0;
+      transition: opacity 0.24s ease;
+    }
+    .clin-node.active-clin-node .clin-node-halo {
+      opacity: 1;
+    }
+
+    /* Pulse indicator */
+    @keyframes vitalPulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.8); opacity: 0; }
+    }
+    .vital-pulse-ring {
+      animation: vitalPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(242, 247, 251, 0.7);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(2, 132, 199, 0.22);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(2, 132, 199, 0.38);
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-sky-500/20 selection:text-navyClin">
+
+  <!-- Mobile Rail Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 bg-navyClin/25 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleMobileRail()"></div>
+
+  <!-- 1. COLLAPSIBLE FROSTED RAIL SIDEBAR -->
+  <aside id="sidebar" class="fixed top-0 left-0 bottom-0 z-50 p-3.5 flex flex-col">
+    <div class="pearl-glass rounded-3xl h-full flex flex-col justify-between p-3.5 overflow-hidden">
+      <div>
+        <!-- Brand Header -->
+        <div class="flex items-center justify-between gap-2 px-1.5 pt-1 pb-4 border-b border-slate-200/80">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-cerulean via-sky-500 to-vitalTeal flex items-center justify-center shrink-0 shadow-md shadow-cerulean/25 ring-2 ring-white">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+            </div>
+            <div class="min-w-0 rail-label">
+              <div class="flex items-center gap-1.5">
+                <span class="font-display font-extrabold text-[15px] tracking-tight text-navyClin truncate">AETHER MED</span>
+                <span class="px-1.5 py-0.5 text-xs font-mono font-semibold rounded-md bg-cerulean/10 text-cerulean border border-cerulean/20">HL7</span>
+              </div>
+              <p class="text-[12.5px] text-slateClin truncate">Clinical AI &amp; Bio-Telemetry</p>
+            </div>
+          </div>
+
+          <button onclick="toggleRail()" title="Collapse or expand clinical rail" class="hidden lg:flex w-8 h-8 rounded-xl clinical-tray items-center justify-center text-navyClin hover:bg-white transition shrink-0">
+            <svg id="railCollapseIcon" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sidebar Modules -->
+        <nav class="mt-4 space-y-1" aria-label="Clinical Workspace Navigation">
+          <p class="px-3 pb-1.5 text-xs font-mono font-semibold uppercase tracking-wider text-slateClin/75 rail-label">Care Command</p>
+
+          <button onclick="selectRailNav(this, 'Clinical Command', '#sec-hero')" class="rail-item active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="2" />
+              <rect x="14" y="3" width="7" height="7" rx="2" />
+              <rect x="14" y="14" width="7" height="7" rx="2" />
+              <rect x="3" y="14" width="7" height="7" rx="2" />
+            </svg>
+            <span class="rail-label truncate">Clinical Command</span>
+          </button>
+
+          <button onclick="selectRailNav(this, 'ICU Bio-Stream', '#sec-dataflow')" class="rail-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateClin">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            <span class="rail-label truncate">ICU Bio-Stream</span>
+            <span class="rail-label ml-auto text-[12.5px] font-mono font-semibold text-vitalTeal bg-vitalTeal/10 px-2 py-0.5 rounded-full">Live</span>
+          </button>
+
+          <button onclick="selectRailNav(this, 'AI Radiology', '#sec-triage')" class="rail-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateClin">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 3v3m0 12v3M3 12h3m12 0h3" />
+            </svg>
+            <span class="rail-label truncate">AI Radiology</span>
+            <span id="railP1Badge" class="rail-label ml-auto text-[12.5px] font-mono font-bold text-alertRose bg-alertRose/10 px-2 py-0.5 rounded-full">2 P1</span>
+          </button>
+
+          <button onclick="selectRailNav(this, 'Ward Capacity', '#sec-kpis')" class="rail-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateClin">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+            </svg>
+            <span class="rail-label truncate">Ward Capacity</span>
+          </button>
+
+          <button onclick="selectRailNav(this, 'Pharmacy Lab', '#sec-outcomes')" class="rail-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateClin">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31L4.72 18.55A2 2 0 0 0 6.45 21.5h11.1a2 2 0 0 0 1.73-2.95L14 9.31V2" />
+              <path d="M8.5 2h7M7 16h10" />
+            </svg>
+            <span class="rail-label truncate">Pharmacy Lab</span>
+          </button>
+
+          <button onclick="selectRailNav(this, 'HIPAA Logs', '#sec-dataflow')" class="rail-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateClin">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            <span class="rail-label truncate">HIPAA Logs</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom HIPAA Zero-Trust & Attending Clinician -->
+      <div class="space-y-3">
+        <div class="rail-footer-card clinical-tray rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[12.5px] font-semibold text-navyClin flex items-center gap-1.5">
+              <span class="relative flex h-2 w-2">
+                <span class="vital-pulse-ring absolute inline-flex h-full w-full rounded-full bg-vitalTeal"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-vitalTeal"></span>
+              </span>
+              FHIR R4 Mesh
+            </span>
+            <span class="font-mono text-[12.5px] font-semibold text-cerulean tabular-nums">11.4 ms</span>
+          </div>
+          <p class="text-[12.5px] text-slateClin leading-snug">Zero-Trust HIPAA Enclave · End-to-End AES-256-GCM Active</p>
+        </div>
+
+        <div class="flex items-center gap-2.5 px-1.5 pt-1">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-navyClin to-cerulean text-white font-display font-bold text-xs flex items-center justify-center shrink-0 ring-2 ring-white shadow-xs">
+            DR
+          </div>
+          <div class="rail-label min-w-0 flex-1">
+            <p class="text-xs font-semibold text-navyClin truncate">Dr. Elena Rostova, MD</p>
+            <p class="text-[12.5px] text-slateClin truncate">Chief of Critical Care AI</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace Shell -->
+  <div id="workspaceShell" class="min-h-screen flex flex-col">
+
+    <!-- Sticky Frosted Pearl Topbar -->
+    <header class="sticky top-0 z-30 px-4 sm:px-6 lg:px-8 pt-3.5 pb-2">
+      <div class="pearl-glass rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <!-- Left: Mobile Button + Breadcrumb + Department Switcher -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="toggleMobileRail()" class="lg:hidden w-9 h-9 rounded-xl clinical-tray flex items-center justify-center text-navyClin" aria-label="Open navigation">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M4 7h16M4 12h16M4 17h10" />
+            </svg>
+          </button>
+
+          <div class="hidden sm:block pr-2 border-r border-slate-200">
+            <div class="flex items-center gap-1.5 text-xs">
+              <span class="text-slateClin font-medium">Aether Clinical</span>
+              <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              <span id="topModuleCrumb" class="font-semibold text-navyClin">Clinical Command</span>
+            </div>
+            <p class="text-[12.5px] text-slateClin">Autonomous Radiology &amp; Bedside Telemetry</p>
+          </div>
+
+          <!-- Department Switcher -->
+          <div class="clinical-tray p-1 rounded-xl flex items-center gap-1" role="tablist" aria-label="Hospital Department Switcher">
+            <button onclick="switchDepartment('cardio')" data-dept="cardio" class="dept-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-navyClin shadow-2xs transition flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cerulean"></span>
+              <span>Cardiology ICU</span>
+            </button>
+            <button onclick="switchDepartment('neuro')" data-dept="neuro" class="dept-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slateClin hover:text-navyClin transition flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-vitalTeal"></span>
+              <span>Neurology</span>
+            </button>
+            <button onclick="switchDepartment('onco')" data-dept="onco" class="dept-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slateClin hover:text-navyClin transition flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+              <span>Oncology AI</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Quick Patient Search + Admit Triage CTA -->
+        <div class="flex items-center gap-2.5 flex-1 sm:flex-initial justify-end">
+          <div class="relative flex-1 sm:w-56 max-w-xs">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input
+              id="patientSearchInput"
+              type="text"
+              oninput="handlePatientSearch(this.value)"
+              placeholder="Search MRN, patient, scan..."
+              class="w-full pl-9 pr-3 py-2 rounded-xl clinical-tray text-xs text-navyClin placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cerulean/30 focus:bg-white transition"
+            />
+          </div>
+
+          <button onclick="openAdmitModal()" class="cerulean-btn px-3.5 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shrink-0">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>Admit Triage</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Clinical Bento Content -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-4 max-w-[1600px] w-full mx-auto">
+      <div id="defaultDashboardView" class="space-y-6">
+
+      <!-- 2. HERO BIO-GLASS VISUAL SHOWCASE CARD -->
+      <section id="sec-hero" class="bio-hero-perspective">
+        <div id="bioHeroCard" class="pearl-glass rounded-[28px] p-2.5 sm:p-3.5">
+          <div id="bioHeroSpecular" class="absolute inset-0 z-20 rounded-[28px]"></div>
+
+          <div class="relative rounded-[22px] overflow-hidden min-h-[276px] sm:min-h-[304px] flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-br from-[#0B192C] via-[#0E3A5D] to-[#0D6E72]">
+            <!-- Bespoke Bio-Glass Vector Backdrop Fallback Underneath -->
+            <svg class="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <radialGradient id="bioOrb1" cx="76%" cy="32%" r="45%">
+                  <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.52" />
+                  <stop offset="55%" stop-color="#0284C7" stop-opacity="0.2" />
+                  <stop offset="100%" stop-color="#0F172A" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="bioOrb2" cx="28%" cy="78%" r="42%">
+                  <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.38" />
+                  <stop offset="100%" stop-color="#0F172A" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+              <rect width="1200" height="420" fill="#0B192C" />
+              <rect width="1200" height="420" fill="url(#bioOrb1)" />
+              <rect width="1200" height="420" fill="url(#bioOrb2)" />
+              <!-- Subtle Precision Diagnostic Rings -->
+              <g stroke="#E0F2FE" stroke-opacity="0.22" fill="none">
+                <circle cx="910" cy="175" r="145" stroke-width="1.2" stroke-dasharray="5 5" />
+                <circle cx="910" cy="175" r="102" stroke-width="1.5" />
+                <circle cx="910" cy="175" r="58" stroke-width="1" />
+                <path d="M740 175 H1080 M910 15 V335" stroke-opacity="0.14" />
+              </g>
+            </svg>
+
+            <!-- Embedded Visual Banner Art -->
+            <img
+              src="/templates/assets/medglass-visual.jpg"
+              onerror="if(!this.dataset.rel){this.dataset.rel='1';this.src='../../assets/medglass-visual.jpg';}else{this.style.opacity='0';}"
+              alt="Aether Med Precision AI Radiology and ICU Bio-Telemetry Visualization"
+              class="absolute inset-0 w-full h-full object-cover object-center mix-blend-screen opacity-75 transition-opacity duration-500"
+            />
+
+            <!-- Clinical Frosted Gradient Veil -->
+            <div class="absolute inset-0 bg-gradient-to-r from-[#0B192C]/90 via-[#0F2942]/75 to-[#0E3A5D]/40"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0B192C]/65 via-transparent to-white/5"></div>
+
+            <!-- Top Overlay Badges: AI Diagnostic Accuracy + Active Unit -->
+            <div class="relative z-10 flex flex-wrap items-center justify-between gap-3">
+              <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-white text-navyClin shadow-lg shadow-slate-950/15">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="vital-pulse-ring absolute inline-flex h-full w-full rounded-full bg-vitalTeal"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-vitalTeal"></span>
+                </span>
+                <span class="text-[12.5px] font-semibold uppercase tracking-wider text-slateClin">AI Diagnostic Accuracy</span>
+                <span id="heroConcordanceBadge" class="font-mono text-xs font-bold text-cerulean tabular-nums">99.42% Concordance</span>
+              </div>
+
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/60 backdrop-blur-md border border-white/20 text-sky-100 text-xs font-mono tabular-nums">
+                <svg class="w-3.5 h-3.5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span id="heroUnitCode">UNIT-4A · CARDIOLOGY ICU COMMAND</span>
+              </div>
+            </div>
+
+            <!-- Bottom Row: Headline + Frosted Live Animated SVG ECG / Sinus Rhythm Card -->
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end pt-8">
+              <div class="lg:col-span-7 space-y-2.5">
+                <h1 class="font-display font-extrabold text-2xl sm:text-3xl lg:text-[34px] text-white leading-tight tracking-tight">
+                  Multimodal Clinical AI &amp; Continuous ICU Bio-Telemetry
+                </h1>
+                <p id="heroClinicalDesc" class="text-sm sm:text-[15px] text-sky-100/90 max-w-2xl leading-relaxed">
+                  Real-time 12-lead telemetry fused with Aether Vision 3D CT/MRI triage. Sub-minute pulmonary embolism &amp; arrhythmia detection routed directly to attending consoles.
+                </p>
+              </div>
+
+              <!-- Live Animated SVG ECG / Sinus Rhythm Frosted Overlay Card -->
+              <div class="lg:col-span-5">
+                <div class="rounded-2xl bg-white/90 backdrop-blur-xl border border-white p-4 shadow-xl shadow-slate-950/20 text-navyClin">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-vitalTeal"></span>
+                      <span class="text-[12.5px] font-bold uppercase tracking-wider text-navyClin">Lead II · Sinus Rhythm Stream</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 font-mono text-xs font-bold tabular-nums">
+                      <span id="heroBpm" class="text-vitalTeal">72 BPM</span>
+                      <span class="text-slate-300">|</span>
+                      <span id="heroSpo2" class="text-cerulean">99% SpO2</span>
+                    </div>
+                  </div>
+
+                  <!-- Animated SVG ECG Waveform -->
+                  <div class="h-14 w-full rounded-xl bg-[#F2F7FB] border border-sky-900/10 px-2 flex items-center overflow-hidden">
+                    <svg class="w-full h-11 overflow-visible" viewBox="0 0 360 54" fill="none" aria-label="Live Animated Sinus Rhythm ECG Waveform">
+                      <!-- Subtle millimeter clinical grid -->
+                      <g stroke="#0284C7" stroke-opacity="0.08" stroke-width="1">
+                        <line x1="0" y1="14" x2="360" y2="14" />
+                        <line x1="0" y1="27" x2="360" y2="27" />
+                        <line x1="0" y1="40" x2="360" y2="40" />
+                      </g>
+                      <!-- Baseline Trace -->
+                      <path d="M0 32 H34 L42 25 L50 32 H62 L67 37 L74 7 L82 47 L89 32 H104 L114 22 L125 32 H174 L182 25 L190 32 H202 L207 37 L214 7 L222 47 L229 32 H244 L254 22 L265 32 H310 L318 25 L326 32 H360" stroke="#0D9488" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      <!-- Animated Glowing Sweep -->
+                      <path class="ecg-live-trace" d="M0 32 H34 L42 25 L50 32 H62 L67 37 L74 7 L82 47 L89 32 H104 L114 22 L125 32 H174 L182 25 L190 32 H202 L207 37 L214 7 L222 47 L229 32 H244 L254 22 L265 32 H310 L318 25 L326 32 H360" stroke="#0D9488" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </div>
+
+                  <div class="mt-2 flex items-center justify-between text-[12.5px] text-slateClin font-mono tabular-nums">
+                    <span id="heroMapStat">MAP 88 mmHg · QT/QTc 392ms</span>
+                    <span class="text-vitalTeal font-semibold">0.02% Artifact</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. FOUR TACTILE KPI CARDS WITH SPARKLINES -->
+      <section id="sec-kpis" aria-label="Clinical Performance Metrics" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+
+        <!-- KPI 1: Active Monitored Patients -->
+        <article class="pearl-glass pearl-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateClin">Active Monitored Patients</p>
+              <h2 id="kpiPatVal" class="mt-2 font-mono font-bold text-2xl sm:text-[28px] text-navyClin tabular-nums tracking-tight">348</h2>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-cerulean/10 border border-cerulean/20 flex items-center justify-center text-cerulean shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="medSpark1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0284C7" stop-opacity="0.28" />
+                  <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0 34 C30 32, 55 26, 82 27 C110 28, 136 16, 160 12 C170 10, 176 9, 180 8 L180 46 L0 46 Z" fill="url(#medSpark1)" />
+              <path d="M0 34 C30 32, 55 26, 82 27 C110 28, 136 16, 160 12 C170 10, 176 9, 180 8" fill="none" stroke="#0284C7" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200/70">
+            <span id="kpiPatDelta" class="font-mono font-semibold text-cerulean bg-cerulean/10 px-2 py-0.5 rounded-full tabular-nums">100% Wearable Sync</span>
+            <span id="kpiPatSub" class="text-slateClin font-medium">42 High-Acuity ICU</span>
+          </div>
+        </article>
+
+        <!-- KPI 2: AI Triage Turnaround -->
+        <article class="pearl-glass pearl-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateClin">AI Triage Turnaround</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <h2 id="kpiTurnVal" class="font-mono font-bold text-2xl sm:text-[28px] text-navyClin tabular-nums tracking-tight">4.2 min</h2>
+                <span id="kpiTurnPct" class="font-mono text-xs font-bold text-vitalTeal tabular-nums">-68%</span>
+              </div>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-vitalTeal/10 border border-vitalTeal/20 flex items-center justify-center text-vitalTeal shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="medSpark2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0D9488" stop-opacity="0.28" />
+                  <stop offset="100%" stop-color="#0D9488" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0 10 C32 14, 58 20, 88 26 C118 32, 144 35, 180 39 L180 46 L0 46 Z" fill="url(#medSpark2)" />
+              <path d="M0 10 C32 14, 58 20, 88 26 C118 32, 144 35, 180 39" fill="none" stroke="#0D9488" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200/70">
+            <span class="font-mono font-semibold text-vitalTeal bg-vitalTeal/10 px-2 py-0.5 rounded-full tabular-nums">DICOM → Attending</span>
+            <span id="kpiTurnSub" class="text-slateClin font-medium">vs 13.1m Baseline</span>
+          </div>
+        </article>
+
+        <!-- KPI 3: ICU Bed Availability -->
+        <article class="pearl-glass pearl-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateClin">ICU Bed Availability</p>
+              <h2 id="kpiBedVal" class="mt-2 font-mono font-bold text-2xl sm:text-[28px] text-navyClin tabular-nums tracking-tight">86.5%</h2>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-cerulean shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="medSpark3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0284C7" stop-opacity="0.24" />
+                  <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0 26 C35 28, 65 20, 96 22 C126 24, 150 15, 180 14 L180 46 L0 46 Z" fill="url(#medSpark3)" />
+              <path d="M0 26 C35 28, 65 20, 96 22 C126 24, 150 15, 180 14" fill="none" stroke="#0284C7" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200/70">
+            <span id="kpiBedDelta" class="font-mono font-semibold text-cerulean bg-cerulean/10 px-2 py-0.5 rounded-full tabular-nums">18 Negative-Press Ready</span>
+            <span id="kpiBedSub" class="text-slateClin font-medium">Auto-Discharge Forecast</span>
+          </div>
+        </article>
+
+        <!-- KPI 4: Lab Biomarker Throughput -->
+        <article class="pearl-glass pearl-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateClin">Lab Biomarker Throughput</p>
+              <h2 id="kpiLabVal" class="mt-2 font-mono font-bold text-2xl sm:text-[28px] text-navyClin tabular-nums tracking-tight">1,290 / hr</h2>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-vitalTeal/10 border border-vitalTeal/20 flex items-center justify-center text-vitalTeal shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 2v7.31L4.72 18.55A2 2 0 0 0 6.45 21.5h11.1a2 2 0 0 0 1.73-2.95L14 9.31V2" />
+                <path d="M8.5 2h7M7 16h10" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="medSpark4" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0D9488" stop-opacity="0.26" />
+                  <stop offset="100%" stop-color="#0D9488" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0 38 C28 35, 58 29, 88 23 C118 17, 148 13, 180 7 L180 46 L0 46 Z" fill="url(#medSpark4)" />
+              <path d="M0 38 C28 35, 58 29, 88 23 C118 17, 148 13, 180 7" fill="none" stroke="#0D9488" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200/70">
+            <span class="font-mono font-semibold text-vitalTeal bg-vitalTeal/10 px-2 py-0.5 rounded-full tabular-nums">+19.4% Automation</span>
+            <span id="kpiLabSub" class="text-slateClin font-medium">Troponin-I · Lactate · CBC</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- 4. ANIMATED CLINICAL AI DATA FLOW PIPELINE -->
+      <section id="sec-dataflow" class="pearl-glass rounded-[28px] p-5 sm:p-7">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[12.5px] font-mono font-semibold uppercase bg-cerulean/10 text-cerulean border border-cerulean/20">HIPAA Zero-Trust Pipeline</span>
+              <span class="text-xs font-mono text-slateClin tabular-nums">HL7 FHIR R4 · DICOMweb TLS 1.3</span>
+            </div>
+            <h2 class="font-display font-bold text-lg sm:text-xl text-navyClin mt-1">Clinical AI Bio-Telemetry &amp; Diagnostic Data Flow</h2>
+          </div>
+          <span class="text-xs text-slateClin">Select any pipeline stage to inspect encryption, HL7 latency &amp; throughput</span>
+        </div>
+
+        <!-- Interactive SVG Clinical Pipeline -->
+        <div class="w-full overflow-x-auto pb-2">
+          <div class="min-w-[860px]">
+            <svg class="w-full h-auto select-none" viewBox="0 0 1120 210" fill="none" role="img" aria-label="Interactive 4-Stage Clinical AI Data Flow">
+              <defs>
+                <linearGradient id="medPipeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#0284C7" />
+                  <stop offset="50%" stop-color="#0D9488" />
+                  <stop offset="100%" stop-color="#0F172A" />
+                </linearGradient>
+                <filter id="medGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="3.2" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="medCardShadow" x="-10%" y="-12%" width="120%" height="130%">
+                  <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0E7490" flood-opacity="0.08" />
+                </filter>
+
+                <path id="medPath1" d="M 248 105 C 276 105, 286 78, 314 105" />
+                <path id="medPath2" d="M 538 105 C 566 105, 576 132, 604 105" />
+                <path id="medPath3" d="M 828 105 C 856 105, 866 78, 894 105" />
+              </defs>
+
+              <!-- Base Tracks -->
+              <path d="M 248 105 C 276 105, 286 78, 314 105" stroke="#DCE8F2" stroke-width="7" stroke-linecap="round" />
+              <path d="M 538 105 C 566 105, 576 132, 604 105" stroke="#DCE8F2" stroke-width="7" stroke-linecap="round" />
+              <path d="M 828 105 C 856 105, 866 78, 894 105" stroke="#DCE8F2" stroke-width="7" stroke-linecap="round" />
+
+              <!-- Animated Conduits -->
+              <path class="fhir-conduit" d="M 248 105 C 276 105, 286 78, 314 105" stroke="url(#medPipeGrad)" stroke-width="3" stroke-linecap="round" />
+              <path class="fhir-conduit" d="M 538 105 C 566 105, 576 132, 604 105" stroke="url(#medPipeGrad)" stroke-width="3" stroke-linecap="round" />
+              <path class="fhir-conduit" d="M 828 105 C 856 105, 866 78, 894 105" stroke="url(#medPipeGrad)" stroke-width="3" stroke-linecap="round" />
+
+              <!-- Moving Cerulean & Teal Telemetry Packets -->
+              <g filter="url(#medGlow)">
+                <circle r="5.5" fill="#0284C7">
+                  <animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#medPath1" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#0D9488">
+                  <animateMotion dur="1.6s" begin="0.8s" repeatCount="indefinite"><mpath href="#medPath1" /></animateMotion>
+                </circle>
+
+                <circle r="5.5" fill="#0D9488">
+                  <animateMotion dur="1.7s" begin="0.2s" repeatCount="indefinite"><mpath href="#medPath2" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#0284C7">
+                  <animateMotion dur="1.7s" begin="1.05s" repeatCount="indefinite"><mpath href="#medPath2" /></animateMotion>
+                </circle>
+
+                <circle r="5.5" fill="#0284C7">
+                  <animateMotion dur="1.5s" begin="0.35s" repeatCount="indefinite"><mpath href="#medPath3" /></animateMotion>
+                </circle>
+                <circle r="4" fill="#0D9488">
+                  <animateMotion dur="1.5s" begin="1.1s" repeatCount="indefinite"><mpath href="#medPath3" /></animateMotion>
+                </circle>
+              </g>
+
+              <!-- STAGE 01: Wearable & Bedside Biosensors -->
+              <g class="clin-node active-clin-node" onclick="selectClinicalNode(0)" transform="translate(18, 25)">
+                <rect class="clin-node-halo" x="-4" y="-4" width="238" height="166" rx="26" fill="none" stroke="#0284C7" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="clin-node-box" x="0" y="0" width="230" height="158" rx="22" fill="#FFFFFF" fill-opacity="0.96" stroke="#DCE8F2" stroke-width="1.5" filter="url(#medCardShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#E0F2FE" stroke="#BAE6FD" />
+                <g transform="translate(25, 25)" stroke="#0284C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 10h3l2.5-6 4 12 2.5-6H18" />
+                </g>
+                <text x="174" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0284C7">STAGE 01</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700" fill="#0F172A">Wearable &amp; Bedside</text>
+                <text x="16" y="104" font-family="JetBrains Mono, monospace" font-size="17" font-weight="700" fill="#0284C7">500 Hz Waveforms</text>
+                <rect x="16" y="122" width="198" height="20" rx="10" fill="#F2F7FB" />
+                <text x="26" y="136" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">12-Lead ECG · SpO2 · Art-Line</text>
+              </g>
+
+              <!-- STAGE 02: HL7 FHIR Encrypted Stream -->
+              <g class="clin-node" onclick="selectClinicalNode(1)" transform="translate(308, 25)">
+                <rect class="clin-node-halo" x="-4" y="-4" width="238" height="166" rx="26" fill="none" stroke="#0284C7" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="clin-node-box" x="0" y="0" width="230" height="158" rx="22" fill="#FFFFFF" fill-opacity="0.96" stroke="#DCE8F2" stroke-width="1.5" filter="url(#medCardShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#CCFBF1" stroke="#99F6E4" />
+                <g transform="translate(25, 25)" stroke="#0D9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="8" width="14" height="10" rx="2" />
+                  <path d="M6 8V5a4 4 0 0 1 8 0v3" />
+                </g>
+                <text x="174" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0D9488">STAGE 02</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700" fill="#0F172A">HL7 FHIR Encrypted</text>
+                <text x="16" y="104" font-family="JetBrains Mono, monospace" font-size="17" font-weight="700" fill="#0D9488">11.4 ms Latency</text>
+                <rect x="16" y="122" width="198" height="20" rx="10" fill="#F2F7FB" />
+                <text x="26" y="136" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">AES-256-GCM · PHI Tokenized</text>
+              </g>
+
+              <!-- STAGE 03: Aether Vision Diagnostics -->
+              <g class="clin-node" onclick="selectClinicalNode(2)" transform="translate(598, 25)">
+                <rect class="clin-node-halo" x="-4" y="-4" width="238" height="166" rx="26" fill="none" stroke="#0284C7" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="clin-node-box" x="0" y="0" width="230" height="158" rx="22" fill="#FFFFFF" fill-opacity="0.96" stroke="#DCE8F2" stroke-width="1.5" filter="url(#medCardShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#E0F2FE" stroke="#BAE6FD" />
+                <g transform="translate(25, 25)" stroke="#0284C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="10" cy="10" r="7" />
+                  <circle cx="10" cy="10" r="2.5" />
+                </g>
+                <text x="174" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0284C7">STAGE 03</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700" fill="#0F172A">Aether Vision AI</text>
+                <text x="16" y="104" font-family="JetBrains Mono, monospace" font-size="17" font-weight="700" fill="#0F172A">99.42% Concord</text>
+                <rect x="16" y="122" width="198" height="20" rx="10" fill="#F2F7FB" />
+                <text x="26" y="136" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">3D Voxel CT · Sepsis Predictor</text>
+              </g>
+
+              <!-- STAGE 04: Physician Action Console -->
+              <g class="clin-node" onclick="selectClinicalNode(3)" transform="translate(888, 25)">
+                <rect class="clin-node-halo" x="-4" y="-4" width="222" height="166" rx="26" fill="none" stroke="#0284C7" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="clin-node-box" x="0" y="0" width="214" height="158" rx="22" fill="#FFFFFF" fill-opacity="0.96" stroke="#DCE8F2" stroke-width="1.5" filter="url(#medCardShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#F1F5F9" stroke="#CBD5E1" />
+                <g transform="translate(25, 25)" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 11l3 3L20 6" />
+                  <path d="M18 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" />
+                </g>
+                <text x="158" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0F172A">STAGE 04</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700" fill="#0F172A">Physician Console</text>
+                <text x="16" y="104" font-family="JetBrains Mono, monospace" font-size="17" font-weight="700" fill="#0D9488">4.2 min Action</text>
+                <rect x="16" y="122" width="182" height="20" rx="10" fill="#F2F7FB" />
+                <text x="24" y="136" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">1-Tap Order Set &amp; PACS</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Stage Telemetry Inspection Drawer Bar -->
+        <div class="mt-3 clinical-tray rounded-2xl p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3.5">
+            <div id="clinStageCode" class="w-10 h-10 rounded-xl bg-navyClin text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">
+              S01
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 id="clinStageTitle" class="font-display font-bold text-sm sm:text-base text-navyClin">01 · Wearable &amp; Bedside Biosensor Mesh</h3>
+                <span id="clinStageBadge" class="px-2 py-0.5 rounded-full text-[12.5px] font-mono font-semibold bg-vitalTeal/10 text-vitalTeal">ISO/IEEE 11073 VERIFIED</span>
+              </div>
+              <p id="clinStageDesc" class="text-xs text-slateClin mt-0.5">Continuous 500Hz multi-lead ECG, arterial line pressure, and optical SpO2 streaming from 348 wireless ICU patches.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-200/80">
+            <div>
+              <p class="text-xs font-mono uppercase text-slateClin">Encryption</p>
+              <p id="clinStageEnc" class="font-mono font-bold text-xs sm:text-sm text-navyClin tabular-nums">TLS 1.3 · FIPS 140-3</p>
+            </div>
+            <div>
+              <p class="text-xs font-mono uppercase text-slateClin">HL7 Latency</p>
+              <p id="clinStageLat" class="font-mono font-bold text-xs sm:text-sm text-cerulean tabular-nums">8.2 ms Edge</p>
+            </div>
+            <div>
+              <p class="text-xs font-mono uppercase text-slateClin">Throughput</p>
+              <p id="clinStageThr" class="font-mono font-bold text-xs sm:text-sm text-vitalTeal tabular-nums">42,800 msg/sec</p>
+            </div>
+            <div>
+              <p class="text-xs font-mono uppercase text-slateClin">HIPAA Audit</p>
+              <p id="clinStageHash" class="font-mono font-bold text-xs sm:text-sm text-navyClin tabular-nums">SHA-3 Immutable</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. VISUAL DATA & PATIENT QUEUE ROW (7 COLS OUTCOMES CHART + 5 COLS AI TRIAGE QUEUE) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- Left (7 Cols): Multi-Vital Cohort Outcomes & Readmission Risk SVG Area/Bar Chart -->
+        <div id="sec-outcomes" class="lg:col-span-7 pearl-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+          <div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 class="font-display font-bold text-lg sm:text-xl text-navyClin">Cohort Stabilization &amp; Readmission Risk</h2>
+                <p class="text-xs text-slateClin mt-0.5">AI early-warning stabilization index vs. 30-day predicted readmission risk</p>
+              </div>
+
+              <!-- 24H / 7D / 30D Tabs -->
+              <div class="clinical-tray p-1 rounded-xl inline-flex items-center gap-1 self-start" role="tablist">
+                <button onclick="switchOutcomeRange('24h')" data-range="24h" class="range-tab px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-white text-navyClin shadow-2xs transition">24H</button>
+                <button onclick="switchOutcomeRange('7d')" data-range="7d" class="range-tab px-3 py-1 rounded-lg text-xs font-mono font-medium text-slateClin hover:text-navyClin transition">7D</button>
+                <button onclick="switchOutcomeRange('30d')" data-range="30d" class="range-tab px-3 py-1 rounded-lg text-xs font-mono font-medium text-slateClin hover:text-navyClin transition">30D</button>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 text-xs">
+              <div class="flex flex-wrap items-center gap-4">
+                <span class="inline-flex items-center gap-2 font-medium text-navyClin">
+                  <span class="w-3 h-3 rounded-full bg-cerulean ring-2 ring-cerulean/20"></span>
+                  Cohort Vital Stability (%)
+                </span>
+                <span class="inline-flex items-center gap-2 font-medium text-slateClin">
+                  <span class="w-3 h-3 rounded-xs bg-vitalTeal/35 border border-vitalTeal"></span>
+                  AI Pre-Emptive Interventions
+                </span>
+              </div>
+              <span id="outcomeSummaryStat" class="font-mono text-xs font-semibold text-vitalTeal tabular-nums">Readmission Risk Reduced: -34.2%</span>
+            </div>
+          </div>
+
+          <!-- Interactive SVG Area + Bar Hybrid Chart -->
+          <div id="medChartContainer" class="relative w-full h-[290px] sm:h-[315px] select-none">
+            <svg id="medOutcomeSvg" class="w-full h-full overflow-visible" viewBox="0 0 680 280" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="ceruleanAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0284C7" stop-opacity="0.30" />
+                  <stop offset="75%" stop-color="#0D9488" stop-opacity="0.08" />
+                  <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="tealBarGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0D9488" stop-opacity="0.45" />
+                  <stop offset="100%" stop-color="#0D9488" stop-opacity="0.12" />
+                </linearGradient>
+              </defs>
+
+              <!-- Grid Lines -->
+              <g stroke="#0F172A" stroke-opacity="0.07" stroke-dasharray="4 4">
+                <line x1="42" y1="26" x2="664" y2="26" />
+                <line x1="42" y1="82" x2="664" y2="82" />
+                <line x1="42" y1="138" x2="664" y2="138" />
+                <line x1="42" y1="194" x2="664" y2="194" />
+                <line x1="42" y1="250" x2="664" y2="250" />
+              </g>
+
+              <!-- Y-Axis Labels -->
+              <g font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B" text-anchor="end">
+                <text x="34" y="30">100%</text>
+                <text x="34" y="86">85%</text>
+                <text x="34" y="142">70%</text>
+                <text x="34" y="198">55%</text>
+                <text x="34" y="254">40%</text>
+              </g>
+
+              <!-- Bar Group (AI Early Interventions) -->
+              <g id="medChartBars"></g>
+
+              <!-- Smooth Stability Area & Line -->
+              <path id="medStabilityArea" d="" fill="url(#ceruleanAreaGrad)" />
+              <path id="medStabilityLine" d="" fill="none" stroke="#0284C7" stroke-width="3" stroke-linecap="round" />
+
+              <!-- X-Axis Labels -->
+              <g id="medXLabels" font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B" text-anchor="middle"></g>
+
+              <!-- Hover Guide -->
+              <g id="medCrosshair" class="opacity-0 transition-opacity duration-150 pointer-events-none">
+                <line id="medCrossLine" x1="180" y1="22" x2="180" y2="250" stroke="#0F172A" stroke-width="1.2" stroke-dasharray="3 3" />
+                <circle id="medCrossDot" cx="180" cy="80" r="6" fill="#0284C7" stroke="#FFFFFF" stroke-width="2.5" />
+              </g>
+
+              <rect id="medChartHitbox" x="42" y="20" width="622" height="234" fill="transparent" class="cursor-crosshair" />
+            </svg>
+
+            <!-- Clinical Chart Floating Tooltip -->
+            <div id="medChartTooltip" class="pointer-events-none opacity-0 transition-opacity duration-150 absolute top-3 left-14 z-20 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl px-3.5 py-2.5 min-w-[202px]">
+              <div class="flex items-center justify-between gap-3 pb-1.5 mb-1.5 border-b border-slate-100">
+                <span id="medTtTime" class="font-mono text-[12.5px] font-bold text-navyClin">12:00</span>
+                <span id="medTtRisk" class="font-mono text-xs font-semibold px-1.5 py-0.5 rounded bg-vitalTeal/10 text-vitalTeal">Risk 4.1%</span>
+              </div>
+              <div class="space-y-1 text-xs">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slateClin">Cohort Stability</span>
+                  <span id="medTtStab" class="font-mono font-bold text-cerulean tabular-nums">96.4%</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slateClin">AI Interventions</span>
+                  <span id="medTtIntv" class="font-mono font-semibold text-navyClin tabular-nums">18 Alerts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right (5 Cols): AI Radiology & Critical Triage Queue -->
+        <div id="sec-triage" class="lg:col-span-5 pearl-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h2 class="font-display font-bold text-lg sm:text-xl text-navyClin">AI Radiology &amp; Triage Queue</h2>
+              <span id="queueCountPill" class="px-2.5 py-0.5 rounded-full text-[12.5px] font-mono font-bold bg-cerulean/10 text-cerulean tabular-nums">5 Scans</span>
+            </div>
+            <p class="text-xs text-slateClin mb-4">Click any patient card to inspect multi-vital waveform &amp; approve AI protocol</p>
+
+            <!-- Filter Pills: All / Priority 1 / AI Cleared -->
+            <div class="clinical-tray p-1 rounded-xl inline-flex items-center gap-1 mb-4" role="tablist" aria-label="Triage Filter">
+              <button onclick="setTriageFilter('all')" data-filter="all" class="triage-pill px-3 py-1 rounded-lg text-xs font-semibold bg-white text-navyClin shadow-2xs transition">All</button>
+              <button onclick="setTriageFilter('p1')" data-filter="p1" class="triage-pill px-3 py-1 rounded-lg text-xs font-medium text-slateClin hover:text-navyClin transition flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-alertRose"></span>
+                <span>Priority 1</span>
+              </button>
+              <button onclick="setTriageFilter('cleared')" data-filter="cleared" class="triage-pill px-3 py-1 rounded-lg text-xs font-medium text-slateClin hover:text-navyClin transition flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-vitalTeal"></span>
+                <span>AI Cleared</span>
+              </button>
+            </div>
+
+            <!-- Patient Queue List -->
+            <div id="triageQueueList" class="space-y-2.5 max-h-[330px] overflow-y-auto pr-1">
+              <!-- Rendered dynamically by JS -->
+            </div>
+          </div>
+
+          <div class="pt-3 mt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slateClin">
+            <span>Aether Vision v3.9 FDA 510(k) CADt</span>
+            <span class="font-mono font-semibold text-cerulean">PACS Synced</span>
+          </div>
+        </div>
+
+      </section>
+      </div>
+
+      <!-- Dedicated Clinical Sub-Page View -->
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="px-4 sm:px-6 lg:px-8 py-4 mt-2">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slateClin border-t border-slate-200/80 pt-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-vitalTeal"></span>
+          <span class="font-medium text-navyClin">AETHER MED Clinical Command OS</span>
+          <span>· HIPAA / HITRUST CSF Certified · HL7 FHIR R4</span>
+        </div>
+        <div class="font-mono text-[12.5px] tabular-nums">
+          Enclave Session: <span class="text-navyClin font-semibold">AE-9942-ICU</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Patient Vitals & AI Radiology Drawer/Modal -->
+  <div id="patientModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-navyClin/35 backdrop-blur-sm">
+    <div class="pearl-glass rounded-[28px] max-w-lg w-full p-6 space-y-4 border border-white shadow-2xl">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="pmPriorityBadge" class="px-2 py-0.5 rounded-full text-[12.5px] font-mono font-bold">PRIORITY 1</span>
+            <span id="pmMrn" class="font-mono text-xs text-slateClin">MRN-48291</span>
+          </div>
+          <h3 id="pmName" class="font-display font-bold text-lg text-navyClin mt-1">Marcus Vance · 64M</h3>
+          <p id="pmScanModality" class="text-xs text-slateClin">CT Pulmonary Angiogram · Bed ICU-04</p>
+        </div>
+        <button onclick="closePatientModal()" class="w-8 h-8 rounded-xl clinical-tray flex items-center justify-center text-slateClin hover:text-navyClin">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Live Vitals Grid -->
+      <div class="grid grid-cols-4 gap-2.5">
+        <div class="clinical-tray rounded-2xl p-3 text-center">
+          <p class="text-xs font-mono uppercase text-slateClin">Heart Rate</p>
+          <p id="pmHr" class="font-mono font-bold text-sm text-navyClin mt-0.5 tabular-nums">114 BPM</p>
+        </div>
+        <div class="clinical-tray rounded-2xl p-3 text-center">
+          <p class="text-xs font-mono uppercase text-slateClin">SpO2</p>
+          <p id="pmSpo2" class="font-mono font-bold text-sm text-cerulean mt-0.5 tabular-nums">93%</p>
+        </div>
+        <div class="clinical-tray rounded-2xl p-3 text-center">
+          <p class="text-xs font-mono uppercase text-slateClin">Art BP</p>
+          <p id="pmBp" class="font-mono font-bold text-sm text-navyClin mt-0.5 tabular-nums">142/88</p>
+        </div>
+        <div class="clinical-tray rounded-2xl p-3 text-center">
+          <p class="text-xs font-mono uppercase text-slateClin">AI Conf.</p>
+          <p id="pmConf" class="font-mono font-bold text-sm text-vitalTeal mt-0.5 tabular-nums">98.7%</p>
+        </div>
+      </div>
+
+      <!-- AI Radiology Finding -->
+      <div class="clinical-tray rounded-2xl p-4 space-y-1.5">
+        <p class="text-[12.5px] font-mono font-semibold uppercase text-cerulean">Aether Vision 3D Finding</p>
+        <p id="pmFinding" class="text-xs text-navyClin leading-relaxed">Subsegmental right lower lobe filling defect flagged in 38 seconds. RV/LV ratio 0.92. Anticoagulation order set pre-staged for attending review.</p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-1">
+        <button onclick="closePatientModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slateClin hover:bg-white transition">Close</button>
+        <button onclick="markPatientCleared()" class="cerulean-btn px-4 py-2 rounded-xl text-xs font-semibold">Verify &amp; Sign Protocol</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- + Admit Triage Modal -->
+  <div id="admitModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-navyClin/35 backdrop-blur-sm">
+    <div class="pearl-glass rounded-[28px] max-w-md w-full p-6 space-y-4 border border-white shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-display font-bold text-base text-navyClin">Admit Acute AI Triage</h3>
+          <p class="text-xs text-slateClin">Stream DICOM &amp; Bedside HL7 Telemetry</p>
+        </div>
+        <button onclick="closeAdmitModal()" class="w-8 h-8 rounded-xl clinical-tray flex items-center justify-center text-slateClin hover:text-navyClin">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="submitAdmitTriage(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-navyClin mb-1">Patient Name &amp; Age</label>
+          <input id="admitName" type="text" required placeholder="e.g., Clara Lindholm · 57F" class="w-full px-3.5 py-2 rounded-xl clinical-tray text-navyClin focus:outline-none focus:ring-2 focus:ring-cerulean/30 focus:bg-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-navyClin mb-1">Imaging Modality</label>
+            <select id="admitScan" class="w-full px-3 py-2 rounded-xl clinical-tray text-navyClin focus:outline-none">
+              <option value="CT Coronary Angiogram">CT Coronary Angiogram</option>
+              <option value="3T Brain Perfusion MRI">3T Brain Perfusion MRI</option>
+              <option value="Chest High-Res CT">Chest High-Res CT</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-navyClin mb-1">Acuity Level</label>
+            <select id="admitPriority" class="w-full px-3 py-2 rounded-xl clinical-tray text-navyClin focus:outline-none">
+              <option value="p1">Priority 1 (Critical)</option>
+              <option value="cleared">AI Cleared (Routine)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-navyClin mb-1">Preliminary Clinical Note</label>
+          <input id="admitNote" type="text" required placeholder="e.g., Acute substernal pressure, troponin pending" class="w-full px-3.5 py-2 rounded-xl clinical-tray text-navyClin focus:outline-none focus:ring-2 focus:ring-cerulean/30 focus:bg-white" />
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closeAdmitModal()" class="px-4 py-2 rounded-xl font-semibold text-slateClin hover:bg-white">Cancel</button>
+          <button type="submit" class="cerulean-btn px-4 py-2 rounded-xl font-semibold">Stream to AI Queue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Clinical Toast Notification -->
+  <div id="clinToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300 pearl-glass rounded-2xl px-4 py-3 flex items-center gap-2.5 shadow-xl">
+    <span class="w-2.5 h-2.5 rounded-full bg-cerulean shrink-0"></span>
+    <span id="clinToastText" class="text-xs font-semibold text-navyClin">Telemetry updated.</span>
+  </div>
+
+  <script>
+    // Department Datasets
+    const DEPARTMENTS = {
+      cardio: {
+        label: 'Cardiology ICU',
+        unitCode: 'UNIT-4A · CARDIOLOGY ICU COMMAND',
+        concordance: '99.42% Concordance',
+        desc: 'Real-time 12-lead telemetry fused with Aether Vision 3D CT/MRI triage. Sub-minute pulmonary embolism & arrhythmia detection routed directly to attending consoles.',
+        bpm: '72 BPM',
+        spo2: '99% SpO2',
+        mapStat: 'MAP 88 mmHg · QT/QTc 392ms',
+        kpis: {
+          patVal: '348', patDelta: '100% Wearable Sync', patSub: '42 High-Acuity ICU',
+          turnVal: '4.2 min', turnPct: '-68%', turnSub: 'vs 13.1m Baseline',
+          bedVal: '86.5%', bedDelta: '18 Negative-Press Ready', bedSub: 'Auto-Discharge Forecast',
+          labVal: '1,290 / hr', labSub: 'Troponin-I · Lactate · CBC'
+        },
+        outcomes: {
+          '24h': {
+            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Now'],
+            stability: [91.2, 92.4, 94.0, 95.8, 95.1, 96.4, 97.2],
+            interventions: [12, 9, 16, 21, 18, 15, 19],
+            risk: ['5.4%', '5.1%', '4.6%', '4.1%', '4.2%', '3.8%', '3.5%'],
+            summary: 'Readmission Risk Reduced: -34.2%'
+          },
+          '7d': {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            stability: [89.5, 91.0, 93.2, 94.6, 95.4, 96.1, 97.2],
+            interventions: [24, 22, 28, 25, 30, 19, 21],
+            risk: ['6.1%', '5.8%', '5.0%', '4.5%', '4.2%', '3.9%', '3.5%'],
+            summary: '7-Day STEMI Door-to-Balloon: 38 min'
+          },
+          '30d': {
+            labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Now'],
+            stability: [87.0, 89.4, 91.8, 93.5, 95.0, 96.3, 97.2],
+            interventions: [31, 34, 29, 33, 27, 25, 22],
+            risk: ['6.8%', '6.2%', '5.5%', '4.9%', '4.4%', '3.9%', '3.5%'],
+            summary: '30-Day ICU Mortality Reduction: -22.8%'
+          }
+        }
+      },
+      neuro: {
+        label: 'Neurology',
+        unitCode: 'UNIT-7B · ACUTE STROKE & NEURO ICU',
+        concordance: '99.18% Concordance',
+        desc: 'Automated LVO stroke vessel occlusion detection on non-contrast & perfusion CT with continuous EEG seizure-burden telemetry across 28 neuro-critical beds.',
+        bpm: '68 BPM',
+        spo2: '98% SpO2',
+        mapStat: 'ICP 11 mmHg · CPP 76 mmHg',
+        kpis: {
+          patVal: '214', patDelta: 'Continuous qEEG', patSub: '28 Neuro-Critical Beds',
+          turnVal: '3.4 min', turnPct: '-74%', turnSub: 'LVO CT Perfusion Alert',
+          bedVal: '89.2%', bedDelta: '11 Stroke-Ready Bays', bedSub: 'Thrombectomy Sync',
+          labVal: '980 / hr', labSub: 'S100B · Coag · ABG Panel'
+        },
+        outcomes: {
+          '24h': {
+            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Now'],
+            stability: [88.4, 90.2, 91.8, 93.6, 94.9, 95.5, 96.4],
+            interventions: [10, 14, 19, 17, 22, 16, 15],
+            risk: ['6.2%', '5.8%', '5.2%', '4.7%', '4.3%', '4.0%', '3.8%'],
+            summary: 'Median LVO Triage-to-Angio: 19.4 min'
+          },
+          '7d': {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            stability: [87.2, 89.6, 91.4, 93.0, 94.2, 95.8, 96.4],
+            interventions: [18, 21, 24, 20, 26, 17, 19],
+            risk: ['6.5%', '6.0%', '5.4%', '4.9%', '4.5%', '4.1%', '3.8%'],
+            summary: '7-Day mRS 0-2 Recovery Rate: +28.4%'
+          },
+          '30d': {
+            labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Now'],
+            stability: [86.0, 88.2, 90.5, 92.1, 94.0, 95.2, 96.4],
+            interventions: [25, 28, 26, 29, 24, 21, 19],
+            risk: ['7.0%', '6.4%', '5.8%', '5.2%', '4.6%', '4.1%', '3.8%'],
+            summary: '30-Day Silent Seizure Catch: 100%'
+          }
+        }
+      },
+      onco: {
+        label: 'Oncology AI',
+        unitCode: 'UNIT-9C · PRECISION ONCOLOGY & CAR-T',
+        concordance: '99.61% Concordance',
+        desc: 'Volumetric RECIST 1.1 tumor response tracking paired with wearable cytokine-release syndrome (CRS) thermometry and neutropenic sepsis early warning.',
+        bpm: '76 BPM',
+        spo2: '99% SpO2',
+        mapStat: 'Temp 36.8°C · ANC 2.1 K/uL',
+        kpis: {
+          patVal: '412', patDelta: 'CAR-T Bio-Patch On', patSub: '34 Inpatient Infusion',
+          turnVal: '5.1 min', turnPct: '-64%', turnSub: '3D PET/CT Volumetric',
+          bedVal: '91.0%', bedDelta: '14 HEPA Positive-Press', bedSub: 'Cleanroom Verified',
+          labVal: '1,640 / hr', labSub: 'IL-6 · ctDNA · Ferritin'
+        },
+        outcomes: {
+          '24h': {
+            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Now'],
+            stability: [92.0, 93.1, 94.5, 95.2, 96.6, 97.1, 97.8],
+            interventions: [8, 11, 15, 19, 14, 12, 16],
+            risk: ['4.8%', '4.5%', '4.1%', '3.9%', '3.5%', '3.3%', '3.1%'],
+            summary: 'CRS Grade >=2 Pre-Empted: 94.6%'
+          },
+          '7d': {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            stability: [90.8, 92.0, 93.7, 94.9, 96.0, 97.0, 97.8],
+            interventions: [16, 19, 22, 25, 21, 18, 16],
+            risk: ['5.2%', '4.9%', '4.4%', '4.0%', '3.6%', '3.3%', '3.1%'],
+            summary: '7-Day ctDNA Liquid Biopsy Concordance: 99.6%'
+          },
+          '30d': {
+            labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Now'],
+            stability: [89.2, 91.0, 92.8, 94.4, 95.9, 96.8, 97.8],
+            interventions: [22, 24, 27, 23, 20, 18, 16],
+            risk: ['5.9%', '5.3%', '4.8%', '4.3%', '3.8%', '3.4%', '3.1%'],
+            summary: '30-Day Unplanned ED Visits: -41.0%'
+          }
+        }
+      }
+    };
+
+    const CLINICAL_STAGES = [
+      {
+        code: 'S01',
+        title: '01 · Wearable & Bedside Biosensor Mesh',
+        badge: 'ISO/IEEE 11073 VERIFIED',
+        desc: 'Continuous 500Hz multi-lead ECG, arterial line pressure, and optical SpO2 streaming from 348 wireless ICU patches.',
+        enc: 'TLS 1.3 · FIPS 140-3',
+        lat: '8.2 ms Edge',
+        thr: '42,800 msg/sec',
+        hash: 'SHA-3 Immutable'
+      },
+      {
+        code: 'S02',
+        title: '02 · HL7 FHIR R4 Encrypted Zero-Trust Broker',
+        badge: 'HIPAA SAFE HARBOR',
+        desc: 'Real-time normalization of HL7v2, FHIR Observation bundles, and DICOMweb slices inside confidential hardware enclaves.',
+        enc: 'AES-256-GCM Enclave',
+        lat: '11.4 ms Broker',
+        thr: '1.84 GB/s DICOM',
+        hash: 'Zero-PHI Leak'
+      },
+      {
+        code: 'S03',
+        title: '03 · Aether Vision 3D Radiology & Sepsis Foundation AI',
+        badge: '99.42% CONCORDANCE',
+        desc: 'Multimodal transformer fusing 3D CT/MRI voxel volumes with 6-hour hemodynamic trends to flag occult pathology.',
+        enc: 'Confidential GPU',
+        lat: '38.0 sec Volume',
+        thr: '240 Scans/hr',
+        hash: 'FDA 510(k) CADt'
+      },
+      {
+        code: 'S04',
+        title: '04 · Attending Physician Action Console & Mobile Alert',
+        badge: '4.2 MIN TURNAROUND',
+        desc: 'Delivers annotated key-slice heatmaps and pre-staged EHR order sets with one-tap cryptographic physician sign-off.',
+        enc: 'FIDO2 Biometric',
+        lat: '1.4 ms Push',
+        thr: '100% Ack SLA',
+        hash: 'EHR Co-Signed'
+      }
+    ];
+
+    let triagePatients = [
+      {
+        id: 'PT-101',
+        mrn: 'MRN-48291',
+        name: 'Marcus Vance · 64M',
+        modality: 'CT Pulmonary Angiogram · ICU-04',
+        priority: 'p1',
+        conf: 98.7,
+        hr: '114 BPM',
+        spo2: '93%',
+        bp: '142/88',
+        finding: 'Subsegmental right lower lobe filling defect flagged in 38 seconds. RV/LV ratio 0.92. Anticoagulation protocol staged.'
+      },
+      {
+        id: 'PT-102',
+        mrn: 'MRN-51904',
+        name: 'Amara Okafor · 52F',
+        modality: '3T Perfusion MRI · Neuro-02',
+        priority: 'p1',
+        conf: 99.1,
+        hr: '98 BPM',
+        spo2: '96%',
+        bp: '158/94',
+        finding: 'Distal M2 branch penumbra mismatch ratio 2.4 detected. Neuro-interventional team notified automatically.'
+      },
+      {
+        id: 'PT-103',
+        mrn: 'MRN-39418',
+        name: 'Henrik Solberg · 71M',
+        modality: 'Gated Coronary CT · Ward-4A',
+        priority: 'cleared',
+        conf: 99.5,
+        hr: '68 BPM',
+        spo2: '99%',
+        bp: '122/76',
+        finding: 'Patent LAD stent graft with CAD-RADS 1 profile. Zero acute plaque rupture features; cleared for step-down.'
+      },
+      {
+        id: 'PT-104',
+        mrn: 'MRN-60215',
+        name: 'Mei-Ling Chen · 46F',
+        modality: 'Low-Dose Chest CT · Onco-09',
+        priority: 'cleared',
+        conf: 98.9,
+        hr: '74 BPM',
+        spo2: '99%',
+        bp: '118/72',
+        finding: 'RECIST 1.1 target lesion volume decreased -42% vs baseline scan. Zero pneumonitis or pleural effusion.'
+      },
+      {
+        id: 'PT-105',
+        mrn: 'MRN-77340',
+        name: 'julian Mercer · 59M'.replace(/^j/, 'J'),
+        modality: 'Bedside Thoracic Echo · ICU-11',
+        priority: 'cleared',
+        conf: 97.8,
+        hr: '71 BPM',
+        spo2: '98%',
+        bp: '126/78',
+        finding: 'Preserved LVEF 58% with normal bi-ventricular wall motion and physiological pericardial contour.'
+      }
+    ];
+
+    let activeDept = 'cardio';
+    let activeRange = '24h';
+    let activeFilter = 'all';
+    let searchQuery = '';
+    let selectedPatientId = null;
+
+    // Sidebar Rail Collapse
+    function toggleRail() {
+      document.body.classList.toggle('rail-collapsed');
+    }
+
+    function toggleMobileRail() {
+      const open = document.body.classList.toggle('mobile-rail-open');
+      document.getElementById('mobileBackdrop').classList.toggle('hidden', !open);
+    }
+
+    const MED_SUBPAGES = {
+      'ICU Bio-Stream': {
+        badge: 'ISO/IEEE 11073 WAVEFORM MESH',
+        title: 'Continuous ICU Bio-Stream & Hemodynamics',
+        subtitle: '500Hz 12-lead ECG arrhythmia surveillance, invasive arterial pressure trends, and early sepsis shock index scoring.',
+        kpis: [
+          { label: 'Wireless ICU Patches', val: '348 Live', delta: '100% Sync', tone: 'cerulean', sub: '0.02% signal artifact rate' },
+          { label: 'Mean Arterial Pressure', val: '88 mmHg', delta: 'Target 65-95', tone: 'teal', sub: 'Vasopressor auto-titration' },
+          { label: 'Early Sepsis Catch SLA', val: '3.8 hr', delta: 'Pre-Onset Lead', tone: 'teal', sub: 'qSOFA + lactate transformer' },
+          { label: 'Active Arrhythmia Watch', val: '3 Beds', delta: 'Telemetry Pinned', tone: 'rose', sub: 'AFib / Non-sustained VT' }
+        ],
+        visualTitle: 'Unit Hemodynamic Stability & Signal Quality',
+        visualSub: 'Real-time waveform fidelity and autonomic stability across critical care bays',
+        curve: 'M 14,56 L 52,56 L 64,42 L 76,56 L 94,56 L 102,66 L 112,18 L 122,82 L 132,56 L 165,56 L 180,40 L 196,56 L 248,56 L 258,66 L 268,18 L 278,82 L 288,56 L 388,56',
+        bars: [
+          { name: 'Cardiology ICU-4A (12-Lead + Art Line)', pct: 98, val: '98.4% Signal Lock · 42 Beds', color: '#0284C7' },
+          { name: 'Neuro-Critical ICU-7B (ICP + qEEG)', pct: 96, val: '96.1% Signal Lock · 28 Beds', color: '#0D9488' },
+          { name: 'Cardiothoracic Step-Down Telemetry', pct: 94, val: '94.8% Wearable Patch Sync', color: '#0369A1' },
+          { name: 'Acoustic Respiratory Rate Mesh', pct: 92, val: 'Zero False Apnea Alarms', color: '#14B8A6' }
+        ],
+        tableTitle: 'High-Acuity Bedside Bio-Telemetry Console',
+        actionCol: 'Bedside Action',
+        rows: [
+          { id: 'ICU-04', col1: 'Marcus Vance · 64M', col2: 'HR 114 · SpO2 93% · MAP 91', col3: 'Sinus Tachycardia', status: 'Watch P1', done: 'Pinned Console', btn: 'Pin 12-Lead', toast: 'Pinned Bed ICU-04 12-lead ECG stream to central attending wall.' },
+          { id: 'ICU-09', col1: 'Elena Lindholm · 58F', col2: 'HR 76 · SpO2 99% · MAP 84', col3: 'Normal Sinus', status: 'Stable', done: 'Weaning Staged', btn: 'Stage Wean', toast: 'Staged spontaneous breathing trial protocol for Bed ICU-09.' },
+          { id: 'ICU-12', col1: 'David K. Park · 69M', col2: 'HR 88 · SpO2 96% · MAP 72', col3: 'Paroxysmal AFib', status: 'Monitoring', done: 'K+ / Mg Ordered', btn: 'Order Lytes', toast: 'Stat electrolyte & magnesium replacement panel queued in EHR.' },
+          { id: 'ICU-15', col1: 'Sonia Al-Mansoor · 49F', col2: 'HR 71 · SpO2 99% · MAP 89', col3: 'Post-PCI Recovery', status: 'Step-Down', done: 'Cleared Transfer', btn: 'Approve Transfer', toast: 'Approved telemetry step-down transfer for Bed ICU-15.' },
+          { id: 'ICU-18', col1: 'Thomas Sterling · 73M', col2: 'HR 64 · SpO2 98% · MAP 82', col3: 'Paced Rhythm 100%', status: 'Capture OK', done: 'Pacer Interrog.', btn: 'Log Threshold', toast: 'Recorded pacemaker capture threshold check into FHIR chart.' }
+        ]
+      },
+      'AI Radiology': {
+        badge: 'FDA 510(K) CADt · DICOMWEB 3D',
+        title: 'Aether Vision 3D Radiology & Voxel Triage',
+        subtitle: 'Automated pulmonary embolism, intracranial hemorrhage, and LVO stroke flagging directly from scanner reconstruction.',
+        kpis: [
+          { label: 'Diagnostic Concordance', val: '99.42%', delta: 'Attending Co-Sign', tone: 'teal', sub: 'Across 18,400 audited studies' },
+          { label: 'Median Scan-to-Alert', val: '38.0 sec', delta: '-74% vs Manual', tone: 'cerulean', sub: 'Direct CT/MR gantry stream' },
+          { label: 'Studies Analyzed Today', val: '612 Scans', delta: '240 / hr Peak', tone: 'cerulean', sub: 'CT · 3T MRI · Portable CXR' },
+          { label: 'Open Priority-1 Flags', val: '2 Critical', delta: 'Radiologist Live', tone: 'rose', sub: 'PE & M2 Penumbra Mismatch' }
+        ],
+        visualTitle: 'Modality Sensitivity & Inference Throughput',
+        visualSub: 'Aether Vision foundation model AUC performance by clinical protocol',
+        curve: 'M 14,90 C 80,74 146,56 212,40 C 280,26 336,20 388,16',
+        bars: [
+          { name: 'CT Pulmonary Angiography (Acute PE)', pct: 99, val: '99.3% Sens · 38s Voxel Pass', color: '#0284C7' },
+          { name: '3T Brain Perfusion & LVO Stroke CT', pct: 98, val: '98.9% Sens · Auto-ASPECTS', color: '#0D9488' },
+          { name: 'Volumetric Oncology RECIST 1.1', pct: 97, val: '97.8% Reproducibility', color: '#0369A1' },
+          { name: 'ICU Portable Chest X-Ray Line/Pneumo', pct: 99, val: '99.5% ETT / Central Line Check', color: '#14B8A6' }
+        ],
+        tableTitle: 'PACS AI Worklist & Key-Slice Sign-Off Queue',
+        actionCol: 'PACS Action',
+        rows: [
+          { id: 'ACC-8841', col1: 'CTPA — Marcus Vance (64M)', col2: 'RLL Subsegmental PE', col3: 'Conf 98.7% · 38s', status: 'P1 Critical', done: 'Co-Signed STAT', btn: 'Co-Sign P1', toast: 'Radiology P1 report co-signed and pushed to ICU team.' },
+          { id: 'ACC-8844', col1: '3T Perfusion — Amara Okafor (52F)', col2: 'Distal M2 Mismatch 2.4x', col3: 'Conf 99.1% · 41s', status: 'P1 Stroke', done: 'Angio Activated', btn: 'Page Neuro-IR', toast: 'Neuro-Interventional Angio Suite #2 activated with 3D vessel map.' },
+          { id: 'ACC-8849', col1: 'Coronary CTA — Henrik Solberg (71M)', col2: 'Patent LAD Graft · CAD-RADS 1', col3: 'Conf 99.5% · 34s', status: 'AI Cleared', done: 'Finalized EHR', btn: 'Finalize Read', toast: 'Finalized negative Coronary CTA structured report in EHR.' },
+          { id: 'ACC-8853', col1: 'Chest CT — Mei-Ling Chen (46F)', col2: 'Target Lesion -42% Volume', col3: 'Conf 98.9% · 46s', status: 'Responder', done: 'Synced Tumor Bd', btn: 'Send Tumor Bd', toast: 'Exported 3D volumetric segmentation to Molecular Tumor Board.' },
+          { id: 'ACC-8858', col1: 'Portable CXR — ICU Bed 14', col2: 'ET Tube 3.8cm Above Carina', col3: 'Conf 99.6% · 9s', status: 'Verified', done: 'Archived PACS', btn: 'Confirm Line', toast: 'Confirmed optimal endotracheal & central venous catheter placement.' }
+        ]
+      },
+      'Ward Capacity': {
+        badge: 'PREDICTIVE BED & STAFFING COMMAND',
+        title: 'Hospital Ward Capacity & Surge Orchestration',
+        subtitle: 'AI discharge readiness forecasting, negative-pressure isolation availability, and nurse-to-acuity ratio balancing.',
+        kpis: [
+          { label: 'Critical Care Occupancy', val: '86.5%', delta: '18 ICU Beds Ready', tone: 'cerulean', sub: 'Optimal 82–88% buffer zone' },
+          { label: 'Predicted 12h Discharges', val: '29 Beds', delta: '94% Model Acc.', tone: 'teal', sub: 'Pharmacy & transport pre-booked' },
+          { label: 'ED Boarding Wait Time', val: '14 min', delta: '-52% vs Regional', tone: 'teal', sub: 'Direct-to-bed telemetry admit' },
+          { label: 'Nurse Acuity Alignment', val: '99.1%', delta: '1:1.6 ICU Ratio', tone: 'cerulean', sub: 'Zero unsafe acuity variance' }
+        ],
+        visualTitle: 'Live Unit Occupancy & Isolation Readiness',
+        visualSub: 'Real-time staffed bed availability across specialty inpatient wings',
+        curve: 'M 14,78 C 82,70 148,62 214,54 C 280,46 336,42 388,38',
+        bars: [
+          { name: 'Unit 4A — Cardiology & CT-Surgery ICU', pct: 86, val: '36 / 42 Occupied · 6 Open', color: '#0284C7' },
+          { name: 'Unit 7B — Acute Stroke & Neuro-Critical', pct: 82, val: '23 / 28 Occupied · 5 Open', color: '#0D9488' },
+          { name: 'Unit 9C — HEPA Positive-Press Oncology', pct: 88, val: '30 / 34 Occupied · 4 Open', color: '#0369A1' },
+          { name: 'Rapid Observation & Telemetry Step-Down', pct: 74, val: '40 / 54 Occupied · 14 Open', color: '#14B8A6' }
+        ],
+        tableTitle: 'Unit Bed Turnover & Environmental Readiness Queue',
+        actionCol: 'Flow Control',
+        rows: [
+          { id: 'WARD-4A', col1: 'Cardiology ICU Bays 07 & 11', col2: 'Negative-Pressure Ready', col3: 'UV-C Sterilized', status: 'Open Now', done: 'Reserved Cath', btn: 'Hold for Cath', toast: 'Reserved Cardiology ICU Bays 07 & 11 for incoming Cath Lab transfers.' },
+          { id: 'WARD-7B', col1: 'Neuro-Critical Stroke Bay 03', col2: 'qEEG + Perfusion Rigged', col3: '11 Stroke Ready', status: 'Standby', done: 'EMS Synced', btn: 'Sync EMS Alert', toast: 'Linked Stroke Bay 03 directly to regional EMS pre-hospital notification.' },
+          { id: 'WARD-9C', col1: 'HEPA Cleanroom Infusion Suite', col2: 'ISO-7 Positive Pressure', col3: '0.0 CFU Verified', status: 'Certified', done: 'Assigned CAR-T', btn: 'Assign Admit', toast: 'Assigned HEPA Suite 9C-04 to scheduled CAR-T inpatient admission.' },
+          { id: 'WARD-SD', col1: 'Telemetry Step-Down Wing East', col2: '8 Morning Discharges', col3: 'Med-Rec Complete', status: 'Turning Over', done: 'EVS Dispatched', btn: 'Dispatch EVS', toast: 'Priority environmental turnover crew dispatched to Step-Down East.' },
+          { id: 'STAFF-RN', col1: 'Float Pool Critical Care RNs', col2: '4 CCRN Specialists', col3: '19:00 Shift Cover', status: 'Available', done: 'Allocated 4A/7B', btn: 'Balance Shift', toast: 'Allocated 4 CCRN float specialists across Units 4A and 7B.' }
+        ]
+      },
+      'Pharmacy Lab': {
+        badge: 'AUTOMATED BIOMARKER & IV ROBOTICS',
+        title: 'Precision Pharmacy & Core Lab Analyzer Hub',
+        subtitle: 'Pneumatic tube STAT biomarker turnaround, AI renal/genomic dose adjustment, and robotic IV compounding.',
+        kpis: [
+          { label: 'Biomarker Throughput', val: '1,290 / hr', delta: '+19.4% Auto', tone: 'teal', sub: 'hs-Troponin · Lactate · CBC' },
+          { label: 'STAT Troponin Turnaround', val: '11.2 min', delta: ' Vein-to-EHR', tone: 'cerulean', sub: 'SLA ceiling: 20.0 min' },
+          { label: 'AI Dosing Interventions', val: '46 Today', delta: '100% Accepted', tone: 'teal', sub: 'eGFR & CYP2C19 pharmacogenomics' },
+          { label: 'Robotic IV Compounding', val: '99.98%', delta: 'Gravimetric Ver.', tone: 'cerulean', sub: 'USP <797> cleanroom robotics' }
+        ],
+        visualTitle: 'Analyzer Line Utilization & STAT SLA Attainment',
+        visualSub: 'Real-time sample processing velocity across core pathology & cleanroom lines',
+        curve: 'M 14,94 C 80,80 146,62 214,46 C 280,32 336,24 388,16',
+        bars: [
+          { name: 'High-Sensitivity Cardiac & Sepsis Immunoassay', pct: 95, val: '11.2m TAT · 99.8% Within SLA', color: '#0D9488' },
+          { name: 'Automated Hematology & Coagulation Track', pct: 91, val: '8.4m TAT · Auto-Diff Vision', color: '#0284C7' },
+          { name: 'USP <797> Vasopressor & Chemo IV Robotics', pct: 89, val: 'Barcode + Gravimetric 100%', color: '#0369A1' },
+          { name: 'Antimicrobial Stewardship MIC Susceptibility', pct: 93, val: 'Rapid MALDI-TOF 4.5h Narrowing', color: '#14B8A6' }
+        ],
+        tableTitle: 'STAT Lab Panels & Clinical Pharmacist Verification Queue',
+        actionCol: 'Pharm/Lab Op',
+        rows: [
+          { id: 'RX-401', col1: 'Heparin Weight-Based Infusion', col2: 'Marcus Vance · ICU-04', col3: 'Anti-Xa 0.48 IU/mL', status: 'Staged P1', done: 'Verified & Sent', btn: 'Verify Smart-Pump', toast: 'Pushed pharmacist-verified heparin rate to ICU-04 smart infusion pump.' },
+          { id: 'LB-812', col1: 'Serial hs-Troponin-I + Lactate', col2: 'Cardiology ICU Batch (14)', col3: 'TAT 10.8 min', status: 'Resulted', done: 'Auto-Posted EHR', btn: 'Release Batch', toast: 'Released 14 validated hs-Troponin & lactate panels to flowsheet.' },
+          { id: 'RX-409', col1: 'Vancomycin AUC/MIC Bayesian Dose', col2: 'eGFR 48 mL/min Adjusted', col3: 'AUC Target 460', status: 'Dose Tuned', done: 'Signed PharmD', btn: 'Approve Regimen', toast: 'Bayesian AUC-guided vancomycin regimen signed by ICU PharmD.' },
+          { id: 'LB-819', col1: 'Rapid Blood Culture MALDI-TOF', col2: 'Sepsis Rule-Out · Bed 16', col3: 'Negative @ 24h', status: 'De-Escalate', done: 'Stewardship Sent', btn: 'Flag De-Escal.', toast: 'Sent antibiotic de-escalation recommendation to attending rounding list.' },
+          { id: 'RX-415', col1: 'Tocilizumab CRS Rescue Standby', col2: 'Unit 9C CAR-T Pyxis', col3: '4 Vials Chilled', status: 'Stocked 100%', done: 'Lot Verified', btn: 'Audit Pyxis', toast: 'Verified cold-chain temperature & lot expiry inside Unit 9C Pyxis.' }
+        ]
+      },
+      'HIPAA Logs': {
+        badge: 'HITRUST CSF · FIPS 140-3 ENCLAVE',
+        title: 'Zero-Trust HIPAA Security & HL7 FHIR Audit Ledger',
+        subtitle: 'End-to-end AES-256-GCM PHI encryption, FIDO2 biometric clinician sign-offs, and immutable access logs.',
+        kpis: [
+          { label: 'FHIR R4 Broker Latency', val: '11.4 ms', delta: 'mTLS 1.3 Strict', tone: 'cerulean', sub: '42,800 HL7 messages/sec' },
+          { label: 'PHI Unauthorized Leaks', val: '0 Events', delta: '100% Enclave', tone: 'teal', sub: 'Confidential GPU de-ident ON' },
+          { label: 'FIDO2 Clinician Auth', val: '100%', delta: 'Badge Tap + Bio', tone: 'teal', sub: 'Zero password-only sessions' },
+          { label: 'Immutable Audit Hashes', val: '8.94M', delta: 'SHA-3 Chained', tone: 'cerulean', sub: '6-year HIPAA retention vault' }
+        ],
+        visualTitle: 'Enclave Attestation & Access Policy Compliance',
+        visualSub: 'Continuous cryptographic verification across EHR, PACS, and bedside IoT',
+        curve: 'M 14,84 C 82,74 148,60 214,46 C 280,34 336,24 388,18',
+        bars: [
+          { name: 'HL7 FHIR R4 / DICOMweb TLS 1.3 Encryption', pct: 100, val: '100% FIPS 140-3 Cipher Suites', color: '#0284C7' },
+          { name: 'AI Inference Automatic PHI De-Identification', pct: 100, val: 'Safe Harbor 18 Identifiers Scrubbed', color: '#0D9488' },
+          { name: 'Bedside Medical IoT Micro-Segmentation', pct: 99, val: '99.6% NAC Device Cert Pinned', color: '#0369A1' },
+          { name: 'Break-Glass Emergency Chart Access Review', pct: 100, val: '100% Co-Reviewed Within 4h', color: '#14B8A6' }
+        ],
+        tableTitle: 'Real-Time HIPAA Access & Cryptographic Attestation Log',
+        actionCol: 'Security Op',
+        rows: [
+          { id: 'HIP-901', col1: 'DICOMweb Confidential GPU Enclave', col2: 'Aether Vision 3D Worker', col3: 'Zero-PHI RAM Wipe', status: 'Attested', done: 'Quote Verified', btn: 'Verify SGX/SEV', toast: 'Hardware enclave cryptographic attestation quote verified intact.' },
+          { id: 'HIP-904', col1: 'Epic / Cerner FHIR R4 Event Mesh', col2: 'Bi-Directional mTLS 1.3', col3: '11.4ms · 0 Drops', status: 'Encrypted', done: 'Cert Rotated', btn: 'Rotate mTLS', toast: 'Zero-downtime mTLS leaf certificate rotation completed across FHIR brokers.' },
+          { id: 'HIP-908', col1: 'Emergency Trauma Break-Glass #12', col2: 'Attending MD · ED Trauma', col3: 'FIDO2 Co-Signed', status: 'Authorized', done: 'Compliance Logged', btn: 'Sign Audit', toast: 'Emergency trauma chart access countersigned and archived to HIPAA log.' },
+          { id: 'HIP-912', col1: 'Wireless ICU Patch VLAN Quarantine', col2: '348 IEEE 11073 Sensors', col3: 'Zero Lateral Traffic', status: 'Isolated', done: 'NAC Scanned', btn: 'Run NAC Scan', toast: 'Completed passive medical-IoT posture scan with zero rogue endpoints.' },
+          { id: 'HIP-917', col1: 'HITRUST CSF Quarterly Evidence Pack', col2: 'Immutable WORM Storage', col3: 'SHA-3 Verified', status: 'Ready', done: 'Exported CISO', btn: 'Export Report', toast: 'Exported signed HITRUST CSF & HIPAA Security Rule compliance report.' }
+        ]
+      }
+    };
+
+    function renderMedSubpage(label) {
+      const cfg = MED_SUBPAGES[label];
+      const subEl = document.getElementById('tabSubpageView');
+      if (!cfg || !subEl) return;
+
+      const dept = DEPARTMENTS[activeDept];
+      const toneMap = {
+        cerulean: 'bg-cerulean/10 text-cerulean border border-cerulean/20',
+        teal: 'bg-vitalTeal/10 text-vitalTeal border border-vitalTeal/20',
+        rose: 'bg-alertRose/10 text-alertRose border border-alertRose/25'
+      };
+
+      subEl.innerHTML = `
+        <!-- Sub-page Pearl-Glass Header -->
+        <section class="pearl-glass rounded-[28px] p-5 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold uppercase bg-cerulean/10 text-cerulean border border-cerulean/20">${cfg.badge}</span>
+                <span id="medSubUnitCode" class="text-xs font-mono text-slateClin">${dept.unitCode}</span>
+              </div>
+              <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-navyClin mt-2 tracking-tight">${cfg.title}</h1>
+              <p class="text-sm text-slateClin mt-1 max-w-3xl">${cfg.subtitle}</p>
+            </div>
+            <button type="button" onclick="returnToMedOverview()" class="px-4 py-2.5 rounded-2xl clinical-tray hover:bg-white text-xs sm:text-sm font-semibold text-navyClin transition inline-flex items-center gap-2 shrink-0">
+              <svg class="w-4 h-4 text-cerulean" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>
+              <span>&larr; Overview</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 4 Clinical KPI Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+          ${cfg.kpis.map(k => `
+            <article class="pearl-glass pearl-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slateClin">${k.label}</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-mono font-bold ${toneMap[k.tone] || toneMap.cerulean}">${k.delta}</span>
+              </div>
+              <div class="mt-3 font-mono font-bold text-2xl sm:text-[28px] text-navyClin tabular-nums">${k.val}</div>
+              <p class="mt-2 pt-2 border-t border-slate-200/70 text-xs text-slateClin font-medium">${k.sub}</p>
+            </article>
+          `).join('')}
+        </section>
+
+        <!-- Clinical SVG Visual + Interactive 5-Row Protocol Table -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-5 pearl-glass rounded-[28px] p-5 sm:p-6 flex flex-col justify-between">
+            <div>
+              <h2 class="font-display font-bold text-lg text-navyClin">${cfg.visualTitle}</h2>
+              <p class="text-xs text-slateClin mt-0.5">${cfg.visualSub}</p>
+
+              <div class="mt-4 clinical-tray rounded-2xl p-4">
+                <div class="flex items-center justify-between text-xs font-mono mb-2">
+                  <span class="text-navyClin font-semibold">HL7 FHIR LIVE STREAM</span>
+                  <span class="text-vitalTeal font-bold">${dept.concordance}</span>
+                </div>
+                <svg class="w-full h-28 overflow-visible" viewBox="0 0 400 105">
+                  <line x1="14" y1="24" x2="388" y2="24" stroke="rgba(2,132,199,0.10)" stroke-dasharray="4 4"/>
+                  <line x1="14" y1="56" x2="388" y2="56" stroke="rgba(2,132,199,0.10)" stroke-dasharray="4 4"/>
+                  <line x1="14" y1="92" x2="388" y2="92" stroke="rgba(15,23,42,0.14)"/>
+                  <path class="ecg-live-trace" d="${cfg.curve}" fill="none" stroke="#0D9488" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+
+              <div class="mt-5 space-y-3.5">
+                ${cfg.bars.map(b => `
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-semibold text-navyClin truncate pr-2">${b.name}</span>
+                      <span class="font-mono text-slateClin tabular-nums">${b.val}</span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-slate-200/80 overflow-hidden">
+                      <div class="h-full rounded-full transition-all duration-500" style="width: ${b.pct}%; background-color: ${b.color};"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 pearl-glass rounded-[28px] p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="font-display font-bold text-lg text-navyClin">${cfg.tableTitle}</h2>
+                <p class="text-xs text-slateClin mt-0.5">FIDO2 authenticated clinical actions synchronized with hospital EHR</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-cerulean/10 text-cerulean">5 Active Records</span>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white/85">
+              <table class="w-full text-left text-sm">
+                <thead class="border-b border-slate-200/80 bg-pearl/90 text-xs font-mono uppercase text-slateClin">
+                  <tr>
+                    <th class="px-4 py-3">Patient / Node</th>
+                    <th class="px-4 py-3">Clinical Detail</th>
+                    <th class="px-4 py-3">Telemetry</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3 text-right">${cfg.actionCol}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200/70 text-xs">
+                  ${cfg.rows.map((r, i) => `
+                    <tr class="hover:bg-white transition">
+                      <td class="px-4 py-3.5">
+                        <div class="font-semibold text-sm text-navyClin">${r.col1}</div>
+                        <div class="font-mono text-slateClin">${r.id}</div>
+                      </td>
+                      <td class="px-4 py-3.5 text-slateClin">${r.col2}</td>
+                      <td class="px-4 py-3.5 font-mono font-semibold text-navyClin tabular-nums">${r.col3}</td>
+                      <td class="px-4 py-3.5">
+                        <span id="medSubState-${i}" class="inline-flex px-2.5 py-0.5 rounded-full font-mono font-semibold bg-cerulean/10 text-cerulean">${r.status}</span>
+                      </td>
+                      <td class="px-4 py-3.5 text-right">
+                        <button type="button" data-med-row="${i}" class="med-sub-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-navyClin hover:border-cerulean hover:bg-cerulean hover:text-white transition">
+                          ${r.btn}
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
+
+      subEl.querySelectorAll('.med-sub-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.getAttribute('data-med-row'), 10);
+          const row = cfg.rows[idx];
+          const stEl = document.getElementById('medSubState-' + idx);
+          if (row && stEl) {
+            stEl.textContent = row.done;
+            stEl.className = 'inline-flex px-2.5 py-0.5 rounded-full font-mono font-semibold bg-vitalTeal/15 text-vitalTeal';
+            btn.textContent = 'Signed';
+            btn.className = 'med-sub-btn px-3 py-1.5 rounded-xl bg-vitalTeal/10 border border-vitalTeal/25 text-xs font-semibold text-vitalTeal';
+            showClinicalToast(row.toast);
+          }
+        });
+      });
+    }
+
+    function returnToMedOverview() {
+      const firstRail = document.querySelector('.rail-item');
+      if (firstRail) {
+        selectRailNav(firstRail, 'Clinical Command', '#sec-hero');
+      }
+    }
+
+    function selectRailNav(btn, label, selector) {
+      document.querySelectorAll('.rail-item').forEach(el => {
+        el.classList.remove('active');
+        el.classList.add('text-slateClin');
+      });
+      btn.classList.add('active');
+      btn.classList.remove('text-slateClin');
+      document.getElementById('topModuleCrumb').textContent = label;
+
+      if (window.innerWidth < 1024 && document.body.classList.contains('mobile-rail-open')) {
+        toggleMobileRail();
+      }
+
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+      if (label === 'Clinical Command' || !MED_SUBPAGES[label]) {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderMedSubpage(label);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Hero Bio-Glass 3D Tilt & Specular Sheen
+    const bioHero = document.getElementById('bioHeroCard');
+    bioHero.addEventListener('mousemove', (e) => {
+      const r = bioHero.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      const rotY = ((x / r.width) - 0.5) * 4.0;
+      const rotX = (0.5 - (y / r.height)) * 3.4;
+
+      bioHero.style.setProperty('--mx', ((x / r.width) * 100).toFixed(1) + '%');
+      bioHero.style.setProperty('--my', ((y / r.height) * 100).toFixed(1) + '%');
+      bioHero.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+    });
+    bioHero.addEventListener('mouseleave', () => {
+      bioHero.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+
+    // Clinical Data Flow Stage Selection
+    function selectClinicalNode(idx) {
+      document.querySelectorAll('.clin-node').forEach((node, i) => {
+        node.classList.toggle('active-clin-node', i === idx);
+      });
+      const st = CLINICAL_STAGES[idx];
+      document.getElementById('clinStageCode').textContent = st.code;
+      document.getElementById('clinStageTitle').textContent = st.title;
+      document.getElementById('clinStageBadge').textContent = st.badge;
+      document.getElementById('clinStageDesc').textContent = st.desc;
+      document.getElementById('clinStageEnc').textContent = st.enc;
+      document.getElementById('clinStageLat').textContent = st.lat;
+      document.getElementById('clinStageThr').textContent = st.thr;
+      document.getElementById('clinStageHash').textContent = st.hash;
+    }
+
+    // Smooth Curve Builder
+    function smoothClinicalCurve(pts) {
+      if (!pts.length) return '';
+      let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i === 0 ? i : i - 1];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    let medChartPoints = [];
+
+    function renderOutcomeChart() {
+      const cfg = DEPARTMENTS[activeDept].outcomes[activeRange];
+      const xStart = 58;
+      const xEnd = 648;
+      const yTop = 26;
+      const yBottom = 250;
+      const ySpan = yBottom - yTop;
+      const stepX = (xEnd - xStart) / (cfg.labels.length - 1);
+
+      document.getElementById('outcomeSummaryStat').textContent = cfg.summary;
+
+      const pts = cfg.stability.map((val, i) => {
+        const norm = (val - 40) / 60; // 40% to 100% scale
+        return {
+          x: xStart + i * stepX,
+          y: yBottom - norm * ySpan,
+          stab: val,
+          intv: cfg.interventions[i],
+          risk: cfg.risk[i],
+          label: cfg.labels[i]
+        };
+      });
+      medChartPoints = pts;
+
+      // Render Intervention Bars
+      const barGroup = document.getElementById('medChartBars');
+      barGroup.innerHTML = pts.map(p => {
+        const barH = (p.intv / 40) * (ySpan * 0.62);
+        const by = yBottom - barH;
+        return `<rect x="${(p.x - 13).toFixed(1)}" y="${by.toFixed(1)}" width="26" height="${barH.toFixed(1)}" rx="6" fill="url(#tealBarGrad)" stroke="#0D9488" stroke-opacity="0.35" />`;
+      }).join('');
+
+      const lineD = smoothClinicalCurve(pts);
+      document.getElementById('medStabilityLine').setAttribute('d', lineD);
+      document.getElementById('medStabilityArea').setAttribute('d', `${lineD} L ${xEnd} ${yBottom} L ${xStart} ${yBottom} Z`);
+
+      document.getElementById('medXLabels').innerHTML = pts
+        .map(p => `<text x="${p.x.toFixed(1)}" y="271">${p.label}</text>`)
+        .join('');
+    }
+
+    // Outcome Chart Hover Crosshair
+    const medHitbox = document.getElementById('medChartHitbox');
+    const medCross = document.getElementById('medCrosshair');
+    const medTip = document.getElementById('medChartTooltip');
+    const medWrap = document.getElementById('medChartContainer');
+
+    medHitbox.addEventListener('mousemove', (e) => {
+      if (!medChartPoints.length) return;
+      const rect = medHitbox.getBoundingClientRect();
+      const svgX = ((e.clientX - rect.left) / rect.width) * 622 + 42;
+
+      let closest = medChartPoints[0];
+      let best = Math.abs(svgX - closest.x);
+      for (const pt of medChartPoints) {
+        const d = Math.abs(svgX - pt.x);
+        if (d < best) {
+          best = d;
+          closest = pt;
+        }
+      }
+
+      document.getElementById('medCrossLine').setAttribute('x1', closest.x);
+      document.getElementById('medCrossLine').setAttribute('x2', closest.x);
+      document.getElementById('medCrossDot').setAttribute('cx', closest.x);
+      document.getElementById('medCrossDot').setAttribute('cy', closest.y);
+
+      medCross.classList.remove('opacity-0');
+      medTip.classList.remove('opacity-0');
+
+      document.getElementById('medTtTime').textContent = closest.label;
+      document.getElementById('medTtRisk').textContent = 'Risk ' + closest.risk;
+      document.getElementById('medTtStab').textContent = closest.stab.toFixed(1) + '%';
+      document.getElementById('medTtIntv').textContent = closest.intv + ' Alerts';
+
+      const wRect = medWrap.getBoundingClientRect();
+      const px = (closest.x / 680) * wRect.width;
+      medTip.style.left = Math.min(Math.max(12, px - 100), wRect.width - 214) + 'px';
+    });
+
+    medHitbox.addEventListener('mouseleave', () => {
+      medCross.classList.add('opacity-0');
+      medTip.classList.add('opacity-0');
+    });
+
+    function switchOutcomeRange(range) {
+      activeRange = range;
+      document.querySelectorAll('.range-tab').forEach(btn => {
+        const act = btn.dataset.range === range;
+        btn.className = act
+          ? 'range-tab px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-white text-navyClin shadow-2xs transition'
+          : 'range-tab px-3 py-1 rounded-lg text-xs font-mono font-medium text-slateClin hover:text-navyClin transition';
+      });
+      renderOutcomeChart();
+    }
+
+    // Triage Queue Rendering & Filtering
+    function renderTriageQueue() {
+      const q = searchQuery.trim().toLowerCase();
+      const filtered = triagePatients.filter(item => {
+        const matchesTab = activeFilter === 'all' || item.priority === activeFilter;
+        const matchesQuery = !q ||
+          item.name.toLowerCase().includes(q) ||
+          item.mrn.toLowerCase().includes(q) ||
+          item.modality.toLowerCase().includes(q);
+        return matchesTab && matchesQuery;
+      });
+
+      const p1Total = triagePatients.filter(p => p.priority === 'p1').length;
+      document.getElementById('railP1Badge').textContent = `${p1Total} P1`;
+      document.getElementById('queueCountPill').textContent = `${filtered.length} ${filtered.length === 1 ? 'Scan' : 'Scans'}`;
+
+      const listEl = document.getElementById('triageQueueList');
+      if (!filtered.length) {
+        listEl.innerHTML = `
+          <div class="clinical-tray rounded-2xl p-6 text-center text-xs text-slateClin">
+            No matching scans in current filter.
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(p => {
+        const isP1 = p.priority === 'p1';
+        const pillCls = isP1
+          ? 'bg-alertRose/10 text-alertRose border border-alertRose/25'
+          : 'bg-vitalTeal/10 text-vitalTeal border border-vitalTeal/20';
+        const pillText = isP1 ? 'PRIORITY 1' : 'AI CLEARED';
+        const barColor = isP1 ? '#E11D48' : '#0D9488';
+
+        return `
+          <div onclick="openPatientModal('${p.id}')" class="cursor-pointer rounded-2xl bg-white/85 hover:bg-white border border-slate-200/80 hover:border-cerulean/40 p-3.5 transition shadow-2xs">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-display font-bold text-xs sm:text-sm text-navyClin">${p.name}</span>
+                  <span class="font-mono text-[12.5px] text-slateClin">${p.mrn}</span>
+                </div>
+                <p class="text-[12.5px] text-slateClin mt-0.5">${p.modality}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-xs font-mono font-bold shrink-0 ${pillCls}">${pillText}</span>
+            </div>
+
+            <div class="mt-2.5 flex items-center justify-between gap-3">
+              <div class="flex-1">
+                <div class="flex items-center justify-between text-xs font-mono mb-1">
+                  <span class="text-slateClin">AI Confidence</span>
+                  <span class="font-bold text-navyClin tabular-nums">${p.conf.toFixed(1)}%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-200/80 overflow-hidden">
+                  <div class="h-full rounded-full" style="width: ${p.conf}%; background-color: ${barColor};"></div>
+                </div>
+              </div>
+              <div class="text-right font-mono text-[12.5px] tabular-nums pl-2 border-l border-slate-200">
+                <div class="${isP1 ? 'text-alertRose font-bold' : 'text-navyClin font-semibold'}">${p.hr}</div>
+                <div class="text-cerulean">${p.spo2} SpO2</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setTriageFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll('.triage-pill').forEach(btn => {
+        const act = btn.dataset.filter === filter;
+        btn.classList.toggle('bg-white', act);
+        btn.classList.toggle('text-navyClin', act);
+        btn.classList.toggle('shadow-2xs', act);
+        btn.classList.toggle('font-semibold', act);
+        btn.classList.toggle('text-slateClin', !act);
+        btn.classList.toggle('font-medium', !act);
+      });
+      renderTriageQueue();
+    }
+
+    function handlePatientSearch(val) {
+      searchQuery = val;
+      renderTriageQueue();
+    }
+
+    // Patient Modal Inspection & Sign-Off
+    function openPatientModal(id) {
+      const p = triagePatients.find(item => item.id === id);
+      if (!p) return;
+      selectedPatientId = id;
+
+      const badge = document.getElementById('pmPriorityBadge');
+      if (p.priority === 'p1') {
+        badge.textContent = 'PRIORITY 1 · CRITICAL';
+        badge.className = 'px-2 py-0.5 rounded-full text-[12.5px] font-mono font-bold bg-alertRose/10 text-alertRose';
+      } else {
+        badge.textContent = 'AI CLEARED';
+        badge.className = 'px-2 py-0.5 rounded-full text-[12.5px] font-mono font-bold bg-vitalTeal/10 text-vitalTeal';
+      }
+
+      document.getElementById('pmMrn').textContent = p.mrn;
+      document.getElementById('pmName').textContent = p.name;
+      document.getElementById('pmScanModality').textContent = p.modality;
+      document.getElementById('pmHr').textContent = p.hr;
+      document.getElementById('pmSpo2').textContent = p.spo2;
+      document.getElementById('pmBp').textContent = p.bp;
+      document.getElementById('pmConf').textContent = p.conf.toFixed(1) + '%';
+      document.getElementById('pmFinding').textContent = p.finding;
+
+      const m = document.getElementById('patientModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closePatientModal() {
+      const m = document.getElementById('patientModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function markPatientCleared() {
+      const p = triagePatients.find(item => item.id === selectedPatientId);
+      if (p) {
+        p.priority = 'cleared';
+        p.hr = '74 BPM';
+        p.spo2 = '99%';
+        renderTriageQueue();
+        showClinicalToast(`Signed clinical protocol for ${p.name}`);
+      }
+      closePatientModal();
+    }
+
+    // Admit Triage Modal
+    function openAdmitModal() {
+      const m = document.getElementById('admitModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeAdmitModal() {
+      const m = document.getElementById('admitModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function submitAdmitTriage(e) {
+      e.preventDefault();
+      const name = document.getElementById('admitName').value.trim();
+      const scan = document.getElementById('admitScan').value;
+      const priority = document.getElementById('admitPriority').value;
+      const note = document.getElementById('admitNote').value.trim();
+
+      const newMrn = 'MRN-' + Math.floor(30000 + Math.random() * 65000);
+      triagePatients.unshift({
+        id: 'PT-' + Date.now(),
+        mrn: newMrn,
+        name: name,
+        modality: `${scan} · Direct Admit`,
+        priority: priority,
+        conf: 99.2,
+        hr: priority === 'p1' ? '112 BPM' : '72 BPM',
+        spo2: priority === 'p1' ? '94%' : '99%',
+        bp: priority === 'p1' ? '148/92' : '120/78',
+        finding: note
+      });
+
+      e.target.reset();
+      closeAdmitModal();
+      renderTriageQueue();
+      showClinicalToast(`Admitted ${name} (${newMrn}) to AI Radiology stream.`);
+    }
+
+    // Department Switcher
+    function switchDepartment(deptKey) {
+      activeDept = deptKey;
+      const d = DEPARTMENTS[deptKey];
+
+      document.querySelectorAll('.dept-tab').forEach(btn => {
+        const act = btn.dataset.dept === deptKey;
+        btn.classList.toggle('bg-white', act);
+        btn.classList.toggle('text-navyClin', act);
+        btn.classList.toggle('shadow-2xs', act);
+        btn.classList.toggle('font-semibold', act);
+        btn.classList.toggle('text-slateClin', !act);
+        btn.classList.toggle('font-medium', !act);
+      });
+
+      document.getElementById('heroConcordanceBadge').textContent = d.concordance;
+      document.getElementById('heroUnitCode').textContent = d.unitCode;
+      document.getElementById('heroClinicalDesc').textContent = d.desc;
+      document.getElementById('heroBpm').textContent = d.bpm;
+      document.getElementById('heroSpo2').textContent = d.spo2;
+      document.getElementById('heroMapStat').textContent = d.mapStat;
+
+      document.getElementById('kpiPatVal').textContent = d.kpis.patVal;
+      document.getElementById('kpiPatDelta').textContent = d.kpis.patDelta;
+      document.getElementById('kpiPatSub').textContent = d.kpis.patSub;
+      document.getElementById('kpiTurnVal').textContent = d.kpis.turnVal;
+      document.getElementById('kpiTurnPct').textContent = d.kpis.turnPct;
+      document.getElementById('kpiTurnSub').textContent = d.kpis.turnSub;
+      document.getElementById('kpiBedVal').textContent = d.kpis.bedVal;
+      document.getElementById('kpiBedDelta').textContent = d.kpis.bedDelta;
+      document.getElementById('kpiBedSub').textContent = d.kpis.bedSub;
+      document.getElementById('kpiLabVal').textContent = d.kpis.labVal;
+      document.getElementById('kpiLabSub').textContent = d.kpis.labSub;
+      const medSubUnit = document.getElementById('medSubUnitCode');
+      if (medSubUnit) medSubUnit.textContent = d.unitCode;
+
+      renderOutcomeChart();
+      showClinicalToast(`Switched telemetry command to ${d.label}`);
+    }
+
+    let clinToastTimeout = null;
+    function showClinicalToast(msg) {
+      const el = document.getElementById('clinToast');
+      document.getElementById('clinToastText').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(clinToastTimeout);
+      clinToastTimeout = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-3');
+      }, 3100);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      selectClinicalNode(0);
+      renderOutcomeChart();
+      renderTriageQueue();
+    });
+  </script>
+</body>
+</html>

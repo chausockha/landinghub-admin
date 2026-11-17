@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MONOBASE UI — Swiss Minimalist B2B Customer &amp; Seat Directory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', '"Inter"', 'sans-serif'],
+            grotesk: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvasNeutral: '#FCFCFD',
+            borderCrisp: '#EAECF0',
+            borderInput: '#D0D5DD',
+            inkPrimary: '#101828',
+            inkSecondary: '#475467',
+            inkTertiary: '#344054',
+            indigoRoyal: '#4F46E5',
+            indigoSoft: '#EEF2FF',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #FCFCFD;
+      color: #101828;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    .mono-surface {
+      background: #FFFFFF;
+      border: 1px solid #EAECF0;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      transition: border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mono-surface-hover:hover {
+      border-color: #D0D5DD;
+      box-shadow: 0 6px 18px -4px rgba(16, 24, 40, 0.06);
+    }
+
+    /* Collapsible Sidebar: 268px <-> 78px on Desktop */
+    .sidebar-rail {
+      width: 268px;
+      background-color: #FFFFFF;
+      border-right: 1px solid #EAECF0;
+      transition: width 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .workspace-shell {
+      transition: padding-left 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (min-width: 1024px) {
+      body:not(.rail-collapsed) .workspace-shell {
+        padding-left: 268px;
+      }
+      body.rail-collapsed .sidebar-rail {
+        width: 78px;
+      }
+      body.rail-collapsed .workspace-shell {
+        padding-left: 78px;
+      }
+      body.rail-collapsed .rail-hide {
+        display: none !important;
+      }
+      body.rail-collapsed .rail-center {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+
+    .mono-checkbox {
+      width: 17px;
+      height: 17px;
+      border-radius: 5px;
+      border: 1px solid #D0D5DD;
+      accent-color: #4F46E5;
+      cursor: pointer;
+    }
+
+    /* Kinetic Data Visualization Transitions */
+    .license-bar-fill {
+      width: 0%;
+      transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes monoBeacon {
+      0% { transform: scale(1); opacity: 0.75; }
+      80%, 100% { transform: scale(2.3); opacity: 0; }
+    }
+
+    .mono-beacon-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: monoBeacon 2.3s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes areaReveal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .spark-area-reveal {
+      animation: areaReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes metricPulse {
+      0% { color: #4F46E5; }
+      100% { color: #101828; }
+    }
+
+    .metric-tick {
+      animation: metricPulse 0.65s ease-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-indigo-500/10 selection:text-indigo-900">
+
+  <!-- Floating Sparkline Tooltip -->
+  <div id="sparkTooltip" class="pointer-events-none fixed z-50 hidden px-2.5 py-1.5 rounded-lg bg-[#101828] text-white font-mono text-xs font-medium shadow-xl border border-white/10 -translate-x-1/2 -translate-y-full"></div>
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm hidden lg:hidden" onclick="closeMobileDrawer()"></div>
+
+  <!-- LEFT WHITE MINIMAL SIDEBAR -->
+  <aside id="sidebar" class="sidebar-rail fixed inset-y-0 left-0 z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 select-none">
+    <!-- Top Brand + Primary Nav -->
+    <div class="p-4 space-y-6 overflow-y-auto">
+      <!-- Brand Logo Row -->
+      <div class="rail-center flex items-center justify-between px-2 pt-1">
+        <a href="#" onclick="selectSidebarNav('Customers'); return false;" class="flex items-center gap-3">
+          <!-- Geometric Cube SVG Logo -->
+          <div class="w-9 h-9 rounded-lg bg-[#101828] text-white flex items-center justify-center shrink-0 shadow-sm">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+          </div>
+          <div class="rail-hide flex flex-col">
+            <span class="font-display font-bold text-[15px] tracking-tight text-[#101828] leading-tight">Monobase UI</span>
+            <span class="text-xs text-[#475467]">Enterprise Directory</span>
+          </div>
+        </a>
+
+        <button type="button" onclick="closeMobileDrawer()" class="lg:hidden w-10 h-10 rounded-lg text-[#475467] hover:bg-slate-100 flex items-center justify-center" aria-label="Close sidebar">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Primary Navigation -->
+      <nav aria-label="Primary Sidebar" class="space-y-1">
+        <button type="button" data-side="Customers" onclick="selectSidebarNav('Customers')" title="Customers" class="side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-semibold bg-[#EEF2FF] text-[#4F46E5] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#4F46E5] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 00-3-3.87" />
+              <path d="M16 3.13a4 4 0 010 7.75" />
+            </svg>
+            <span class="rail-hide">Customers</span>
+          </span>
+        </button>
+
+        <button type="button" data-side="Workspaces" onclick="selectSidebarNav('Workspaces')" title="Workspaces" class="side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1V9.5z" />
+            </svg>
+            <span class="rail-hide">Workspaces</span>
+          </span>
+        </button>
+
+        <button type="button" data-side="Projects" onclick="selectSidebarNav('Projects')" title="Projects" class="side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
+            <span class="rail-hide">Projects</span>
+          </span>
+        </button>
+
+        <button type="button" data-side="Tasks" onclick="selectSidebarNav('Tasks')" title="Tasks" class="side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            <span class="rail-hide">Tasks</span>
+          </span>
+          <span class="rail-hide px-2 py-0.5 rounded-full bg-[#F2F4F7] text-[#344054] text-xs font-medium">10</span>
+        </button>
+
+        <button type="button" data-side="Reporting" onclick="selectSidebarNav('Reporting')" title="Reporting" class="side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 118 2.83" />
+              <path d="M22 12A10 10 0 0012 2v10z" />
+            </svg>
+            <span class="rail-hide">Reporting</span>
+          </span>
+        </button>
+
+        <button type="button" data-side="Users" onclick="selectSidebarNav('Users')" title="Users" class="side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+            <span class="rail-hide">Users</span>
+          </span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Bottom Secondary Nav + Bordered User Profile Card -->
+    <div class="p-4 space-y-3 border-t border-[#EAECF0]">
+      <div class="space-y-1">
+        <button type="button" data-side="Notifications" onclick="selectSidebarNav('Notifications')" title="Notifications" class="side-nav-btn rail-center w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="rail-hide">Notifications</span>
+          </span>
+          <span class="rail-hide px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F46E5] text-xs font-semibold">4</span>
+        </button>
+
+        <button type="button" data-side="Support" onclick="selectSidebarNav('Support')" title="Support" class="side-nav-btn rail-center w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span class="rail-hide">Support</span>
+          </span>
+        </button>
+
+        <button type="button" data-side="Settings" onclick="selectSidebarNav('Settings')" title="Settings" class="side-nav-btn rail-center w-full min-h-[40px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+            </svg>
+            <span class="rail-hide">Settings</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Bordered User Profile Card -->
+      <div onclick="notifyToast('Workspace owner: Frankie Sullivan (@frankie)')" class="rail-center border border-[#EAECF0] rounded-xl p-2.5 flex items-center justify-between gap-2.5 hover:bg-[#F9FAFB] cursor-pointer transition-colors">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="relative shrink-0">
+            <div class="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#4F46E5] border border-indigo-200 font-semibold text-xs flex items-center justify-center">
+              FS
+            </div>
+            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+          </div>
+          <div class="rail-hide min-w-0">
+            <p class="text-sm font-semibold text-[#101828] truncate">Frankie Sullivan</p>
+            <p class="text-xs text-[#475467] truncate">@frankie</p>
+          </div>
+        </div>
+        <svg class="rail-hide w-4 h-4 text-[#667085] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="workspace-shell min-h-screen flex flex-col">
+    <!-- Minimal Utility Topbar -->
+    <header class="sticky top-0 z-30 h-14 bg-white/95 backdrop-blur border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="toggleSidebarRail()" class="w-10 h-10 rounded-lg border border-[#EAECF0] bg-white hover:bg-[#F9FAFB] text-[#475467] hover:text-[#101828] flex items-center justify-center transition-colors" aria-label="Toggle navigation sidebar" title="Collapse or expand sidebar">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <line x1="9" y1="3" x2="9" y2="21" />
+          </svg>
+        </button>
+
+        <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm">
+          <span class="text-[#475467]">Monobase</span>
+          <svg class="w-4 h-4 text-[#D0D5DD]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="topBreadcrumb" class="font-medium text-[#101828]">Customers</span>
+        </nav>
+      </div>
+
+      <!-- Right: Live Telemetry Stream Toggle + Horizon Switcher -->
+      <div class="flex items-center gap-3">
+        <button id="monoStreamBtn" type="button" onclick="toggleMonoLiveStream()" class="hidden sm:inline-flex h-9 px-3 rounded-lg border border-indigo-200 bg-[#EEF2FF] text-[#4F46E5] text-xs font-semibold items-center gap-2 transition-colors">
+          <span class="relative flex h-2 w-2">
+            <span id="monoStreamPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-80"></span>
+            <span id="monoStreamDot" class="relative inline-flex rounded-full h-2 w-2 bg-[#4F46E5]"></span>
+          </span>
+          <span id="monoStreamText">Live Telemetry</span>
+        </button>
+
+        <div class="inline-flex p-0.5 rounded-lg bg-[#F2F4F7] border border-[#EAECF0]" role="group" aria-label="KPI Timeframe">
+          <button type="button" data-tf="12m" onclick="setMetricTimeframe('12m')" class="tf-btn h-8 px-2.5 rounded-md text-xs font-semibold bg-white text-[#101828] shadow-sm transition-all">12m</button>
+          <button type="button" data-tf="30d" onclick="setMetricTimeframe('30d')" class="tf-btn h-8 px-2.5 rounded-md text-xs font-medium text-[#475467] hover:text-[#101828] transition-all">30d</button>
+          <button type="button" data-tf="7d" onclick="setMetricTimeframe('7d')" class="tf-btn h-8 px-2.5 rounded-md text-xs font-medium text-[#475467] hover:text-[#101828] transition-all">7d</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 max-w-[1480px] w-full mx-auto space-y-6">
+      <div id="defaultDashboardView" class="space-y-6">
+
+      <!-- Page Header Row -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 id="pageTitle" class="font-display text-[28px] leading-tight font-bold text-[#101828] tracking-tight">Customers</h1>
+          <p class="text-sm text-[#475467] mt-1">Manage B2B accounts, seat allocations, and enterprise license utilization.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" onclick="openImportModal()" class="h-[42px] px-4 rounded-lg bg-white hover:bg-[#F9FAFB] border border-[#D0D5DD] text-[#344054] text-sm font-semibold inline-flex items-center gap-2 shadow-sm transition-colors">
+            <svg class="w-4 h-4 text-[#475467]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16" />
+              <line x1="12" y1="12" x2="12" y2="21" />
+              <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3" />
+            </svg>
+            <span>Import CSV</span>
+          </button>
+
+          <button type="button" onclick="openAddCustomerModal()" class="h-[42px] px-4 rounded-lg bg-[#4F46E5] hover:bg-indigo-700 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm transition-colors">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>Add customer</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Underline Navigation Tabs -->
+      <div class="border-b border-[#EAECF0] overflow-x-auto">
+        <nav class="flex items-center gap-6 min-w-max" role="tablist" aria-label="Customer Directory Views">
+          <button type="button" data-tab="Overview" onclick="switchTab('Overview')" class="dir-tab pb-3.5 text-sm font-medium border-b-2 border-transparent text-[#475467] hover:text-[#101828] transition-colors">Overview</button>
+          <button type="button" data-tab="Customer Table" onclick="switchTab('Customer Table')" class="dir-tab pb-3.5 text-sm font-semibold border-b-2 border-[#4F46E5] text-[#4F46E5] transition-colors">Customer Table</button>
+          <button type="button" data-tab="List view" onclick="switchTab('List view')" class="dir-tab pb-3.5 text-sm font-medium border-b-2 border-transparent text-[#475467] hover:text-[#101828] transition-colors">List view</button>
+          <button type="button" data-tab="Segments" onclick="switchTab('Segments')" class="dir-tab pb-3.5 text-sm font-medium border-b-2 border-transparent text-[#475467] hover:text-[#101828] transition-colors">Segments</button>
+          <button type="button" data-tab="Custom fields" onclick="switchTab('Custom fields')" class="dir-tab pb-3.5 text-sm font-medium border-b-2 border-transparent text-[#475467] hover:text-[#101828] transition-colors">Custom fields</button>
+        </nav>
+      </div>
+
+      <!-- 3 Minimalist Stat Cards with Animated Sparklines (3-column grid) -->
+      <section aria-label="Customer Metrics" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Stat 1: Total customers -->
+        <article class="mono-surface mono-surface-hover p-6 flex flex-col justify-between gap-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-[#475467]">Total customers</span>
+            <button type="button" onclick="notifyToast('Total customer cohort breakdown copied')" class="w-9 h-9 -mr-2 rounded-lg text-[#98A2B3] hover:text-[#475467] hover:bg-[#F9FAFB] flex items-center justify-center transition-colors" aria-label="Card options">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-end justify-between gap-4">
+            <div class="space-y-2">
+              <span id="statTotalCustomers" class="block font-display text-3xl font-bold text-[#101828] tracking-tight">2,420</span>
+              <span id="statTotalDelta" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>20%</span>
+              </span>
+            </div>
+            <!-- Interactive Sparkline 1 -->
+            <svg id="sparkTotal" class="w-[116px] h-[48px] overflow-visible shrink-0" viewBox="0 0 116 48" fill="none" aria-label="Total customers sparkline">
+              <defs>
+                <linearGradient id="sparkIndigoGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path id="sparkTotalArea" class="spark-area-reveal" d="" fill="url(#sparkIndigoGrad)" />
+              <path id="sparkTotalLine" d="" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round" />
+              <circle id="sparkTotalDot" cx="112" cy="8" r="3.5" fill="#4F46E5" stroke="#FFFFFF" stroke-width="1.5" />
+              <g id="sparkTotalHits"></g>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Stat 2: Active members -->
+        <article class="mono-surface mono-surface-hover p-6 flex flex-col justify-between gap-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-[#475467]">Active members</span>
+            <button type="button" onclick="notifyToast('Active seat telemetry refreshed')" class="w-9 h-9 -mr-2 rounded-lg text-[#98A2B3] hover:text-[#475467] hover:bg-[#F9FAFB] flex items-center justify-center transition-colors" aria-label="Card options">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-end justify-between gap-4">
+            <div class="space-y-2">
+              <span id="statActiveMembers" class="block font-display text-3xl font-bold text-[#101828] tracking-tight">1,210</span>
+              <span id="statMembersDelta" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>15%</span>
+              </span>
+            </div>
+            <!-- Interactive Sparkline 2 -->
+            <svg id="sparkMembers" class="w-[116px] h-[48px] overflow-visible shrink-0" viewBox="0 0 116 48" fill="none" aria-label="Active members sparkline">
+              <defs>
+                <linearGradient id="sparkEmeraldGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path id="sparkMembersArea" class="spark-area-reveal" d="" fill="url(#sparkEmeraldGrad)" />
+              <path id="sparkMembersLine" d="" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" />
+              <circle id="sparkMembersDot" cx="112" cy="10" r="3.5" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5" />
+              <g id="sparkMembersHits"></g>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Stat 3: Active right now -->
+        <article class="mono-surface mono-surface-hover p-6 flex flex-col justify-between gap-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-[#475467] inline-flex items-center gap-2">
+              <span>Active right now</span>
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+            </span>
+            <button type="button" onclick="notifyToast('Live seat sessions verified via SSO heartbeat')" class="w-9 h-9 -mr-2 rounded-lg text-[#98A2B3] hover:text-[#475467] hover:bg-[#F9FAFB] flex items-center justify-center transition-colors" aria-label="Card options">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span id="statActiveNow" class="font-display text-3xl font-bold text-[#101828] tracking-tight">316</span>
+            <!-- Overlapping 5-avatar stack -->
+            <div class="flex items-center -space-x-2">
+              <span class="w-8 h-8 rounded-full ring-2 ring-white bg-[#EEF2FF] text-[#4F46E5] text-xs font-semibold flex items-center justify-center">FS</span>
+              <span class="w-8 h-8 rounded-full ring-2 ring-white bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center">OR</span>
+              <span class="w-8 h-8 rounded-full ring-2 ring-white bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center justify-center">ana</span>
+              <span class="w-8 h-8 rounded-full ring-2 ring-white bg-amber-50 text-amber-700 text-xs font-semibold flex items-center justify-center">LK</span>
+              <span class="w-8 h-8 rounded-full ring-2 ring-white bg-[#F2F4F7] text-[#344054] text-xs font-semibold flex items-center justify-center">+12</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- MINIMALIST REAL-TIME SEAT & WEBHOOK DATA FLOW STRIP -->
+      <section aria-label="Live Seat Provisioning and Webhook Stream" class="mono-surface px-5 py-3.5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="w-9 h-9 rounded-lg bg-[#EEF2FF] text-[#4F46E5] border border-indigo-200 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-semibold text-[#101828]">Seat Provisioning &amp; Billing Sync Stream</h2>
+                <span id="monoSyncRate" class="font-mono text-xs font-medium text-[#4F46E5] bg-[#EEF2FF] px-2 py-0.5 rounded-md">428 events/min</span>
+              </div>
+              <p id="monoNodeStatus" class="text-xs text-[#475467] mt-0.5">Hover any directory node to inspect SSO &amp; license sync latency</p>
+            </div>
+          </div>
+
+          <!-- Swiss Minimalist SVG Flow with <animateMotion> Packets & Beacons -->
+          <div class="flex-1 max-w-2xl overflow-x-auto">
+            <svg class="w-full min-w-[500px] h-[58px]" viewBox="0 0 620 58" fill="none" aria-label="Seat sync packet flow">
+              <path d="M 88 29 C 140 29, 168 29, 224 29" stroke="#D0D5DD" stroke-width="1.6" stroke-dasharray="4 4" />
+              <path d="M 304 29 C 352 12, 392 12, 444 23" stroke="#C7D2FE" stroke-width="1.8" />
+              <path d="M 304 29 C 352 46, 392 46, 444 35" stroke="#A7F3D0" stroke-width="1.8" />
+              <path d="M 516 29 L 552 29" stroke="#D0D5DD" stroke-width="1.6" />
+
+              <!-- Animated Flowing Data Packets -->
+              <g id="monoFlowPackets">
+                <circle r="3.5" fill="#4F46E5">
+                  <animateMotion dur="2s" repeatCount="indefinite" path="M 88 29 C 140 29, 168 29, 224 29" />
+                </circle>
+                <circle r="3.5" fill="#4F46E5">
+                  <animateMotion dur="2.3s" begin="0.3s" repeatCount="indefinite" path="M 304 29 C 352 12, 392 12, 444 23" />
+                </circle>
+                <circle r="3.5" fill="#10B981">
+                  <animateMotion dur="2.5s" begin="0.8s" repeatCount="indefinite" path="M 304 29 C 352 46, 392 46, 444 35" />
+                </circle>
+                <circle r="3" fill="#4F46E5" opacity="0.8">
+                  <animateMotion dur="1.5s" repeatCount="indefinite" path="M 516 29 L 552 29" />
+                </circle>
+              </g>
+
+              <!-- Node 1: SSO Auth -->
+              <g class="cursor-pointer" onmouseenter="setMonoNodeInfo('SAML 2.0 / OIDC Ingress · 316 active tokens · 8.4ms verification')">
+                <circle class="mono-beacon-ring" cx="48" cy="29" r="9" fill="#4F46E5" opacity="0.2" />
+                <rect x="8" y="14" width="80" height="30" rx="8" fill="#FFFFFF" stroke="#EAECF0" stroke-width="1.5" />
+                <circle cx="21" cy="29" r="3.5" fill="#4F46E5" />
+                <text x="30" y="33" fill="#101828" font-size="12" font-weight="600">SSO Auth</text>
+              </g>
+
+              <!-- Node 2: Directory Core -->
+              <g class="cursor-pointer" onmouseenter="setMonoNodeInfo('Monobase Directory Graph · 2,420 accounts · ACID seat ledger')">
+                <circle class="mono-beacon-ring" cx="264" cy="29" r="9" fill="#4F46E5" opacity="0.2" />
+                <rect x="218" y="14" width="92" height="30" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5" />
+                <circle cx="232" cy="29" r="3.5" fill="#4F46E5" />
+                <text x="241" y="33" fill="#4F46E5" font-size="12" font-weight="600">Directory</text>
+              </g>
+
+              <!-- Node 3: License Sync -->
+              <g class="cursor-pointer" onmouseenter="setMonoNodeInfo('License Quota Engine · 71.4% avg utilization · Auto-proration ready')">
+                <circle class="mono-beacon-ring" cx="480" cy="29" r="9" fill="#10B981" opacity="0.2" />
+                <rect x="438" y="14" width="84" height="30" rx="8" fill="#FFFFFF" stroke="#EAECF0" stroke-width="1.5" />
+                <circle cx="451" cy="29" r="3.5" fill="#10B981" />
+                <text x="460" y="33" fill="#101828" font-size="12" font-weight="600">Licenses</text>
+              </g>
+
+              <!-- Node 4: Webhook Sink -->
+              <g class="cursor-pointer" onmouseenter="setMonoNodeInfo('Stripe &amp; CRM Webhooks · 99.98% delivery · 0 dead-letter events')">
+                <rect x="548" y="14" width="66" height="30" rx="8" fill="#F9FAFB" stroke="#EAECF0" stroke-width="1.5" />
+                <text x="581" y="33" text-anchor="middle" fill="#344054" font-size="12" font-weight="600">Billing</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contextual Interactive Overview Chart Panel (Shown when "Overview" tab is clicked) -->
+      <section id="overviewChartPanel" class="hidden mono-surface p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-semibold text-[#101828]">Net Seat Expansion &amp; License Utilization</h2>
+            <p class="text-sm text-[#475467]">Interactive cohort trajectory across active enterprise workspaces</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="inline-flex items-center gap-2 text-xs font-medium text-[#475467]">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#4F46E5]"></span>Active Seats
+            </span>
+            <span class="inline-flex items-center gap-2 text-xs font-medium text-[#475467]">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>Provisioned Quota
+            </span>
+            <button type="button" onclick="switchTab('Customer Table')" class="h-10 px-3.5 rounded-lg border border-[#EAECF0] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054]">
+              Return to Customer Table
+            </button>
+          </div>
+        </div>
+
+        <div class="relative select-none">
+          <div id="overviewTooltip" class="pointer-events-none hidden absolute z-20 -translate-x-1/2 -translate-y-full px-3 py-2 rounded-lg bg-[#101828] text-white text-xs shadow-xl">
+            <div id="ovTipMonth" class="font-semibold text-slate-300 mb-1">November</div>
+            <div id="ovTipVal" class="font-mono">1,210 active seats</div>
+          </div>
+
+          <svg id="overviewSvg" class="w-full h-[210px] overflow-visible" viewBox="0 0 760 200" fill="none" aria-label="Seat expansion overview chart">
+            <defs>
+              <linearGradient id="ovIndigoFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.16" />
+                <stop offset="100%" stop-color="#4F46E5" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <line x1="44" y1="24" x2="736" y2="24" stroke="#EAECF0" />
+            <line x1="44" y1="74" x2="736" y2="74" stroke="#EAECF0" />
+            <line x1="44" y1="124" x2="736" y2="124" stroke="#EAECF0" />
+            <line x1="44" y1="170" x2="736" y2="170" stroke="#D0D5DD" />
+
+            <path id="ovAreaPath" d="M44 148 C155 138, 250 116, 360 98 C475 79, 590 56, 736 34 L736 170 L44 170 Z" fill="url(#ovIndigoFill)" />
+            <path d="M44 134 C155 122, 250 104, 360 84 C475 64, 590 44, 736 22" stroke="#10B981" stroke-width="2" stroke-dasharray="5 5" />
+            <path id="ovMainLine" d="M44 148 C155 138, 250 116, 360 98 C475 79, 590 56, 736 34" stroke="#4F46E5" stroke-width="2.6" stroke-linecap="round"/>
+
+            <circle r="4" fill="#4F46E5" stroke="#FFFFFF" stroke-width="1.5">
+              <animateMotion dur="3.8s" repeatCount="indefinite" path="M44 148 C155 138, 250 116, 360 98 C475 79, 590 56, 736 34" />
+            </circle>
+
+            <line id="ovGuide" x1="0" y1="20" x2="0" y2="170" stroke="#98A2B3" stroke-dasharray="3 3" opacity="0" />
+            <circle id="ovDot" cx="0" cy="0" r="5" fill="#4F46E5" stroke="#FFFFFF" stroke-width="2" opacity="0" />
+
+            <g fill="#475467" font-size="12" font-family="JetBrains Mono, monospace">
+              <text x="44" y="190">Jan</text>
+              <text x="182" y="190">Mar</text>
+              <text x="320" y="190">May</text>
+              <text x="458" y="190">Jul</text>
+              <text x="596" y="190">Sep</text>
+              <text x="712" y="190">Nov</text>
+            </g>
+            <g id="ovHitRects"></g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- Contextual Secondary Tab Banner (for List view / Segments / Custom fields) -->
+      <div id="tabContextBanner" class="hidden mono-surface px-5 py-3.5 flex items-center justify-between gap-4 bg-[#EEF2FF]/50 border-indigo-200">
+        <span id="tabContextText" class="text-sm font-medium text-[#101828]">Viewing filtered segment</span>
+        <button type="button" onclick="switchTab('Customer Table')" class="h-9 px-3 rounded-lg bg-white border border-[#D0D5DD] text-xs font-semibold text-[#344054] hover:bg-slate-50">Back to Default Table</button>
+      </div>
+
+      <!-- FILTER CHIPS & SEARCH TOOLBAR -->
+      <section aria-label="Directory Filters and Search" class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <!-- Left: Interactive Filter Chips -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" id="chipAllTime" onclick="removeChip('allTime')" class="h-10 px-3.5 rounded-lg bg-white border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054] inline-flex items-center gap-2 transition-colors">
+            <span>All time</span>
+            <svg class="w-3.5 h-3.5 text-[#667085]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+
+          <button type="button" id="chipRegion" onclick="removeChip('region')" class="h-10 px-3.5 rounded-lg bg-white border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054] inline-flex items-center gap-2 transition-colors">
+            <span>US, AU, +4</span>
+            <svg class="w-3.5 h-3.5 text-[#667085]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+
+          <button type="button" id="chipCustomer" onclick="toggleStatusFilter('Customer')" class="h-10 px-3.5 rounded-lg bg-white border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054] inline-flex items-center gap-2 transition-colors">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Active Customer</span>
+          </button>
+
+          <button type="button" id="chipChurned" onclick="toggleStatusFilter('Churned')" class="h-10 px-3.5 rounded-lg bg-white border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054] inline-flex items-center gap-2 transition-colors">
+            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+            <span>Churned</span>
+          </button>
+
+          <button type="button" onclick="resetAllFilters()" class="h-10 px-3 rounded-lg text-sm font-medium text-[#475467] hover:text-[#4F46E5] hover:bg-[#EEF2FF]/50 transition-colors">
+            Reset filters
+          </button>
+        </div>
+
+        <!-- Right: Real-time Search Input with Cmd+K Badge -->
+        <div class="relative w-full lg:w-[352px]">
+          <svg class="w-4 h-4 text-[#667085] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+          </svg>
+          <input id="directorySearch" type="text" oninput="handleSearchInput()" placeholder="Search company, domain, or role..." class="w-full h-[42px] pl-10 pr-16 rounded-lg bg-white border border-[#D0D5DD] text-sm text-[#101828] placeholder:text-[#667085] focus:outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-indigo-500/10 transition-all" />
+          <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md bg-[#F9FAFB] border border-[#EAECF0] font-mono text-xs text-[#667085] inline-flex items-center gap-1">
+            <span>Cmd+K</span>
+          </kbd>
+        </div>
+      </section>
+
+      <!-- SIGNATURE MINIMALIST DATA TABLE -->
+      <section aria-label="Customer Accounts Table" class="mono-surface overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-[#EAECF0] bg-[#F9FAFB] text-xs font-medium text-[#475467]">
+                <th class="py-3.5 pl-6 pr-2 w-12">
+                  <input id="masterCheckbox" type="checkbox" onchange="toggleSelectAllPage(this.checked)" class="mono-checkbox align-middle" aria-label="Select all visible rows" />
+                </th>
+                <th class="py-3.5 px-4">
+                  <button type="button" onclick="toggleCompanySort()" class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#475467] hover:text-[#101828] transition-colors">
+                    <span>Company</span>
+                    <svg id="sortArrowIcon" class="w-3.5 h-3.5 text-[#475467] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 5v14M19 12l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </th>
+                <th class="py-3.5 px-4 font-semibold">Status</th>
+                <th class="py-3.5 px-4 font-semibold">About</th>
+                <th class="py-3.5 px-4 font-semibold">Users</th>
+                <th class="py-3.5 px-4 font-semibold">License use</th>
+                <th class="py-3.5 pl-4 pr-6 text-right font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customerTableBody" class="divide-y divide-[#EAECF0] text-sm bg-white">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Minimalist Pagination Footer -->
+        <div class="px-6 py-4 border-t border-[#EAECF0] bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <button id="prevPageBtn" type="button" onclick="changePage(-1)" class="h-10 px-3.5 rounded-lg bg-white hover:bg-[#F9FAFB] disabled:opacity-50 disabled:pointer-events-none border border-[#D0D5DD] text-sm font-semibold text-[#344054] inline-flex items-center gap-2 transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              <span>Previous</span>
+            </button>
+            <button id="nextPageBtn" type="button" onclick="changePage(1)" class="h-10 px-3.5 rounded-lg bg-white hover:bg-[#F9FAFB] disabled:opacity-50 disabled:pointer-events-none border border-[#D0D5DD] text-sm font-semibold text-[#344054] inline-flex items-center gap-2 transition-colors">
+              <span>Next</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <p id="paginationLabel" class="text-sm font-medium text-[#344054]">Page 1 of 2</p>
+        </div>
+      </section>
+
+      </div>
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+    </main>
+  </div>
+
+  <!-- FLOATING BULK ACTION BAR (Shown when >= 1 row selected) -->
+  <div id="bulkActionBar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 px-4 py-2.5 rounded-xl bg-[#101828] text-white shadow-2xl border border-white/10">
+    <span id="bulkCountLabel" class="text-sm font-semibold px-1">2 selected</span>
+    <span class="h-4 w-px bg-white/20"></span>
+    <button type="button" onclick="bulkExportSelected()" class="h-9 px-3 rounded-lg hover:bg-white/10 text-sm font-medium transition-colors">Export</button>
+    <button type="button" onclick="bulkToggleStatus()" class="h-9 px-3 rounded-lg hover:bg-white/10 text-sm font-medium transition-colors">Change status</button>
+    <button type="button" onclick="bulkDeleteSelected()" class="h-9 px-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/50 text-rose-200 text-sm font-semibold transition-colors">Delete</button>
+    <button type="button" onclick="clearSelection()" class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white" aria-label="Clear selection">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <!-- ADD / EDIT CUSTOMER MODAL -->
+  <div id="customerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" onclick="if(event.target===this) closeCustomerModal()">
+    <div class="bg-white rounded-2xl border border-[#EAECF0] shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="px-6 py-5 border-b border-[#EAECF0] flex items-center justify-between">
+        <div>
+          <h3 id="customerModalTitle" class="font-display text-lg font-bold text-[#101828]">Add customer</h3>
+          <p class="text-sm text-[#475467] mt-0.5">Provision a new B2B workspace in Monobase directory</p>
+        </div>
+        <button type="button" onclick="closeCustomerModal()" class="w-10 h-10 rounded-lg text-[#667085] hover:text-[#101828] hover:bg-[#F9FAFB] flex items-center justify-center" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="saveCustomerForm(event)" class="p-6 space-y-4">
+        <input type="hidden" id="editCustomerId" value="" />
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="custNameInput" class="block text-sm font-medium text-[#344054] mb-1.5">Company name</label>
+            <input id="custNameInput" type="text" required placeholder="e.g. Attio Labs" class="w-full h-11 px-3.5 rounded-lg border border-[#D0D5DD] text-sm text-[#101828] focus:outline-none focus:border-[#4F46E5]" />
+          </div>
+          <div>
+            <label for="custDomainInput" class="block text-sm font-medium text-[#344054] mb-1.5">Domain</label>
+            <input id="custDomainInput" type="text" required placeholder="attio.com" class="w-full h-11 px-3.5 rounded-lg border border-[#D0D5DD] text-sm text-[#101828] focus:outline-none focus:border-[#4F46E5]" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="custCategoryInput" class="block text-sm font-medium text-[#344054] mb-1.5">Category</label>
+            <input id="custCategoryInput" type="text" required placeholder="Collaborative CRM" class="w-full h-11 px-3.5 rounded-lg border border-[#D0D5DD] text-sm text-[#101828] focus:outline-none focus:border-[#4F46E5]" />
+          </div>
+          <div>
+            <label for="custStatusInput" class="block text-sm font-medium text-[#344054] mb-1.5">Status</label>
+            <select id="custStatusInput" class="w-full h-11 px-3 rounded-lg border border-[#D0D5DD] bg-white text-sm text-[#101828] focus:outline-none focus:border-[#4F46E5]">
+              <option value="Customer">Customer</option>
+              <option value="Churned">Churned</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="custDescInput" class="block text-sm font-medium text-[#344054] mb-1.5">About summary</label>
+          <input id="custDescInput" type="text" required placeholder="Data-driven relationship platform for modern teams" class="w-full h-11 px-3.5 rounded-lg border border-[#D0D5DD] text-sm text-[#101828] focus:outline-none focus:border-[#4F46E5]" />
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="custLicenseInput" class="text-sm font-medium text-[#344054]">License utilization (%)</label>
+            <span id="custLicensePreview" class="font-mono text-xs font-semibold text-[#4F46E5]">75%</span>
+          </div>
+          <input id="custLicenseInput" type="range" min="5" max="100" value="75" oninput="document.getElementById('custLicensePreview').textContent = this.value + '%'" class="w-full accent-[#4F46E5]" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeCustomerModal()" class="h-11 px-4 rounded-lg border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-semibold text-[#344054]">Cancel</button>
+          <button type="submit" class="h-11 px-5 rounded-lg bg-[#4F46E5] hover:bg-indigo-700 text-white text-sm font-semibold">Save customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- IMPORT CSV MODAL -->
+  <div id="importModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" onclick="if(event.target===this) closeImportModal()">
+    <div class="bg-white rounded-2xl border border-[#EAECF0] shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="px-6 py-5 border-b border-[#EAECF0] flex items-center justify-between">
+        <h3 class="font-display text-lg font-bold text-[#101828]">Import customer CSV</h3>
+        <button type="button" onclick="closeImportModal()" class="w-10 h-10 rounded-lg text-[#667085] hover:text-[#101828] hover:bg-[#F9FAFB] flex items-center justify-center" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div onclick="simulateCsvImport()" class="border-2 border-dashed border-[#EAECF0] hover:border-[#4F46E5] rounded-xl p-8 text-center cursor-pointer transition-colors">
+          <div class="w-11 h-11 rounded-xl bg-[#F9FAFB] border border-[#EAECF0] mx-auto mb-3 flex items-center justify-center text-[#475467]">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3" />
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-[#4F46E5]">Click to import sample batch</p>
+          <p class="text-xs text-[#475467] mt-1">CSV or UTF-8 TSV up to 10 MB (company, domain, seats)</p>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" onclick="closeImportModal()" class="h-10 px-4 rounded-lg border border-[#D0D5DD] text-sm font-semibold text-[#344054] hover:bg-[#F9FAFB]">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST STACK -->
+  <div id="toastStack" class="fixed bottom-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+  <script>
+    // --- 1. INITIAL 10 SAAS COMPANIES (Paginated 7 per page across Page 1 & Page 2) ---
+    let customers = [
+      {
+        id: 'c1',
+        name: 'Catalog',
+        domain: 'catalogapp.io',
+        markBg: '#EEF2FF',
+        markColor: '#4F46E5',
+        initials: 'CA',
+        status: 'Customer',
+        aboutTitle: 'Content curating app',
+        aboutSub: 'Brings all your news into one place',
+        users: ['AL', 'MK', 'SR'],
+        extraUsers: 5,
+        license: 78
+      },
+      {
+        id: 'c2',
+        name: 'Circooles',
+        domain: 'getcircooles.com',
+        markBg: '#F2F4F7',
+        markColor: '#344054',
+        initials: 'CI',
+        status: 'Churned',
+        aboutTitle: 'Design software',
+        aboutSub: 'Super lightweight vector design app',
+        users: ['JD', 'KL', 'MN'],
+        extraUsers: 8,
+        license: 64
+      },
+      {
+        id: 'c3',
+        name: 'Command+R',
+        domain: 'cmdr.ai',
+        markBg: '#ECFDF3',
+        markColor: '#027A48',
+        initials: 'CR',
+        status: 'Customer',
+        aboutTitle: 'Data prediction',
+        aboutSub: 'AI and enterprise machine learning pipeline',
+        users: ['EV', 'TR', 'PK'],
+        extraUsers: 2,
+        license: 42
+      },
+      {
+        id: 'c4',
+        name: 'Hourglass',
+        domain: 'hourglass.app',
+        markBg: '#EEF2FF',
+        markColor: '#4F46E5',
+        initials: 'HG',
+        status: 'Customer',
+        aboutTitle: 'Productivity app',
+        aboutSub: 'Time management and async sprint tracking',
+        users: ['FS', 'OR', 'DN'],
+        extraUsers: 4,
+        license: 86
+      },
+      {
+        id: 'c5',
+        name: 'Layers',
+        domain: 'getlayers.io',
+        markBg: '#F2F4F7',
+        markColor: '#344054',
+        initials: 'LY',
+        status: 'Churned',
+        aboutTitle: 'Web app integrations',
+        aboutSub: 'Connect cloud SaaS apps seamlessly',
+        users: ['TW', 'HB'],
+        extraUsers: 1,
+        license: 31
+      },
+      {
+        id: 'c6',
+        name: 'Quotient',
+        domain: 'quotient.co',
+        markBg: '#F5F3FF',
+        markColor: '#6D28D9',
+        initials: 'QT',
+        status: 'Customer',
+        aboutTitle: 'Sales CRM',
+        aboutSub: 'Web-based enterprise sales doc management',
+        users: ['RM', 'SC', 'LP'],
+        extraUsers: 6,
+        license: 55
+      },
+      {
+        id: 'c7',
+        name: 'Sisyphus',
+        domain: 'sisyphus.com',
+        markBg: '#ECFDF3',
+        markColor: '#027A48',
+        initials: 'SY',
+        status: 'Customer',
+        aboutTitle: 'Automation workflow',
+        aboutSub: 'Time tracking, invoicing and corporate expenses',
+        users: ['NK', 'BL', 'YT'],
+        extraUsers: 4,
+        license: 72
+      },
+      {
+        id: 'c8',
+        name: 'Linearity',
+        domain: 'linearity.dev',
+        markBg: '#EEF2FF',
+        markColor: '#4F46E5',
+        initials: 'LN',
+        status: 'Customer',
+        aboutTitle: 'Issue tracking',
+        aboutSub: 'High-velocity product roadmaps and sprint cycles',
+        users: ['KR', 'MT', 'VZ'],
+        extraUsers: 9,
+        license: 91
+      },
+      {
+        id: 'c9',
+        name: 'Vercelis',
+        domain: 'vercelis.cloud',
+        markBg: '#F2F4F7',
+        markColor: '#101828',
+        initials: 'VC',
+        status: 'Customer',
+        aboutTitle: 'Edge cloud network',
+        aboutSub: 'Zero-config frontend deployments and serverless functions',
+        users: ['GR', 'LD', 'AW'],
+        extraUsers: 7,
+        license: 84
+      },
+      {
+        id: 'c10',
+        name: 'Raycasta',
+        domain: 'raycasta.so',
+        markBg: '#F2F4F7',
+        markColor: '#344054',
+        initials: 'RC',
+        status: 'Churned',
+        aboutTitle: 'Developer launcher',
+        aboutSub: 'Extensible workspace command bar for engineering teams',
+        users: ['TP', 'JH'],
+        extraUsers: 3,
+        license: 28
+      }
+    ];
+
+    const PAGE_SIZE = 7;
+    let currentPage = 1;
+    let statusFilter = null;
+    let sortDirection = 'asc';
+    let selectedIds = new Set();
+    let baseTotalCustomers = 2420;
+    let liveActiveSeats = 316;
+    let monoLiveEnabled = true;
+
+    // --- 2. KINETIC SPARKLINES & SVG DRAW-IN ---
+    function animateStrokePath(pathEl) {
+      if (!pathEl || typeof pathEl.getTotalLength !== 'function') return;
+      const len = pathEl.getTotalLength();
+      pathEl.style.transition = 'none';
+      pathEl.style.strokeDasharray = `${len}`;
+      pathEl.style.strokeDashoffset = `${len}`;
+      void pathEl.getBoundingClientRect();
+      pathEl.style.transition = 'stroke-dashoffset 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+      pathEl.style.strokeDashoffset = '0';
+    }
+
+    function buildSparkCurve(pts) {
+      if (!pts.length) return '';
+      let d = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i];
+        const p1 = pts[i + 1];
+        const cx = (p0.x + p1.x) / 2;
+        d += ` C ${cx} ${p0.y}, ${cx} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+      return d;
+    }
+
+    const sparkSeries = {
+      '12m': {
+        total: [1720, 1840, 1950, 2080, 2240, 2420],
+        members: [860, 920, 995, 1060, 1140, 1210],
+        labels: ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov']
+      },
+      '30d': {
+        total: [510, 528, 540, 555, 568, 580],
+        members: [880, 895, 904, 918, 929, 940],
+        labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Now']
+      },
+      '7d': {
+        total: [112, 118, 116, 122, 126, 130],
+        members: [584, 592, 590, 601, 608, 612],
+        labels: ['Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      }
+    };
+
+    function renderSparkline(lineId, areaId, dotId, hitsId, values, labels, unitLabel) {
+      const minV = Math.min(...values) * 0.94;
+      const maxV = Math.max(...values) * 1.03;
+      const w = 112;
+      const startX = 4;
+      const step = (w - startX) / (values.length - 1);
+
+      const pts = values.map((v, i) => ({
+        x: Math.round(startX + i * step),
+        y: Math.round(42 - ((v - minV) / (maxV - minV || 1)) * 34),
+        val: v,
+        lbl: labels[i]
+      }));
+
+      const dLine = buildSparkCurve(pts);
+      const dArea = `${dLine} L ${pts[pts.length - 1].x} 46 L ${pts[0].x} 46 Z`;
+
+      const lineEl = document.getElementById(lineId);
+      const areaEl = document.getElementById(areaId);
+      const dotEl = document.getElementById(dotId);
+      const hitsEl = document.getElementById(hitsId);
+
+      lineEl.setAttribute('d', dLine);
+      areaEl.setAttribute('d', dArea);
+
+      const last = pts[pts.length - 1];
+      dotEl.setAttribute('cx', last.x);
+      dotEl.setAttribute('cy', last.y);
+
+      animateStrokePath(lineEl);
+
+      hitsEl.innerHTML = '';
+      const tip = document.getElementById('sparkTooltip');
+      pts.forEach((p) => {
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', p.x - step / 2);
+        rect.setAttribute('y', '0');
+        rect.setAttribute('width', step);
+        rect.setAttribute('height', '48');
+        rect.setAttribute('fill', 'transparent');
+        rect.style.cursor = 'pointer';
+        rect.addEventListener('mouseenter', () => {
+          dotEl.setAttribute('cx', p.x);
+          dotEl.setAttribute('cy', p.y);
+          const box = rect.getBoundingClientRect();
+          tip.textContent = `${p.lbl}: ${p.val.toLocaleString()} ${unitLabel}`;
+          tip.style.left = `${box.left + box.width / 2}px`;
+          tip.style.top = `${box.top - 6}px`;
+          tip.classList.remove('hidden');
+        });
+        rect.addEventListener('mouseleave', () => {
+          dotEl.setAttribute('cx', last.x);
+          dotEl.setAttribute('cy', last.y);
+          tip.classList.add('hidden');
+        });
+        hitsEl.appendChild(rect);
+      });
+    }
+
+    function initOverviewInteractiveHits() {
+      const points = [
+        { x: 44, y: 148, m: 'January', v: '860 active seats' },
+        { x: 182, y: 132, m: 'March', v: '940 active seats' },
+        { x: 320, y: 105, m: 'May', v: '1,025 active seats' },
+        { x: 458, y: 82, m: 'July', v: '1,095 active seats' },
+        { x: 596, y: 56, m: 'September', v: '1,158 active seats' },
+        { x: 736, y: 34, m: 'November', v: '1,210 active seats' }
+      ];
+      const g = document.getElementById('ovHitRects');
+      const guide = document.getElementById('ovGuide');
+      const dot = document.getElementById('ovDot');
+      const tip = document.getElementById('overviewTooltip');
+      const svg = document.getElementById('overviewSvg');
+      g.innerHTML = '';
+
+      points.forEach((pt) => {
+        const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        r.setAttribute('x', pt.x - 55);
+        r.setAttribute('y', '16');
+        r.setAttribute('width', '110');
+        r.setAttribute('height', '160');
+        r.setAttribute('fill', 'transparent');
+        r.style.cursor = 'pointer';
+        r.addEventListener('mouseenter', () => {
+          guide.setAttribute('x1', pt.x);
+          guide.setAttribute('x2', pt.x);
+          guide.setAttribute('opacity', '1');
+          dot.setAttribute('cx', pt.x);
+          dot.setAttribute('cy', pt.y);
+          dot.setAttribute('opacity', '1');
+          document.getElementById('ovTipMonth').textContent = pt.m;
+          document.getElementById('ovTipVal').textContent = pt.v;
+          tip.style.left = `${Math.min(88, Math.max(12, (pt.x / 760) * 100))}%`;
+          tip.style.top = `${Math.max(12, (pt.y / 200) * svg.clientHeight - 8)}px`;
+          tip.classList.remove('hidden');
+        });
+        r.addEventListener('mouseleave', () => {
+          guide.setAttribute('opacity', '0');
+          dot.setAttribute('opacity', '0');
+          tip.classList.add('hidden');
+        });
+        g.appendChild(r);
+      });
+    }
+
+    function setMonoNodeInfo(text) {
+      document.getElementById('monoNodeStatus').textContent = text;
+    }
+
+    // --- 3. LIVE TELEMETRY STREAM ---
+    function toggleMonoLiveStream() {
+      monoLiveEnabled = !monoLiveEnabled;
+      const btn = document.getElementById('monoStreamBtn');
+      const ping = document.getElementById('monoStreamPing');
+      const dot = document.getElementById('monoStreamDot');
+      const label = document.getElementById('monoStreamText');
+      const packets = document.getElementById('monoFlowPackets');
+
+      if (monoLiveEnabled) {
+        btn.className = 'hidden sm:inline-flex h-9 px-3 rounded-lg border border-indigo-200 bg-[#EEF2FF] text-[#4F46E5] text-xs font-semibold items-center gap-2 transition-colors';
+        ping.classList.remove('hidden');
+        dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-[#4F46E5]';
+        label.textContent = 'Live Telemetry';
+        packets.style.opacity = '1';
+        notifyToast('Live seat telemetry resumed');
+      } else {
+        btn.className = 'hidden sm:inline-flex h-9 px-3 rounded-lg border border-[#EAECF0] bg-[#F2F4F7] text-[#475467] text-xs font-semibold items-center gap-2 transition-colors';
+        ping.classList.add('hidden');
+        dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-[#667085]';
+        label.textContent = 'Stream Paused';
+        packets.style.opacity = '0';
+        notifyToast('Live seat telemetry paused');
+      }
+    }
+
+    setInterval(() => {
+      if (!monoLiveEnabled) return;
+      const delta = Math.floor(Math.random() * 5) - 2;
+      liveActiveSeats = Math.max(308, Math.min(329, liveActiveSeats + delta));
+      const nowEl = document.getElementById('statActiveNow');
+      nowEl.textContent = String(liveActiveSeats);
+      nowEl.classList.remove('metric-tick');
+      void nowEl.offsetWidth;
+      nowEl.classList.add('metric-tick');
+
+      const rate = 415 + Math.floor(Math.random() * 34);
+      document.getElementById('monoSyncRate').textContent = `${rate} events/min`;
+    }, 2900);
+
+    // --- 4. SIDEBAR & TABS ---
+    function toggleSidebarRail() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('sidebar').classList.remove('-translate-x-full');
+        document.getElementById('mobileBackdrop').classList.remove('hidden');
+      } else {
+        document.body.classList.toggle('rail-collapsed');
+      }
+    }
+
+    function closeMobileDrawer() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('mobileBackdrop').classList.add('hidden');
+    }
+
+    const MONOBASE_SUBPAGES = {
+      'Workspaces': {
+        badge: 'Organization Topology', title: 'Enterprise Workspaces', subtitle: 'Multi-tenant isolation boundaries, SSO domain verification, and regional data residency.', cta: 'Provision Workspace',
+        kpis: [
+          { label: 'Active Tenants', val: '184', delta: '+14% YoY' },
+          { label: 'SAML Enforced', val: '96.2%', delta: '+4.8%' },
+          { label: 'EU Data Residency', val: '62 Orgs', delta: 'GDPR Locked' },
+          { label: 'Avg Seat Quota', val: '78.4%', delta: 'Healthy' }
+        ],
+        chartTitle: 'Tenant Provisioning Velocity', chartSub: 'Monthly enterprise org activations & SSO domain handshakes',
+        bars: [
+          { label: 'US-East Multi-Tenant Pool', pct: 84, val: '112 Orgs' },
+          { label: 'EU-Central Sovereign Pool', pct: 68, val: '54 Orgs' },
+          { label: 'Dedicated Single-Tenant VPC', pct: 46, val: '18 Orgs' }
+        ],
+        cols: ['Workspace', 'Residency', 'Provisioned Seats', 'SSO Policy', 'Action'],
+        rows: [
+          { c1: 'Linearity Core', sub: 'linearity.dev', c2: 'US-East', c3: '180 / 200', status: 'SAML 2.0', act: 'Verify DNS' },
+          { c1: 'Catalog Media', sub: 'catalogapp.io', c2: 'EU-Central', c3: '94 / 120', status: 'OIDC Okta', act: 'Verify DNS' },
+          { c1: 'Command+R AI', sub: 'cmdr.ai', c2: 'Dedicated VPC', c3: '310 / 350', status: 'SAML 2.0', act: 'Audit Logs' },
+          { c1: 'Hourglass Ops', sub: 'hourglass.app', c2: 'US-West', c3: '64 / 75', status: 'Google Workspace', act: 'Sync SCIM' },
+          { c1: 'Quotient Revenue', sub: 'quotient.co', c2: 'EU-Central', c3: '112 / 150', status: 'OIDC Azure', act: 'Sync SCIM' }
+        ]
+      },
+      'Projects': {
+        badge: 'Delivery Rollouts', title: 'Enterprise Onboarding Projects', subtitle: 'Implementation milestones, SCIM directory migrations, and solution architect playbooks.', cta: 'New Implementation',
+        kpis: [
+          { label: 'Active Rollouts', val: '28', delta: '92% On-Track' },
+          { label: 'Avg Time-to-Value', val: '11.4 Days', delta: '-3.2d Faster' },
+          { label: 'SCIM Migrations', val: '19 Live', delta: 'Zero Errors' },
+          { label: 'CSAT Handover', val: '4.94 / 5', delta: '+0.12' }
+        ],
+        chartTitle: 'Milestone Completion Cadence', chartSub: 'Weekly enterprise go-live velocity across solution pods',
+        bars: [
+          { label: 'Phase 1 · Identity & SAML Setup', pct: 95, val: '95% Complete' },
+          { label: 'Phase 2 · Role & Seat Mapping', pct: 81, val: '81% Complete' },
+          { label: 'Phase 3 · Billing & Webhook Cutover', pct: 69, val: '69% Complete' }
+        ],
+        cols: ['Project Name', 'Lead Architect', 'Completion', 'Stage', 'Action'],
+        rows: [
+          { c1: 'Vercelis Global SSO Cutover', sub: '420 seats · Enterprise', c2: 'F. Sullivan', c3: '92%', status: 'Go-Live Ready', act: 'Approve' },
+          { c1: 'Sisyphus Billing Sync', sub: 'Stripe Net-30 webhook', c2: 'O. Rhye', c3: '78%', status: 'In Review', act: 'Advance' },
+          { c1: 'Attio Labs SCIM Import', sub: 'Okta group mapping', c2: 'L. Steiner', c3: '85%', status: 'Testing', act: 'Run Test' },
+          { c1: 'Catalog Custom Roles', sub: 'RBAC policy matrix', c2: 'A. Baker', c3: '64%', status: 'In Progress', act: 'Inspect' },
+          { c1: 'Command+R Audit Vault', sub: 'SOC2 SIEM streaming', c2: 'N. Korova', c3: '100%', status: 'Completed', act: 'Archive' }
+        ]
+      },
+      'Tasks': {
+        badge: 'Action Queue · 10 Open', title: 'Account Operations Tasks', subtitle: 'Pending license expansions, security questionnaire reviews, and renewal checkpoints.', cta: 'Create Task',
+        kpis: [
+          { label: 'Open Tasks', val: '10', delta: '4 High Priority' },
+          { label: 'Completed (7d)', val: '46', delta: '+18% Velocity' },
+          { label: 'SLA Adherence', val: '99.1%', delta: 'Within 4h' },
+          { label: 'Automated Actions', val: '68%', delta: '+9% Lift' }
+        ],
+        chartTitle: 'Daily Triage Resolution', chartSub: 'Cleared account tasks vs inbound customer requests',
+        bars: [
+          { label: 'License & Quota Increases', pct: 90, val: '18 Cleared' },
+          { label: 'SOC2 & DPA Legal Reviews', pct: 76, val: '14 Cleared' },
+          { label: 'Custom Webhook Debugging', pct: 62, val: '14 Cleared' }
+        ],
+        cols: ['Task Summary', 'Assignee', 'Due Window', 'Priority', 'Action'],
+        rows: [
+          { c1: 'Approve +50 seats for Linearity', sub: 'Auto-prorated annual invoice', c2: '@frankie', c3: 'Today, 17:00', status: 'High', act: 'Complete' },
+          { c1: 'Countersign Command+R GDPR DPA', sub: 'EU Frankfurt residency', c2: '@olivia', c3: 'Tomorrow', status: 'High', act: 'Complete' },
+          { c1: 'Rotate Sisyphus webhook secret', sub: 'Scheduled 90-day key policy', c2: '@lana', c3: 'Nov 18', status: 'Normal', act: 'Complete' },
+          { c1: 'Review Circooles win-back offer', sub: 'Q4 churn recovery campaign', c2: '@frankie', c3: 'Nov 19', status: 'Normal', act: 'Complete' },
+          { c1: 'Verify Attio CSV field mappings', sub: 'Custom CRM metadata sync', c2: '@phoenix', c3: 'Nov 20', status: 'Low', act: 'Complete' }
+        ]
+      },
+      'Reporting': {
+        badge: 'Executive BI', title: 'Net Retention & Seat Reporting', subtitle: 'Board-ready SaaS cohort analytics, gross logo retention, and license utilization.', cta: 'Export Board Deck',
+        kpis: [
+          { label: 'Net Dollar Retention', val: '121.8%', delta: '+3.4% QoQ' },
+          { label: 'Gross Logo Retention', val: '94.6%', delta: '+1.1% YoY' },
+          { label: 'Annualized ARR', val: '$8.94M', delta: '+24.2%' },
+          { label: 'Avg License Use', val: '74.2%', delta: '+5.8% Lift' }
+        ],
+        chartTitle: 'Cohort Expansion Trajectory', chartSub: '12-month net seat expansion across enterprise tiers',
+        bars: [
+          { label: 'Enterprise Tier ($50k+ ARR)', pct: 92, val: '128% NDR' },
+          { label: 'Growth Tier ($10k–$50k ARR)', pct: 78, val: '114% NDR' },
+          { label: 'Starter B2B Teams', pct: 61, val: '103% NDR' }
+        ],
+        cols: ['Report Artifact', 'Cadence', 'Coverage', 'Status', 'Action'],
+        rows: [
+          { c1: 'Q4 Net Seat Expansion Ledger', sub: '2,420 customer accounts', c2: 'Weekly', c3: 'FY 2026', status: 'Ready', act: 'Download' },
+          { c1: 'Enterprise Churn Risk Matrix', sub: 'Accounts under 40% license use', c2: 'Daily', c3: '14 Flagged', status: 'Ready', act: 'Download' },
+          { c1: 'SOC2 Access & SCIM Audit', sub: 'Immutable admin trail', c2: 'Monthly', c3: '100% Pass', status: 'Verified', act: 'Download' },
+          { c1: 'Stripe Revenue Reconciliation', sub: 'Invoice vs seat ledger', c2: 'Real-time', c3: '$0 Variance', status: 'Synced', act: 'Download' },
+          { c1: 'Regional ARR Tax Summary', sub: 'US, EU, UK & APAC', c2: 'Quarterly', c3: 'Q4 Draft', status: 'Ready', act: 'Download' }
+        ]
+      },
+      'Users': {
+        badge: 'IAM & RBAC', title: 'Internal Team & Role Directory', subtitle: 'Admin privileges, hardware passkey enforcement, and session audit trails.', cta: 'Invite Operator',
+        kpis: [
+          { label: 'Internal Operators', val: '38', delta: '100% 2FA' },
+          { label: 'Passkey Enrolled', val: '36 / 38', delta: '94.7% WebAuthn' },
+          { label: 'Active Sessions', val: '19', delta: 'Zero Anomalies' },
+          { label: 'Custom RBAC Roles', val: '6 Roles', delta: 'Least Privilege' }
+        ],
+        chartTitle: 'Privilege Distribution', chartSub: 'Scoped permissions across engineering, revops, and support',
+        bars: [
+          { label: 'Customer Success & RevOps', pct: 82, val: '18 Members' },
+          { label: 'Platform Engineering', pct: 64, val: '12 Members' },
+          { label: 'Super-Admin / Security', pct: 28, val: '8 Members' }
+        ],
+        cols: ['Team Member', 'RBAC Role', 'Auth Method', 'Status', 'Action'],
+        rows: [
+          { c1: 'Frankie Sullivan', sub: 'frankie@monobase.io', c2: 'Workspace Owner', c3: 'Hardware Passkey', status: 'Online', act: 'Audit' },
+          { c1: 'Olivia Rhye', sub: 'olivia@monobase.io', c2: 'RevOps Lead', c3: 'Hardware Passkey', status: 'Online', act: 'Audit' },
+          { c1: 'Lana Steiner', sub: 'lana@monobase.io', c2: 'Solutions Architect', c3: 'SAML + TOTP', status: 'Online', act: 'Audit' },
+          { c1: 'Demi Wilkinson', sub: 'demi@monobase.io', c2: 'Security Admin', c3: 'Hardware Passkey', status: 'Online', act: 'Audit' },
+          { c1: 'Candice Wu', sub: 'candice@monobase.io', c2: 'Billing Specialist', c3: 'Hardware Passkey', status: 'Away', act: 'Audit' }
+        ]
+      },
+      'Notifications': {
+        badge: '4 Unread Events', title: 'System & Directory Notifications', subtitle: 'Real-time seat threshold alerts, SSO certificate expirations, and billing webhooks.', cta: 'Mark All Read',
+        kpis: [
+          { label: 'Unread Alerts', val: '4', delta: 'Actionable' },
+          { label: 'Webhook Delivery', val: '99.98%', delta: '0 Dead-Letter' },
+          { label: 'Quota Warnings', val: '3 Orgs', delta: '>90% Seats' },
+          { label: 'Digest Subscribers', val: '24', delta: 'Slack + Email' }
+        ],
+        chartTitle: 'Event Dispatch Breakdown', chartSub: '24-hour notification volume by severity class',
+        bars: [
+          { label: 'Seat Expansion Triggers (>85%)', pct: 88, val: '142 Events' },
+          { label: 'SSO / SCIM Sync Confirmations', pct: 74, val: '218 Events' },
+          { label: 'Invoice & Payment Webhooks', pct: 56, val: '68 Events' }
+        ],
+        cols: ['Alert Event', 'Workspace', 'Timestamp', 'Severity', 'Action'],
+        rows: [
+          { c1: 'License quota reached 91%', sub: 'Auto-upsell workflow ready', c2: 'Linearity', c3: '4 mins ago', status: 'Expansion', act: 'Acknowledge' },
+          { c1: 'Bulk CSV import completed', sub: '24 seat records verified', c2: 'Attio Labs', c3: '22 mins ago', status: 'Info', act: 'Acknowledge' },
+          { c1: 'SAML X.509 cert renews in 14d', sub: 'Automated rotation scheduled', c2: 'Catalog', c3: '1 hour ago', status: 'Reminder', act: 'Acknowledge' },
+          { c1: 'Annual invoice #INV-9042 paid', sub: '$48,000 settled via ACH', c2: 'Command+R', c3: '3 hours ago', status: 'Billing', act: 'Acknowledge' },
+          { c1: 'Churn risk score elevated', sub: 'Active usage dropped below 35%', c2: 'Layers', c3: 'Yesterday', status: 'Watch', act: 'Acknowledge' }
+        ]
+      },
+      'Support': {
+        badge: 'Enterprise Desk', title: 'Dedicated B2B Support Queue', subtitle: 'Priority Slack Connect escalations, SSO troubleshooting, and SLA response metrics.', cta: 'New Escalation',
+        kpis: [
+          { label: 'First Response', val: '4.2 min', delta: 'Enterprise SLA' },
+          { label: 'Active Threads', val: '7', delta: '0 Breached' },
+          { label: 'Resolution CSAT', val: '99.2%', delta: '+1.4% QoQ' },
+          { label: 'Slack Connect Orgs', val: '118', delta: 'Live Bridge' }
+        ],
+        chartTitle: 'Ticket Volume by Category', chartSub: 'Rolling 30-day enterprise support distribution',
+        bars: [
+          { label: 'SAML / OIDC Group Claims', pct: 79, val: '38% Share' },
+          { label: 'Seat Proration & Invoices', pct: 64, val: '31% Share' },
+          { label: 'API Rate Limit & Webhooks', pct: 52, val: '31% Share' }
+        ],
+        cols: ['Ticket / Thread', 'Account', 'SLA Timer', 'Channel', 'Action'],
+        rows: [
+          { c1: '#SUP-410 · Okta SCIM attribute map', sub: 'Custom department field', c2: 'Quotient', c3: '12m left', status: 'Slack Connect', act: 'Claim' },
+          { c1: '#SUP-409 · Add VAT ID to Q4 invoice', sub: 'EU reverse charge', c2: 'Catalog', c3: '48m left', status: 'Email', act: 'Claim' },
+          { c1: '#SUP-408 · Sandbox API key increase', sub: 'Load testing burst', c2: 'Vercelis', c3: '1h 15m', status: 'Slack Connect', act: 'Approve' },
+          { c1: '#SUP-407 · Export audit JSON archive', sub: 'ISO-27001 review', c2: 'Hourglass', c3: '2h 40m', status: 'Portal', act: 'Send Link' },
+          { c1: '#SUP-406 · Re-activate 8 seats', sub: 'Seasonal contractor pod', c2: 'Sisyphus', c3: 'Resolved', status: 'Slack Connect', act: 'Close' }
+        ]
+      },
+      'Settings': {
+        badge: 'Workspace Config', title: 'Monobase Directory Settings', subtitle: 'API keys, SAML SSO enforcement, automated proration rules, and webhook endpoints.', cta: 'Save Configuration',
+        kpis: [
+          { label: 'API Version', val: '2026-11', delta: 'Stable' },
+          { label: 'SSO Enforcement', val: 'Strict', delta: 'SAML + Passkey' },
+          { label: 'Audit Retention', val: '7 Years', delta: 'SOC2 Type II' },
+          { label: 'Webhook Endpoints', val: '5 Active', delta: 'TLS 1.3' }
+        ],
+        chartTitle: 'Security & Compliance Posture', chartSub: 'Automated directory governance checks passing in real time',
+        bars: [
+          { label: 'Identity & Access Controls', pct: 100, val: '100% Compliant' },
+          { label: 'Encryption at Rest & Transit', pct: 100, val: 'AES-256 / TLS 1.3' },
+          { label: 'Automated Key Rotation', pct: 92, val: '92% Coverage' }
+        ],
+        cols: ['Governance Control', 'Scope', 'Current Value', 'State', 'Action'],
+        rows: [
+          { c1: 'Enforce SAML SSO for all admins', sub: 'Block password fallback', c2: 'Global IAM', c3: 'Required', status: 'Enabled', act: 'Toggle' },
+          { c1: 'Auto-prorate mid-cycle seat adds', sub: 'Sync immediately to Stripe', c2: 'Billing Engine', c3: 'Instant', status: 'Enabled', act: 'Toggle' },
+          { c1: 'SCIM deprovisioning grace window', sub: 'Revoke tokens immediately', c2: 'Directory Core', c3: '0 Hours', status: 'Enabled', act: 'Toggle' },
+          { c1: 'Weekly executive CSV digest', sub: 'Sent Mondays 08:00 UTC', c2: 'Reporting', c3: '24 Recipients', status: 'Enabled', act: 'Toggle' },
+          { c1: 'Sandbox webhook replay logging', sub: 'Retain payloads for 14 days', c2: 'Developer API', c3: '14 Days', status: 'Enabled', act: 'Toggle' }
+        ]
+      }
+    };
+
+    function getMonoConfig(key) {
+      if (MONOBASE_SUBPAGES[key]) return MONOBASE_SUBPAGES[key];
+      return {
+        badge: 'Directory View',
+        title: key,
+        subtitle: `Synchronized ${key.toLowerCase()} schema, dynamic filters, and real-time B2B seat records.`,
+        cta: `Save ${key}`,
+        kpis: [
+          { label: 'Matched Accounts', val: '2,420', delta: '+20% YoY' },
+          { label: 'Active Seats', val: '1,210', delta: '+15%' },
+          { label: 'Schema Sync', val: '100%', delta: 'ACID Verified' },
+          { label: 'Query Latency', val: '6.8 ms', delta: 'Indexed' }
+        ],
+        chartTitle: `${key} Distribution`,
+        chartSub: 'Live breakdown across enterprise, mid-market, and growth cohorts',
+        bars: [
+          { label: 'Enterprise Multi-Year Accounts', pct: 86, val: '86% Utilized' },
+          { label: 'Self-Serve Growth Teams', pct: 72, val: '72% Utilized' },
+          { label: 'Custom Metadata Indexed', pct: 94, val: '94% Populated' }
+        ],
+        cols: ['Segment / Field', 'Target Scope', 'Matched Records', 'State', 'Action'],
+        rows: [
+          { c1: 'High-Utilization Enterprise (>80%)', sub: 'Upsell ready cohort', c2: 'B2B SaaS', c3: '412 Orgs', status: 'Active', act: 'Apply' },
+          { c1: 'EMEA Sovereign Data Accounts', sub: 'Frankfurt EU cluster', c2: 'GDPR Region', c3: '618 Orgs', status: 'Active', act: 'Apply' },
+          { c1: 'Annual Renewal Window (Next 60d)', sub: 'CSM playbook linked', c2: 'RevOps', c3: '194 Orgs', status: 'Synced', act: 'Apply' },
+          { c1: 'Custom Attribute: billing_tier_v2', sub: 'String · Indexed', c2: 'Directory API', c3: '2,420 Orgs', status: 'Indexed', act: 'Edit' },
+          { c1: 'Custom Attribute: sso_provider', sub: 'Enum · SAML/OIDC', c2: 'Identity Core', c3: '2,180 Orgs', status: 'Indexed', act: 'Edit' }
+        ]
+      };
+    }
+
+    function renderMonoSubpage(sectionKey) {
+      const cfg = getMonoConfig(sectionKey);
+      const container = document.getElementById('tabSubpageView');
+      if (!container) return;
+
+      const kpiHtml = cfg.kpis.map(k => `
+        <article class="mono-surface mono-surface-hover p-5 flex flex-col justify-between gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-[#475467]">${k.label}</span>
+            <span class="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+          </div>
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="font-display text-2xl font-bold text-[#101828] tracking-tight">${k.val}</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">${k.delta}</span>
+          </div>
+        </article>
+      `).join('');
+
+      const barsHtml = cfg.bars.map(b => `
+        <div>
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-medium text-[#344054]">${b.label}</span>
+            <span class="font-mono font-semibold text-[#101828]">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-[#EAECF0] overflow-hidden">
+            <div class="h-full rounded-full bg-[#4F46E5]" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map(r => `
+        <tr class="hover:bg-[#F9FAFB] transition-colors">
+          <td class="py-3.5 pl-6 pr-3">
+            <div class="text-sm font-semibold text-[#101828]">${r.c1}</div>
+            <div class="text-xs text-[#475467]">${r.sub}</div>
+          </td>
+          <td class="py-3.5 px-3 text-sm text-[#475467] whitespace-nowrap">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono text-sm font-medium text-[#101828] whitespace-nowrap">${r.c3}</td>
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            <span class="status-pill inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F46E5] border border-indigo-200 text-xs font-medium">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#4F46E5]"></span><span>${r.status}</span>
+            </span>
+          </td>
+          <td class="py-3.5 pl-3 pr-6 text-right whitespace-nowrap">
+            <button type="button" onclick="handleMonoRowAction(this, '${r.c1}', '${r.act}')" class="h-8 px-3 rounded-lg border border-[#D0D5DD] bg-white hover:bg-[#4F46E5] hover:border-[#4F46E5] hover:text-white text-xs font-semibold text-[#344054] transition-colors">
+              ${r.act}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5 mb-1.5">
+              <button type="button" onclick="selectSidebarNav('Customers')" class="h-8 px-3 rounded-lg bg-white hover:bg-[#F9FAFB] border border-[#D0D5DD] text-xs font-semibold text-[#344054] inline-flex items-center gap-1.5 shadow-sm transition-colors">
+                <span>&larr; Overview</span>
+              </button>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F46E5] border border-indigo-200 text-xs font-semibold">${cfg.badge}</span>
+            </div>
+            <h2 class="font-display text-[28px] leading-tight font-bold text-[#101828] tracking-tight">${cfg.title}</h2>
+            <p class="text-sm text-[#475467] mt-1">${cfg.subtitle}</p>
+          </div>
+          <button type="button" onclick="notifyToast('${cfg.cta} completed in ${cfg.title}')" class="h-[42px] px-4 rounded-lg bg-[#4F46E5] hover:bg-indigo-700 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm transition-colors shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            <span>${cfg.cta}</span>
+          </button>
+        </div>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          ${kpiHtml}
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 mono-surface p-6 flex flex-col justify-between gap-5">
+            <div>
+              <h3 class="text-base font-semibold text-[#101828]">${cfg.chartTitle}</h3>
+              <p class="text-xs text-[#475467] mt-0.5">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl bg-[#F9FAFB] border border-[#EAECF0] p-4">
+              <svg viewBox="0 0 360 130" class="w-full h-32 overflow-visible" fill="none">
+                <line x1="16" y1="24" x2="344" y2="24" stroke="#EAECF0" />
+                <line x1="16" y1="68" x2="344" y2="68" stroke="#EAECF0" />
+                <line x1="16" y1="110" x2="344" y2="110" stroke="#D0D5DD" />
+                <path d="M 20 98 C 88 86, 144 64, 204 54 C 260 44, 300 32, 340 20 L 340 110 L 20 110 Z" fill="rgba(79, 70, 229, 0.12)" />
+                <path d="M 20 98 C 88 86, 144 64, 204 54 C 260 44, 300 32, 340 20" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="340" cy="20" r="4" fill="#4F46E5" stroke="#FFFFFF" stroke-width="1.5" />
+                <g fill="#475467" font-size="12" font-family="JetBrains Mono, monospace">
+                  <text x="20" y="126">Q1</text>
+                  <text x="124" y="126">Q2</text>
+                  <text x="228" y="126">Q3</text>
+                  <text x="320" y="126">Q4</text>
+                </g>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 mono-surface overflow-hidden flex flex-col justify-between">
+            <div class="px-6 py-4 border-b border-[#EAECF0] flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-semibold text-[#101828]">${cfg.title} Records</h3>
+                <p class="text-xs text-[#475467] mt-0.5">Swiss-minimalist operational directory with live state controls</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-[#F2F4F7] font-mono text-xs font-medium text-[#344054]">5 Entries</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-[#EAECF0] bg-[#F9FAFB] text-xs font-medium text-[#475467]">
+                    <th class="py-3 pl-6 pr-3">${cfg.cols[0]}</th>
+                    <th class="py-3 px-3">${cfg.cols[1]}</th>
+                    <th class="py-3 px-3">${cfg.cols[2]}</th>
+                    <th class="py-3 px-3">${cfg.cols[3]}</th>
+                    <th class="py-3 pl-3 pr-6 text-right">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#EAECF0]">
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function handleMonoRowAction(btn, itemTitle, actionType) {
+      if (actionType === 'Toggle') {
+        const row = btn.closest('tr');
+        const pillText = row ? row.querySelector('.status-pill span:last-child') : null;
+        const isEnabled = pillText && pillText.textContent === 'Enabled';
+        if (pillText) pillText.textContent = isEnabled ? 'Paused' : 'Enabled';
+        notifyToast(`${itemTitle}: ${isEnabled ? 'Paused' : 'Enabled'}`);
+        return;
+      }
+      btn.textContent = 'Updated';
+      btn.className = 'h-8 px-3 rounded-lg bg-[#4F46E5] border border-[#4F46E5] text-white text-xs font-semibold transition-colors';
+      notifyToast(`${actionType} completed for ${itemTitle}`);
+    }
+
+    function selectSidebarNav(section) {
+      const normalized = (section === 'Home' || section === 'Customers') ? 'Customers' : section;
+      document.getElementById('topBreadcrumb').textContent = normalized;
+      document.getElementById('pageTitle').textContent = normalized;
+      document.querySelectorAll('.side-nav-btn').forEach((btn) => {
+        const active = btn.getAttribute('data-side') === normalized;
+        const svg = btn.querySelector('svg');
+        if (active) {
+          btn.className = 'side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-semibold bg-[#EEF2FF] text-[#4F46E5] transition-colors';
+          if (svg) svg.setAttribute('class', 'w-5 h-5 text-[#4F46E5] shrink-0');
+        } else {
+          btn.className = 'side-nav-btn rail-center w-full min-h-[42px] px-3 rounded-lg flex items-center justify-between text-sm font-medium text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828] transition-colors';
+          if (svg) svg.setAttribute('class', 'w-5 h-5 text-[#667085] shrink-0');
+        }
+      });
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (normalized === 'Customers') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        document.querySelectorAll('.dir-tab').forEach((btn) => {
+          const isTable = btn.getAttribute('data-tab') === 'Customer Table';
+          btn.className = isTable
+            ? 'dir-tab pb-3.5 text-sm font-semibold border-b-2 border-[#4F46E5] text-[#4F46E5] transition-colors'
+            : 'dir-tab pb-3.5 text-sm font-medium border-b-2 border-transparent text-[#475467] hover:text-[#101828] transition-colors';
+        });
+        syncBulkBar();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        document.getElementById('bulkActionBar').classList.add('hidden');
+        document.getElementById('bulkActionBar').classList.remove('flex');
+        renderMonoSubpage(normalized);
+      }
+
+      closeMobileDrawer();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.dir-tab').forEach((btn) => {
+        const active = btn.getAttribute('data-tab') === tabName;
+        btn.className = active
+          ? 'dir-tab pb-3.5 text-sm font-semibold border-b-2 border-[#4F46E5] text-[#4F46E5] transition-colors'
+          : 'dir-tab pb-3.5 text-sm font-medium border-b-2 border-transparent text-[#475467] hover:text-[#101828] transition-colors';
+      });
+
+      const overviewPanel = document.getElementById('overviewChartPanel');
+      const banner = document.getElementById('tabContextBanner');
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+
+      overviewPanel.classList.add('hidden');
+      banner.classList.add('hidden');
+
+      if (tabName === 'Overview') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        overviewPanel.classList.remove('hidden');
+        animateStrokePath(document.getElementById('ovMainLine'));
+      } else if (tabName === 'Customer Table') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        document.getElementById('topBreadcrumb').textContent = tabName;
+        renderMonoSubpage(tabName);
+      }
+    }
+
+    // --- 5. KPI TIMEFRAME SWITCHER ---
+    const tfPresets = {
+      '12m': { totalOffset: 0, delta1: '20%', members: '1,210', delta2: '15%' },
+      '30d': { totalOffset: -1840, delta1: '8%', members: '940', delta2: '11%' },
+      '7d': { totalOffset: -2290, delta1: '4%', members: '612', delta2: '6%' }
+    };
+    let currentTf = '12m';
+
+    function setMetricTimeframe(tf) {
+      currentTf = tf;
+      document.querySelectorAll('.tf-btn').forEach((b) => {
+        const active = b.getAttribute('data-tf') === tf;
+        b.className = active
+          ? 'tf-btn h-8 px-2.5 rounded-md text-xs font-semibold bg-white text-[#101828] shadow-sm transition-all'
+          : 'tf-btn h-8 px-2.5 rounded-md text-xs font-medium text-[#475467] hover:text-[#101828] transition-all';
+      });
+      updateStatCards(true);
+    }
+
+    function updateStatCards(redrawSpark = false) {
+      const p = tfPresets[currentTf];
+      const computedTotal = Math.max(customers.length, baseTotalCustomers + p.totalOffset + (customers.length - 10));
+      document.getElementById('statTotalCustomers').textContent = computedTotal.toLocaleString();
+      document.getElementById('statTotalDelta').querySelector('span').textContent = p.delta1;
+      document.getElementById('statActiveMembers').textContent = p.members;
+      document.getElementById('statMembersDelta').querySelector('span').textContent = p.delta2;
+
+      if (redrawSpark) {
+        const s = sparkSeries[currentTf];
+        renderSparkline('sparkTotalLine', 'sparkTotalArea', 'sparkTotalDot', 'sparkTotalHits', s.total, s.labels, 'accts');
+        renderSparkline('sparkMembersLine', 'sparkMembersArea', 'sparkMembersDot', 'sparkMembersHits', s.members, s.labels, 'seats');
+      }
+    }
+
+    // --- 6. FILTERS, SORT & SEARCH ---
+    function removeChip(which) {
+      if (which === 'allTime') {
+        document.getElementById('chipAllTime').classList.add('hidden');
+        notifyToast('Removed "All time" date constraint');
+      } else if (which === 'region') {
+        document.getElementById('chipRegion').classList.add('hidden');
+        notifyToast('Removed region filter (US, AU, +4)');
+      }
+      renderTable();
+    }
+
+    function toggleStatusFilter(status) {
+      statusFilter = statusFilter === status ? null : status;
+      syncFilterChipStyles();
+      currentPage = 1;
+      renderTable();
+    }
+
+    function syncFilterChipStyles() {
+      const custChip = document.getElementById('chipCustomer');
+      const churnChip = document.getElementById('chipChurned');
+
+      custChip.className = statusFilter === 'Customer'
+        ? 'h-10 px-3.5 rounded-lg bg-[#EEF2FF] border border-[#4F46E5] text-sm font-semibold text-[#4F46E5] inline-flex items-center gap-2 transition-colors'
+        : 'h-10 px-3.5 rounded-lg bg-white border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054] inline-flex items-center gap-2 transition-colors';
+
+      churnChip.className = statusFilter === 'Churned'
+        ? 'h-10 px-3.5 rounded-lg bg-[#EEF2FF] border border-[#4F46E5] text-sm font-semibold text-[#4F46E5] inline-flex items-center gap-2 transition-colors'
+        : 'h-10 px-3.5 rounded-lg bg-white border border-[#D0D5DD] hover:bg-[#F9FAFB] text-sm font-medium text-[#344054] inline-flex items-center gap-2 transition-colors';
+    }
+
+    function resetAllFilters() {
+      statusFilter = null;
+      document.getElementById('directorySearch').value = '';
+      document.getElementById('chipAllTime').classList.remove('hidden');
+      document.getElementById('chipRegion').classList.remove('hidden');
+      syncFilterChipStyles();
+      currentPage = 1;
+      renderTable();
+      notifyToast('Filters reset to default directory state');
+    }
+
+    function handleSearchInput() {
+      currentPage = 1;
+      renderTable();
+    }
+
+    function toggleCompanySort() {
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      const icon = document.getElementById('sortArrowIcon');
+      icon.style.transform = sortDirection === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)';
+      renderTable();
+    }
+
+    function getFilteredCustomers() {
+      const q = (document.getElementById('directorySearch').value || '').trim().toLowerCase();
+      const filtered = customers.filter((c) => {
+        const matchesStatus = !statusFilter || c.status === statusFilter;
+        const matchesSearch = !q ||
+          c.name.toLowerCase().includes(q) ||
+          c.domain.toLowerCase().includes(q) ||
+          c.aboutTitle.toLowerCase().includes(q) ||
+          c.aboutSub.toLowerCase().includes(q);
+        return matchesStatus && matchesSearch;
+      });
+
+      return filtered.sort((a, b) => {
+        const cmp = a.name.localeCompare(b.name);
+        return sortDirection === 'asc' ? cmp : -cmp;
+      });
+    }
+
+    // --- 7. RENDER TABLE & ANIMATED LICENSE BARS ---
+    function renderStatusBadge(status) {
+      if (status === 'Customer') {
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Customer</span>`;
+      }
+      return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F2F4F7] text-[#344054] border border-[#EAECF0] text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-[#667085]"></span>Churned</span>`;
+    }
+
+    function renderAvatarStack(users, extra) {
+      const palette = [
+        'bg-[#EEF2FF] text-[#4F46E5]',
+        'bg-slate-100 text-slate-700',
+        'bg-emerald-50 text-emerald-700'
+      ];
+      const circles = users.map((u, idx) =>
+        `<span class="w-7 h-7 rounded-full ring-2 ring-white ${palette[idx % palette.length]} text-xs font-semibold flex items-center justify-center">${u}</span>`
+      ).join('');
+      const more = extra > 0
+        ? `<span class="w-7 h-7 rounded-full ring-2 ring-white bg-[#F2F4F7] text-[#475467] text-xs font-semibold flex items-center justify-center">+${extra}</span>`
+        : '';
+      return `<div class="flex items-center -space-x-1.5">${circles}${more}</div>`;
+    }
+
+    function animateLicenseFills() {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          document.querySelectorAll('.license-bar-fill').forEach((bar) => {
+            const pct = bar.getAttribute('data-pct');
+            if (pct) bar.style.width = pct + '%';
+          });
+        }, 35);
+      });
+    }
+
+    function renderTable() {
+      const filtered = getFilteredCustomers();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIdx = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+      const tbody = document.getElementById('customerTableBody');
+
+      if (!pageItems.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-sm text-[#475467]">
+              No customer workspaces match your current search or filter criteria.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = pageItems.map((c) => {
+          const checked = selectedIds.has(c.id) ? 'checked' : '';
+          const rowHighlight = selectedIds.has(c.id) ? 'bg-[#EEF2FF]/50' : 'hover:bg-[#F9FAFB]';
+          return `
+            <tr class="${rowHighlight} transition-colors">
+              <td class="py-4 pl-6 pr-2">
+                <input type="checkbox" ${checked} onchange="toggleRowSelection('${c.id}', this.checked)" class="mono-checkbox align-middle" aria-label="Select ${c.name}" />
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full border border-[#EAECF0] flex items-center justify-center font-display font-bold text-xs shrink-0" style="background:${c.markBg}; color:${c.markColor}">
+                    ${c.initials}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-sm text-[#101828]">${c.name}</div>
+                    <div class="text-sm text-[#475467]">${c.domain}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">${renderStatusBadge(c.status)}</td>
+              <td class="py-4 px-4 min-w-[250px]">
+                <div class="text-sm font-medium text-[#101828]">${c.aboutTitle}</div>
+                <div class="text-sm text-[#475467]">${c.aboutSub}</div>
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">${renderAvatarStack(c.users, c.extraUsers)}</td>
+              <td class="py-4 px-4 whitespace-nowrap">
+                <div class="flex items-center gap-3">
+                  <div class="w-24 h-2 rounded-full bg-[#EAECF0] overflow-hidden">
+                    <div class="license-bar-fill h-full rounded-full bg-[#4F46E5]" data-pct="${c.license}"></div>
+                  </div>
+                  <span class="font-mono text-sm font-medium text-[#344054]">${c.license}%</span>
+                </div>
+              </td>
+              <td class="py-4 pl-4 pr-6 text-right whitespace-nowrap">
+                <div class="inline-flex items-center gap-1">
+                  <button type="button" onclick="openEditCustomerModal('${c.id}')" class="w-9 h-9 rounded-lg text-[#667085] hover:text-[#4F46E5] hover:bg-[#EEF2FF] flex items-center justify-center transition-colors" aria-label="Edit ${c.name}" title="Edit customer">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                  </button>
+                  <button type="button" onclick="deleteSingleCustomer('${c.id}')" class="w-9 h-9 rounded-lg text-[#667085] hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors" aria-label="Delete ${c.name}" title="Delete customer">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const master = document.getElementById('masterCheckbox');
+      master.checked = pageItems.length > 0 && pageItems.every((item) => selectedIds.has(item.id));
+
+      document.getElementById('paginationLabel').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+      document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+      syncBulkBar();
+      updateStatCards(false);
+      animateLicenseFills();
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderTable();
+    }
+
+    // --- 8. BULK SELECTION & ACTIONS ---
+    function toggleRowSelection(id, isChecked) {
+      if (isChecked) selectedIds.add(id);
+      else selectedIds.delete(id);
+      renderTable();
+    }
+
+    function toggleSelectAllPage(isChecked) {
+      const filtered = getFilteredCustomers();
+      const startIdx = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+      pageItems.forEach((item) => {
+        if (isChecked) selectedIds.add(item.id);
+        else selectedIds.delete(item.id);
+      });
+      renderTable();
+    }
+
+    function syncBulkBar() {
+      const bar = document.getElementById('bulkActionBar');
+      const count = selectedIds.size;
+      if (count >= 1) {
+        document.getElementById('bulkCountLabel').textContent = `${count} selected`;
+        bar.classList.remove('hidden');
+        bar.classList.add('flex');
+      } else {
+        bar.classList.add('hidden');
+        bar.classList.remove('flex');
+      }
+    }
+
+    function clearSelection() {
+      selectedIds.clear();
+      renderTable();
+    }
+
+    function bulkExportSelected() {
+      const count = selectedIds.size;
+      notifyToast(`Exported ${count} selected customer record${count === 1 ? '' : 's'} to CSV`);
+    }
+
+    function bulkToggleStatus() {
+      customers = customers.map((c) => {
+        if (!selectedIds.has(c.id)) return c;
+        return { ...c, status: c.status === 'Customer' ? 'Churned' : 'Customer' };
+      });
+      notifyToast(`Updated status for ${selectedIds.size} workspace${selectedIds.size === 1 ? '' : 's'}`);
+      renderTable();
+    }
+
+    function bulkDeleteSelected() {
+      const removed = selectedIds.size;
+      customers = customers.filter((c) => !selectedIds.has(c.id));
+      selectedIds.clear();
+      renderTable();
+      notifyToast(`Deleted ${removed} customer workspace${removed === 1 ? '' : 's'}`);
+    }
+
+    function deleteSingleCustomer(id) {
+      const target = customers.find((c) => c.id === id);
+      customers = customers.filter((c) => c.id !== id);
+      selectedIds.delete(id);
+      renderTable();
+      if (target) notifyToast(`Removed ${target.name} from directory`);
+    }
+
+    // --- 9. ADD / EDIT CUSTOMER MODAL & CSV IMPORT ---
+    function openAddCustomerModal() {
+      document.getElementById('customerModalTitle').textContent = 'Add customer';
+      document.getElementById('editCustomerId').value = '';
+      document.getElementById('custNameInput').value = '';
+      document.getElementById('custDomainInput').value = '';
+      document.getElementById('custCategoryInput').value = '';
+      document.getElementById('custStatusInput').value = 'Customer';
+      document.getElementById('custDescInput').value = '';
+      document.getElementById('custLicenseInput').value = 75;
+      document.getElementById('custLicensePreview').textContent = '75%';
+
+      const modal = document.getElementById('customerModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => document.getElementById('custNameInput').focus(), 30);
+    }
+
+    function openEditCustomerModal(id) {
+      const c = customers.find((item) => item.id === id);
+      if (!c) return;
+      document.getElementById('customerModalTitle').textContent = 'Edit customer';
+      document.getElementById('editCustomerId').value = c.id;
+      document.getElementById('custNameInput').value = c.name;
+      document.getElementById('custDomainInput').value = c.domain;
+      document.getElementById('custCategoryInput').value = c.aboutTitle;
+      document.getElementById('custStatusInput').value = c.status;
+      document.getElementById('custDescInput').value = c.aboutSub;
+      document.getElementById('custLicenseInput').value = c.license;
+      document.getElementById('custLicensePreview').textContent = c.license + '%';
+
+      const modal = document.getElementById('customerModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeCustomerModal() {
+      const modal = document.getElementById('customerModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveCustomerForm(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editCustomerId').value;
+      const name = document.getElementById('custNameInput').value.trim();
+      const domain = document.getElementById('custDomainInput').value.trim().replace(/^https?:\/\//, '');
+      const aboutTitle = document.getElementById('custCategoryInput').value.trim();
+      const status = document.getElementById('custStatusInput').value;
+      const aboutSub = document.getElementById('custDescInput').value.trim();
+      const license = parseInt(document.getElementById('custLicenseInput').value, 10) || 70;
+      const initials = name.slice(0, 2).toUpperCase();
+
+      if (editId) {
+        customers = customers.map((c) =>
+          c.id === editId ? { ...c, name, domain, initials, status, aboutTitle, aboutSub, license } : c
+        );
+        notifyToast(`Updated ${name} workspace`);
+      } else {
+        const newEntry = {
+          id: 'c_' + Date.now(),
+          name,
+          domain,
+          markBg: '#EEF2FF',
+          markColor: '#4F46E5',
+          initials,
+          status,
+          aboutTitle,
+          aboutSub,
+          users: ['FS', initials],
+          extraUsers: 3,
+          license
+        };
+        customers.unshift(newEntry);
+        currentPage = 1;
+        notifyToast(`Added ${name} (${domain}) to customer directory`);
+      }
+
+      closeCustomerModal();
+      renderTable();
+    }
+
+    function openImportModal() {
+      const m = document.getElementById('importModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeImportModal() {
+      const m = document.getElementById('importModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function simulateCsvImport() {
+      const sample = {
+        id: 'c_csv_' + Date.now(),
+        name: 'Attio Labs',
+        domain: 'attio.com',
+        markBg: '#EEF2FF',
+        markColor: '#4F46E5',
+        initials: 'AT',
+        status: 'Customer',
+        aboutTitle: 'Collaborative CRM',
+        aboutSub: 'Real-time relationship intelligence for B2B revenue teams',
+        users: ['FS', 'NK', 'OR'],
+        extraUsers: 6,
+        license: 82
+      };
+      customers.unshift(sample);
+      closeImportModal();
+      currentPage = 1;
+      renderTable();
+      notifyToast('Imported 1 new workspace (Attio Labs) from CSV');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        selectSidebarNav('Customers');
+        document.getElementById('directorySearch').focus();
+      } else if (e.key === 'Escape') {
+        closeCustomerModal();
+        closeImportModal();
+      }
+    });
+
+    // --- 10. MINIMAL TOAST ---
+    function notifyToast(message) {
+      const stack = document.getElementById('toastStack');
+      const el = document.createElement('div');
+      el.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#101828] text-white text-sm font-medium shadow-xl border border-white/10 transition-all duration-200';
+      el.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-[#4F46E5] shrink-0"></span>
+        <span>${message}</span>
+      `;
+      stack.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(6px)';
+        setTimeout(() => el.remove(), 220);
+      }, 2600);
+    }
+
+    // Initialize
+    renderTable();
+    updateStatCards(true);
+    initOverviewInteractiveHits();
+  </script>
+</body>
+</html>

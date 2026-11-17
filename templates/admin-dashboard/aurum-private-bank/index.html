@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURUM CENTURION — Luxury Black &amp; 24K Gold Private Banking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            serifLux: ['Cinzel', 'Georgia', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: '#070709',
+            onyx: '#101015',
+            gold24k: '#D4AF37',
+            goldBright: '#F5C451',
+            goldChampagne: '#FDE699',
+            goldDeep: '#9A7418',
+            ivory: '#FAF8F2',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #070709;
+      background-image:
+        radial-gradient(ellipse 60% 45% at 18% 12%, rgba(212, 175, 55, 0.11) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 82% 20%, rgba(245, 196, 81, 0.08) 0%, transparent 65%),
+        radial-gradient(ellipse 65% 50% at 50% 92%, rgba(154, 116, 24, 0.10) 0%, transparent 70%);
+      color: #FAF8F2;
+      min-height: 100vh;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Signature Brushed 24K Metallic Champagne Gold Rimmed Card */
+    .aurum-card {
+      position: relative;
+      border-radius: 18px;
+      background:
+        linear-gradient(165deg, rgba(20, 20, 27, 0.95) 0%, rgba(12, 12, 17, 0.98) 100%) padding-box,
+        linear-gradient(135deg, rgba(253, 230, 153, 0.52) 0%, rgba(212, 175, 55, 0.28) 38%, rgba(154, 116, 24, 0.18) 68%, rgba(245, 196, 81, 0.45) 100%) border-box;
+      border: 1px solid transparent;
+      box-shadow:
+        0 18px 40px -14px rgba(0, 0, 0, 0.88),
+        0 0 26px -10px rgba(212, 175, 55, 0.16),
+        inset 0 1px 0 rgba(253, 230, 153, 0.12);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease;
+    }
+    .aurum-card:hover {
+      box-shadow:
+        0 22px 46px -12px rgba(0, 0, 0, 0.94),
+        0 0 32px -8px rgba(245, 196, 81, 0.26),
+        inset 0 1px 0 rgba(253, 230, 153, 0.22);
+    }
+    .aurum-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 14%;
+      right: 26%;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, rgba(253, 230, 153, 0.85), rgba(212, 175, 55, 0.55), transparent);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    /* Gold Metallic Text Gradient */
+    .gold-foil-text {
+      background: linear-gradient(135deg, #FDE699 0%, #F5C451 42%, #D4AF37 72%, #FDE699 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Sovereign Gold CTA Button */
+    .gold-cta-btn {
+      background: linear-gradient(135deg, #FDE699 0%, #F5C451 38%, #D4AF37 78%, #B68B23 100%);
+      color: #070709;
+      box-shadow:
+        0 8px 24px -6px rgba(212, 175, 55, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+    .gold-cta-btn:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+      box-shadow:
+        0 12px 28px -4px rgba(245, 196, 81, 0.62),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* Sidebar Navigation Item */
+    .aurum-nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.625rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #A1A1AA;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .aurum-nav-btn:hover {
+      color: #FAF8F2;
+      background: rgba(212, 175, 55, 0.08);
+      border-color: rgba(212, 175, 55, 0.2);
+    }
+    .aurum-nav-btn.active {
+      color: #FDE699;
+      font-weight: 600;
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.18) 0%, rgba(154, 116, 24, 0.06) 100%);
+      border-color: rgba(245, 196, 81, 0.42);
+      box-shadow: 0 0 20px -6px rgba(212, 175, 55, 0.32);
+    }
+
+    /* Obsidian Input */
+    .aurum-input {
+      background: rgba(7, 7, 9, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.26);
+      border-radius: 11px;
+      color: #FAF8F2;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .aurum-input:focus {
+      outline: none;
+      border-color: #F5C451;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.25);
+    }
+
+    /* 3D Perspective-Tilt Brushed Titanium-Black & 24K Gold Centurion Card */
+    .centurion-stage {
+      perspective: 1100px;
+    }
+    .centurion-plate {
+      position: relative;
+      border-radius: 16px;
+      background:
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.018) 0px, rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 4px),
+        radial-gradient(circle at 85% 18%, rgba(245, 196, 81, 0.22) 0%, transparent 52%),
+        linear-gradient(140deg, #1B1B22 0%, #0B0B0F 48%, #15130E 100%);
+      border: 1px solid rgba(245, 196, 81, 0.52);
+      box-shadow:
+        0 20px 42px -12px rgba(0, 0, 0, 0.92),
+        0 0 28px -8px rgba(212, 175, 55, 0.28),
+        inset 0 1px 0 rgba(253, 230, 153, 0.35);
+      transform-style: preserve-3d;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease, border-color 0.3s ease;
+      overflow: hidden;
+    }
+    .centurion-plate.frozen {
+      filter: saturate(0.35) brightness(0.82);
+      border-color: rgba(161, 161, 170, 0.45);
+    }
+    .centurion-glare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle 180px at var(--glare-x, 75%) var(--glare-y, 25%), rgba(253, 230, 153, 0.22), transparent 70%);
+      mix-blend-mode: screen;
+    }
+
+    /* Kinetic Spline Animation */
+    @keyframes goldSplineDraw {
+      from { stroke-dashoffset: 1400; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .gold-spline-anim {
+      stroke-dasharray: 1400;
+      animation: goldSplineDraw 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Donut Interactive Slice */
+    .aurum-donut-slice {
+      transition: stroke-width 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
+      cursor: pointer;
+    }
+    .aurum-donut-slice:hover,
+    .aurum-donut-slice.active-slice {
+      stroke-width: 21;
+      filter: drop-shadow(0 0 8px rgba(245, 196, 81, 0.55));
+    }
+
+    /* Subtle Custom Scrollbar for Ledger */
+    .aurum-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .aurum-scroll::-webkit-scrollbar-track {
+      background: rgba(16, 16, 21, 0.6);
+    }
+    .aurum-scroll::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.35);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-2.5">
+
+  <!-- Shared SVG Filters & Metallic Gradients -->
+  <svg width="0" height="0" class="absolute pointer-events-none" aria-hidden="true">
+    <defs>
+      <filter id="aurumGoldGlow" x="-25%" y="-25%" width="150%" height="150%">
+        <feGaussianBlur stdDeviation="3.5" result="goldBlur" />
+        <feMerge>
+          <feMergeNode in="goldBlur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <linearGradient id="liquidGoldStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#9A7418" />
+        <stop offset="35%" stop-color="#D4AF37" />
+        <stop offset="70%" stop-color="#F5C451" />
+        <stop offset="100%" stop-color="#FDE699" />
+      </linearGradient>
+      <linearGradient id="liquidGoldArea" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#F5C451" stop-opacity="0.30" />
+        <stop offset="55%" stop-color="#D4AF37" stop-opacity="0.09" />
+        <stop offset="100%" stop-color="#070709" stop-opacity="0" />
+      </linearGradient>
+      <linearGradient id="smokedGoldBar" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.38" />
+        <stop offset="100%" stop-color="#9A7418" stop-opacity="0.08" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="max-w-[1860px] mx-auto flex flex-col gap-2.5">
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         TOP SOVEREIGN HEADER BAR
+    ══════════════════════════════════════════════════════════════════════ -->
+    <header class="aurum-card px-3.5 py-2 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand Crest + Live Spot Gold Ticker -->
+      <div class="flex items-center gap-3.5 flex-wrap">
+        <div onclick="returnToAurumOverview()" class="flex items-center gap-2.5 cursor-pointer select-none group">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FDE699] via-[#D4AF37] to-[#9A7418] p-[1px] shadow-[0_0_18px_rgba(212,175,55,0.45)]">
+            <div class="w-full h-full rounded-[11px] bg-[#070709] flex items-center justify-center">
+              <svg class="w-4 h-4 text-[#F5C451]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 21 8.5 17.5 20 6.5 20 3 8.5 12 2" />
+                <polygon points="12 7 16.5 10.5 14.8 16.5 9.2 16.5 7.5 10.5 12 7" fill="currentColor" fill-opacity="0.25" />
+              </svg>
+            </div>
+          </div>
+          <div class="leading-none">
+            <span class="font-serifLux text-sm sm:text-base font-bold tracking-[0.14em] gold-foil-text">AURUM PRIVATE</span>
+            <span class="hidden sm:inline-block ml-2 text-xs text-[#A1A1AA] font-medium">Zurich · Geneva</span>
+          </div>
+        </div>
+
+        <!-- Live XAU/USD Badge -->
+        <button onclick="showAurumToast('LBMA Spot Gold XAU/USD: $2,694.80/oz (+1.48% · Zurich Bullion Fixing)')" class="inline-flex items-center gap-2 rounded-full bg-[#101015] border border-[#D4AF37]/35 px-3 py-1 text-xs font-mono cursor-pointer hover:border-[#F5C451] transition">
+          <span class="w-2 h-2 rounded-full bg-[#F5C451] animate-pulse"></span>
+          <span class="text-[#A1A1AA]">XAU/USD</span>
+          <span class="font-bold text-[#FDE699]">$2,694.80</span>
+          <span class="text-emerald-400 font-semibold">+1.48%</span>
+        </button>
+      </div>
+
+      <!-- Center Sovereign Search -->
+      <div class="relative flex-1 max-w-sm min-w-[200px] hidden md:block">
+        <svg class="w-3.5 h-3.5 text-[#D4AF37] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          id="globalVaultSearch"
+          oninput="syncVaultSearch(this.value)"
+          type="text"
+          placeholder="Search vault ledger, ISIN, wire ref..."
+          class="aurum-input w-full pl-9 pr-3 py-1.5 text-xs placeholder:text-[#A1A1AA]/70"
+        />
+      </div>
+
+      <!-- Right Controls: Currency Switcher + Notifications + Sovereign Profile -->
+      <div class="flex items-center gap-2.5">
+        <!-- Currency Switcher USD / CHF / XAU -->
+        <div class="inline-flex items-center rounded-xl bg-[#070709] border border-[#D4AF37]/30 p-0.5" role="group" aria-label="Sovereign Currency Switcher">
+          <button type="button" data-ccy="USD" onclick="setAurumCurrency('USD')" class="ccy-btn rounded-lg px-2.5 py-1 text-xs font-mono font-bold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer">USD</button>
+          <button type="button" data-ccy="CHF" onclick="setAurumCurrency('CHF')" class="ccy-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">CHF</button>
+          <button type="button" data-ccy="XAU" onclick="setAurumCurrency('XAU')" class="ccy-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">XAU</button>
+        </div>
+
+        <!-- Concierge Bell -->
+        <button onclick="showAurumToast('2 Sovereign Alerts: T-Bill Coupon Settled (+$26,110) &amp; Zurich Bullion Audit Verified')" class="relative w-8 h-8 rounded-xl bg-[#101015] border border-[#D4AF37]/30 flex items-center justify-center text-[#FDE699] hover:border-[#F5C451] transition cursor-pointer" aria-label="Vault Notifications">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#F5C451]"></span>
+        </button>
+
+        <!-- Sovereign Tier Profile -->
+        <div onclick="showAurumToast('Client Dossier: Alexander V. Sterling · Sovereign Tier #CH-0089')" class="flex items-center gap-2 pl-2 border-l border-[#D4AF37]/20 cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#FDE699] via-[#D4AF37] to-[#9A7418] p-[1.5px]">
+            <div class="w-full h-full rounded-full bg-[#101015] flex items-center justify-center font-serifLux text-xs font-bold text-[#FDE699]">AS</div>
+          </div>
+          <div class="hidden xl:block leading-tight">
+            <p class="text-xs font-semibold text-[#FAF8F2]">A. Sterling</p>
+            <p class="text-xs font-medium text-[#F5C451]">Sovereign Tier</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Quick Tab Strip -->
+    <nav class="lg:hidden flex items-center gap-1.5 overflow-x-auto pb-0.5 aurum-scroll">
+      <button data-aurum-tab="Wealth Overview" onclick="switchAurumTab('Wealth Overview')" class="aurum-nav-btn active w-auto whitespace-nowrap">Wealth Overview</button>
+      <button data-aurum-tab="Centurion Cards" onclick="switchAurumTab('Centurion Cards')" class="aurum-nav-btn w-auto whitespace-nowrap">Centurion Cards</button>
+      <button data-aurum-tab="Bullion Vault (XAU)" onclick="switchAurumTab('Bullion Vault (XAU)')" class="aurum-nav-btn w-auto whitespace-nowrap">Bullion Vault (XAU)</button>
+      <button data-aurum-tab="Private Credit" onclick="switchAurumTab('Private Credit')" class="aurum-nav-btn w-auto whitespace-nowrap">Private Credit</button>
+      <button data-aurum-tab="Concierge Wires" onclick="switchAurumTab('Concierge Wires')" class="aurum-nav-btn w-auto whitespace-nowrap">Concierge Wires</button>
+      <button data-aurum-tab="Vault Security" onclick="switchAurumTab('Vault Security')" class="aurum-nav-btn w-auto whitespace-nowrap">Vault Security</button>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         WORKSPACE SHELL: SLIM OBSIDIAN-GOLD SIDEBAR + BENTO STAGE
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div class="flex gap-3 items-stretch">
+
+      <!-- Left Slim Obsidian-Gold Sidebar -->
+      <aside class="hidden lg:flex w-[212px] flex-shrink-0 aurum-card p-3 flex-col justify-between select-none">
+        <div class="space-y-4">
+          <div>
+            <p class="px-2.5 text-xs font-semibold uppercase tracking-wider text-[#D4AF37]/80 mb-2">Private Chambers</p>
+            <nav class="space-y-1" aria-label="Sovereign Private Banking Navigation">
+              <button data-aurum-tab="Wealth Overview" onclick="switchAurumTab('Wealth Overview')" class="aurum-nav-btn active">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-[#F5C451]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" /><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+                    <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" /><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+                  </svg>
+                  <span>Wealth Overview</span>
+                </span>
+              </button>
+
+              <button data-aurum-tab="Centurion Cards" onclick="switchAurumTab('Centurion Cards')" class="aurum-nav-btn">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <rect x="2" y="5" width="20" height="14" rx="2.5" /><line x1="2" y1="10" x2="22" y2="10" />
+                  </svg>
+                  <span>Centurion Cards</span>
+                </span>
+                <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-1.5 py-0.5 text-xs font-mono text-[#FDE699]">3</span>
+              </button>
+
+              <button data-aurum-tab="Bullion Vault (XAU)" onclick="switchAurumTab('Bullion Vault (XAU)')" class="aurum-nav-btn">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <polygon points="6 7 18 7 21 17 3 17 6 7" /><line x1="9" y1="11" x2="15" y2="11" />
+                  </svg>
+                  <span>Bullion Vault (XAU)</span>
+                </span>
+              </button>
+
+              <button data-aurum-tab="Private Credit" onclick="switchAurumTab('Private Credit')" class="aurum-nav-btn">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <line x1="12" y1="2" x2="12" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                  <span>Private Credit</span>
+                </span>
+              </button>
+
+              <button data-aurum-tab="Concierge Wires" onclick="switchAurumTab('Concierge Wires')" class="aurum-nav-btn">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                  <span>Concierge Wires</span>
+                </span>
+              </button>
+
+              <button data-aurum-tab="Vault Security" onclick="switchAurumTab('Vault Security')" class="aurum-nav-btn">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" />
+                  </svg>
+                  <span>Vault Security</span>
+                </span>
+              </button>
+            </nav>
+          </div>
+
+          <!-- Allocated Swiss Bunker Telemetry -->
+          <div class="rounded-2xl bg-[#070709]/90 border border-[#D4AF37]/25 p-3 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-[#FDE699]">Zurich Bunker #04</span>
+              <span class="inline-flex items-center gap-1 text-xs font-mono text-emerald-400">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Sealed
+              </span>
+            </div>
+            <p class="text-xs text-[#A1A1AA] leading-relaxed">42.50 oz LBMA 999.9 Good Delivery bars physically segregated.</p>
+            <div class="w-full h-1.5 rounded-full bg-[#101015] overflow-hidden">
+              <div class="h-full w-4/5 rounded-full bg-gradient-to-r from-[#9A7418] via-[#D4AF37] to-[#FDE699]"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Geneva Private Banker Card -->
+        <div class="pt-3 border-t border-[#D4AF37]/20 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-[#A1A1AA]">Private Banker</span>
+            <span class="text-[#F5C451] font-semibold">24/7 Desk</span>
+          </div>
+          <button onclick="showAurumToast('Encrypted line connected: M. Delacroix · Managing Director, Geneva')" class="w-full rounded-xl bg-[#101015] hover:bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-3 py-2 text-xs font-semibold text-[#FAF8F2] flex items-center justify-center gap-2 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-[#F5C451]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            <span>Direct Geneva Desk</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           MAIN STAGE: DEFAULT OVERVIEW + SUB-PAGE VIEW ENGINE
+      ════════════════════════════════════════════════════════════════════ -->
+      <main class="flex-1 min-w-0">
+
+        <!-- DEFAULT BENTO DASHBOARD VIEW -->
+        <div id="defaultDashboardView" class="space-y-2.5">
+
+          <!-- ROW 1: 4 GOLD-RIMMED KPI CARDS WITH KINETIC GOLD SPARKLINES -->
+          <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5" aria-label="Sovereign Key Metrics">
+            <!-- KPI 1: Total Sovereign Wealth -->
+            <div onclick="showAurumToast('Total Sovereign Wealth: +$223,140 net appreciation over 30 days')" class="aurum-card px-4 py-3 flex items-center justify-between gap-3 cursor-pointer">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-[#A1A1AA]">Total Sovereign Wealth</span>
+                  <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-2 py-0.5 text-xs font-mono font-semibold text-[#FDE699]">+4.8%</span>
+                </div>
+                <p id="kpiWealthVal" class="font-display text-xl xl:text-2xl font-extrabold text-[#FAF8F2] tracking-tight mt-1">$4,850,420</p>
+                <p class="text-xs text-[#A1A1AA] mt-0.5">Net audited multi-custody</p>
+              </div>
+              <svg class="w-20 h-11 flex-shrink-0" viewBox="0 0 88 44" fill="none">
+                <path d="M4 36 C 18 34, 26 24, 38 26 C 50 28, 60 14, 84 8" stroke="url(#liquidGoldStroke)" stroke-width="2.4" stroke-linecap="round" filter="url(#aurumGoldGlow)" />
+                <circle cx="84" cy="8" r="3" fill="#FDE699" />
+              </svg>
+            </div>
+
+            <!-- KPI 2: 24K Bullion Reserve -->
+            <div onclick="switchAurumTab('Bullion Vault (XAU)')" class="aurum-card px-4 py-3 flex items-center justify-between gap-3 cursor-pointer">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-[#A1A1AA]">24K Bullion Reserve</span>
+                  <span class="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-xs font-mono font-semibold text-emerald-300">999.9</span>
+                </div>
+                <p id="kpiBullionVal" class="font-display text-xl xl:text-2xl font-extrabold gold-foil-text tracking-tight mt-1">42.50 oz</p>
+                <p id="kpiBullionSub" class="text-xs text-[#A1A1AA] mt-0.5">Spot value $114,529</p>
+              </div>
+              <svg class="w-20 h-11 flex-shrink-0" viewBox="0 0 88 44" fill="none">
+                <path d="M4 33 C 20 30, 30 32, 45 20 C 58 10, 68 15, 84 7" stroke="url(#liquidGoldStroke)" stroke-width="2.4" stroke-linecap="round" filter="url(#aurumGoldGlow)" />
+                <circle cx="84" cy="7" r="3" fill="#FDE699" />
+              </svg>
+            </div>
+
+            <!-- KPI 3: Private Treasury Yield -->
+            <div onclick="switchAurumTab('Private Credit')" class="aurum-card px-4 py-3 flex items-center justify-between gap-3 cursor-pointer">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-[#A1A1AA]">Private Treasury Yield</span>
+                  <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-2 py-0.5 text-xs font-mono font-semibold text-[#FDE699]">T-Bills</span>
+                </div>
+                <p id="kpiYieldVal" class="font-display text-xl xl:text-2xl font-extrabold text-[#FAF8F2] tracking-tight mt-1">6.45% APY</p>
+                <p id="kpiYieldSub" class="text-xs text-emerald-400 font-medium mt-0.5">+$26,110 monthly coupon</p>
+              </div>
+              <svg class="w-20 h-11 flex-shrink-0" viewBox="0 0 88 44" fill="none">
+                <path d="M4 34 L 22 29 L 40 25 L 58 18 L 84 10" stroke="url(#liquidGoldStroke)" stroke-width="2.4" stroke-linecap="round" filter="url(#aurumGoldGlow)" />
+                <circle cx="84" cy="10" r="3" fill="#FDE699" />
+              </svg>
+            </div>
+
+            <!-- KPI 4: Gold Metal Cashback -->
+            <div onclick="switchAurumTab('Centurion Cards')" class="aurum-card px-4 py-3 flex items-center justify-between gap-3 cursor-pointer">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-[#A1A1AA]">Gold Metal Cashback</span>
+                  <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-2 py-0.5 text-xs font-mono font-semibold text-[#FDE699]">2.5% XAU</span>
+                </div>
+                <p id="kpiCashbackVal" class="font-display text-xl xl:text-2xl font-extrabold text-[#FAF8F2] tracking-tight mt-1">$18,940</p>
+                <p class="text-xs text-[#A1A1AA] mt-0.5">7.03 oz auto-minted YTD</p>
+              </div>
+              <svg class="w-20 h-11 flex-shrink-0" viewBox="0 0 88 44" fill="none">
+                <path d="M4 35 C 18 28, 34 31, 50 19 C 64 9, 73 12, 84 6" stroke="url(#liquidGoldStroke)" stroke-width="2.4" stroke-linecap="round" filter="url(#aurumGoldGlow)" />
+                <circle cx="84" cy="6" r="3" fill="#FDE699" />
+              </svg>
+            </div>
+          </section>
+
+          <!-- ROW 2: 3D CENTURION CARD (5 COLS) + HERO KINETIC GOLD TRAJECTORY CHART (7 COLS) -->
+          <section class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-stretch">
+
+            <!-- Left 5 Cols: 3D Perspective-Tilt Brushed Titanium-Black & 24K Gold Centurion Card -->
+            <div class="aurum-card p-3.5 lg:col-span-5 flex flex-col justify-between gap-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <h2 class="font-display text-sm font-bold text-[#FAF8F2]">24K Centurion Metal Card</h2>
+                  <p class="text-xs text-[#A1A1AA]">Hand-anodized titanium · 18g gold inlay</p>
+                </div>
+                <span id="cardStatusBadge" class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-mono font-semibold text-emerald-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>ACTIVE
+                </span>
+              </div>
+
+              <!-- Interactive 3D Tilt Stage -->
+              <div
+                id="centurionStage"
+                onmousemove="handleCardTilt(event)"
+                onmouseleave="resetCardTilt()"
+                class="centurion-stage select-none"
+              >
+                <div id="centurionPlate" class="centurion-plate p-4 flex flex-col justify-between h-[156px]">
+                  <div id="centurionGlare" class="centurion-glare"></div>
+
+                  <!-- Card Top: Sovereign Crest + AURUM CENTURION + Contactless -->
+                  <div class="relative z-10 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5 text-[#F5C451]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <polygon points="12 2 21 8.5 17.5 20 6.5 20 3 8.5 12 2" />
+                        <circle cx="12" cy="12" r="3" fill="currentColor" />
+                      </svg>
+                      <span class="font-serifLux text-xs font-bold tracking-[0.2em] gold-foil-text">AURUM CENTURION</span>
+                    </div>
+                    <!-- Contactless SVG -->
+                    <svg class="w-4 h-4 text-[#FDE699]/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M8.5 14.5A4 4 0 0 1 8.5 9.5" />
+                      <path d="M12 17a7.5 7.5 0 0 0 0-10" />
+                      <path d="M15.5 19.5a11 11 0 0 0 0-15" />
+                    </svg>
+                  </div>
+
+                  <!-- Card Middle: Metallic 24K Gold EMV Chip + PAN -->
+                  <div class="relative z-10 flex items-center justify-between gap-3 my-1">
+                    <!-- 24K Gold EMV Chip SVG -->
+                    <svg class="w-10 h-7 flex-shrink-0" viewBox="0 0 44 32" fill="none">
+                      <rect x="1" y="1" width="42" height="30" rx="5" fill="url(#liquidGoldStroke)" stroke="#FDE699" stroke-width="1" />
+                      <line x1="15" y1="1" x2="15" y2="31" stroke="#070709" stroke-opacity="0.45" stroke-width="1.2" />
+                      <line x1="29" y1="1" x2="29" y2="31" stroke="#070709" stroke-opacity="0.45" stroke-width="1.2" />
+                      <line x1="1" y1="11" x2="15" y2="11" stroke="#070709" stroke-opacity="0.45" stroke-width="1.2" />
+                      <line x1="29" y1="11" x2="43" y2="11" stroke="#070709" stroke-opacity="0.45" stroke-width="1.2" />
+                      <line x1="1" y1="21" x2="15" y2="21" stroke="#070709" stroke-opacity="0.45" stroke-width="1.2" />
+                      <line x1="29" y1="21" x2="43" y2="21" stroke="#070709" stroke-opacity="0.45" stroke-width="1.2" />
+                    </svg>
+                    <p id="centurionPanText" class="font-mono text-sm sm:text-base font-bold tracking-[0.14em] text-[#FAF8F2]">
+                      ••••  ••••  ••••  8899
+                    </p>
+                  </div>
+
+                  <!-- Card Bottom: Holder + Expiry + Sovereign Crest -->
+                  <div class="relative z-10 flex items-end justify-between text-xs">
+                    <div>
+                      <p class="font-mono text-xs text-[#FDE699] tracking-wider font-semibold">ALEXANDER V. STERLING</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="font-mono text-xs text-[#A1A1AA]">EXP <strong class="text-[#FAF8F2]">09/29</strong></span>
+                      <span class="font-serifLux text-xs font-bold text-[#F5C451]">24K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Controls + Limit Bar -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[#A1A1AA]">Monthly Sovereign Limit</span>
+                  <span id="cardLimitLabel" class="font-mono font-bold text-[#FAF8F2]">$164,200 <span class="text-[#A1A1AA] font-normal">/ $250,000</span></span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-[#070709] border border-[#D4AF37]/25 overflow-hidden">
+                  <div class="h-full w-[66%] rounded-full bg-gradient-to-r from-[#9A7418] via-[#D4AF37] to-[#FDE699]"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-0.5">
+                  <button id="panToggleBtn" type="button" onclick="toggleCenturionPan()" class="rounded-xl bg-[#101015] hover:bg-[#D4AF37]/15 border border-[#D4AF37]/35 py-1.5 px-3 text-xs font-semibold text-[#FDE699] flex items-center justify-center gap-1.5 transition cursor-pointer">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <span id="panToggleLabel">Reveal PAN</span>
+                  </button>
+                  <button id="freezeCardBtn" type="button" onclick="toggleCenturionFreeze()" class="rounded-xl bg-[#101015] hover:bg-[#D4AF37]/15 border border-[#D4AF37]/35 py-1.5 px-3 text-xs font-semibold text-[#FAF8F2] flex items-center justify-center gap-1.5 transition cursor-pointer">
+                    <svg class="w-3.5 h-3.5 text-[#F5C451]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <span id="freezeCardLabel">Freeze Card</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 7 Cols: Hero Kinetic Gold Chart (Sovereign Wealth & Physical Gold Trajectory) -->
+            <div class="aurum-card p-3.5 lg:col-span-7 flex flex-col justify-between">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h2 class="font-display text-sm sm:text-base font-bold text-[#FAF8F2]">Sovereign Wealth &amp; Physical Gold Trajectory</h2>
+                    <span id="heroDeltaBadge" class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/40 px-2 py-0.5 text-xs font-mono font-bold text-[#FDE699]">+18.4% YTD</span>
+                  </div>
+                  <p class="text-xs text-[#A1A1AA] mt-0.5">Combined portfolio valuation &amp; smoked-gold institutional liquidity inflows (hover nodes to inspect)</p>
+                </div>
+
+                <!-- Timeframe Pills: 1W / 1M / 6M / 1Y / ALL -->
+                <div class="inline-flex items-center rounded-xl bg-[#070709] border border-[#D4AF37]/25 p-0.5">
+                  <button type="button" data-tf="1W" onclick="switchTrajectoryTf('1W')" class="tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">1W</button>
+                  <button type="button" data-tf="1M" onclick="switchTrajectoryTf('1M')" class="tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">1M</button>
+                  <button type="button" data-tf="6M" onclick="switchTrajectoryTf('6M')" class="tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">6M</button>
+                  <button type="button" data-tf="1Y" onclick="switchTrajectoryTf('1Y')" class="tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-bold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer">1Y</button>
+                  <button type="button" data-tf="ALL" onclick="switchTrajectoryTf('ALL')" class="tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">ALL</button>
+                </div>
+              </div>
+
+              <!-- Interactive Hover Callout Strip + SVG Spline Canvas -->
+              <div class="relative mt-2">
+                <!-- Interactive Callout Pill -->
+                <div id="chartCalloutBox" class="inline-flex flex-wrap items-center gap-3 rounded-xl bg-[#070709]/95 border border-[#F5C451]/45 px-3 py-1.5 text-xs mb-1.5 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                  <span id="calloutPeriod" class="font-mono font-semibold text-[#F5C451]">Nov 2026</span>
+                  <span class="text-[#A1A1AA]">Valuation: <strong id="calloutVal" class="font-mono text-[#FAF8F2]">$4,850,420</strong></span>
+                  <span class="text-[#A1A1AA]">Bullion: <strong id="calloutGold" class="font-mono text-[#FDE699]">42.50 oz XAU</strong></span>
+                  <span id="calloutInflow" class="font-mono text-emerald-400">+$184,000 Inflow</span>
+                </div>
+
+                <svg id="heroTrajectorySvg" class="w-full h-[182px] overflow-visible select-none" viewBox="0 0 680 185">
+                  <!-- Horizontal Subtle Gridlines -->
+                  <line x1="16" y1="28" x2="664" y2="28" stroke="#D4AF37" stroke-opacity="0.12" stroke-dasharray="4 4" />
+                  <line x1="16" y1="78" x2="664" y2="78" stroke="#D4AF37" stroke-opacity="0.12" stroke-dasharray="4 4" />
+                  <line x1="16" y1="128" x2="664" y2="128" stroke="#D4AF37" stroke-opacity="0.12" stroke-dasharray="4 4" />
+                  <line x1="16" y1="158" x2="664" y2="158" stroke="#D4AF37" stroke-opacity="0.24" />
+
+                  <!-- Smoked-Gold Liquidity Bars Group -->
+                  <g id="heroLiquidityBars"></g>
+
+                  <!-- Area Fill Under Spline -->
+                  <path id="heroAreaPath" d="" fill="url(#liquidGoldArea)" />
+
+                  <!-- Liquid-Gold Smooth Cubic Spline -->
+                  <path id="heroSplinePath" d="" fill="none" stroke="url(#liquidGoldStroke)" stroke-width="3" stroke-linecap="round" filter="url(#aurumGoldGlow)" class="gold-spline-anim" />
+
+                  <!-- Golden Photon Orb Gliding Along Trajectory -->
+                  <circle r="4.5" fill="#FDE699" filter="url(#aurumGoldGlow)">
+                    <animateMotion id="photonMotion" dur="5.5s" repeatCount="indefinite" path="M 34 134 C 110 124, 150 108, 218 96 C 286 84, 340 94, 412 66 C 484 38, 558 46, 646 22" />
+                  </circle>
+
+                  <!-- Active Vertical Hairline + Node Ring -->
+                  <line id="heroHoverLine" x1="646" y1="14" x2="646" y2="158" stroke="#FDE699" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="3 3" />
+                  <circle id="heroActiveDot" cx="646" cy="22" r="6" fill="#070709" stroke="#FDE699" stroke-width="2.5" />
+
+                  <!-- Interactive Hover Columns & X-Axis Labels -->
+                  <g id="heroInteractiveNodes"></g>
+                </svg>
+              </div>
+            </div>
+          </section>
+
+          <!-- ROW 3: 24K GOLD DONUT (4 COLS) + CONCIERGE WIRE & BULLION SWAP (4 COLS) + PRIVATE VAULT LEDGER (4 COLS) -->
+          <section class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-stretch">
+
+            <!-- Left 4 Cols: Asset Allocation 24K Gold Donut Ring -->
+            <div class="aurum-card p-3.5 lg:col-span-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="font-display text-sm font-bold text-[#FAF8F2]">Sovereign Asset Allocation</h2>
+                  <p class="text-xs text-[#A1A1AA]">Hover ring slices to inspect custody</p>
+                </div>
+                <span class="rounded-full bg-[#101015] border border-[#D4AF37]/30 px-2.5 py-0.5 text-xs font-mono text-[#FDE699]">4 Classes</span>
+              </div>
+
+              <div class="flex items-center gap-3.5 my-2">
+                <!-- Interactive SVG Donut Ring -->
+                <div class="relative w-[132px] h-[132px] flex-shrink-0">
+                  <svg viewBox="0 0 140 140" class="w-full h-full -rotate-90 overflow-visible">
+                    <circle cx="70" cy="70" r="48" fill="none" stroke="#181820" stroke-width="16" />
+                    <g id="aurumDonutSlices"></g>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-2 pointer-events-none">
+                    <span id="donutCenterLabel" class="text-xs text-[#A1A1AA] truncate max-w-[92px]">Private Eq.</span>
+                    <span id="donutCenterPct" class="font-display text-lg font-extrabold gold-foil-text leading-tight">42%</span>
+                    <span id="donutCenterAmt" class="font-mono text-xs text-[#FAF8F2]">$2.04M</span>
+                  </div>
+                </div>
+
+                <!-- Interactive Legend -->
+                <div id="aurumDonutLegend" class="flex-1 space-y-1.5 min-w-0"></div>
+              </div>
+
+              <div class="pt-2 border-t border-[#D4AF37]/15 flex items-center justify-between text-xs">
+                <span class="text-[#A1A1AA]">Sharpe Ratio (3Y)</span>
+                <span class="font-mono font-bold text-emerald-400">2.48 · Tier-1 Audited</span>
+              </div>
+            </div>
+
+            <!-- Center 4 Cols: Instant Concierge Wire & Bullion Swap -->
+            <div class="aurum-card p-3.5 lg:col-span-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <h2 class="font-display text-sm font-bold text-[#FAF8F2]">Concierge Wire &amp; Bullion Swap</h2>
+                  <p class="text-xs text-[#A1A1AA]">Zero-slippage LBMA desk &amp; priority SWIFT</p>
+                </div>
+                <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-2 py-0.5 text-xs font-mono text-[#FDE699]">Instant</span>
+              </div>
+
+              <!-- Mode Toggle: USD -> Physical XAU vs SWIFT Sovereign Wire -->
+              <div class="grid grid-cols-2 gap-1.5 rounded-xl bg-[#070709] border border-[#D4AF37]/25 p-1 my-2">
+                <button id="modeBtnBullion" type="button" onclick="setOrderMode('BULLION')" class="rounded-lg py-1.5 px-2 text-xs font-semibold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer">
+                  USD -&gt; Physical XAU
+                </button>
+                <button id="modeBtnWire" type="button" onclick="setOrderMode('WIRE')" class="rounded-lg py-1.5 px-2 text-xs font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer">
+                  SWIFT Sovereign Wire
+                </button>
+              </div>
+
+              <!-- Order Form -->
+              <form onsubmit="executeSovereignOrder(event)" class="space-y-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="orderAmountInput" class="block text-xs text-[#A1A1AA] mb-1">Order Amount (USD)</label>
+                    <div class="relative">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-[#F5C451] font-bold">$</span>
+                      <input
+                        id="orderAmountInput"
+                        type="number"
+                        min="1000"
+                        step="500"
+                        value="54000"
+                        oninput="updateOrderEstimate()"
+                        class="aurum-input w-full pl-7 pr-2.5 py-1.5 text-xs font-mono font-bold"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="orderTargetSelect" id="orderTargetLabel" class="block text-xs text-[#A1A1AA] mb-1">Custody Destination</label>
+                    <select id="orderTargetSelect" class="aurum-input w-full px-2.5 py-1.5 text-xs font-medium">
+                      <option value="Zurich Bunker #04 (LBMA 999.9)">Zurich Bunker #04</option>
+                      <option value="Geneva FreePort Segregated">Geneva FreePort</option>
+                      <option value="Singapore Bullion Reserve">Singapore Vault</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Live Conversion Preview -->
+                <div class="rounded-xl bg-[#070709]/90 border border-[#D4AF37]/25 px-3 py-2 flex items-center justify-between text-xs">
+                  <span id="orderPreviewLeft" class="text-[#A1A1AA]">Allocated Output:</span>
+                  <span id="orderPreviewRight" class="font-mono font-bold text-[#FDE699]">20.04 oz Physical XAU</span>
+                </div>
+
+                <button type="submit" class="gold-cta-btn w-full rounded-xl py-2 px-4 text-xs font-bold tracking-wide flex items-center justify-center gap-2 cursor-pointer">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" />
+                  </svg>
+                  <span>Execute Sovereign Order</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Right 4 Cols: Private Vault Ledger -->
+            <div class="aurum-card p-3.5 lg:col-span-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <div>
+                  <h2 class="font-display text-sm font-bold text-[#FAF8F2]">Private Vault Ledger</h2>
+                  <p class="text-xs text-[#A1A1AA]">Real-time bullion &amp; wire settlements</p>
+                </div>
+                <div class="relative w-36">
+                  <input
+                    id="ledgerSearchInput"
+                    oninput="syncVaultSearch(this.value)"
+                    type="text"
+                    placeholder="Filter ledger..."
+                    class="aurum-input w-full px-2.5 py-1 text-xs placeholder:text-[#A1A1AA]/70"
+                  />
+                </div>
+              </div>
+
+              <div id="vaultLedgerList" class="space-y-1.5 max-h-[192px] overflow-y-auto pr-1 aurum-scroll"></div>
+            </div>
+
+          </section>
+        </div>
+
+        <!-- MULTI-TAB SUB-PAGE VIEW CONTAINER -->
+        <div id="tabSubpageView" class="hidden"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Luxury Obsidian & 24K Gold Toast Notification -->
+  <div id="aurumToast" class="fixed bottom-4 right-4 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300">
+    <div class="aurum-card px-4 py-2.5 flex items-center gap-2.5 shadow-2xl">
+      <span class="w-2 h-2 rounded-full bg-[#F5C451]"></span>
+      <span id="aurumToastMsg" class="text-xs font-medium text-[#FAF8F2]">Sovereign order executed</span>
+    </div>
+  </div>
+
+  <script>
+    const XAU_SPOT_USD = 2694.80;
+    const CHF_RATE = 0.88;
+
+    let currentCurrency = 'USD';
+    let baseWealthUsd = 4850420;
+    let baseBullionOz = 42.50;
+    let panRevealed = false;
+    let cardFrozen = false;
+    let currentOrderMode = 'BULLION';
+    let currentTf = '1Y';
+    let ledgerQuery = '';
+
+    // Hero Trajectory Dataset across timeframes
+    const TRAJECTORY_DATA = {
+      '1W': {
+        delta: '+1.9% 1W',
+        points: [
+          { label: 'Mon', usd: 4762000, oz: '41.80 oz XAU', inflow: '+$22,000 Inflow', bar: 34 },
+          { label: 'Tue', usd: 4779500, oz: '41.80 oz XAU', inflow: '+$17,500 Inflow', bar: 42 },
+          { label: 'Wed', usd: 4794100, oz: '42.10 oz XAU', inflow: '+$14,600 Inflow', bar: 38 },
+          { label: 'Thu', usd: 4812000, oz: '42.10 oz XAU', inflow: '+$17,900 Inflow', bar: 52 },
+          { label: 'Fri', usd: 4831800, oz: '42.50 oz XAU', inflow: '+$19,800 Inflow', bar: 60 },
+          { label: 'Sun', usd: 4850420, oz: '42.50 oz XAU', inflow: '+$18,620 Inflow', bar: 68 }
+        ]
+      },
+      '1M': {
+        delta: '+4.8% 1M',
+        points: [
+          { label: 'Wk 1', usd: 4627280, oz: '40.00 oz XAU', inflow: '+$48,000 Inflow', bar: 38 },
+          { label: 'Wk 2', usd: 4685400, oz: '40.50 oz XAU', inflow: '+$58,120 Inflow', bar: 48 },
+          { label: 'Wk 3', usd: 4719000, oz: '41.20 oz XAU', inflow: '+$33,600 Inflow', bar: 44 },
+          { label: 'Wk 4', usd: 4784900, oz: '41.90 oz XAU', inflow: '+$65,900 Inflow', bar: 62 },
+          { label: 'Wk 5', usd: 4818200, oz: '42.50 oz XAU', inflow: '+$33,300 Inflow', bar: 56 },
+          { label: 'Now', usd: 4850420, oz: '42.50 oz XAU', inflow: '+$32,220 Inflow', bar: 74 }
+        ]
+      },
+      '6M': {
+        delta: '+11.6% 6M',
+        points: [
+          { label: 'Jun', usd: 4346000, oz: '36.00 oz XAU', inflow: '+$95,000 Inflow', bar: 36 },
+          { label: 'Jul', usd: 4428000, oz: '37.50 oz XAU', inflow: '+$82,000 Inflow', bar: 45 },
+          { label: 'Aug', usd: 4512000, oz: '39.00 oz XAU', inflow: '+$84,000 Inflow', bar: 50 },
+          { label: 'Sep', usd: 4619000, oz: '40.20 oz XAU', inflow: '+$107,000 Inflow', bar: 58 },
+          { label: 'Oct', usd: 4738000, oz: '41.50 oz XAU', inflow: '+$119,000 Inflow', bar: 66 },
+          { label: 'Nov', usd: 4850420, oz: '42.50 oz XAU', inflow: '+$112,420 Inflow', bar: 76 }
+        ]
+      },
+      '1Y': {
+        delta: '+18.4% YTD',
+        points: [
+          { label: 'Jan', usd: 4096500, oz: '32.00 oz XAU', inflow: '+$110,000 Inflow', bar: 32 },
+          { label: 'Mar', usd: 4235000, oz: '34.50 oz XAU', inflow: '+$138,500 Inflow', bar: 44 },
+          { label: 'May', usd: 4389000, oz: '36.50 oz XAU', inflow: '+$154,000 Inflow', bar: 50 },
+          { label: 'Jul', usd: 4492000, oz: '38.80 oz XAU', inflow: '+$103,000 Inflow', bar: 46 },
+          { label: 'Sep', usd: 4666420, oz: '41.00 oz XAU', inflow: '+$174,420 Inflow', bar: 64 },
+          { label: 'Nov', usd: 4850420, oz: '42.50 oz XAU', inflow: '+$184,000 Inflow', bar: 78 }
+        ]
+      },
+      'ALL': {
+        delta: '+64.2% 5Y',
+        points: [
+          { label: '2022', usd: 2954000, oz: '18.00 oz XAU', inflow: '+$320,000 Inflow', bar: 28 },
+          { label: '2023', usd: 3380000, oz: '24.00 oz XAU', inflow: '+$426,000 Inflow', bar: 40 },
+          { label: '2024', usd: 3840000, oz: '30.00 oz XAU', inflow: '+$460,000 Inflow', bar: 52 },
+          { label: '2025', usd: 4310000, oz: '36.50 oz XAU', inflow: '+$470,000 Inflow', bar: 64 },
+          { label: 'H1 26', usd: 4590000, oz: '40.00 oz XAU', inflow: '+$280,000 Inflow', bar: 70 },
+          { label: 'Now', usd: 4850420, oz: '42.50 oz XAU', inflow: '+$260,420 Inflow', bar: 82 }
+        ]
+      }
+    };
+
+    // Asset Allocation Donut Slices
+    const ALLOCATION_SLICES = [
+      { name: 'Private Equities', short: 'Private Eq.', pct: 42, usd: '$2.04M', color: '#F5C451' },
+      { name: '24K Gold Bullion', short: '24K Bullion', pct: 28, usd: '$1.36M', color: '#D4AF37' },
+      { name: 'US Sovereign T-Bills', short: 'US T-Bills', pct: 18, usd: '$873K', color: '#FDE699' },
+      { name: 'Swiss CHF Liquidity', short: 'Swiss CHF', pct: 12, usd: '$582K', color: '#9A7418' }
+    ];
+
+    // Private Vault Ledger Entries
+    const VAULT_LEDGER = [
+      { title: 'LBMA 24K Bullion Allocation', meta: 'Zurich Bunker #04 · 5.00 oz', amount: '-$13,474', pill: '24K Allocated', pillType: 'gold' },
+      { title: 'US Sovereign T-Bill Coupon', meta: 'ISIN US912797 · Monthly Yield', amount: '+$26,110', pill: 'Settled', pillType: 'emerald' },
+      { title: 'Geneva Concierge SWIFT Wire', meta: 'Patek Philippe Salon Rue du Rhone', amount: '-$68,500', pill: 'Priority', pillType: 'gold' },
+      { title: 'Centurion 2.5% Metal Rebate', meta: 'Auto-minted 0.84 oz XAU', amount: '+$2,264', pill: 'XAU Minted', pillType: 'emerald' },
+      { title: 'Swiss Lombard Credit Sweep', meta: 'Pictet Co-Custody Liquidity', amount: '+$125,000', pill: 'Settled', pillType: 'emerald' }
+    ];
+
+    // 5 Rich Sub-Pages Data
+    const AURUM_SUBPAGES = {
+      'Centurion Cards': {
+        badge: '3 Sovereign Metal Cards Active',
+        title: 'Centurion Titanium & 24K Gold Card Suite',
+        subtitle: 'Manage bespoke spending limits, 2.5% physical XAU cashback auto-minting, and global concierge privileges',
+        ctaLabel: 'Issue Supplementary Metal Card',
+        ctaToast: 'Initiated bespoke 24K Gold supplementary card engraving order',
+        kpis: [
+          { label: 'Combined Monthly Spend', val: '$164,200', pill: '65.7% Used', sub: '$250,000 sovereign limit' },
+          { label: '24K Gold Cashback YTD', val: '$18,940', pill: '7.03 oz XAU', sub: '2.5% instant bullion credit' },
+          { label: 'Aviation & Lounge Passes', val: 'Unlimited', pill: 'FBO + Private', sub: 'Global JetCard & Centurion Suites' },
+          { label: 'Zero-FX Sovereign Spread', val: '0.00% Fee', pill: 'Interbank', sub: 'CHF · EUR · GBP · JPY · SGD' }
+        ],
+        visualTitle: 'Category Spend & Cashback Velocity',
+        visualSub: 'Current billing cycle allocation across Centurion metal cards',
+        bars: [
+          { label: 'Private Aviation & Yacht Charter', val: '$74,800', pct: 78, detail: '1.87 oz XAU cashback earned' },
+          { label: 'Haute Horlogerie & Fine Art', val: '$52,400', pct: 62, detail: 'Geneva & London gallery authorizations' },
+          { label: 'Five-Star Hospitality & Dining', val: '$24,900', pct: 42, detail: 'Complimentary suite upgrades applied' },
+          { label: 'Diplomatic & Executive Travel', val: '$12,100', pct: 26, detail: 'Zero interbank FX markup' }
+        ],
+        tableTitle: 'Issued Centurion Metal Cards',
+        columns: ['Cardholder & Tier', 'Card Ending', 'Monthly Spend', 'Cashback Mode', 'Status', 'Action'],
+        rows: [
+          { c1: 'A. Sterling · Primary 24K', c2: '•••• 8899', c3: '$118,400 / $150k', c4: '2.5% Physical XAU', status: 'Active', pillType: 'emerald', btn: 'Boost Limit' },
+          { c1: 'C. Sterling · Spouse Rose-Gold', c2: '•••• 4410', c3: '$31,200 / $60k', c4: '2.5% Physical XAU', status: 'Active', pillType: 'emerald', btn: 'Boost Limit' },
+          { c1: 'Sterling Family Office Corp', c2: '•••• 9021', c3: '$14,600 / $40k', c4: 'USD Treasury Sweep', status: 'Active', pillType: 'gold', btn: 'Inspect' },
+          { c1: 'Zurich Aviation Virtual Card', c2: '•••• 7712', c3: '$0 / $100k', c4: 'Single-Charter Lock', status: 'Standby', pillType: 'gold', btn: 'Activate' },
+          { c1: 'Geneva Vault Emergency Metal', c2: '•••• 0008', c3: '$0 / $50k', c4: 'Vault-Custody Sealed', status: 'Sealed', pillType: 'gold', btn: 'Unseal' }
+        ]
+      },
+      'Bullion Vault (XAU)': {
+        badge: 'LBMA 999.9 Good Delivery Audited',
+        title: 'Allocated Physical 24K Bullion Vault (XAU)',
+        subtitle: 'Direct legal title to segregated Swiss & Singapore bullion bars with serial-number bar registry',
+        ctaLabel: 'Mint & Allocate 10 oz Bar',
+        ctaToast: 'Allocated +10.00 oz LBMA 999.9 Gold Bar in Zurich Bunker #04',
+        kpis: [
+          { label: 'Total Segregated Gold', val: '42.50 oz', pill: '1.322 kg', sub: '100% allocated off-balance-sheet' },
+          { label: 'Live Liquidation Value', val: '$114,529', pill: '+18.9% Unrealized', sub: 'Spot $2,694.80 / troy oz' },
+          { label: 'Annual Custody Fee', val: '0.12% p.a.', pill: 'Sovereign Rate', sub: 'Lloyd’s of London insured' },
+          { label: 'Physical Delivery SLA', val: '24 Hours', pill: 'Armored Courier', sub: 'Zurich · Geneva · London · NYC' }
+        ],
+        visualTitle: 'Multi-Jurisdiction Bunker Distribution',
+        visualSub: 'Geopolitical diversification of physical 24K bullion holdings',
+        bars: [
+          { label: 'Zurich Alpine Bunker #04 (Valcambi)', val: '24.50 oz', pct: 58, detail: 'Serial #VC-992841 to #VC-992865' },
+          { label: 'Geneva FreePort Segregated Chamber', val: '12.00 oz', pct: 30, detail: 'PAMP Suisse 999.9 Fortuna cast bars' },
+          { label: 'Singapore Le Freeport Vault', val: '6.00 oz', pct: 16, detail: 'Argor-Heraeus kilobar fractional title' },
+          { label: 'Lloyd’s Specie All-Risk Coverage', val: '100% Insured', pct: 100, detail: 'Policy #LL-CH-884920 verified' }
+        ],
+        tableTitle: 'Serialized Bullion Bar Registry',
+        columns: ['Refinery & Assay', 'Serial Number', 'Weight (Fine)', 'Vault Chamber', 'Audit Status', 'Action'],
+        rows: [
+          { c1: 'PAMP Suisse 999.9 Gold', c2: 'PS-884120-CH', c3: '10.00 oz', c4: 'Zurich Bunker #04', status: 'Verified', pillType: 'emerald', btn: 'Assay PDF' },
+          { c1: 'Valcambi Suisse Cast Bar', c2: 'VC-992841-CH', c3: '10.00 oz', c4: 'Zurich Bunker #04', status: 'Verified', pillType: 'emerald', btn: 'Assay PDF' },
+          { c1: 'PAMP Suisse 999.9 Gold', c2: 'PS-773109-GE', c3: '12.00 oz', c4: 'Geneva FreePort', status: 'Verified', pillType: 'emerald', btn: 'Request Delivery' },
+          { c1: 'Argor-Heraeus Sovereign', c2: 'AH-551902-SG', c3: '6.00 oz', c4: 'Singapore Vault', status: 'Verified', pillType: 'emerald', btn: 'Assay PDF' },
+          { c1: 'Valcambi CombiBar Mint', c2: 'VC-992865-CH', c3: '4.50 oz', c4: 'Zurich Bunker #04', status: 'Cashback Pool', pillType: 'gold', btn: 'Convert USD' }
+        ]
+      },
+      'Private Credit': {
+        badge: 'SOFR + 85 bps Sovereign Lombard',
+        title: 'Private Credit, Lombard Lines & Sovereign T-Bills',
+        subtitle: 'Unlock instant tax-efficient liquidity collateralized against equities and 24K bullion without selling assets',
+        ctaLabel: 'Draw Lombard Tranche',
+        ctaToast: 'Prepared $250,000 CHF/USD Lombard credit drawdown at 4.15% APR',
+        kpis: [
+          { label: 'Approved Lombard Line', val: '$2,500,000', pill: '52% Max LTV', sub: '$2,120,000 immediately available' },
+          { label: 'Active Credit Drawn', val: '$380,000', pill: 'CHF 1.95% APR', sub: 'Swiss franc carry facility' },
+          { label: 'US T-Bill Ladder Yield', val: '6.45% APY', pill: '$873,000 Held', sub: 'State-tax exempt sovereign notes' },
+          { label: 'Collateral Health Score', val: '94 / 100', pill: 'Zero Margin Risk', sub: 'Buffer covers -58% market drawdown' }
+        ],
+        visualTitle: 'Sovereign Yield & Collateral Ratios',
+        visualSub: 'Fixed-income ladder vs low-rate Swiss Lombard facility',
+        bars: [
+          { label: '90-Day US Treasury Bill Ladder', val: '6.45% APY', pct: 86, detail: '$873,000 par value · matures rolling 30d' },
+          { label: 'Swiss Confederation CHF Repo Pool', val: '3.10% APY', pct: 54, detail: 'Zero counterparty bank risk' },
+          { label: 'Bullion-Backed LTV Utilization', val: '15.2% LTV', pct: 24, detail: 'Conservative buffer well below 75% cap' },
+          { label: 'Net Positive Carry Spread', val: '+4.50% Net', pct: 76, detail: 'Earning T-Bill yield over CHF borrow cost' }
+        ],
+        tableTitle: 'Active Facilities & Treasury Instruments',
+        columns: ['Facility / Instrument', 'Principal', 'Rate / Yield', 'Maturity', 'Standing', 'Action'],
+        rows: [
+          { c1: 'Swiss CHF Lombard Facility', c2: '$380,000 eq.', c3: '1.95% Fixed', c4: 'Revolving Open', status: 'Healthy LTV', pillType: 'emerald', btn: 'Repay / Draw' },
+          { c1: 'US Treasury 3M Sovereign Note', c2: '$450,000', c3: '6.48% APY', c4: '18 Dec 2026', status: 'Accruing', pillType: 'gold', btn: 'Auto-Roll' },
+          { c1: 'US Treasury 6M Sovereign Bill', c2: '$423,000', c3: '6.42% APY', c4: '14 Mar 2027', status: 'Accruing', pillType: 'gold', btn: 'Auto-Roll' },
+          { c1: '24K Bullion Collateral Line', c2: '$95,000 Cap', c3: '0.00% Undrawn', c4: 'On-Demand', status: 'Standby', pillType: 'emerald', btn: 'Draw Funds' },
+          { c1: 'Private Equity Bridge Line', c2: '$1,200,000 Cap', c3: 'SOFR + 0.85%', c4: 'Capital Call SLA', status: 'Approved', pillType: 'emerald', btn: 'Term Sheet' }
+        ]
+      },
+      'Concierge Wires': {
+        badge: 'Priority SWIFT gpi & Fedwire Direct',
+        title: 'Concierge Wires, Escrow & Multi-Currency Settlement',
+        subtitle: 'Same-hour sovereign wire execution with dedicated Geneva compliance pre-clearance and zero intermediary fees',
+        ctaLabel: 'New Sovereign SWIFT Wire',
+        ctaToast: 'Opened Priority SWIFT gpi wire ticket with Geneva Desk pre-clearance',
+        kpis: [
+          { label: '30-Day Wire Volume', val: '$412,800', pill: '9 Settlements', sub: '100% same-hour finality' },
+          { label: 'Daily Sovereign Wire Cap', val: '$5,000,000', pill: 'Pre-Cleared', sub: 'Hardware biometric sign-off' },
+          { label: 'Average SWIFT gpi Speed', val: '14 Mins', pill: 'Direct Nostro', sub: 'Zero correspondent bank deductions' },
+          { label: 'Whitelisted Beneficiaries', val: '18 Vaults', pill: 'Cryptographic', sub: 'IBAN & routing checksum locked' }
+        ],
+        visualTitle: 'Corridor Settlement Distribution',
+        visualSub: 'Volume routed across sovereign clearing rails over 90 days',
+        bars: [
+          { label: 'SIX SIS Swiss Interbank Clearing (CHF)', val: '$188,000', pct: 74, detail: 'Instant RTGS finality via SNB' },
+          { label: 'US Fedwire Sovereign Treasury Rail', val: '$142,300', pct: 60, detail: 'Direct ABA routing · zero wire fee' },
+          { label: 'SEPA Instant Eurozone Private Rail', val: '$58,500', pct: 36, detail: 'Monaco & Paris gallery settlements' },
+          { label: 'LBMA Bullion Book-Entry Transfer', val: '$24,000', pct: 22, detail: 'Instant Zurich vault title swap' }
+        ],
+        tableTitle: 'Recent Sovereign Wire & Escrow Dispatches',
+        columns: ['Beneficiary', 'Rail & Ref', 'Amount', 'Value Date', 'Settlement', 'Action'],
+        rows: [
+          { c1: 'Patek Philippe Salon Geneva', c2: 'SIX-CH-99412', c3: '$68,500', c4: '15 Nov 2026', status: 'Completed', pillType: 'emerald', btn: 'MT103 Receipt' },
+          { c1: 'Sotheby’s Fine Art Escrow', c2: 'SWIFT-GB-4410', c3: '$145,000', c4: '11 Nov 2026', status: 'Completed', pillType: 'emerald', btn: 'MT103 Receipt' },
+          { c1: 'VistaJet Flight Hours Retainer', c2: 'FED-US-88201', c3: '$95,000', c4: '06 Nov 2026', status: 'Completed', pillType: 'emerald', btn: 'MT103 Receipt' },
+          { c1: 'Sterling Family Trust Zurich', c2: 'SIX-CH-77830', c3: '$75,000', c4: '02 Nov 2026', status: 'Completed', pillType: 'gold', btn: 'Repeat Wire' },
+          { c1: 'Monaco Yacht Berth Marina', c2: 'SEPA-MC-3319', c3: '$29,300', c4: '28 Oct 2026', status: 'Completed', pillType: 'emerald', btn: 'Repeat Wire' }
+        ]
+      },
+      'Vault Security': {
+        badge: 'FIPS 140-3 Level 4 Hardware Quorum',
+        title: 'Sovereign Vault Security & Biometric Governance',
+        subtitle: 'Cryptographic YubiKey + biometric multi-signature rules protecting bullion releases and high-value wires',
+        ctaLabel: 'Run Cryptographic Audit',
+        ctaToast: 'Cryptographic HSM audit passed: Zero anomalies · All 3 hardware keys verified',
+        kpis: [
+          { label: 'Security Posture Rating', val: '99.8 / 100', pill: 'Tier-IV Max', sub: 'Swiss FINMA & ISO-27001 compliant' },
+          { label: 'Hardware Signing Keys', val: '3 of 3 Synced', pill: '2-of-3 Quorum', sub: 'Primary Titanium Key + 2 Vault Backups' },
+          { label: 'Geo-Fenced Sovereign Zones', val: 'Zurich · NYC', pill: 'Active Shield', sub: 'Blocks out-of-corridor card/wire auth' },
+          { label: 'Last Penetration Verification', val: '2h Ago', pill: 'Zero Alerts', sub: 'Continuous SOC-24 enclave telemetry' }
+        ],
+        visualTitle: 'Enclave & Biometric Telemetry',
+        visualSub: 'Hardware security module and physical vault access integrity',
+        bars: [
+          { label: 'Multi-Sig Hardware Quorum Health', val: '100%', pct: 100, detail: '2-of-3 YubiKey Bio signatures enforced' },
+          { label: 'Post-Quantum TLS 1.3 Session Tunnel', val: '0.8ms', pct: 94, detail: 'Zurich dedicated private fiber node' },
+          { label: 'Biometric Voiceprint + FaceID Match', val: '99.97%', pct: 96, detail: 'Required on wires exceeding $100,000' },
+          { label: 'Duress PIN Silent Concierge Lock', val: 'Armed', pct: 88, detail: 'Routes decoy ledger while alerting Geneva' }
+        ],
+        tableTitle: 'Sovereign Security & Governance Controls',
+        toggles: [
+          { title: '2-of-3 Hardware Key Quorum Above $100,000', desc: 'Requires physical titanium FIDO2 key tap plus Geneva banker co-signature', on: true },
+          { title: 'Physical Bullion Withdrawal 48-Hour Time-Lock', desc: 'Enforces mandatory cooling window with video verification before armored dispatch', on: true },
+          { title: 'Automatic Geo-Fence Card & SWIFT Shield', desc: 'Restricts Centurion card and wire initiation to whitelisted travel corridors', on: true },
+          { title: 'Silent Duress Vault Mode', desc: 'Entering secondary PIN displays capped $25,000 travel balance and locks XAU vault', on: true },
+          { title: 'Allow Instant Inter-Vault XAU Swaps Without Call', desc: 'Permits instant USD-to-XAU allocation inside existing segregated Zurich bunker', on: false }
+        ]
+      }
+    };
+
+    function formatCurrencyValue(usdAmount) {
+      if (currentCurrency === 'CHF') {
+        return 'CHF ' + Math.round(usdAmount * CHF_RATE).toLocaleString();
+      }
+      if (currentCurrency === 'XAU') {
+        return (usdAmount / XAU_SPOT_USD).toFixed(2) + ' oz XAU';
+      }
+      return '$' + Math.round(usdAmount).toLocaleString();
+    }
+
+    function setAurumCurrency(ccy) {
+      currentCurrency = ccy;
+      document.querySelectorAll('.ccy-btn').forEach((btn) => {
+        const active = btn.dataset.ccy === ccy;
+        btn.className = active
+          ? 'ccy-btn rounded-lg px-2.5 py-1 text-xs font-mono font-bold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer'
+          : 'ccy-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer';
+      });
+
+      document.getElementById('kpiWealthVal').textContent = formatCurrencyValue(baseWealthUsd);
+      document.getElementById('kpiBullionVal').textContent = baseBullionOz.toFixed(2) + ' oz';
+      document.getElementById('kpiBullionSub').textContent = 'Spot value ' + formatCurrencyValue(baseBullionOz * XAU_SPOT_USD);
+      document.getElementById('kpiYieldSub').textContent = '+' + formatCurrencyValue(26110) + ' monthly coupon';
+      document.getElementById('kpiCashbackVal').textContent = formatCurrencyValue(18940);
+      document.getElementById('cardLimitLabel').innerHTML = `${formatCurrencyValue(164200)} <span class="text-[#A1A1AA] font-normal">/ ${formatCurrencyValue(250000)}</span>`;
+
+      renderTrajectoryChart(currentTf);
+      showAurumToast(`Display currency switched to Sovereign ${ccy}`);
+    }
+
+    // 3D Perspective-Tilt on Centurion Card
+    function handleCardTilt(e) {
+      const stage = document.getElementById('centurionStage');
+      const plate = document.getElementById('centurionPlate');
+      const glare = document.getElementById('centurionGlare');
+      if (!stage || !plate) return;
+
+      const rect = stage.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const pctX = (x / rect.width) * 100;
+      const pctY = (y / rect.height) * 100;
+
+      const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 9;
+      const rotateX = -((y - rect.height / 2) / (rect.height / 2)) * 7;
+
+      plate.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+      if (glare) {
+        glare.style.setProperty('--glare-x', `${pctX.toFixed(1)}%`);
+        glare.style.setProperty('--glare-y', `${pctY.toFixed(1)}%`);
+      }
+    }
+
+    function resetCardTilt() {
+      const plate = document.getElementById('centurionPlate');
+      if (plate) plate.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    }
+
+    function toggleCenturionPan() {
+      panRevealed = !panRevealed;
+      document.getElementById('centurionPanText').textContent = panRevealed
+        ? '4921  8840  1920  8899'
+        : '••••  ••••  ••••  8899';
+      document.getElementById('panToggleLabel').textContent = panRevealed ? 'Mask PAN' : 'Reveal PAN';
+      showAurumToast(panRevealed ? 'Biometric match: Full Centurion PAN revealed' : 'Centurion PAN masked');
+    }
+
+    function toggleCenturionFreeze() {
+      cardFrozen = !cardFrozen;
+      const plate = document.getElementById('centurionPlate');
+      const badge = document.getElementById('cardStatusBadge');
+      const label = document.getElementById('freezeCardLabel');
+
+      plate.classList.toggle('frozen', cardFrozen);
+      if (cardFrozen) {
+        badge.className = 'inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 px-2.5 py-0.5 text-xs font-mono font-semibold text-[#FDE699]';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#F5C451]"></span>FROZEN';
+        label.textContent = 'Unfreeze Card';
+        showAurumToast('Centurion Card •••• 8899 temporarily frozen across all POS/online rails');
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-mono font-semibold text-emerald-300';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>ACTIVE';
+        label.textContent = 'Freeze Card';
+        showAurumToast('Centurion Card •••• 8899 restored to Active sovereign standing');
+      }
+    }
+
+    // Smooth Catmull-Rom / Cubic Spline Builder & Interactive Hero Chart
+    function buildSmoothPath(coords) {
+      if (!coords.length) return '';
+      let d = `M ${coords[0].x} ${coords[0].y}`;
+      for (let i = 0; i < coords.length - 1; i++) {
+        const p0 = coords[i];
+        const p1 = coords[i + 1];
+        const midX = ((p0.x + p1.x) / 2).toFixed(1);
+        d += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+      return d;
+    }
+
+    function renderTrajectoryChart(tfKey) {
+      currentTf = tfKey;
+      const series = TRAJECTORY_DATA[tfKey];
+      if (!series) return;
+
+      document.getElementById('heroDeltaBadge').textContent = series.delta;
+
+      const pts = series.points;
+      const vals = pts.map((p) => p.usd);
+      const minV = Math.min(...vals) * 0.985;
+      const maxV = Math.max(...vals) * 1.01;
+
+      const startX = 46;
+      const endX = 638;
+      const stepX = (endX - startX) / (pts.length - 1);
+
+      const coords = pts.map((p, i) => {
+        const x = Math.round(startX + i * stepX);
+        const norm = (p.usd - minV) / (maxV - minV || 1);
+        const y = Math.round(136 - norm * 108);
+        return { ...p, x, y };
+      });
+
+      const splineD = buildSmoothPath(coords);
+      const areaD = `${splineD} L ${coords[coords.length - 1].x} 158 L ${coords[0].x} 158 Z`;
+
+      const splineEl = document.getElementById('heroSplinePath');
+      splineEl.setAttribute('d', splineD);
+      splineEl.classList.remove('gold-spline-anim');
+      void splineEl.offsetWidth;
+      splineEl.classList.add('gold-spline-anim');
+
+      document.getElementById('heroAreaPath').setAttribute('d', areaD);
+
+      const photon = document.getElementById('photonMotion');
+      if (photon) photon.setAttribute('path', splineD);
+
+      // Smoked-gold liquidity bars
+      const barsGroup = document.getElementById('heroLiquidityBars');
+      barsGroup.innerHTML = coords.map((c) => {
+        const h = c.bar;
+        const y = 158 - h;
+        return `<rect x="${c.x - 14}" y="${y}" width="28" height="${h}" rx="5" fill="url(#smokedGoldBar)" stroke="#D4AF37" stroke-opacity="0.22" />`;
+      }).join('');
+
+      // Interactive hover columns + nodes + X labels (font-size="12" for strict >=12px compliance)
+      const nodesGroup = document.getElementById('heroInteractiveNodes');
+      nodesGroup.innerHTML = coords.map((c, idx) => `
+        <g class="cursor-pointer" onmouseenter="inspectTrajectoryNode(${idx})" onclick="inspectTrajectoryNode(${idx})">
+          <rect x="${c.x - 42}" y="12" width="84" height="162" fill="transparent" />
+          <circle cx="${c.x}" cy="${c.y}" r="4" fill="#101015" stroke="#F5C451" stroke-width="2" />
+          <text x="${c.x}" y="177" text-anchor="middle" fill="#A1A1AA" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500">${c.label}</text>
+        </g>
+      `).join('');
+
+      window._currentCoords = coords;
+      inspectTrajectoryNode(coords.length - 1);
+    }
+
+    function inspectTrajectoryNode(idx) {
+      const coords = window._currentCoords || [];
+      const node = coords[idx];
+      if (!node) return;
+
+      document.getElementById('heroHoverLine').setAttribute('x1', node.x);
+      document.getElementById('heroHoverLine').setAttribute('x2', node.x);
+      document.getElementById('heroActiveDot').setAttribute('cx', node.x);
+      document.getElementById('heroActiveDot').setAttribute('cy', node.y);
+
+      document.getElementById('calloutPeriod').textContent = node.label;
+      document.getElementById('calloutVal').textContent = formatCurrencyValue(node.usd);
+      document.getElementById('calloutGold').textContent = node.oz;
+      document.getElementById('calloutInflow').textContent = node.inflow;
+    }
+
+    function switchTrajectoryTf(tfKey) {
+      document.querySelectorAll('.tf-btn').forEach((b) => {
+        const active = b.dataset.tf === tfKey;
+        b.className = active
+          ? 'tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-bold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer'
+          : 'tf-btn rounded-lg px-2.5 py-1 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer';
+      });
+      renderTrajectoryChart(tfKey);
+    }
+
+    // 24K Gold Asset Allocation Donut Ring
+    function renderAurumDonut() {
+      const r = 48;
+      const circ = 2 * Math.PI * r;
+      let offset = 0;
+
+      const slicesEl = document.getElementById('aurumDonutSlices');
+      const legendEl = document.getElementById('aurumDonutLegend');
+
+      slicesEl.innerHTML = ALLOCATION_SLICES.map((s, idx) => {
+        const dash = (s.pct / 100) * circ;
+        const gap = 3.5;
+        const seg = `<circle
+          data-slice="${idx}"
+          onmouseenter="highlightDonutSlice(${idx})"
+          onclick="highlightDonutSlice(${idx})"
+          cx="70" cy="70" r="${r}"
+          fill="none"
+          stroke="${s.color}"
+          stroke-width="16"
+          stroke-dasharray="${Math.max(dash - gap, 2).toFixed(1)} ${circ.toFixed(1)}"
+          stroke-dashoffset="${(-offset).toFixed(1)}"
+          class="aurum-donut-slice ${idx === 0 ? 'active-slice' : ''}"
+        />`;
+        offset += dash;
+        return seg;
+      }).join('');
+
+      legendEl.innerHTML = ALLOCATION_SLICES.map((s, idx) => `
+        <div
+          onmouseenter="highlightDonutSlice(${idx})"
+          onclick="highlightDonutSlice(${idx})"
+          class="flex items-center justify-between gap-2 rounded-lg px-2 py-1 hover:bg-[#D4AF37]/10 cursor-pointer transition"
+        >
+          <span class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${s.color}"></span>
+            <span class="text-xs text-[#FAF8F2] truncate">${s.name}</span>
+          </span>
+          <span class="font-mono text-xs font-bold text-[#FDE699]">${s.pct}%</span>
+        </div>
+      `).join('');
+    }
+
+    function highlightDonutSlice(idx) {
+      const item = ALLOCATION_SLICES[idx];
+      if (!item) return;
+      document.querySelectorAll('.aurum-donut-slice').forEach((el) => {
+        el.classList.toggle('active-slice', Number(el.dataset.slice) === idx);
+      });
+      document.getElementById('donutCenterLabel').textContent = item.short;
+      document.getElementById('donutCenterPct').textContent = item.pct + '%';
+      document.getElementById('donutCenterAmt').textContent = item.usd;
+    }
+
+    // Instant Concierge Wire & Bullion Swap Engine
+    function setOrderMode(mode) {
+      currentOrderMode = mode;
+      const btnBullion = document.getElementById('modeBtnBullion');
+      const btnWire = document.getElementById('modeBtnWire');
+      const targetLabel = document.getElementById('orderTargetLabel');
+      const targetSelect = document.getElementById('orderTargetSelect');
+
+      if (mode === 'BULLION') {
+        btnBullion.className = 'rounded-lg py-1.5 px-2 text-xs font-semibold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer';
+        btnWire.className = 'rounded-lg py-1.5 px-2 text-xs font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer';
+        targetLabel.textContent = 'Custody Destination';
+        targetSelect.innerHTML = `
+          <option value="Zurich Bunker #04">Zurich Bunker #04</option>
+          <option value="Geneva FreePort">Geneva FreePort</option>
+          <option value="Singapore Vault">Singapore Vault</option>
+        `;
+      } else {
+        btnWire.className = 'rounded-lg py-1.5 px-2 text-xs font-semibold bg-gradient-to-r from-[#F5C451] to-[#D4AF37] text-[#070709] transition cursor-pointer';
+        btnBullion.className = 'rounded-lg py-1.5 px-2 text-xs font-semibold text-[#A1A1AA] hover:text-[#FAF8F2] transition cursor-pointer';
+        targetLabel.textContent = 'SWIFT Beneficiary';
+        targetSelect.innerHTML = `
+          <option value="Geneva Family Trust IBAN">Geneva Family Trust</option>
+          <option value="Sotheby's Fine Art Escrow">Sotheby's Escrow</option>
+          <option value="VistaJet Charter Retainer">VistaJet Retainer</option>
+        `;
+      }
+      updateOrderEstimate();
+    }
+
+    function updateOrderEstimate() {
+      const raw = parseFloat(document.getElementById('orderAmountInput').value) || 0;
+      const leftEl = document.getElementById('orderPreviewLeft');
+      const rightEl = document.getElementById('orderPreviewRight');
+
+      if (currentOrderMode === 'BULLION') {
+        const oz = raw / XAU_SPOT_USD;
+        leftEl.textContent = 'Allocated Output:';
+        rightEl.textContent = `${oz.toFixed(2)} oz Physical XAU`;
+      } else {
+        const chf = Math.round(raw * CHF_RATE);
+        leftEl.textContent = 'Priority SWIFT gpi:';
+        rightEl.textContent = `CHF ${chf.toLocaleString()} · 0.00% Fee`;
+      }
+    }
+
+    function executeSovereignOrder(e) {
+      e.preventDefault();
+      const raw = parseFloat(document.getElementById('orderAmountInput').value) || 0;
+      if (raw <= 0) return;
+      const target = document.getElementById('orderTargetSelect').value;
+
+      if (currentOrderMode === 'BULLION') {
+        const oz = raw / XAU_SPOT_USD;
+        baseBullionOz += oz;
+        VAULT_LEDGER.unshift({
+          title: 'Physical 24K Bullion Swap',
+          meta: `${target} · +${oz.toFixed(2)} oz XAU`,
+          amount: `-$${Math.round(raw).toLocaleString()}`,
+          pill: '24K Allocated',
+          pillType: 'gold'
+        });
+        document.getElementById('kpiBullionVal').textContent = baseBullionOz.toFixed(2) + ' oz';
+        document.getElementById('kpiBullionSub').textContent = 'Spot value ' + formatCurrencyValue(baseBullionOz * XAU_SPOT_USD);
+        showAurumToast(`Allocated +${oz.toFixed(2)} oz LBMA 999.9 Gold into ${target}`);
+      } else {
+        baseWealthUsd = Math.max(baseWealthUsd - raw, 0);
+        VAULT_LEDGER.unshift({
+          title: 'Sovereign SWIFT gpi Wire',
+          meta: `${target} · Same-Hour Finality`,
+          amount: `-$${Math.round(raw).toLocaleString()}`,
+          pill: 'Settled',
+          pillType: 'emerald'
+        });
+        document.getElementById('kpiWealthVal').textContent = formatCurrencyValue(baseWealthUsd);
+        showAurumToast(`Dispatched $${Math.round(raw).toLocaleString()} Priority SWIFT Wire to ${target}`);
+      }
+
+      renderVaultLedger();
+    }
+
+    // Private Vault Ledger Renderer & Live Search Filter
+    function syncVaultSearch(val) {
+      ledgerQuery = (val || '').trim().toLowerCase();
+      const gInput = document.getElementById('globalVaultSearch');
+      const lInput = document.getElementById('ledgerSearchInput');
+      if (gInput && gInput.value !== val) gInput.value = val;
+      if (lInput && lInput.value !== val) lInput.value = val;
+      renderVaultLedger();
+    }
+
+    function renderVaultLedger() {
+      const listEl = document.getElementById('vaultLedgerList');
+      if (!listEl) return;
+
+      const filtered = VAULT_LEDGER.filter((item) =>
+        !ledgerQuery ||
+        item.title.toLowerCase().includes(ledgerQuery) ||
+        item.meta.toLowerCase().includes(ledgerQuery) ||
+        item.pill.toLowerCase().includes(ledgerQuery)
+      );
+
+      if (!filtered.length) {
+        listEl.innerHTML = `<div class="rounded-xl bg-[#070709]/80 border border-[#D4AF37]/20 p-3 text-xs text-[#A1A1AA] text-center">No matching sovereign ledger entries.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((item) => {
+        const pillCls = item.pillType === 'emerald'
+          ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+          : 'bg-[#D4AF37]/15 border-[#D4AF37]/35 text-[#FDE699]';
+        const amtCls = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-[#FAF8F2]';
+        return `
+          <div onclick="showAurumToast('${item.title} · ${item.meta} (${item.amount})')" class="rounded-xl bg-[#070709]/85 hover:bg-[#101015] border border-[#D4AF37]/20 hover:border-[#D4AF37]/45 px-3 py-2 flex items-center justify-between gap-2 cursor-pointer transition">
+            <div class="min-w-0">
+              <p class="text-xs font-semibold text-[#FAF8F2] truncate">${item.title}</p>
+              <p class="text-xs text-[#A1A1AA] truncate">${item.meta}</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="font-mono text-xs font-bold ${amtCls}">${item.amount}</p>
+              <span class="inline-block rounded-full border px-2 py-0.5 text-xs font-mono ${pillCls}">${item.pill}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Multi-Tab Sub-Page View Engine (#defaultDashboardView + #tabSubpageView)
+    function toggleVaultSecuritySwitch(idx) {
+      const toggles = AURUM_SUBPAGES['Vault Security'].toggles;
+      if (!toggles[idx]) return;
+      toggles[idx].on = !toggles[idx].on;
+      renderAurumSubpage('Vault Security');
+      showAurumToast(`${toggles[idx].title}: ${toggles[idx].on ? 'Armed' : 'Standby'}`);
+    }
+
+    function triggerSubpageRowAction(tabKey, idx) {
+      const sub = AURUM_SUBPAGES[tabKey];
+      if (!sub || !sub.rows || !sub.rows[idx]) return;
+      const r = sub.rows[idx];
+      if (tabKey === 'Centurion Cards' && r.btn === 'Boost Limit') {
+        r.status = 'Limit +$25k';
+        r.pillType = 'gold';
+        renderAurumSubpage(tabKey);
+        showAurumToast(`Approved +$25,000 sovereign limit boost for ${r.c1}`);
+      } else if (tabKey === 'Bullion Vault (XAU)' && r.btn === 'Request Delivery') {
+        r.status = 'Courier Slotted';
+        r.pillType = 'gold';
+        renderAurumSubpage(tabKey);
+        showAurumToast(`Scheduled armored Brinks courier for ${r.c2} (${r.c3})`);
+      } else {
+        showAurumToast(`${r.btn} · ${r.c1} (${r.c2})`);
+      }
+    }
+
+    function renderAurumSubpage(tabKey) {
+      const data = AURUM_SUBPAGES[tabKey];
+      const container = document.getElementById('tabSubpageView');
+      if (!data || !container) return;
+
+      const kpiHtml = data.kpis.map((k) => `
+        <div class="aurum-card p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium text-[#A1A1AA]">${k.label}</span>
+            <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-2.5 py-0.5 text-xs font-mono font-semibold text-[#FDE699]">${k.pill}</span>
+          </div>
+          <p class="font-display text-2xl font-extrabold text-[#FAF8F2] tracking-tight mt-2">${k.val}</p>
+          <p class="text-xs text-[#A1A1AA] mt-2 pt-2 border-t border-[#D4AF37]/15">${k.sub}</p>
+        </div>
+      `).join('');
+
+      const barsHtml = data.bars.map((b) => `
+        <div onclick="showAurumToast('${b.label}: ${b.val}')" class="rounded-xl bg-[#070709]/90 border border-[#D4AF37]/25 hover:border-[#F5C451]/60 p-3 cursor-pointer transition">
+          <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+            <span class="font-semibold text-[#FAF8F2]">${b.label}</span>
+            <span class="font-mono font-bold text-[#FDE699]">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-[#101015] overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-[#9A7418] via-[#D4AF37] to-[#FDE699]" style="width:${b.pct}%"></div>
+          </div>
+          <p class="text-xs text-[#A1A1AA] mt-1">${b.detail}</p>
+        </div>
+      `).join('');
+
+      let rightModuleHtml = '';
+      if (data.toggles) {
+        rightModuleHtml = `
+          <div class="space-y-2.5">
+            ${data.toggles.map((t, idx) => `
+              <div onclick="toggleVaultSecuritySwitch(${idx})" class="rounded-xl bg-[#070709]/90 border ${t.on ? 'border-[#F5C451]/45' : 'border-[#D4AF37]/20'} p-3.5 flex items-center justify-between gap-4 cursor-pointer transition">
+                <div class="min-w-0">
+                  <p class="text-xs sm:text-sm font-semibold text-[#FAF8F2]">${t.title}</p>
+                  <p class="text-xs text-[#A1A1AA] mt-0.5">${t.desc}</p>
+                </div>
+                <button type="button" aria-pressed="${t.on}" class="w-11 h-6 rounded-full p-0.5 flex items-center flex-shrink-0 transition ${t.on ? 'bg-gradient-to-r from-[#D4AF37] to-[#F5C451] justify-end' : 'bg-zinc-700 justify-start'}">
+                  <span class="w-5 h-5 rounded-full bg-[#070709] shadow"></span>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        rightModuleHtml = `
+          <div class="overflow-x-auto aurum-scroll">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-[#D4AF37]/20 text-xs text-[#A1A1AA]">
+                  <th class="pb-2.5 pr-2 font-medium">${data.columns[0]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[1]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[2]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[3]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[4]}</th>
+                  <th class="pb-2.5 pl-2 font-medium text-right">${data.columns[5]}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#D4AF37]/15 text-xs">
+                ${data.rows.map((r, idx) => {
+                  const pillCls = r.pillType === 'emerald'
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                    : 'bg-[#D4AF37]/15 border-[#D4AF37]/35 text-[#FDE699]';
+                  return `
+                    <tr class="hover:bg-[#D4AF37]/5 transition">
+                      <td class="py-3 pr-2 font-semibold text-[#FAF8F2]">${r.c1}</td>
+                      <td class="py-3 px-2 font-mono text-[#FDE699]">${r.c2}</td>
+                      <td class="py-3 px-2 font-mono font-semibold text-[#FAF8F2]">${r.c3}</td>
+                      <td class="py-3 px-2 text-[#A1A1AA]">${r.c4}</td>
+                      <td class="py-3 px-2"><span class="rounded-full border px-2.5 py-0.5 text-xs font-mono ${pillCls}">${r.status}</span></td>
+                      <td class="py-3 pl-2 text-right">
+                        <button type="button" onclick="triggerSubpageRowAction('${tabKey.replace(/'/g, "\\'")}', ${idx})" class="rounded-lg bg-[#101015] hover:bg-[#D4AF37] text-[#FDE699] hover:text-[#070709] border border-[#D4AF37]/35 px-3 py-1 text-xs font-semibold transition cursor-pointer">
+                          ${r.btn}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-3">
+          <!-- Sub-Page Sovereign Header -->
+          <div class="aurum-card p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="returnToAurumOverview()" class="inline-flex items-center gap-1.5 rounded-full bg-[#101015] hover:bg-[#D4AF37]/20 border border-[#D4AF37]/35 px-3 py-1 text-xs font-semibold text-[#FDE699] transition cursor-pointer">
+                  <span>← Overview</span>
+                </button>
+                <span class="rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-3 py-1 text-xs font-mono font-semibold text-[#FDE699]">${data.badge}</span>
+              </div>
+              <h1 class="font-display text-lg sm:text-xl font-extrabold text-[#FAF8F2] tracking-tight pt-0.5">${data.title}</h1>
+              <p class="text-xs text-[#A1A1AA]">${data.subtitle}</p>
+            </div>
+            <button type="button" onclick="showAurumToast('${data.ctaToast.replace(/'/g, "\\'")}')" class="gold-cta-btn rounded-xl px-4 py-2 text-xs font-bold flex items-center gap-2 cursor-pointer">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              <span>${data.ctaLabel}</span>
+            </button>
+          </div>
+
+          <!-- 4 Gold-Rimmed KPIs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
+            ${kpiHtml}
+          </div>
+
+          <!-- Left Visual Chart/Progress + Right 5-Row Interactive Table/Toggles -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-stretch">
+            <div class="aurum-card p-4 lg:col-span-5 flex flex-col justify-between space-y-3">
+              <div>
+                <h2 class="font-display text-sm sm:text-base font-bold text-[#FAF8F2]">${data.visualTitle}</h2>
+                <p class="text-xs text-[#A1A1AA] mt-0.5">${data.visualSub}</p>
+              </div>
+              <!-- Gold Decorative Telemetry Wave -->
+              <svg class="w-full h-14" viewBox="0 0 360 52" fill="none">
+                <path d="M4 42 C 58 38, 92 18, 148 24 C 204 30, 256 10, 356 8" stroke="url(#liquidGoldStroke)" stroke-width="2.5" stroke-linecap="round" filter="url(#aurumGoldGlow)" />
+                <circle cx="356" cy="8" r="3.5" fill="#FDE699" />
+              </svg>
+              <div class="space-y-2">
+                ${barsHtml}
+              </div>
+            </div>
+
+            <div class="aurum-card p-4 lg:col-span-7 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="font-display text-sm sm:text-base font-bold text-[#FAF8F2]">${data.tableTitle}</h2>
+                  <p class="text-xs text-[#A1A1AA] mt-0.5">Direct sovereign chamber execution with live audit log</p>
+                </div>
+                <span class="rounded-full bg-[#101015] border border-[#D4AF37]/30 px-3 py-1 text-xs font-mono text-emerald-400">HSM Synced</span>
+              </div>
+              ${rightModuleHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function returnToAurumOverview(silent = false) {
+      document.querySelectorAll('[data-aurum-tab]').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.aurumTab === 'Wealth Overview');
+      });
+      document.getElementById('tabSubpageView').classList.add('hidden');
+      document.getElementById('defaultDashboardView').classList.remove('hidden');
+      if (!silent) showAurumToast('Returned to Sovereign Wealth Overview');
+    }
+
+    function switchAurumTab(tabKey) {
+      document.querySelectorAll('[data-aurum-tab]').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.aurumTab === tabKey);
+      });
+
+      if (tabKey === 'Wealth Overview') {
+        returnToAurumOverview(true);
+        showAurumToast('Wealth Overview · Sovereign Chamber');
+      } else {
+        document.getElementById('defaultDashboardView').classList.add('hidden');
+        const sub = document.getElementById('tabSubpageView');
+        sub.classList.remove('hidden');
+        renderAurumSubpage(tabKey);
+        showAurumToast(`Opened ${tabKey}`);
+      }
+    }
+
+    let aurumToastTimer = null;
+    function showAurumToast(msg) {
+      const toast = document.getElementById('aurumToast');
+      document.getElementById('aurumToastMsg').textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(aurumToastTimer);
+      aurumToastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+      }, 2700);
+    }
+
+    // Boot Aurum Centurion Suite
+    renderTrajectoryChart('1Y');
+    renderAurumDonut();
+    updateOrderEstimate();
+    renderVaultLedger();
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="bg35" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#DCE0EC"/>
+      <stop offset="100%" stop-color="#E7EAF4"/>
+    </linearGradient>
+    <linearGradient id="plum35" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2B0F5E"/>
+      <stop offset="100%" stop-color="#1E0844"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Periwinkle Backdrop -->
+  <rect width="800" height="450" fill="url(#bg35)"/>
+
+  <!-- Main Rounded Shell -->
+  <rect x="20" y="14" width="760" height="422" rx="22" fill="#F4F6FB"/>
+
+  <!-- Left Deep-Plum Icon Rail -->
+  <path d="M42 14 H72 V436 H42 Q20 436 20 414 V36 Q20 14 42 14 Z" fill="url(#plum35)"/>
+  <circle cx="46" cy="36" r="4" fill="#9B7BFF"/>
+  <circle cx="41" cy="45" r="4" fill="#7C5CFA"/>
+  <circle cx="51" cy="45" r="4" fill="#F59E6C"/>
+  <circle cx="46" cy="84" r="13" fill="#7B5CFA"/>
+  <circle cx="46" cy="122" r="4.5" fill="none" stroke="#A78BFA" stroke-width="1.5"/>
+  <rect x="41" y="152" width="10" height="8" rx="2" fill="none" stroke="#A78BFA" stroke-width="1.5"/>
+  <circle cx="46" cy="190" r="5" fill="none" stroke="#A78BFA" stroke-width="1.5"/>
+  <circle cx="46" cy="402" r="5" fill="none" stroke="#A78BFA" stroke-width="1.5"/>
+
+  <!-- Top Bar (Badge-safe left zone x < 430, y < 95 contains ZERO text) -->
+  <rect x="114" y="26" width="210" height="24" rx="12" fill="#FFFFFF"/>
+  <!-- Top Right Profile (x >= 680, safe) -->
+  <circle cx="702" cy="38" r="10" fill="#F59E0B"/>
+  <text x="718" y="42" fill="#334155" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Sullivan</text>
+
+  <!-- Center Kanban White Container -->
+  <rect x="86" y="62" width="486" height="360" rx="18" fill="#FFFFFF"/>
+  <!-- Create Project Pill on right of board header (x >= 468, safe from left badges) -->
+  <rect x="476" y="74" width="80" height="22" rx="11" fill="#6C4CF6"/>
+  <text x="516" y="88" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Create Project</text>
+
+  <!-- Column Titles (y = 112, 100% badge-safe) -->
+  <text x="104" y="112" fill="#475569" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Started</text>
+  <text x="256" y="112" fill="#475569" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">On Going</text>
+  <text x="408" y="112" fill="#475569" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Completed</text>
+
+  <!-- Kanban Row 1 -->
+  <rect x="100" y="122" width="142" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="110" y="132" width="56" height="14" rx="7" fill="#E6F0FF"/>
+  <text x="138" y="142" text-anchor="middle" fill="#2563EB" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Web Design</text>
+  <rect x="110" y="176" width="122" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="110" y="176" width="62" height="4" rx="2" fill="#6C4CF6"/>
+  <circle cx="115" cy="194" r="5" fill="#F59E0B"/><circle cx="123" cy="194" r="5" fill="#EF4444"/><circle cx="131" cy="194" r="5" fill="#6366F1"/>
+
+  <rect x="252" y="122" width="142" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="262" y="132" width="54" height="14" rx="7" fill="#FFF0E5"/>
+  <text x="289" y="142" text-anchor="middle" fill="#EA580C" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Mobile App</text>
+  <rect x="262" y="176" width="122" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="262" y="176" width="40" height="4" rx="2" fill="#6C4CF6"/>
+  <circle cx="267" cy="194" r="5" fill="#8B5CF6"/><circle cx="275" cy="194" r="5" fill="#EC4899"/>
+
+  <rect x="404" y="122" width="148" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="414" y="132" width="54" height="14" rx="7" fill="#EFEAFF"/>
+  <text x="441" y="142" text-anchor="middle" fill="#6D28D9" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Dashboard</text>
+  <rect x="414" y="176" width="126" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="414" y="176" width="112" height="4" rx="2" fill="#6C4CF6"/>
+  <circle cx="419" cy="194" r="5" fill="#10B981"/><circle cx="427" cy="194" r="5" fill="#0EA5E9"/>
+
+  <!-- Kanban Row 2 (Center Card Tilted!) -->
+  <rect x="100" y="220" width="142" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="110" y="230" width="68" height="14" rx="7" fill="#FFEAF6"/>
+  <text x="144" y="240" text-anchor="middle" fill="#DB2777" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">App Dev</text>
+  <rect x="110" y="274" width="122" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="110" y="274" width="76" height="4" rx="2" fill="#6C4CF6"/>
+
+  <!-- Dashed Slot + Tilted Dragged Card -->
+  <rect x="252" y="220" width="142" height="88" rx="12" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="4 4"/>
+  <g transform="rotate(5 323 264)">
+    <rect x="254" y="222" width="140" height="86" rx="12" fill="#FFFFFF" stroke="#E0D7FF" stroke-width="1.4"/>
+    <rect x="264" y="232" width="54" height="14" rx="7" fill="#EFEAFF"/>
+    <text x="291" y="242" text-anchor="middle" fill="#6D28D9" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Dashboard</text>
+    <rect x="264" y="276" width="118" height="4" rx="2" fill="#ECEEF6"/>
+    <rect x="264" y="276" width="52" height="4" rx="2" fill="#6C4CF6"/>
+  </g>
+
+  <rect x="404" y="220" width="148" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="414" y="230" width="60" height="14" rx="7" fill="#E6F0FF"/>
+  <text x="444" y="240" text-anchor="middle" fill="#2563EB" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Landing Page</text>
+  <rect x="414" y="274" width="126" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="414" y="274" width="90" height="4" rx="2" fill="#6C4CF6"/>
+
+  <!-- Kanban Row 3 -->
+  <rect x="100" y="318" width="142" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="110" y="328" width="54" height="14" rx="7" fill="#FFF0E5"/>
+  <rect x="110" y="372" width="122" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="110" y="372" width="80" height="4" rx="2" fill="#6C4CF6"/>
+
+  <rect x="252" y="318" width="142" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="262" y="328" width="60" height="14" rx="7" fill="#E6F0FF"/>
+  <rect x="262" y="372" width="122" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="262" y="372" width="62" height="4" rx="2" fill="#6C4CF6"/>
+
+  <rect x="404" y="318" width="148" height="88" rx="12" fill="#FFFFFF" stroke="#EEF1F8" stroke-width="1.2"/>
+  <rect x="414" y="328" width="64" height="14" rx="7" fill="#FFEAF6"/>
+  <rect x="414" y="372" width="126" height="4" rx="2" fill="#ECEEF6"/>
+  <rect x="414" y="372" width="102" height="4" rx="2" fill="#6C4CF6"/>
+
+  <!-- Right Column: Team Ring + 2x2 KPIs + Schedule -->
+  <rect x="584" y="62" width="182" height="278" rx="18" fill="#FFFFFF"/>
+  <rect x="596" y="74" width="158" height="36" rx="10" fill="#F5F7FC"/>
+  <text x="606" y="96" fill="#1E293B" font-family="Inter, sans-serif" font-size="9.5" font-weight="800">Design Team</text>
+  <circle cx="738" cy="92" r="11" fill="#F98622"/>
+
+  <!-- 72% Ring -->
+  <circle cx="675" cy="166" r="38" fill="none" stroke="#F0ECFF" stroke-width="14"/>
+  <circle cx="675" cy="166" r="32" fill="none" stroke="#6C4CF6" stroke-width="4.5" stroke-dasharray="145 210" stroke-linecap="round" transform="rotate(-90 675 166)"/>
+  <text x="675" y="170" text-anchor="middle" fill="#1E293B" font-family="Inter, sans-serif" font-size="13" font-weight="800">72%</text>
+
+  <!-- 2x2 Summary Cards -->
+  <rect x="596" y="226" width="75" height="46" rx="10" fill="#ECF4FF"/>
+  <text x="606" y="242" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">TOTAL</text>
+  <text x="612" y="260" fill="#1E293B" font-family="Inter, sans-serif" font-size="12" font-weight="800">144</text>
+
+  <rect x="679" y="226" width="75" height="46" rx="10" fill="#FFF1E6"/>
+  <text x="689" y="242" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">DONE</text>
+  <text x="695" y="260" fill="#1E293B" font-family="Inter, sans-serif" font-size="12" font-weight="800">56</text>
+
+  <rect x="596" y="280" width="75" height="46" rx="10" fill="#FFEBF5"/>
+  <text x="606" y="296" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">ACTIVE</text>
+  <text x="612" y="314" fill="#1E293B" font-family="Inter, sans-serif" font-size="12" font-weight="800">72</text>
+
+  <rect x="679" y="280" width="75" height="46" rx="10" fill="#F2ECFF"/>
+  <text x="689" y="296" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">WAITING</text>
+  <text x="695" y="314" fill="#1E293B" font-family="Inter, sans-serif" font-size="12" font-weight="800">24</text>
+
+  <!-- Bottom Right Schedule Card -->
+  <rect x="584" y="350" width="182" height="72" rx="16" fill="#FFFFFF"/>
+  <rect x="596" y="362" width="22" height="22" rx="6" fill="#7B5CFA"/>
+  <text x="625" y="376" fill="#1E293B" font-family="Inter, sans-serif" font-size="8.5" font-weight="800">08:00-11:00 AM</text>
+  <rect x="596" y="390" width="22" height="22" rx="6" fill="#1D7AFC"/>
+  <text x="625" y="404" fill="#1E293B" font-family="Inter, sans-serif" font-size="8.5" font-weight="800">Internal Messages</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <rect width="800" height="450" fill="#060911"/>
+  <!-- Top Cockpit Bar -->
+  <rect x="0" y="0" width="800" height="50" fill="#0B101D"/>
+  <line x1="0" y1="50" x2="800" y2="50" stroke="#164E63"/>
+  <!-- Left Dock -->
+  <rect x="12" y="62" width="176" height="376" rx="12" fill="#0C1220" stroke="#1E293B"/>
+  <text x="26" y="88" font-family="monospace" font-size="11" font-weight="700" fill="#38BDF8">GPU PODS</text>
+  <rect x="24" y="102" width="152" height="44" rx="8" fill="#083344" stroke="#06B6D4"/>
+  <rect x="24" y="156" width="152" height="44" rx="8" fill="#111827" stroke="#1E293B"/>
+  <rect x="24" y="210" width="152" height="44" rx="8" fill="#111827" stroke="#1E293B"/>
+  <!-- Center Upper Neural Topology Panel -->
+  <rect x="198" y="62" width="404" height="218" rx="12" fill="#0C1220" stroke="#164E63"/>
+  <text x="216" y="88" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="700" fill="#F8FAFC">Neural Tensor Routing · 14,820 tok/s</text>
+  <line x1="250" y1="168" x2="395" y2="128" stroke="#06B6D4" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="250" y1="168" x2="395" y2="208" stroke="#6366F1" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="395" y1="128" x2="545" y2="168" stroke="#10B981" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="395" y1="208" x2="545" y2="168" stroke="#06B6D4" stroke-width="2" stroke-dasharray="4 4"/>
+  <circle cx="250" cy="168" r="18" fill="#083344" stroke="#06B6D4" stroke-width="2.5"/>
+  <circle cx="395" cy="128" r="18" fill="#1E1B4B" stroke="#818CF8" stroke-width="2.5"/>
+  <circle cx="395" cy="208" r="18" fill="#1E1B4B" stroke="#818CF8" stroke-width="2.5"/>
+  <circle cx="545" cy="168" r="20" fill="#064E3B" stroke="#10B981" stroke-width="2.5"/>
+  <!-- Center Lower Trace Panel -->
+  <rect x="198" y="290" width="404" height="148" rx="12" fill="#0C1220" stroke="#1E293B"/>
+  <text x="216" y="316" font-family="monospace" font-size="11" font-weight="700" fill="#94A3B8">INFERENCE TRACE WATERFALL</text>
+  <rect x="216" y="332" width="90" height="12" rx="4" fill="#06B6D4"/>
+  <rect x="290" y="354" width="160" height="12" rx="4" fill="#6366F1"/>
+  <rect x="420" y="376" width="150" height="12" rx="4" fill="#10B981"/>
+  <!-- Right Dock Gauges -->
+  <rect x="612" y="62" width="176" height="376" rx="12" fill="#0C1220" stroke="#1E293B"/>
+  <text x="630" y="88" font-family="monospace" font-size="11" font-weight="700" fill="#10B981">TENSOR LOAD</text>
+  <circle cx="700" cy="158" r="44" fill="none" stroke="#1E293B" stroke-width="10"/>
+  <circle cx="700" cy="158" r="44" fill="none" stroke="#06B6D4" stroke-width="10" stroke-dasharray="220 280" transform="rotate(-90 700 158)"/>
+  <text x="700" y="164" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" font-weight="700" fill="#F8FAFC">91.4%</text>
+  <circle cx="700" cy="284" r="44" fill="none" stroke="#1E293B" stroke-width="10"/>
+  <circle cx="700" cy="284" r="44" fill="none" stroke="#10B981" stroke-width="10" stroke-dasharray="190 280" transform="rotate(-90 700 284)"/>
+  <text x="700" y="290" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="16" font-weight="700" fill="#F8FAFC">74.2%</text>
+</svg>

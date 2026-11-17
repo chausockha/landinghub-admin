@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sora Vance — Principal Product &amp; Design Systems Architect</title>
+  <meta name="description" content="Portfolio of Sora Vance — Principal Product & Design Systems Architect. Designing tactile interfaces, multi-brand token architectures, and scalable digital products." />
+
+  <!-- Google Fonts: Fraunces + Plus Jakarta Sans + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#FAF8F4',
+            paper: '#FFFFFF',
+            ink: '#141416',
+            stoneBorder: '#E7E5E0',
+            violetElec: '#7C3AED',
+            coralRose: '#F43F5E',
+            lavenderSoft: '#F3E8FF',
+          },
+          fontFamily: {
+            serif: ['"Fraunces"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-ivory: #FAF8F4;
+      --bg-paper: #FFFFFF;
+      --bg-ink: #141416;
+      --border-stone: #E7E5E0;
+      --play-accent: #7C3AED;
+      --play-accent-soft: #F3E8FF;
+      --play-accent-text: #5B21B6;
+      --play-radius-card: 20px;
+      --play-radius-ctrl: 12px;
+      --play-radius-badge: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-ivory);
+      color: #18181B;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: #EDE9FE;
+      color: #4C1D95;
+    }
+
+    /* Subtle tactile paper dot grid */
+    .bg-editorial-dots {
+      background-image: radial-gradient(#D6D3CD 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .tactile-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-stone);
+      box-shadow: 0 2px 4px rgba(20, 20, 22, 0.02), 0 12px 32px -12px rgba(20, 20, 22, 0.06);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    }
+
+    .tactile-card:hover {
+      border-color: #D4D0C8;
+      box-shadow: 0 4px 8px rgba(20, 20, 22, 0.03), 0 22px 44px -14px rgba(20, 20, 22, 0.1);
+    }
+
+    .ink-card {
+      background: #141416;
+      color: #FAF8F4;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 24px 50px -15px rgba(20, 20, 22, 0.35);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    }
+
+    .ink-card:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    /* Interactive Token Playground Dynamic Classes */
+    .play-surface {
+      border-radius: var(--play-radius-card);
+      transition: border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .play-ctrl {
+      border-radius: var(--play-radius-ctrl);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .play-badge {
+      border-radius: var(--play-radius-badge);
+      background-color: var(--play-accent-soft);
+      color: var(--play-accent-text);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .play-accent-bg {
+      background-color: var(--play-accent);
+      transition: background-color 0.28s ease, border-radius 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .play-accent-border {
+      border-color: var(--play-accent);
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="antialiased relative">
+
+  <!-- Soft Editorial Ambient Aura -->
+  <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div class="absolute -top-40 right-[8%] w-[560px] h-[380px] rounded-full bg-[#F3E8FF]/80 blur-[110px]"></div>
+    <div class="absolute top-56 -left-24 w-[440px] h-[340px] rounded-full bg-rose-200/35 blur-[110px]"></div>
+  </div>
+
+  <!-- 1. FLOATING FROSTED GLASS PILL NAVBAR -->
+  <header class="fixed top-4 inset-x-0 z-50 px-4">
+    <nav aria-label="Primary Navigation" class="max-w-5xl mx-auto flex items-center justify-between px-3.5 sm:px-5 py-2.5 rounded-full bg-white/80 backdrop-blur-xl border border-[#E7E5E0] shadow-[0_10px_30px_rgba(20,20,22,0.06)]">
+      <!-- Brand Identity -->
+      <a href="#top" class="flex items-center gap-2.5 group">
+        <span class="w-8 h-8 rounded-full bg-[#141416] text-[#FAF8F4] flex items-center justify-center group-hover:bg-violetElec transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="8"></circle>
+            <path d="M12 4a8 8 0 0 1 0 16V4z" fill="currentColor" fill-opacity="0.28"></path>
+          </svg>
+        </span>
+        <div class="leading-none">
+          <span class="font-serif font-semibold text-base tracking-tight text-[#141416]">Sora Vance</span>
+          <span class="hidden sm:inline-block ml-1.5 font-mono text-xs uppercase tracking-wider text-stone-500">Systems</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden md:flex items-center gap-1 text-xs font-semibold text-stone-600">
+        <a href="#work" class="px-3.5 py-1.5 rounded-full hover:text-[#141416] hover:bg-stone-100/90 transition-colors">Selected Work</a>
+        <a href="#playground" class="px-3.5 py-1.5 rounded-full hover:text-[#141416] hover:bg-stone-100/90 transition-colors">Playground</a>
+        <a href="#impact" class="px-3.5 py-1.5 rounded-full hover:text-[#141416] hover:bg-stone-100/90 transition-colors">Impact</a>
+        <a href="#process" class="px-3.5 py-1.5 rounded-full hover:text-[#141416] hover:bg-stone-100/90 transition-colors">Process</a>
+        <a href="#inquire" class="px-3.5 py-1.5 rounded-full hover:text-[#141416] hover:bg-stone-100/90 transition-colors">Inquire</a>
+      </div>
+
+      <!-- Right Action + Mobile Toggle -->
+      <div class="flex items-center gap-2">
+        <a href="#inquire" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#141416] hover:bg-violetElec text-[#FAF8F4] text-xs font-semibold transition-colors">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Book Q2 Slot</span>
+        </a>
+
+        <button id="mobileNavBtn" type="button" aria-label="Toggle Menu" aria-expanded="false" class="md:hidden p-1.5 rounded-full text-stone-700 hover:bg-stone-100 transition-colors">
+          <svg id="navOpenSvg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="4" y1="7" x2="20" y2="7"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="17" x2="20" y2="17"></line>
+          </svg>
+          <svg id="navCloseSvg" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+            <line x1="6" y1="18" x2="18" y2="6"></line>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Sheet -->
+    <div id="mobileNavSheet" class="hidden md:hidden max-w-5xl mx-auto mt-2 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-[#E7E5E0] shadow-xl">
+      <div class="flex flex-col gap-1 text-sm font-medium text-stone-700">
+        <a href="#work" class="mobile-sheet-link px-3.5 py-2 rounded-xl hover:bg-stone-100">Selected Work</a>
+        <a href="#playground" class="mobile-sheet-link px-3.5 py-2 rounded-xl hover:bg-stone-100">Token Playground</a>
+        <a href="#impact" class="mobile-sheet-link px-3.5 py-2 rounded-xl hover:bg-stone-100">UX Impact Metrics</a>
+        <a href="#process" class="mobile-sheet-link px-3.5 py-2 rounded-xl hover:bg-stone-100">Philosophy &amp; Praise</a>
+        <a href="#inquire" class="mobile-sheet-link px-3.5 py-2 rounded-xl hover:bg-stone-100">Advisory &amp; Inquire</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 pb-24">
+
+    <!-- 2. EDITORIAL OVERSIZED HERO + INTERACTIVE DESIGN TOKEN PREVIEWER -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center pb-16 sm:pb-24">
+      <!-- Left Editorial Intro -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E7E5E0] text-xs font-medium text-stone-600 shadow-sm">
+          <span class="px-2 py-0.5 rounded-full bg-[#F3E8FF] text-violetElec font-mono text-[12.5px] font-semibold">Principal Architect</span>
+          <span>Product &amp; Design Systems</span>
+          <span class="text-stone-300">&middot;</span>
+          <span class="font-mono text-[12.5px] text-stone-500">NYC / Brooklyn</span>
+        </div>
+
+        <h1 class="font-serif text-4xl sm:text-6xl lg:text-[4.1rem] font-semibold tracking-[-0.025em] text-[#141416] leading-[1.03]">
+          Designing <em class="italic font-normal text-violetElec">tactile</em> interfaces &amp; scalable systems.
+        </h1>
+
+        <p class="text-stone-600 text-base sm:text-lg leading-relaxed max-w-xl">
+          I partner with product-obsessed founders and engineering leaders to craft expressive software interfaces, multi-brand Figma-to-React token architectures, and zero-friction user journeys that measurably move conversion.
+        </p>
+
+        <!-- Primary Actions -->
+        <div class="flex flex-wrap items-center gap-3.5 pt-1">
+          <a href="#work" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#141416] hover:bg-violetElec text-[#FAF8F4] text-sm font-semibold transition-all shadow-[0_12px_28px_-8px_rgba(20,20,22,0.35)]">
+            <span>Explore Case Studies</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+
+          <button type="button" data-copy="sora@soravance.studio" class="copy-studio-email inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-stone-50 border border-[#E7E5E0] text-sm font-medium text-[#141416] transition-all">
+            <svg class="w-4 h-4 text-coralRose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span class="font-mono text-xs sm:text-sm">sora@soravance.studio</span>
+          </button>
+        </div>
+
+        <!-- Pedigree Strip -->
+        <div class="pt-5 border-t border-[#E7E5E0] flex flex-wrap items-center gap-x-7 gap-y-2 text-xs text-stone-500">
+          <span class="font-mono uppercase tracking-wider text-[12.5px] text-stone-400">Previously &amp; Advisory:</span>
+          <span class="font-semibold text-stone-800">Figma Systems Partner</span>
+          <span class="font-semibold text-stone-800">Mercury</span>
+          <span class="font-semibold text-stone-800">Linear Ecosystem</span>
+          <span class="font-semibold text-stone-800">Veloce Health</span>
+        </div>
+      </div>
+
+      <!-- Right Interactive Design System Token Previewer -->
+      <div id="playground" class="lg:col-span-5">
+        <div class="tactile-card rounded-[26px] p-5 sm:p-6 bg-white relative overflow-hidden">
+          <!-- Studio Control Header -->
+          <div class="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-[#E7E5E0]">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full play-accent-bg"></span>
+              <span class="font-mono text-[12.5px] font-semibold uppercase tracking-wider text-stone-700">Live Token Playground</span>
+            </div>
+            <span id="activeTokenReadout" class="font-mono text-[12.5px] px-2 py-0.5 rounded bg-stone-100 text-stone-600">--iris-600 &middot; 12px</span>
+          </div>
+
+          <!-- Controls Row: 4 Accent Swatches + Radius Selector -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+            <!-- 4 Accent Swatches -->
+            <div class="p-2.5 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0]">
+              <div class="font-mono text-xs uppercase tracking-wider text-stone-500 mb-2">Accent Token</div>
+              <div class="flex items-center gap-2.5" role="radiogroup" aria-label="Select Theme Accent">
+                <button type="button" aria-label="Electric Violet" data-accent="#7C3AED" data-soft="#F3E8FF" data-text="#5B21B6" data-name="--iris-600" class="swatch-btn w-7 h-7 rounded-full bg-[#7C3AED] ring-2 ring-offset-2 ring-[#141416] transition-transform hover:scale-105"></button>
+                <button type="button" aria-label="Coral Rose" data-accent="#F43F5E" data-soft="#FFE4E6" data-text="#BE123C" data-name="--coral-500" class="swatch-btn w-7 h-7 rounded-full bg-[#F43F5E] opacity-80 hover:opacity-100 transition-transform hover:scale-105"></button>
+                <button type="button" aria-label="Botanical Emerald" data-accent="#059669" data-soft="#D1FAE5" data-text="#065F46" data-name="--jade-600" class="swatch-btn w-7 h-7 rounded-full bg-[#059669] opacity-80 hover:opacity-100 transition-transform hover:scale-105"></button>
+                <button type="button" aria-label="Warm Ochre" data-accent="#D97706" data-soft="#FEF3C7" data-text="#92400E" data-name="--ochre-600" class="swatch-btn w-7 h-7 rounded-full bg-[#D97706] opacity-80 hover:opacity-100 transition-transform hover:scale-105"></button>
+              </div>
+            </div>
+
+            <!-- Sharp / Rounded / Pill Radius Buttons -->
+            <div class="p-2.5 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0]">
+              <div class="font-mono text-xs uppercase tracking-wider text-stone-500 mb-2">Radius Scale</div>
+              <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-[#E7E5E0] font-mono text-[12.5px]">
+                <button type="button" data-radius="sharp" class="radius-btn py-1 rounded text-stone-500 hover:text-stone-900 transition-colors">Sharp</button>
+                <button type="button" data-radius="rounded" class="radius-btn py-1 rounded bg-[#141416] text-white font-medium transition-colors">Rounded</button>
+                <button type="button" data-radius="pill" class="radius-btn py-1 rounded text-stone-500 hover:text-stone-900 transition-colors">Pill</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Mini UI Component Preview Card -->
+          <div id="livePreviewCard" class="play-surface p-5 bg-[#FAF8F4] border border-[#E7E5E0] bg-editorial-dots">
+            <div class="play-surface bg-white p-4 sm:p-5 border border-[#E7E5E0] shadow-sm space-y-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <span class="play-badge inline-block px-2.5 py-0.5 font-mono text-[12.5px] font-semibold">v4.2 Semantic Tokens</span>
+                  <h3 class="font-serif font-semibold text-lg text-[#141416] mt-1.5">Lumina Component Kit</h3>
+                </div>
+                <!-- Interactive Toggle Switch inside Preview -->
+                <button id="previewToggleSwitch" type="button" role="switch" aria-checked="true" aria-label="Toggle Haptic Motion" class="play-ctrl w-11 h-6 p-0.5 play-accent-bg flex items-center justify-end cursor-pointer">
+                  <span class="w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+                </button>
+              </div>
+
+              <p class="text-xs text-stone-600 leading-relaxed">
+                Synced automatically from Figma Variables to React TypeScript primitives via CI pipeline.
+              </p>
+
+              <!-- Progress / Spacing Token Meter -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between font-mono text-[12.5px] text-stone-500">
+                  <span>WCAG AAA Token Coverage</span>
+                  <span class="font-semibold text-[#141416]" id="previewCoverageLabel">98.4%</span>
+                </div>
+                <div class="h-2 w-full bg-stone-100 overflow-hidden play-ctrl">
+                  <div class="h-full play-accent-bg play-ctrl" style="width: 94%"></div>
+                </div>
+              </div>
+
+              <!-- Live Preview Buttons -->
+              <div class="flex items-center gap-2.5 pt-1">
+                <button type="button" id="previewPublishBtn" class="play-ctrl play-accent-bg text-white text-xs font-semibold px-4 py-2.5 flex-1 shadow-sm hover:opacity-95">
+                  Publish Tokens
+                </button>
+                <button type="button" id="previewInspectBtn" class="play-ctrl bg-stone-100 hover:bg-stone-200/80 text-[#141416] font-mono text-[12.5px] px-3.5 py-2.5 border border-[#E7E5E0]">
+                  16px / 24px
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Token JSON Footer -->
+          <div class="mt-3.5 flex items-center justify-between font-mono text-[12.5px] text-stone-500 px-1">
+            <span id="cssVarSummary">border-radius: 12px; contrast: 7.4:1 AAA</span>
+            <span class="text-stone-400">Interactive</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. UX IMPACT & DESIGN METRICS BENTO GRID -->
+    <section id="impact" class="py-12 sm:py-16 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 reveal">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-widest text-violetElec mb-2">01 // Measurable Design Outcomes</div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141416]">Craft that compounds business velocity</h2>
+        </div>
+        <p class="font-mono text-xs text-stone-500">Verified post-launch product telemetry (2023—2026)</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Metric Card 1: -58% Onboarding Drop-off Funnel Comparison SVG (lg:col-span-5) -->
+        <article class="tactile-card rounded-3xl p-6 sm:p-7 lg:col-span-5 flex flex-col justify-between reveal">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-1 rounded-full bg-rose-50 text-coralRose font-mono text-[12.5px] font-semibold">Conversion Lift</span>
+              <span class="font-mono text-xs text-stone-400">Veloce &amp; Kinetix</span>
+            </div>
+            <div class="font-serif text-4xl sm:text-[2.65rem] font-semibold text-[#141416] tracking-tight">-58%</div>
+            <div class="text-sm font-semibold text-stone-800 mt-1">Onboarding Funnel Drop-off</div>
+            <p class="text-xs text-stone-500 mt-1 leading-relaxed">
+              Replaced 9-step form walls with progressive inline templates and instant sandbox previews.
+            </p>
+          </div>
+
+          <!-- Funnel Comparison SVG -->
+          <div class="mt-6 pt-4 border-t border-[#E7E5E0]">
+            <div class="flex items-center justify-between font-mono text-[12.5px] text-stone-500 mb-2">
+              <span>STEP 1 &rarr; ACTIVATED</span>
+              <span class="text-violetElec font-semibold">41% &rarr; 78.6%</span>
+            </div>
+            <svg viewBox="0 0 360 105" class="w-full h-auto" role="img" aria-label="Onboarding funnel comparison before and after redesign">
+              <!-- Legacy Flow Bars -->
+              <text x="0" y="20" fill="#78716C" font-family="JetBrains Mono" font-size="10">Legacy Flow</text>
+              <rect x="92" y="10" width="240" height="12" rx="6" fill="#F5F5F4"/>
+              <rect x="92" y="10" width="98" height="12" rx="6" fill="#D6D3D1"/>
+              <text x="338" y="20" text-anchor="end" fill="#78716C" font-family="JetBrains Mono" font-size="10">41%</text>
+
+              <!-- Tactile Redesigned Flow -->
+              <text x="0" y="54" fill="#141416" font-family="JetBrains Mono" font-weight="600" font-size="10">New System</text>
+              <rect x="92" y="44" width="240" height="14" rx="7" fill="#F3E8FF"/>
+              <rect x="92" y="44" width="196" height="14" rx="7" fill="#7C3AED"/>
+              <text x="338" y="55" text-anchor="end" fill="#7C3AED" font-family="JetBrains Mono" font-weight="600" font-size="10">78.6%</text>
+
+              <!-- Time-to-Value Bar -->
+              <text x="0" y="88" fill="#57534E" font-family="JetBrains Mono" font-size="10">Time to Value</text>
+              <rect x="92" y="78" width="240" height="12" rx="6" fill="#FFE4E6"/>
+              <rect x="92" y="78" width="76" height="12" rx="6" fill="#F43F5E"/>
+              <text x="338" y="88" text-anchor="end" fill="#BE123C" font-family="JetBrains Mono" font-size="10">1m 40s (-64%)</text>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Metric Card 2: 184 Reusable Figma/React Tokens Adoption Curve (lg:col-span-4) -->
+        <article class="tactile-card rounded-3xl p-6 sm:p-7 lg:col-span-4 flex flex-col justify-between reveal">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-1 rounded-full bg-[#F3E8FF] text-violetElec font-mono text-[12.5px] font-semibold">Design Ops</span>
+              <span class="font-mono text-xs text-stone-400">14 Squads</span>
+            </div>
+            <div class="font-serif text-4xl sm:text-[2.65rem] font-semibold text-[#141416] tracking-tight">184</div>
+            <div class="text-sm font-semibold text-stone-800 mt-1">Semantic Figma / React Tokens</div>
+            <p class="text-xs text-stone-500 mt-1 leading-relaxed">
+              1:1 automated Style Dictionary bridge powering Web, iOS, and macOS desktop surfaces.
+            </p>
+          </div>
+
+          <!-- Adoption Curve SVG -->
+          <div class="mt-6 pt-4 border-t border-[#E7E5E0]">
+            <div class="flex justify-between font-mono text-[12.5px] text-stone-500 mb-1">
+              <span>Component Adoption</span>
+              <span class="text-emerald-700 font-semibold">96.2% coverage</span>
+            </div>
+            <svg viewBox="0 0 280 86" class="w-full h-auto overflow-visible" role="img" aria-label="Token adoption curve growing from Q1 to Q4">
+              <defs>
+                <linearGradient id="violetArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.28"/>
+                  <stop offset="100%" stop-color="#7C3AED" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="70" x2="280" y2="70" stroke="#E7E5E0" stroke-dasharray="3 3"/>
+              <path d="M4,66 C50,63 85,50 130,34 C175,18 220,13 276,10 L276,70 L4,70 Z" fill="url(#violetArea)"/>
+              <path d="M4,66 C50,63 85,50 130,34 C175,18 220,13 276,10" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="276" cy="10" r="4" fill="#7C3AED"/>
+              <text x="4" y="83" fill="#78716C" font-family="JetBrains Mono" font-size="9">Q1 (22%)</text>
+              <text x="122" y="83" fill="#78716C" font-family="JetBrains Mono" font-size="9">Q2 (64%)</text>
+              <text x="228" y="83" fill="#141416" font-family="JetBrains Mono" font-weight="600" font-size="9">Q4 (96%)</text>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Metric Card 3: 98.4% WCAG AAA Contrast Score (Deep Ink #141416 Contrast Card, lg:col-span-3) -->
+        <article class="ink-card rounded-3xl p-6 sm:p-7 lg:col-span-3 flex flex-col justify-between reveal">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-1 rounded-full bg-white/10 text-purple-200 font-mono text-[12.5px]">Accessibility</span>
+              <span class="font-mono text-[12.5px] text-emerald-400">APCA Lc 90+</span>
+            </div>
+            <div class="font-serif text-4xl sm:text-[2.65rem] font-semibold text-white tracking-tight">98.4%</div>
+            <div class="text-sm font-semibold text-stone-200 mt-1">WCAG AAA Contrast Score</div>
+            <p class="text-xs text-stone-400 mt-1.5 leading-relaxed">
+              Perceptually uniform OKLCH ramps guaranteeing legibility across light, dim, and OLED themes.
+            </p>
+          </div>
+
+          <!-- Contrast Swatch Matrix -->
+          <div class="mt-6 pt-4 border-t border-white/10 space-y-2 font-mono text-[12.5px]">
+            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 border border-white/10">
+              <span class="text-stone-300">Ink / Ivory</span>
+              <span class="text-emerald-400 font-semibold">16.8 : 1</span>
+            </div>
+            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-violetElec/25 border border-violetElec/40">
+              <span class="text-purple-100">Iris / Paper</span>
+              <span class="text-purple-200 font-semibold">7.4 : 1</span>
+            </div>
+            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 border border-white/10">
+              <span class="text-stone-300">Keyboard Focus</span>
+              <span class="text-stone-200">100% Ring</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. SELECTED CASE STUDIES SHOWCASE (4 RICH VISUAL BENTO CARDS WITH CUSTOM HTML/CSS/SVG UI MOCKUPS) -->
+    <section id="work" class="py-12 sm:py-16 space-y-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 reveal">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-widest text-coralRose mb-2">02 // Selected Case Studies</div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141416]">Systems &amp; flagship product launches</h2>
+        </div>
+        <span class="font-mono text-xs text-stone-500">04 Deep-Dive Engagements</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Case Study 1: Kinetix Treasury & Multi-Brand Design System (lg:col-span-7) -->
+        <article class="tactile-card rounded-[28px] p-6 sm:p-8 lg:col-span-7 flex flex-col justify-between group reveal">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div class="flex items-center gap-2 font-mono text-xs text-stone-500">
+                <span class="text-[#141416] font-semibold">KINETIX FINANCIAL</span>
+                <span>&middot;</span>
+                <span>Principal Systems Architect</span>
+                <span>&middot;</span>
+                <span>2026</span>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-[#F3E8FF] text-violetElec font-mono text-xs font-semibold">+44% Enterprise Activation</span>
+            </div>
+
+            <h3 class="font-serif text-2xl sm:text-3xl font-semibold text-[#141416] group-hover:text-violetElec transition-colors">
+              Unifying 6 acquired fintech products under one tactile design language
+            </h3>
+            <p class="text-sm text-stone-600 mt-2 leading-relaxed max-w-2xl">
+              Architected a multi-density token engine and command-first treasury workspace handling $4.2B in monthly B2B payouts, cutting engineering UI build time by 61%.
+            </p>
+          </div>
+
+          <!-- Custom Crisp HTML/CSS/SVG UI Mockup: Treasury Command Card -->
+          <div class="mt-6 p-4 sm:p-5 rounded-2xl bg-[#FAF8F4] border border-[#E7E5E0] bg-editorial-dots">
+            <div class="rounded-xl bg-white border border-[#E7E5E0] shadow-sm overflow-hidden">
+              <div class="px-4 py-2.5 bg-stone-50 border-b border-[#E7E5E0] flex items-center justify-between font-mono text-[12.5px] text-stone-500">
+                <span class="flex items-center gap-2 text-[#141416] font-semibold">
+                  <svg class="w-3.5 h-3.5 text-violetElec" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  Quick Settlement &middot; Cmd+K
+                </span>
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">Instant FedNow</span>
+              </div>
+              <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                <div class="sm:col-span-2 space-y-1">
+                  <div class="text-[12.5px] font-mono text-stone-400">OPERATING TREASURY &middot; USD</div>
+                  <div class="font-serif text-2xl font-semibold text-[#141416]">$1,482,910.00</div>
+                  <div class="text-xs text-emerald-700 font-medium">+4.85% APY Treasury Yield Sweep</div>
+                </div>
+                <div class="flex sm:flex-col gap-2">
+                  <span class="px-3 py-2 rounded-lg bg-[#141416] text-white text-xs font-semibold text-center">Wire Batch</span>
+                  <span class="px-3 py-1.5 rounded-lg border border-[#E7E5E0] text-stone-600 font-mono text-[12.5px] text-center">8px Grid</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Case Study 2: Aether Spatial Creative Tool (Deep Ink Showcase Card, lg:col-span-5) -->
+        <article class="ink-card rounded-[28px] p-6 sm:p-8 lg:col-span-5 flex flex-col justify-between group reveal">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="font-mono text-xs text-stone-400">AETHER STUDIO &middot; 2025</span>
+              <span class="px-3 py-1 rounded-full bg-coralRose/20 text-rose-300 font-mono text-xs font-semibold">-38% Time-to-Export</span>
+            </div>
+
+            <h3 class="font-serif text-2xl sm:text-[1.7rem] font-semibold text-white group-hover:text-rose-300 transition-colors leading-snug">
+              Tactile micro-physics &amp; precision bezier timeline for 1.4M motion designers
+            </h3>
+            <p class="text-sm text-stone-400 mt-2 leading-relaxed">
+              Redesigned the inspector chrome, direct-manipulation spring curves, and magnetic snapping guides.
+            </p>
+          </div>
+
+          <!-- Custom Dark Motion Curve Editor SVG Mockup -->
+          <div class="mt-6 p-4 rounded-2xl bg-[#1C1C20] border border-white/10 space-y-3">
+            <div class="flex items-center justify-between font-mono text-[12.5px] text-stone-400">
+              <span class="text-stone-200">spring(stiffness: 380, damping: 28)</span>
+              <span class="text-coralRose">120Hz</span>
+            </div>
+            <svg viewBox="0 0 280 96" class="w-full h-auto">
+              <rect x="0" y="0" width="280" height="96" rx="10" fill="#121215"/>
+              <line x1="20" y1="76" x2="260" y2="76" stroke="rgba(255,255,255,0.08)"/>
+              <line x1="20" y1="24" x2="260" y2="24" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3"/>
+              <!-- Bezier Handle Lines -->
+              <line x1="24" y1="76" x2="96" y2="12" stroke="#F43F5E" stroke-width="1.2" stroke-dasharray="2 2"/>
+              <path d="M24,76 C96,12 132,18 256,24" fill="none" stroke="#F43F5E" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="96" cy="12" r="5" fill="#FAF8F4" stroke="#F43F5E" stroke-width="2"/>
+              <circle cx="24" cy="76" r="4" fill="#7C3AED"/>
+              <circle cx="256" cy="24" r="4" fill="#10B981"/>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Case Study 3: Veloce Health Accessible Triage (lg:col-span-5) -->
+        <article class="tactile-card rounded-[28px] p-6 sm:p-8 lg:col-span-5 flex flex-col justify-between group reveal">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="font-mono text-xs text-stone-500">VELOCE HEALTH &middot; 2025</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-mono text-xs font-semibold">99.1% WCAG AAA</span>
+            </div>
+
+            <h3 class="font-serif text-2xl font-semibold text-[#141416] group-hover:text-violetElec transition-colors leading-snug">
+              Calm, zero-anxiety asynchronous care intake for 600k+ patients
+            </h3>
+            <p class="text-sm text-stone-600 mt-2 leading-relaxed">
+              Crafted a warm, large-target clinical triage flow tested extensively with screen-reader and low-vision cohorts.
+            </p>
+          </div>
+
+          <!-- Custom Patient Intake UI Mockup -->
+          <div class="mt-6 p-4 rounded-2xl bg-[#FAF8F4] border border-[#E7E5E0] space-y-2.5">
+            <div class="flex items-center justify-between text-xs font-semibold text-[#141416]">
+              <span>Symptom Check-In</span>
+              <span class="font-mono text-[12.5px] text-violetElec">Step 2 of 3</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 font-sans text-xs">
+              <div class="p-3 rounded-xl bg-white border-2 border-violetElec text-[#141416] font-semibold flex items-center justify-between">
+                <span> Mild Fatigue</span>
+                <svg class="w-4 h-4 text-violetElec" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="p-3 rounded-xl bg-white border border-[#E7E5E0] text-stone-600 flex items-center justify-between">
+                <span>Shortness of Breath</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Case Study 4: Prism Open-Source Token Compiler (lg:col-span-7) -->
+        <article class="tactile-card rounded-[28px] p-6 sm:p-8 lg:col-span-7 flex flex-col justify-between group reveal">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div class="flex items-center gap-2 font-mono text-xs text-stone-500">
+                <span class="text-[#141416] font-semibold">PRISM TOKENS OSS</span>
+                <span>&middot;</span>
+                <span>Creator &amp; Maintainer</span>
+                <span>&middot;</span>
+                <span>2024</span>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-rose-50 text-coralRose font-mono text-xs font-semibold">28.4k Figma Community Copies</span>
+            </div>
+
+            <h3 class="font-serif text-2xl sm:text-3xl font-semibold text-[#141416] group-hover:text-coralRose transition-colors">
+              Bridging the designer-engineer chasm with bidirectional W3C design tokens
+            </h3>
+            <p class="text-sm text-stone-600 mt-2 leading-relaxed max-w-2xl">
+              An open-source Figma plugin and CLI compiler generating strongly typed CSS Variables, Tailwind presets, and SwiftUI ColorAssets with automatic pull-request diffs.
+            </p>
+          </div>
+
+          <!-- Custom Token Mapping Pipeline Mockup -->
+          <div class="mt-6 p-4 rounded-2xl bg-[#141416] text-stone-200 font-mono text-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+            <div class="p-3 rounded-xl bg-white/[0.06] border border-white/10">
+              <div class="text-xs text-stone-400">FIGMA VARIABLE</div>
+              <div class="text-purple-300 font-semibold mt-1">surface/elevated</div>
+              <div class="text-[12.5px] text-stone-400 mt-0.5">#FAF8F4 &rarr; #141416</div>
+            </div>
+            <div class="flex items-center justify-center text-stone-400 gap-2">
+              <span class="px-2.5 py-1 rounded-full bg-violetElec/25 border border-violetElec/40 text-purple-200 text-[12.5px]">W3C JSON</span>
+              <span>&rarr;</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/[0.06] border border-white/10">
+              <div class="text-xs text-stone-400">REACT PRIMITIVE</div>
+              <div class="text-emerald-300 font-semibold mt-1">tokens.surface.card</div>
+              <div class="text-[12.5px] text-stone-400 mt-0.5">0 runtime CSS kb</div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 5. DESIGN PHILOSOPHY & TESTIMONIALS -->
+    <section id="process" class="py-12 sm:py-16 space-y-10">
+      <!-- 3-Pillar Philosophy Header -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end reveal">
+        <div class="lg:col-span-6">
+          <div class="font-mono text-xs uppercase tracking-widest text-violetElec mb-2">03 // Design Philosophy</div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141416]">
+            Software should feel <em class="italic font-normal">inevitable</em>, tactile, and fast.
+          </h2>
+        </div>
+        <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div class="border-l-2 border-violetElec pl-3.5">
+            <div class="font-mono text-[12.5px] text-stone-400">01</div>
+            <div class="font-semibold text-sm text-[#141416] mt-0.5">Systems Over Screens</div>
+            <p class="text-xs text-stone-500 mt-1">Composable primitives outlive static mockups.</p>
+          </div>
+          <div class="border-l-2 border-coralRose pl-3.5">
+            <div class="font-mono text-[12.5px] text-stone-400">02</div>
+            <div class="font-semibold text-sm text-[#141416] mt-0.5">Sub-100ms Tactility</div>
+            <p class="text-xs text-stone-500 mt-1">Every press, hover, and transition earns trust.</p>
+          </div>
+          <div class="border-l-2 border-[#141416] pl-3.5">
+            <div class="font-mono text-[12.5px] text-stone-400">03</div>
+            <div class="font-semibold text-sm text-[#141416] mt-0.5">Code-Native Delivery</div>
+            <p class="text-xs text-stone-500 mt-1">Fluent in React, CSS architecture, and PR reviews.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Testimonials from Founders & VPs of Engineering -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <blockquote class="tactile-card rounded-3xl p-6 flex flex-col justify-between reveal">
+          <p class="font-serif text-base text-[#141416] leading-relaxed">
+            &ldquo;Sora is the rare principal designer who can debate product strategy with our board at 9am and open a clean TypeScript token PR with our staff engineers by noon.&rdquo;
+          </p>
+          <footer class="mt-6 pt-4 border-t border-[#E7E5E0] flex items-center gap-3">
+            <span class="w-9 h-9 rounded-full bg-[#F3E8FF] text-violetElec font-serif font-semibold text-sm flex items-center justify-center">ML</span>
+            <div>
+              <div class="text-xs font-bold text-[#141416]">Marcus Lindqvist</div>
+              <div class="font-mono text-[12.5px] text-stone-500">VP of Engineering, Kinetix</div>
+            </div>
+          </footer>
+        </blockquote>
+
+        <blockquote class="tactile-card rounded-3xl p-6 flex flex-col justify-between reveal">
+          <p class="font-serif text-base text-[#141416] leading-relaxed">
+            &ldquo;Our onboarding drop-off fell by 58% within three weeks of shipping Sora&rsquo;s redesigned activation architecture. Every interaction felt effortlessly clear.&rdquo;
+          </p>
+          <footer class="mt-6 pt-4 border-t border-[#E7E5E0] flex items-center gap-3">
+            <span class="w-9 h-9 rounded-full bg-rose-100 text-coralRose font-serif font-semibold text-sm flex items-center justify-center">AN</span>
+            <div>
+              <div class="text-xs font-bold text-[#141416]">Dr. Amara Nair</div>
+              <div class="font-mono text-[12.5px] text-stone-500">Co-Founder &amp; CEO, Veloce Health</div>
+            </div>
+          </footer>
+        </blockquote>
+
+        <blockquote class="tactile-card rounded-3xl p-6 flex flex-col justify-between reveal">
+          <p class="font-serif text-base text-[#141416] leading-relaxed">
+            &ldquo;Before Sora, six product squads invented six different button styles every sprint. Now 96% of our UI ships directly from Lumina primitives with zero drift.&rdquo;
+          </p>
+          <footer class="mt-6 pt-4 border-t border-[#E7E5E0] flex items-center gap-3">
+            <span class="w-9 h-9 rounded-full bg-stone-900 text-white font-serif font-semibold text-sm flex items-center justify-center">DC</span>
+            <div>
+              <div class="text-xs font-bold text-[#141416]">Devon Cho</div>
+              <div class="font-mono text-[12.5px] text-stone-500">Co-Founder, Aether Studio</div>
+            </div>
+          </footer>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- 6. COLLABORATION & ADVISORY TIERS + INTERACTIVE BOOKING CTA -->
+    <section id="inquire" class="py-12 sm:py-16 space-y-10">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 reveal">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-widest text-coralRose mb-2">04 // Engagement Models</div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141416]">Collaboration &amp; Advisory Tiers</h2>
+        </div>
+        <p class="font-mono text-xs text-stone-500">Select a tier below to prefill your project inquiry</p>
+      </div>
+
+      <!-- 3 Tiers Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Tier 1: Design System Audit -->
+        <article class="tactile-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between reveal">
+          <div>
+            <div class="flex items-center justify-between font-mono text-xs text-stone-500 mb-3">
+              <span>2-WEEK SPRINT</span>
+              <span class="text-[#141416] font-semibold">$8,500 fixed</span>
+            </div>
+            <h3 class="font-serif text-2xl font-semibold text-[#141416]">Design System Audit</h3>
+            <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+              Surgical diagnostic of your Figma libraries, token naming taxonomy, WCAG/APCA contrast gaps, and React component API ergonomics.
+            </p>
+            <ul class="mt-5 space-y-2.5 text-xs text-stone-700">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-violetElec shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Figma Variable &amp; React parity report</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-violetElec shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Refactored core semantic token JSON</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-violetElec shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>90-min executive &amp; eng roadmap workshop</span>
+              </li>
+            </ul>
+          </div>
+          <button type="button" data-select-tier="Design System Audit" class="tier-select-btn mt-6 w-full py-3 rounded-full border border-[#141416] text-xs font-semibold text-[#141416] hover:bg-[#141416] hover:text-white transition-colors">
+            Select Audit Sprint
+          </button>
+        </article>
+
+        <!-- Tier 2: 0->1 Product Partner (Featured Ink Card) -->
+        <article class="ink-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between relative reveal">
+          <div>
+            <div class="flex items-center justify-between font-mono text-xs mb-3">
+              <span class="px-2.5 py-0.5 rounded-full bg-violetElec text-white text-xs">MOST REQUESTED</span>
+              <span class="text-stone-300">4—8 WEEKS</span>
+            </div>
+            <h3 class="font-serif text-2xl font-semibold text-white">0&rarr;1 Product Partner</h3>
+            <p class="text-xs text-stone-400 mt-2 leading-relaxed">
+              End-to-end product architecture, tactile interactive prototypes, and foundational design system for Seed to Series B launches.
+            </p>
+            <ul class="mt-5 space-y-2.5 text-xs text-stone-200">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-coralRose shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Core user flows &amp; interactive prototypes</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-coralRose shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Production Figma kit + Tailwind/CSS tokens</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-coralRose shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Direct Slack &amp; GitHub PR polish with eng</span>
+              </li>
+            </ul>
+          </div>
+          <button type="button" data-select-tier="0 to 1 Product Partner" class="tier-select-btn mt-6 w-full py-3 rounded-full bg-white text-[#141416] hover:bg-violetElec hover:text-white text-xs font-semibold transition-colors">
+            Partner on 0&rarr;1 Launch
+          </button>
+        </article>
+
+        <!-- Tier 3: Fractional Principal Designer -->
+        <article class="tactile-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between reveal">
+          <div>
+            <div class="flex items-center justify-between font-mono text-xs text-stone-500 mb-3">
+              <span>MONTHLY RETAINER</span>
+              <span class="text-[#141416] font-semibold">2 days / wk</span>
+            </div>
+            <h3 class="font-serif text-2xl font-semibold text-[#141416]">Fractional Principal Designer</h3>
+            <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+              Embedded design leadership raising the craft bar across your existing product &amp; frontend teams without full-time executive overhead.
+            </p>
+            <ul class="mt-5 space-y-2.5 text-xs text-stone-700">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-violetElec shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Weekly design critiques &amp; architecture direction</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-violetElec shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Design system governance &amp; hiring loops</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-violetElec shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Cancel or pause seamlessly any quarter</span>
+              </li>
+            </ul>
+          </div>
+          <button type="button" data-select-tier="Fractional Principal Designer" class="tier-select-btn mt-6 w-full py-3 rounded-full border border-[#141416] text-xs font-semibold text-[#141416] hover:bg-[#141416] hover:text-white transition-colors">
+            Inquire About Retainer
+          </button>
+        </article>
+      </div>
+
+      <!-- Interactive Booking & Inquiry Card -->
+      <div id="bookingCard" class="tactile-card rounded-[30px] p-6 sm:p-10 bg-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center reveal">
+        <div class="lg:col-span-5 space-y-4">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 font-mono text-[12.5px] font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            1 Advisory Slot Open for Next Month
+          </span>
+          <h3 class="font-serif text-3xl font-semibold text-[#141416] leading-tight">
+            Start a conversation about your product or system.
+          </h3>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Share a brief note on what you&rsquo;re building. Every inquiry receives a personal Loom walkthrough or calendar invite within 24 hours.
+          </p>
+          <div class="pt-2">
+            <button type="button" data-copy="sora@soravance.studio" class="copy-studio-email inline-flex items-center gap-2 font-mono text-xs text-violetElec hover:underline">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Or copy sora@soravance.studio</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Booking Form -->
+        <form id="bookingForm" class="lg:col-span-7 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="clientName" class="block font-mono text-[12.5px] uppercase tracking-wider text-stone-500 mb-1.5">Your Name</label>
+              <input id="clientName" name="name" type="text" required placeholder="Elena Rostova" class="w-full px-4 py-3 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0] text-sm text-[#141416] focus:outline-none focus:border-violetElec transition-colors" />
+            </div>
+            <div>
+              <label for="clientEmail" class="block font-mono text-[12.5px] uppercase tracking-wider text-stone-500 mb-1.5">Work Email</label>
+              <input id="clientEmail" name="email" type="email" required placeholder="elena@acme.ai" class="w-full px-4 py-3 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0] text-sm text-[#141416] focus:outline-none focus:border-violetElec transition-colors" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="engagementSelect" class="block font-mono text-[12.5px] uppercase tracking-wider text-stone-500 mb-1.5">Engagement Model</label>
+              <select id="engagementSelect" name="tier" class="w-full px-4 py-3 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0] text-sm text-[#141416] focus:outline-none focus:border-violetElec transition-colors">
+                <option value="0 to 1 Product Partner">0&rarr;1 Product Partner (4—8 wks)</option>
+                <option value="Design System Audit">Design System Audit (2-wk Sprint)</option>
+                <option value="Fractional Principal Designer">Fractional Principal Designer</option>
+              </select>
+            </div>
+            <div>
+              <label for="timelineSelect" class="block font-mono text-[12.5px] uppercase tracking-wider text-stone-500 mb-1.5">Target Kickoff</label>
+              <select id="timelineSelect" name="timeline" class="w-full px-4 py-3 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0] text-sm text-[#141416] focus:outline-none focus:border-violetElec transition-colors">
+                <option>Within 2 weeks</option>
+                <option>Next month</option>
+                <option>Exploring for next quarter</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="projectNotes" class="block font-mono text-[12.5px] uppercase tracking-wider text-stone-500 mb-1.5">Context &amp; Goals</label>
+            <textarea id="projectNotes" name="notes" rows="3" required placeholder="Tell me about your product stage, team size, and key UX or design system goals..." class="w-full px-4 py-3 rounded-xl bg-[#FAF8F4] border border-[#E7E5E0] text-sm text-[#141416] focus:outline-none focus:border-violetElec transition-colors"></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <span id="bookingStatusMsg" class="font-mono text-xs text-stone-500">No commitment &middot; NDA friendly</span>
+            <button type="submit" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#141416] hover:bg-violetElec text-white text-sm font-semibold transition-all">
+              <span>Request Intro Call</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="mt-14 pt-8 border-t border-[#E7E5E0] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+      <div class="flex items-center gap-2.5">
+        <span class="font-serif font-semibold text-sm text-[#141416]">Sora Vance</span>
+        <span>&middot;</span>
+        <span>&copy; 2026 Sora Vance Studio LLC. Set in Fraunces &amp; Plus Jakarta Sans.</span>
+      </div>
+      <div class="flex items-center gap-5 font-mono text-[12.5px]">
+        <a href="#work" class="hover:text-[#141416] transition-colors">Figma (@soravance)</a>
+        <a href="#playground" class="hover:text-[#141416] transition-colors">GitHub</a>
+        <a href="#top" class="hover:text-[#141416] transition-colors">Read.cv</a>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Toast Confirmation -->
+  <div id="studioToast" role="status" aria-live="polite" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#141416] text-[#FAF8F4] shadow-2xl font-mono text-xs">
+    <span class="w-5 h-5 rounded-full bg-violetElec/30 text-purple-300 flex items-center justify-center">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </span>
+    <span id="studioToastText">Copied sora@soravance.studio</span>
+  </div>
+
+  <!-- Interactive Vanilla JS -->
+  <script>
+    (function () {
+      // 1. Mobile Navigation Sheet
+      const mobileNavBtn = document.getElementById('mobileNavBtn');
+      const mobileNavSheet = document.getElementById('mobileNavSheet');
+      const navOpenSvg = document.getElementById('navOpenSvg');
+      const navCloseSvg = document.getElementById('navCloseSvg');
+
+      if (mobileNavBtn && mobileNavSheet) {
+        mobileNavBtn.addEventListener('click', () => {
+          const hidden = mobileNavSheet.classList.toggle('hidden');
+          mobileNavBtn.setAttribute('aria-expanded', String(!hidden));
+          navOpenSvg.classList.toggle('hidden', !hidden);
+          navCloseSvg.classList.toggle('hidden', hidden);
+        });
+
+        document.querySelectorAll('.mobile-sheet-link').forEach((link) => {
+          link.addEventListener('click', () => {
+            mobileNavSheet.classList.add('hidden');
+            mobileNavBtn.setAttribute('aria-expanded', 'false');
+            navOpenSvg.classList.remove('hidden');
+            navCloseSvg.classList.add('hidden');
+          });
+        });
+      }
+
+      // 2. Interactive Theme Accent & Radius Token Previewer
+      const root = document.documentElement;
+      const swatchBtns = document.querySelectorAll('.swatch-btn');
+      const radiusBtns = document.querySelectorAll('.radius-btn');
+      const activeTokenReadout = document.getElementById('activeTokenReadout');
+      const cssVarSummary = document.getElementById('cssVarSummary');
+      const previewToggleSwitch = document.getElementById('previewToggleSwitch');
+      const previewPublishBtn = document.getElementById('previewPublishBtn');
+
+      let currentTokenName = '--iris-600';
+      let currentRadiusLabel = '12px';
+
+      const radiusPresets = {
+        sharp: { card: '4px', ctrl: '2px', badge: '2px', label: '2px' },
+        rounded: { card: '20px', ctrl: '12px', badge: '8px', label: '12px' },
+        pill: { card: '28px', ctrl: '9999px', badge: '9999px', label: '999px' }
+      };
+
+      function updateTokenReadout() {
+        if (activeTokenReadout) {
+          activeTokenReadout.textContent = `${currentTokenName} · ${currentRadiusLabel}`;
+        }
+        if (cssVarSummary) {
+          cssVarSummary.textContent = `border-radius: ${currentRadiusLabel}; contrast: AAA`;
+        }
+      }
+
+      swatchBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const accent = btn.getAttribute('data-accent');
+          const soft = btn.getAttribute('data-soft');
+          const text = btn.getAttribute('data-text');
+          currentTokenName = btn.getAttribute('data-name') || '--iris-600';
+
+          root.style.setProperty('--play-accent', accent);
+          root.style.setProperty('--play-accent-soft', soft);
+          root.style.setProperty('--play-accent-text', text);
+
+          swatchBtns.forEach((b) => {
+            if (b === btn) {
+              b.classList.add('ring-2', 'ring-offset-2', 'ring-[#141416]');
+              b.classList.remove('opacity-80');
+            } else {
+              b.classList.remove('ring-2', 'ring-offset-2', 'ring-[#141416]');
+              b.classList.add('opacity-80');
+            }
+          });
+
+          updateTokenReadout();
+        });
+      });
+
+      radiusBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-radius');
+          const preset = radiusPresets[mode] || radiusPresets.rounded;
+          currentRadiusLabel = preset.label;
+
+          root.style.setProperty('--play-radius-card', preset.card);
+          root.style.setProperty('--play-radius-ctrl', preset.ctrl);
+          root.style.setProperty('--play-radius-badge', preset.badge);
+
+          radiusBtns.forEach((b) => {
+            b.className = b === btn
+              ? 'radius-btn py-1 rounded bg-[#141416] text-white font-medium transition-colors'
+              : 'radius-btn py-1 rounded text-stone-500 hover:text-stone-900 transition-colors';
+          });
+
+          updateTokenReadout();
+        });
+      });
+
+      if (previewToggleSwitch) {
+        previewToggleSwitch.addEventListener('click', () => {
+          const checked = previewToggleSwitch.getAttribute('aria-checked') === 'true';
+          const next = !checked;
+          previewToggleSwitch.setAttribute('aria-checked', String(next));
+          previewToggleSwitch.classList.toggle('justify-end', next);
+          previewToggleSwitch.classList.toggle('justify-start', !next);
+          previewToggleSwitch.classList.toggle('play-accent-bg', next);
+          previewToggleSwitch.classList.toggle('bg-stone-300', !next);
+        });
+      }
+
+      if (previewPublishBtn) {
+        previewPublishBtn.addEventListener('click', () => {
+          showToast(`Synced ${currentTokenName} (${currentRadiusLabel}) to React primitives`);
+        });
+      }
+
+      // 3. Toast Helper & Email Copy
+      const studioToast = document.getElementById('studioToast');
+      const studioToastText = document.getElementById('studioToastText');
+      let toastTimeout = null;
+
+      function showToast(msg) {
+        if (!studioToast || !studioToastText) return;
+        studioToastText.textContent = msg;
+        studioToast.classList.remove('opacity-0', 'translate-y-3');
+        studioToast.classList.add('opacity-100', 'translate-y-0');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          studioToast.classList.add('opacity-0', 'translate-y-3');
+          studioToast.classList.remove('opacity-100', 'translate-y-0');
+        }, 2600);
+      }
+
+      document.querySelectorAll('.copy-studio-email').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-copy') || 'sora@soravance.studio';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(email).catch(() => {});
+          }
+          showToast(`Copied ${email} to clipboard`);
+        });
+      });
+
+      // 4. Tier Selection -> Prefill Booking Form
+      const engagementSelect = document.getElementById('engagementSelect');
+      const bookingCard = document.getElementById('bookingCard');
+      const clientNameInput = document.getElementById('clientName');
+
+      document.querySelectorAll('.tier-select-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const tier = btn.getAttribute('data-select-tier');
+          if (engagementSelect && tier) {
+            engagementSelect.value = tier;
+          }
+          if (bookingCard) {
+            bookingCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+              if (clientNameInput) clientNameInput.focus();
+            }, 450);
+          }
+          showToast(`Selected tier: ${tier}`);
+        });
+      });
+
+      // 5. Interactive Booking Form Submission
+      const bookingForm = document.getElementById('bookingForm');
+      const bookingStatusMsg = document.getElementById('bookingStatusMsg');
+
+      if (bookingForm) {
+        bookingForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const formData = new FormData(bookingForm);
+          const name = formData.get('name') || 'there';
+          const tier = formData.get('tier') || 'Partnership';
+          if (bookingStatusMsg) {
+            bookingStatusMsg.textContent = `Received! Sora will reply to ${name} within 24h.`;
+            bookingStatusMsg.className = 'font-mono text-xs text-emerald-700 font-semibold';
+          }
+          showToast(`Inquiry sent for ${tier}`);
+          bookingForm.reset();
+        });
+      }
+
+      // 6. IntersectionObserver Reveal Animations
+      const reveals = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.08 });
+        reveals.forEach((el) => observer.observe(el));
+      } else {
+        reveals.forEach((el) => el.classList.add('visible'));
+      }
+    })();
+  </script>
+</body>
+</html>

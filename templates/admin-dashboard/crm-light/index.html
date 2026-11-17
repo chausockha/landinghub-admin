@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLARITY CRM — Enterprise Revenue, Customer Health &amp; Deal Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            alabaster: '#F6F8FB',
+            cobalt: '#2563EB',
+            emeraldExec: '#059669',
+            violetExec: '#7C3AED',
+            amberExec: '#D97706',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #F6F8FB;
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .bento-surface {
+      background-color: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 8px 24px -10px rgba(15, 23, 42, 0.06);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .bento-surface:hover {
+      border-color: #CBD5E1;
+      box-shadow:
+        0 2px 4px rgba(15, 23, 42, 0.04),
+        0 12px 28px -10px rgba(15, 23, 42, 0.09);
+    }
+    .deal-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+    .deal-card:hover {
+      transform: translateY(-1px);
+      border-color: #93C5FD;
+      box-shadow: 0 8px 20px -8px rgba(37, 99, 235, 0.14);
+    }
+    .sticky-daylight-bar {
+      background: rgba(255, 255, 255, 0.88);
+      border-bottom: 1px solid #E2E8F0;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-alabaster text-slate-900 selection:bg-cobalt/15 selection:text-cobalt">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileOverlay" class="fixed inset-0 z-40 hidden bg-slate-900/35 backdrop-blur-sm lg:hidden" onclick="toggleMobileNav(false)"></div>
+
+  <div class="flex min-h-screen w-full">
+    <!-- 1. LEFT EXECUTIVE RAIL SIDEBAR -->
+    <aside id="crmSidebar" class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col justify-between border-r border-slate-200 bg-white transition-transform duration-200 ease-out lg:static lg:translate-x-0 shrink-0">
+      <div>
+        <!-- Brand Header -->
+        <div class="flex h-16 items-center justify-between border-b border-slate-200/80 px-5">
+          <a href="#workspace" onclick="event.preventDefault(); switchCrmSection('Revenue Overview')" class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-cobalt text-white shadow-sm shadow-cobalt/30">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-heading text-sm font-extrabold tracking-tight text-slate-900">CLARITY</span>
+                <span class="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs font-semibold text-slate-600 border border-slate-200">CRM</span>
+              </div>
+              <p class="text-[12.5px] font-medium text-slate-500">Revenue Intelligence</p>
+            </div>
+          </a>
+
+          <button onclick="toggleMobileNav(false)" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 lg:hidden" aria-label="Close sidebar">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <!-- Workspace Navigation -->
+        <div class="px-3 py-4">
+          <p class="mb-2 px-2.5 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Revenue Workspace</p>
+          <nav id="execNav" class="space-y-0.5" aria-label="CRM Navigation">
+            <button data-section="Revenue Overview" class="crm-nav-btn flex w-full items-center justify-between rounded-xl bg-blue-50/90 px-3 py-2.5 text-left text-xs font-semibold text-cobalt ring-1 ring-inset ring-cobalt/20 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-cobalt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                  <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+                <span>Revenue Overview</span>
+              </span>
+              <span class="h-1.5 w-1.5 rounded-full bg-cobalt"></span>
+            </button>
+
+            <button data-section="Deal Pipeline" class="crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="5" height="16" rx="1" />
+                  <rect x="10" y="4" width="5" height="11" rx="1" />
+                  <rect x="17" y="4" width="4" height="14" rx="1" />
+                </svg>
+                <span>Deal Pipeline</span>
+              </span>
+              <span id="navDealCount" class="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-xs font-semibold text-slate-600">12</span>
+            </button>
+
+            <button data-section="ARR Forecasting" class="crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                <span>ARR Forecasting</span>
+              </span>
+            </button>
+
+            <button data-section="Enterprise Accounts" class="crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4" />
+                </svg>
+                <span>Enterprise Accounts</span>
+              </span>
+              <span class="rounded-full bg-amber-50 px-2 py-0.5 font-mono text-xs font-semibold text-amberExec border border-amber-200">2 Risk</span>
+            </button>
+
+            <button data-section="Customer Health" class="crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+                <span>Customer Health</span>
+              </span>
+            </button>
+
+            <p class="mt-5 mb-2 pt-3 border-t border-slate-100 px-2.5 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Governance</p>
+
+            <button data-section="Playbooks & Workflows" class="crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                <span>Playbooks &amp; Rules</span>
+              </span>
+            </button>
+
+            <button data-section="RevOps Settings" class="crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition">
+              <span class="flex items-center gap-2.5">
+                <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                <span>RevOps Settings</span>
+              </span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Bottom Quota Attainment Card & User -->
+      <div class="border-t border-slate-200/80 p-3.5 space-y-3">
+        <div class="rounded-xl border border-slate-200 bg-alabaster p-3">
+          <div class="flex items-center justify-between text-[12.5px]">
+            <span class="font-semibold text-slate-700">Q4 Team Attainment</span>
+            <span class="font-mono font-bold text-emeraldExec tabular-nums">86.5%</span>
+          </div>
+          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div class="h-full w-[86.5%] rounded-full bg-gradient-to-r from-cobalt to-emeraldExec"></div>
+          </div>
+          <div class="mt-2 flex items-center justify-between font-mono text-xs text-slate-500 tabular-nums">
+            <span>$1.92M Closed</span>
+            <span>$2.22M Quota</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 px-1">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cobalt/10 font-heading text-xs font-bold text-cobalt ring-1 ring-cobalt/20">
+            CM
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-xs font-semibold text-slate-900">Claire Mercer</p>
+            <p class="truncate text-[12.5px] text-slate-500">VP Global Revenue</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE AREA -->
+    <div id="workspace" class="flex min-w-0 flex-1 flex-col">
+      <!-- STICKY DAYLIGHT TOPBAR -->
+      <header class="sticky-daylight-bar sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <!-- Left: Hamburger + Title + Pipeline Segment Switcher -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="toggleMobileNav(true)" class="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 lg:hidden" aria-label="Open menu">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <div>
+            <h1 id="topHeaderTitle" class="font-heading text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">Executive Revenue Command</h1>
+          </div>
+
+          <!-- Pipeline Segment Filter Pills -->
+          <div id="segmentTabs" class="hidden md:inline-flex items-center rounded-xl border border-slate-200 bg-slate-100/80 p-1">
+            <button data-seg="Q4 Enterprise" class="seg-btn rounded-lg bg-white px-3 py-1 text-xs font-semibold text-slate-900 shadow-sm transition">Q4 Enterprise</button>
+            <button data-seg="Mid-Market" class="seg-btn rounded-lg px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition">Mid-Market</button>
+            <button data-seg="Expansion" class="seg-btn rounded-lg px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition">Expansion</button>
+          </div>
+        </div>
+
+        <!-- Right: Quick Search + New Deal Modal Trigger -->
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <div class="relative hidden sm:block w-52 lg:w-64">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input id="globalDealSearch" oninput="syncGlobalSearch(this.value)" type="text" placeholder="Search deals, accounts, reps..." class="w-full rounded-xl border border-slate-200 bg-alabaster py-1.5 pl-8 pr-3 text-xs text-slate-800 placeholder-slate-400 focus:border-cobalt focus:bg-white focus:outline-none focus:ring-2 focus:ring-cobalt/15 transition" />
+          </div>
+
+          <button onclick="openNewDealModal()" class="inline-flex items-center gap-1.5 rounded-xl bg-cobalt px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-cobalt/25 hover:bg-blue-700 active:scale-[0.99] transition">
+            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>New Deal</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mobile Segment Switcher -->
+      <div class="px-4 pt-3 md:hidden">
+        <div id="segmentTabsMobile" class="flex items-center rounded-xl border border-slate-200 bg-white p-1">
+          <button data-seg="Q4 Enterprise" class="seg-btn-m flex-1 rounded-lg bg-cobalt px-2.5 py-1.5 text-center text-xs font-semibold text-white">Q4 Enterprise</button>
+          <button data-seg="Mid-Market" class="seg-btn-m flex-1 rounded-lg px-2.5 py-1.5 text-center text-xs font-medium text-slate-600">Mid-Market</button>
+          <button data-seg="Expansion" class="seg-btn-m flex-1 rounded-lg px-2.5 py-1.5 text-center text-xs font-medium text-slate-600">Expansion</button>
+        </div>
+      </div>
+
+      <!-- MAIN BENTO WORKSPACE -->
+      <main class="mx-auto w-full max-w-[1600px] flex-1 space-y-6 p-4 sm:p-6 lg:p-8">
+
+        <div id="defaultDashboardView" class="space-y-6">
+        <!-- 2. 4 EXECUTIVE KPI CARDS -->
+        <section aria-label="Executive KPIs" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <!-- KPI 1: Pipeline Coverage -->
+          <article class="bento-surface rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-cobalt border border-blue-100">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                  </span>
+                  <span class="text-xs font-semibold text-slate-500">Pipeline Coverage</span>
+                </div>
+                <p id="crmKpiPipe" class="mt-3 font-mono text-2xl font-bold tracking-tight text-slate-900 sm:text-[28px] tabular-nums">$4.86M</p>
+              </div>
+              <span id="crmKpiPipeBadge" class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-[12.5px] font-semibold text-cobalt border border-blue-200/80 tabular-nums">
+                3.4x target
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between">
+              <span id="crmKpiPipeSub" class="text-xs text-slate-500">Weighted <strong class="font-mono font-semibold text-slate-700">$2.94M</strong></span>
+              <svg class="h-9 w-24 overflow-visible" viewBox="0 0 100 34" fill="none" aria-hidden="true">
+                <path d="M0 28 L16 25 L33 22 L50 23 L66 15 L83 10 L100 5" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 2: Closed-Won QTD -->
+          <article class="bento-surface rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emeraldExec border border-emerald-100">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                  <span class="text-xs font-semibold text-slate-500">Closed-Won QTD</span>
+                </div>
+                <p id="crmKpiWon" class="mt-3 font-mono text-2xl font-bold tracking-tight text-slate-900 sm:text-[28px] tabular-nums">$1.92M</p>
+              </div>
+              <span id="crmKpiWonBadge" class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[12.5px] font-semibold text-emeraldExec border border-emerald-200/80 tabular-nums">
+                +24.6%
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between">
+              <span id="crmKpiWonSub" class="text-xs text-slate-500"><strong class="font-mono font-semibold text-slate-700">19</strong> enterprise logos</span>
+              <svg class="h-9 w-24 overflow-visible" viewBox="0 0 100 34" fill="none" aria-hidden="true">
+                <path d="M0 30 L16 26 L33 24 L50 18 L66 16 L83 9 L100 4" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 3: Avg Sales Cycle -->
+          <article class="bento-surface rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violetExec border border-violet-100">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </span>
+                  <span class="text-xs font-semibold text-slate-500">Avg Sales Cycle</span>
+                </div>
+                <p id="crmKpiCycle" class="mt-3 font-mono text-2xl font-bold tracking-tight text-slate-900 sm:text-[28px] tabular-nums">26 Days</p>
+              </div>
+              <span id="crmKpiCycleBadge" class="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2.5 py-0.5 font-mono text-[12.5px] font-semibold text-violetExec border border-violet-200/80 tabular-nums">
+                -4d faster
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between">
+              <span class="text-xs text-slate-500">Legal SLA <strong class="font-mono font-semibold text-slate-700">4.2d</strong></span>
+              <svg class="h-9 w-24 overflow-visible" viewBox="0 0 100 34" fill="none" aria-hidden="true">
+                <path d="M0 8 L16 11 L33 14 L50 16 L66 21 L83 25 L100 28" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+
+          <!-- KPI 4: Customer Health Score -->
+          <article class="bento-surface rounded-2xl p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amberExec border border-amber-100">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </span>
+                  <span class="text-xs font-semibold text-slate-500">Customer Health Score</span>
+                </div>
+                <p id="crmKpiHealth" class="mt-3 font-mono text-2xl font-bold tracking-tight text-slate-900 sm:text-[28px] tabular-nums">91.4 <span class="text-sm font-medium text-slate-400">/ 100</span></p>
+              </div>
+              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[12.5px] font-semibold text-emeraldExec border border-emerald-200/80 tabular-nums">
+                97.8% GRR
+              </span>
+            </div>
+            <div class="mt-4 flex items-end justify-between">
+              <span class="text-xs text-slate-500">NPS benchmark <strong class="font-mono font-semibold text-slate-700">+68</strong></span>
+              <svg class="h-9 w-24 overflow-visible" viewBox="0 0 100 34" fill="none" aria-hidden="true">
+                <path d="M0 24 L16 22 L33 20 L50 16 L66 13 L83 11 L100 7" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <!-- 3. BENTO DATA VISUALIZATION ROW (7 COLS QUARTERLY ARR FORECAST BAR SVG + 5 COLS LEADERBOARD) -->
+        <section id="forecastSection" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <!-- Left 7 Cols: Quarterly ARR Forecast vs Quota Grouped Bar SVG Chart -->
+          <div class="bento-surface flex flex-col justify-between rounded-2xl p-5 sm:p-6 lg:col-span-7">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 class="font-heading text-base font-bold text-slate-900">Quarterly ARR Forecast vs Quota</h2>
+                <p class="mt-0.5 text-xs text-slate-500">Grouped breakdown by Committed, Best Case, and Open Pipeline ($M)</p>
+              </div>
+
+              <!-- Interactive Quarter Horizon Tabs -->
+              <div id="quarterTabs" class="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100/80 p-1">
+                <button data-qview="FY26" class="q-tab rounded-lg bg-white px-2.5 py-1 font-mono text-[12.5px] font-semibold text-slate-900 shadow-sm transition">FY26 All</button>
+                <button data-qview="H2" class="q-tab rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-medium text-slate-600 hover:text-slate-900 transition">H2 Focus</button>
+                <button data-qview="FY27" class="q-tab rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-medium text-slate-600 hover:text-slate-900 transition">FY27 Plan</button>
+              </div>
+            </div>
+
+            <!-- Legend Strip -->
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200/80 bg-alabaster px-4 py-2.5 text-xs">
+              <div class="flex flex-wrap items-center gap-4">
+                <span class="inline-flex items-center gap-1.5 font-medium text-slate-700"><span class="h-2.5 w-2.5 rounded-sm bg-cobalt"></span>Committed</span>
+                <span class="inline-flex items-center gap-1.5 font-medium text-slate-700"><span class="h-2.5 w-2.5 rounded-sm bg-violetExec"></span>Best Case</span>
+                <span class="inline-flex items-center gap-1.5 font-medium text-slate-700"><span class="h-2.5 w-2.5 rounded-sm bg-emeraldExec"></span>Open Pipeline</span>
+              </div>
+              <span class="inline-flex items-center gap-1.5 font-mono text-[12.5px] font-semibold text-amberExec">
+                <span class="w-3.5 border-t-2 border-dashed border-amberExec"></span>Quota Target
+              </span>
+            </div>
+
+            <!-- Grouped Bar SVG Chart -->
+            <div class="relative mt-4 w-full pt-2">
+              <div id="forecastTooltip" class="pointer-events-none absolute top-0 left-0 z-20 hidden min-w-[190px] rounded-xl border border-slate-200 bg-white/95 p-3 shadow-xl backdrop-blur-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2">
+                  <span id="ftQuarter" class="font-heading text-xs font-bold text-slate-900">Q4 FY26</span>
+                  <span id="ftQuota" class="rounded bg-amber-50 px-1.5 py-0.5 font-mono text-xs font-semibold text-amberExec">Quota $2.2M</span>
+                </div>
+                <div class="space-y-1 font-mono text-[12.5px] tabular-nums">
+                  <div class="flex justify-between"><span class="text-slate-500">Committed:</span><span id="ftCommit" class="font-bold text-cobalt">$2.18M</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Best Case:</span><span id="ftBest" class="font-bold text-violetExec">$2.64M</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Pipeline:</span><span id="ftPipe" class="font-bold text-emeraldExec">$4.86M</span></div>
+                </div>
+              </div>
+
+              <svg id="arrForecastSvg" class="h-64 w-full overflow-visible select-none" viewBox="0 0 680 245" aria-label="Quarterly ARR Forecast Grouped Bar Chart">
+                <!-- Rendered via JS -->
+              </svg>
+            </div>
+          </div>
+
+          <!-- Right 5 Cols: Rep Quota Attainment Leaderboard -->
+          <div class="bento-surface flex flex-col justify-between rounded-2xl p-5 sm:p-6 lg:col-span-5">
+            <div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="font-heading text-base font-bold text-slate-900">Rep Quota Attainment</h2>
+                  <p class="mt-0.5 text-xs text-slate-500">Account executives ranked by QTD ARR closed</p>
+                </div>
+                <span class="rounded-lg bg-emerald-50 px-2.5 py-1 font-mono text-[12.5px] font-bold text-emeraldExec border border-emerald-200/80 tabular-nums">
+                  31.8% Avg Win
+                </span>
+              </div>
+
+              <div class="mt-5 space-y-4">
+                <!-- Rep 1 -->
+                <div class="rounded-xl border border-slate-100 bg-alabaster/60 p-3 hover:border-slate-200 transition">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cobalt text-xs font-bold text-white">EL</span>
+                      <div class="min-w-0">
+                        <p class="truncate text-xs font-bold text-slate-900">Elena Lin</p>
+                        <p class="font-mono text-xs text-slate-500 tabular-nums">38% Win Rate &middot; 6 Deals</p>
+                      </div>
+                    </div>
+                    <div class="text-right font-mono tabular-nums">
+                      <p class="text-xs font-bold text-slate-900">$612,000</p>
+                      <p class="text-xs font-semibold text-emeraldExec">118% of Quota</p>
+                    </div>
+                  </div>
+                  <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                    <div class="h-full w-full rounded-full bg-emeraldExec"></div>
+                  </div>
+                </div>
+
+                <!-- Rep 2 -->
+                <div class="rounded-xl border border-slate-100 bg-alabaster/60 p-3 hover:border-slate-200 transition">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violetExec text-xs font-bold text-white">MR</span>
+                      <div class="min-w-0">
+                        <p class="truncate text-xs font-bold text-slate-900">Marcus Vance</p>
+                        <p class="font-mono text-xs text-slate-500 tabular-nums">34% Win Rate &middot; 5 Deals</p>
+                      </div>
+                    </div>
+                    <div class="text-right font-mono tabular-nums">
+                      <p class="text-xs font-bold text-slate-900">$518,400</p>
+                      <p class="text-xs font-semibold text-cobalt">104% of Quota</p>
+                    </div>
+                  </div>
+                  <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                    <div class="h-full w-[94%] rounded-full bg-cobalt"></div>
+                  </div>
+                </div>
+
+                <!-- Rep 3 -->
+                <div class="rounded-xl border border-slate-100 bg-alabaster/60 p-3 hover:border-slate-200 transition">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white">SN</span>
+                      <div class="min-w-0">
+                        <p class="truncate text-xs font-bold text-slate-900">Sora Nakamura</p>
+                        <p class="font-mono text-xs text-slate-500 tabular-nums">29% Win Rate &middot; 4 Deals</p>
+                      </div>
+                    </div>
+                    <div class="text-right font-mono tabular-nums">
+                      <p class="text-xs font-bold text-slate-900">$436,000</p>
+                      <p class="text-xs font-semibold text-slate-600">87% of Quota</p>
+                    </div>
+                  </div>
+                  <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                    <div class="h-full w-[87%] rounded-full bg-violetExec"></div>
+                  </div>
+                </div>
+
+                <!-- Rep 4 -->
+                <div class="rounded-xl border border-slate-100 bg-alabaster/60 p-3 hover:border-slate-200 transition">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amberExec text-xs font-bold text-white">DK</span>
+                      <div class="min-w-0">
+                        <p class="truncate text-xs font-bold text-slate-900">Devon Kerr</p>
+                        <p class="font-mono text-xs text-slate-500 tabular-nums">26% Win Rate &middot; 4 Deals</p>
+                      </div>
+                    </div>
+                    <div class="text-right font-mono tabular-nums">
+                      <p class="text-xs font-bold text-slate-900">$354,600</p>
+                      <p class="text-xs font-semibold text-amberExec">74% of Quota</p>
+                    </div>
+                  </div>
+                  <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                    <div class="h-full w-[74%] rounded-full bg-amberExec"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. INTERACTIVE DEAL PIPELINE KANBAN / STAGE VIEW (TOGGLEABLE BOARD VIEW <-> TABLE VIEW) -->
+        <section id="pipelineSection" class="bento-surface rounded-2xl p-5 sm:p-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200/80 pb-4">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h2 class="font-heading text-base font-bold text-slate-900">Active Deal Pipeline</h2>
+                <span id="activeSegmentBadge" class="rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-[12.5px] font-semibold text-cobalt border border-blue-200/70">Q4 Enterprise</span>
+              </div>
+              <p class="mt-0.5 text-xs text-slate-500">Click <strong class="font-semibold text-slate-700">Advance</strong> on any deal card to progress it across stages in real time</p>
+            </div>
+
+            <!-- View Toggle (Board View vs Table View) -->
+            <div class="flex flex-wrap items-center gap-2.5">
+              <div class="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100/90 p-1">
+                <button id="btnBoardView" onclick="setPipelineView('board')" class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition">
+                  <svg class="h-3.5 w-3.5 text-cobalt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="5" height="18" rx="1" />
+                    <rect x="10" y="3" width="5" height="12" rx="1" />
+                    <rect x="17" y="3" width="4" height="15" rx="1" />
+                  </svg>
+                  <span>Board View</span>
+                </button>
+                <button id="btnTableView" onclick="setPipelineView('table')" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                  </svg>
+                  <span>Table View</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KANBAN 4-COLUMN BOARD VIEW -->
+          <div id="kanbanBoardContainer" class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- PIPELINE TABLE VIEW (HIDDEN BY DEFAULT) -->
+          <div id="pipelineTableContainer" class="mt-5 hidden overflow-x-auto">
+            <table class="w-full min-w-[740px] text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 text-[12.5px] font-bold uppercase tracking-wider text-slate-400">
+                  <th class="py-2.5 pr-3">Account &amp; Deal</th>
+                  <th class="py-2.5 px-3">Stage</th>
+                  <th class="py-2.5 px-3 text-right">ARR Value</th>
+                  <th class="py-2.5 px-3">Win Prob</th>
+                  <th class="py-2.5 px-3">Next Executive Step</th>
+                  <th class="py-2.5 pl-3 text-right">Owner</th>
+                </tr>
+              </thead>
+              <tbody id="pipelineTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5. ENTERPRISE ACCOUNTS & CHURN RISK TABLE -->
+        <section id="accountsSection" class="bento-surface rounded-2xl p-5 sm:p-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 class="font-heading text-base font-bold text-slate-900">Enterprise Accounts &amp; Renewal Health</h2>
+              <p class="mt-0.5 text-xs text-slate-500">Product telemetry adoption, seat utilization, and renewal risk scoring</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <!-- Risk Filter -->
+              <div id="accountRiskTabs" class="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100/80 p-1">
+                <button data-risk="All" class="risk-tab rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-slate-900 shadow-sm transition">All</button>
+                <button data-risk="Healthy" class="risk-tab rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition">Healthy</button>
+                <button data-risk="Churn Risk" class="risk-tab rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition">Churn Risk</button>
+              </div>
+
+              <!-- Search Filter -->
+              <div class="relative w-full sm:w-56">
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input id="accountSearchInput" oninput="renderAccountsTable()" type="text" placeholder="Filter enterprise accounts..." class="w-full rounded-xl border border-slate-200 bg-alabaster py-1.5 pl-8 pr-3 text-xs text-slate-800 placeholder-slate-400 focus:border-cobalt focus:bg-white focus:outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full min-w-[760px] text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 text-[12.5px] font-bold uppercase tracking-wider text-slate-400">
+                  <th class="py-3 pr-3">Enterprise Account</th>
+                  <th class="py-3 px-3 text-right">Contract ARR</th>
+                  <th class="py-3 px-3">Seat Utilization</th>
+                  <th class="py-3 px-3 w-52">Health Score</th>
+                  <th class="py-3 px-3">Renewal Window</th>
+                  <th class="py-3 pl-3 text-right">Risk Status</th>
+                </tr>
+              </thead>
+              <tbody id="accountsTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+        </div>
+
+        <div id="tabSubpageView" class="hidden space-y-6"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- + NEW DEAL SLIDE-OVER / MODAL -->
+  <div id="newDealModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm" onclick="if(event.target===this)closeNewDealModal()">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+        <div>
+          <span class="font-mono text-xs font-bold uppercase tracking-wider text-cobalt">Pipeline Opportunity</span>
+          <h3 class="font-heading text-base font-bold text-slate-900">Create Enterprise Deal</h3>
+        </div>
+        <button onclick="closeNewDealModal()" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <form id="newDealForm" onsubmit="submitNewDeal(event)" class="mt-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Company Name</label>
+          <input id="dealCompanyInput" required type="text" placeholder="e.g., Snowflake Data Cloud" class="w-full rounded-xl border border-slate-200 bg-alabaster px-3 py-2 text-slate-900 focus:border-cobalt focus:bg-white focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Annual Contract Value ($)</label>
+            <input id="dealArrInput" required type="number" min="10000" step="1000" value="240000" class="w-full rounded-xl border border-slate-200 bg-alabaster px-3 py-2 font-mono text-slate-900 focus:border-cobalt focus:bg-white focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Pipeline Stage</label>
+            <select id="dealStageInput" class="w-full rounded-xl border border-slate-200 bg-alabaster px-3 py-2 text-slate-900 focus:border-cobalt focus:bg-white focus:outline-none">
+              <option value="Discovery">Discovery (25%)</option>
+              <option value="Technical Eval" selected>Technical Eval (55%)</option>
+              <option value="Proposal Sent">Proposal Sent (75%)</option>
+              <option value="Negotiation">Negotiation (90%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Segment</label>
+            <select id="dealSegmentInput" class="w-full rounded-xl border border-slate-200 bg-alabaster px-3 py-2 text-slate-900 focus:border-cobalt focus:bg-white focus:outline-none">
+              <option value="Q4 Enterprise">Q4 Enterprise</option>
+              <option value="Mid-Market">Mid-Market</option>
+              <option value="Expansion">Expansion</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Deal Owner</label>
+            <select id="dealOwnerInput" class="w-full rounded-xl border border-slate-200 bg-alabaster px-3 py-2 text-slate-900 focus:border-cobalt focus:bg-white focus:outline-none">
+              <option value="EL">Elena Lin (EL)</option>
+              <option value="MV">Marcus Vance (MV)</option>
+              <option value="SN">Sora Nakamura (SN)</option>
+              <option value="DK">Devon Kerr (DK)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Next Step</label>
+          <input id="dealNextStepInput" required type="text" placeholder="e.g., InfoSec SOC2 review Tue 2pm" value="Architecture & Security Sign-off" class="w-full rounded-xl border border-slate-200 bg-alabaster px-3 py-2 text-slate-900 focus:border-cobalt focus:bg-white focus:outline-none" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeNewDealModal()" class="rounded-xl border border-slate-200 px-4 py-2 font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="rounded-xl bg-cobalt px-4 py-2 font-semibold text-white shadow-sm hover:bg-blue-700">Add to Pipeline</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="crmToast" class="pointer-events-none fixed bottom-5 right-5 z-50 flex translate-y-6 items-center gap-2 rounded-xl border border-slate-200 bg-slate-900 px-4 py-2.5 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200">
+    <svg class="h-4 w-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+    <span id="crmToastText">Workspace updated</span>
+  </div>
+
+  <script>
+    const STAGES = ['Discovery', 'Technical Eval', 'Proposal Sent', 'Negotiation'];
+    const STAGE_PROB = {
+      'Discovery': 25,
+      'Technical Eval': 55,
+      'Proposal Sent': 75,
+      'Negotiation': 90
+    };
+
+    const segmentKpis = {
+      'Q4 Enterprise': { pipe: '$4.86M', pipeBadge: '3.4x target', pipeSub: '$2.94M', won: '$1.92M', wonBadge: '+24.6%', wonLogos: '19', cycle: '26 Days', cycleBadge: '-4d faster', health: '91.4' },
+      'Mid-Market':    { pipe: '$2.48M', pipeBadge: '3.9x target', pipeSub: '$1.52M', won: '$1.14M', wonBadge: '+19.2%', wonLogos: '34', cycle: '17 Days', cycleBadge: '-3d faster', health: '89.8' },
+      'Expansion':     { pipe: '$1.95M', pipeBadge: '4.2x target', pipeSub: '$1.41M', won: '$980K',  wonBadge: '+32.8%', wonLogos: '27', cycle: '12 Days', cycleBadge: '-5d faster', health: '94.6' }
+    };
+
+    const forecastHorizons = {
+      'FY26': [
+        { q: 'Q1 FY26', commit: 1.65, best: 1.92, pipe: 3.10, quota: 1.70 },
+        { q: 'Q2 FY26', commit: 1.84, best: 2.15, pipe: 3.48, quota: 1.85 },
+        { q: 'Q3 FY26', commit: 2.04, best: 2.38, pipe: 4.12, quota: 2.00 },
+        { q: 'Q4 FY26', commit: 2.18, best: 2.64, pipe: 4.86, quota: 2.20 }
+      ],
+      'H2': [
+        { q: 'Jul-Aug', commit: 1.32, best: 1.54, pipe: 2.75, quota: 1.30 },
+        { q: 'Sep Close', commit: 1.68, best: 1.95, pipe: 3.20, quota: 1.60 },
+        { q: 'Oct-Nov', commit: 1.94, best: 2.28, pipe: 4.05, quota: 1.90 },
+        { q: 'Dec Push', commit: 2.35, best: 2.82, pipe: 4.86, quota: 2.20 }
+      ],
+      'FY27': [
+        { q: 'Q1 FY27', commit: 2.30, best: 2.75, pipe: 4.95, quota: 2.40 },
+        { q: 'Q2 FY27', commit: 2.55, best: 3.08, pipe: 5.40, quota: 2.65 },
+        { q: 'Q3 FY27', commit: 2.82, best: 3.42, pipe: 5.90, quota: 2.90 },
+        { q: 'Q4 FY27', commit: 3.18, best: 3.85, pipe: 6.50, quota: 3.20 }
+      ]
+    };
+
+    let deals = [
+      { id: 'dl_101', company: 'Stripe Global Treasury', code: 'ST', badgeBg: 'bg-indigo-600', arr: 480000, stage: 'Negotiation', prob: 90, segment: 'Q4 Enterprise', nextStep: 'MSA redlines w/ Legal Fri', owner: 'EL' },
+      { id: 'dl_102', company: 'Figma Design Systems', code: 'FG', badgeBg: 'bg-violet-600', arr: 360000, stage: 'Proposal Sent', prob: 75, segment: 'Q4 Enterprise', nextStep: 'CFO commercial review', owner: 'MV' },
+      { id: 'dl_103', company: 'Datadog Cloud Ops', code: 'DD', badgeBg: 'bg-cobalt', arr: 540000, stage: 'Technical Eval', prob: 55, segment: 'Q4 Enterprise', nextStep: 'SSO + SCIM sandbox load test', owner: 'EL' },
+      { id: 'dl_104', company: 'Notion Enterprise AI', code: 'NT', badgeBg: 'bg-slate-900', arr: 290000, stage: 'Discovery', prob: 25, segment: 'Q4 Enterprise', nextStep: 'VP Eng discovery workshop', owner: 'SN' },
+      { id: 'dl_105', company: 'Plaid Financial Mesh', code: 'PL', badgeBg: 'bg-emerald-600', arr: 410000, stage: 'Negotiation', prob: 90, segment: 'Q4 Enterprise', nextStep: 'Procurement PO signature', owner: 'MV' },
+      { id: 'dl_106', company: 'Rippling Workforce', code: 'RP', badgeBg: 'bg-amber-600', arr: 315000, stage: 'Proposal Sent', prob: 75, segment: 'Q4 Enterprise', nextStep: 'Multi-year pricing lock', owner: 'DK' },
+      { id: 'dl_107', company: 'Scale AI Annotation', code: 'SC', badgeBg: 'bg-blue-700', arr: 265000, stage: 'Technical Eval', prob: 55, segment: 'Q4 Enterprise', nextStep: 'SOC2 Type II packet review', owner: 'SN' },
+      { id: 'dl_108', company: 'Brex Spend Platform', code: 'BX', badgeBg: 'bg-slate-800', arr: 220000, stage: 'Discovery', prob: 25, segment: 'Q4 Enterprise', nextStep: 'RevOps stakeholder intro', owner: 'DK' },
+      { id: 'dl_109', company: 'Loom Async Video', code: 'LM', badgeBg: 'bg-violet-500', arr: 145000, stage: 'Proposal Sent', prob: 75, segment: 'Mid-Market', nextStep: 'Annual seat commitment', owner: 'SN' },
+      { id: 'dl_110', company: 'Retool Internal Apps', code: 'RT', badgeBg: 'bg-cobalt', arr: 168000, stage: 'Negotiation', prob: 90, segment: 'Mid-Market', nextStep: 'Final order form sign-off', owner: 'MV' },
+      { id: 'dl_111', company: 'Linear Product Org', code: 'LN', badgeBg: 'bg-slate-900', arr: 195000, stage: 'Proposal Sent', prob: 75, segment: 'Expansion', nextStep: '+450 enterprise seat uplift', owner: 'EL' },
+      { id: 'dl_112', company: 'Vercel Cloud Edge', code: 'VC', badgeBg: 'bg-emerald-600', arr: 280000, stage: 'Negotiation', prob: 90, segment: 'Expansion', nextStep: 'Global multi-region add-on', owner: 'EL' }
+    ];
+
+    const enterpriseAccounts = [
+      { name: 'Cloudflare Global Network', industry: 'Edge Infrastructure', arr: '$640,000', seats: '840 / 850 (99%)', health: 96, renewal: 'Nov 30, 2026', risk: 'Healthy', sponsor: 'Elena Lin' },
+      { name: 'Shopify Merchant Core', industry: 'Commerce Platform', arr: '$520,000', seats: '610 / 650 (94%)', health: 93, renewal: 'Jan 15, 2027', risk: 'Healthy', sponsor: 'Marcus Vance' },
+      { name: 'Northstar BioLabs Corp', industry: 'Genomics & Life Sci', arr: '$285,000', seats: '142 / 300 (47%)', health: 52, renewal: 'Dec 12, 2026', risk: 'Churn Risk', sponsor: 'Devon Kerr' },
+      { name: 'Atlassian Team Graph', industry: 'Enterprise SaaS', arr: '$710,000', seats: '980 / 1,000 (98%)', health: 95, renewal: 'Feb 28, 2027', risk: 'Healthy', sponsor: 'Elena Lin' },
+      { name: 'Helios Freight Logistics', industry: 'Supply Chain Tech', arr: '$190,000', seats: '88 / 180 (49%)', health: 58, renewal: 'Dec 04, 2026', risk: 'Churn Risk', sponsor: 'Sora Nakamura' },
+      { name: 'Gustav Payroll Systems', industry: 'FinTech & HRIS', arr: '$395,000', seats: '412 / 440 (94%)', health: 90, renewal: 'Mar 19, 2027', risk: 'Healthy', sponsor: 'Marcus Vance' }
+    ];
+
+    let activeSegment = 'Q4 Enterprise';
+    let activeQuarterView = 'FY26';
+    let activePipelineView = 'board';
+    let activeRiskFilter = 'All';
+    let globalDealQuery = '';
+
+    function notify(text) {
+      const toast = document.getElementById('crmToast');
+      document.getElementById('crmToastText').textContent = text;
+      toast.classList.remove('opacity-0', 'translate-y-6');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(window.__crmToastTimer);
+      window.__crmToastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-6');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2400);
+    }
+
+    function toggleMobileNav(open) {
+      const sb = document.getElementById('crmSidebar');
+      const ov = document.getElementById('mobileOverlay');
+      if (open) {
+        sb.classList.remove('-translate-x-full');
+        ov.classList.remove('hidden');
+      } else {
+        sb.classList.add('-translate-x-full');
+        ov.classList.add('hidden');
+      }
+    }
+
+    const crmSubpages = {
+      'Deal Pipeline': {
+        tag: 'MEDDPICC STAGE VELOCITY',
+        subtitle: 'Stage-by-stage enterprise conversion rates, legal redline SLAs, and executive sponsor coverage across $4.86M active pipeline.',
+        ctaLabel: 'Run Deal-Desk Sweep',
+        ctaToast: 'Flagged 2 late-stage Negotiation deals for fast-track legal sign-off',
+        kpis: [
+          { label: 'Total Open Pipeline', val: '$4.86M', badge: '12 Deals', tone: 'cobalt', sub: '3.4x Q4 quota coverage' },
+          { label: 'Weighted Commit', val: '$2.94M', badge: '+18.2%', tone: 'emerald', sub: 'MEDDPICC verified >75%' },
+          { label: 'Stage Win Velocity', val: '31.8%', badge: '+4.1 pts', tone: 'violet', sub: 'Discovery -> Closed-Won' },
+          { label: 'Legal Redline SLA', val: '4.2 Days', badge: '-1.8d', tone: 'amber', sub: 'Standardized MSA playbooks' }
+        ],
+        chartTitle: 'Stage-to-Stage Funnel Conversion Efficiency',
+        chartSub: 'Progression rate across Discovery, Technical Eval, Proposal, and Negotiation',
+        bars: [
+          { label: '01 Discovery -> Technical Evaluation', pct: 84, meta: '84% Conversion · Avg 5.2d', color: 'bg-cobalt' },
+          { label: '02 Technical Eval -> Commercial Proposal', pct: 72, meta: '72% Conversion · Avg 8.4d', color: 'bg-violetExec' },
+          { label: '03 Proposal Sent -> Legal Negotiation', pct: 64, meta: '64% Conversion · Avg 6.8d', color: 'bg-emeraldExec' },
+          { label: '04 Final Negotiation -> Closed-Won Signature', pct: 91, meta: '91% Close Rate · Avg 5.6d', color: 'bg-amberExec' }
+        ],
+        svgPts: '14,126 94,112 174,98 254,86 334,70 414,54 486,38',
+        svgColor: '#2563EB',
+        tableTitle: 'Priority Late-Stage Deal Desk Queue',
+        cols: ['Enterprise Deal', 'Stage & Prob', 'Contract ARR', 'Blocker / Next Step', 'Deal Action'],
+        rows: [
+          { c1: 'Stripe Global Treasury', c2: 'Negotiation (90%)', c3: '$480,000', c4: 'MSA liability cap sign-off', action: 'Fast-Track MSA', done: 'Approved' },
+          { c1: 'Datadog Cloud Ops', c2: 'Technical Eval (55%)', c3: '$540,000', c4: 'SCIM 10k-seat load proof', action: 'Send SOC2 Pack', done: 'Sent' },
+          { c1: 'Plaid Financial Mesh', c2: 'Negotiation (90%)', c3: '$410,000', c4: 'Procurement PO counter-sign', action: 'Ping CFO', done: 'Nudged' },
+          { c1: 'Figma Design Systems', c2: 'Proposal Sent (75%)', c3: '$360,000', c4: '3-year ramp schedule lock', action: 'Lock Ramp', done: 'Locked' },
+          { c1: 'Vercel Cloud Edge', c2: 'Negotiation (90%)', c3: '$280,000', c4: 'Multi-region add-on order', action: 'Issue DocuSign', done: 'Dispatched' }
+        ]
+      },
+      'ARR Forecasting': {
+        tag: 'AI MONTE CARLO REVENUE MODEL',
+        subtitle: 'Triangulated board ARR call combining rep bottom-up commits, historical stage-progression AI, and multi-year expansion cohorts.',
+        ctaLabel: 'Publish Board Call',
+        ctaToast: 'Published Q4 $2.18M Commit / $2.64M Best-Case snapshot to Executive Board pack',
+        kpis: [
+          { label: 'Q4 Executive Commit', val: '$2.18M', badge: '99.1% Quota', tone: 'cobalt', sub: 'vs $2.20M Q4 target' },
+          { label: 'AI Model Prediction', val: '$2.34M', badge: '106% Quota', tone: 'emerald', sub: '94.6% historical accuracy' },
+          { label: 'FY27 Ending ARR Plan', val: '$24.8M', badge: '+46% YoY', tone: 'violet', sub: 'Net of 2.2% gross churn' },
+          { label: 'Slippage Risk Exposure', val: '$180K', badge: '2 Deals', tone: 'amber', sub: 'Mitigated by upside buffer' }
+        ],
+        chartTitle: 'Regional Quota Attainment & Commit Confidence',
+        chartSub: 'Weighted commit vs quarterly target across global revenue territories',
+        bars: [
+          { label: 'North America Enterprise East (Elena Lin)', pct: 96, meta: '$980K Commit / $1.02M Quota', color: 'bg-emeraldExec' },
+          { label: 'North America West & AI Native (Marcus Vance)', pct: 91, meta: '$640K Commit / $700K Quota', color: 'bg-cobalt' },
+          { label: 'EMEA Financial & Regulated (Sora Nakamura)', pct: 84, meta: '$340K Commit / $405K Quota', color: 'bg-violetExec' },
+          { label: 'Strategic Expansion & Multi-Year Uplift', pct: 100, meta: '$475K Commit / $420K Quota', color: 'bg-amberExec' }
+        ],
+        svgPts: '14,130 94,116 174,104 254,88 334,72 414,56 486,40',
+        svgColor: '#7C3AED',
+        tableTitle: 'Territory Forecast Rollup & Rep Calls',
+        cols: ['Territory Pod', 'VP / Lead', 'Rep Commit', 'AI Weighted', 'Call Status'],
+        rows: [
+          { c1: 'NAMER Enterprise East', c2: 'Elena Lin', c3: '$612,000', c4: '$648,000 (High)', action: 'Lock Call', done: 'Locked' },
+          { c1: 'NAMER AI & Cloud West', c2: 'Marcus Vance', c3: '$518,400', c4: '$542,000 (High)', action: 'Lock Call', done: 'Locked' },
+          { c1: 'EMEA DACH & UKI', c2: 'Sora Nakamura', c3: '$436,000', c4: '$445,000 (Med)', action: 'Lock Call', done: 'Locked' },
+          { c1: 'Mid-Market Velocity', c2: 'Devon Kerr', c3: '$354,600', c4: '$372,000 (Med)', action: 'Lock Call', done: 'Locked' },
+          { c1: 'Installed Base Expansion', c2: 'Claire Mercer', c3: '$259,000', c4: '$333,000 (Upside)', action: 'Lock Call', done: 'Locked' }
+        ]
+      },
+      'Enterprise Accounts': {
+        tag: 'STRATEGIC BOOK OF BUSINESS',
+        subtitle: 'Multi-product penetration, licensed seat utilization, and executive QBR alignment across Fortune 500 & AI-native customers.',
+        ctaLabel: 'Export Whitespace Map',
+        ctaToast: 'Exported $1.95M seat-expansion whitespace matrix across 42 strategic accounts',
+        kpis: [
+          { label: 'Active Enterprise ARR', val: '$18.4M', badge: '42 Logos', tone: 'cobalt', sub: '$438K average ACV' },
+          { label: 'Net Revenue Retention', val: '131.4%', badge: '+5.2 pts', tone: 'emerald', sub: 'Driven by seat + API tier' },
+          { label: 'Avg Seat Utilization', val: '91.8%', badge: 'Expansion Trigger', tone: 'violet', sub: '14 accounts >95% capacity' },
+          { label: 'Upcoming 90d Renewals', val: '$1.42M', badge: '6 Contracts', tone: 'amber', sub: '4 auto-uplift clauses' }
+        ],
+        chartTitle: 'Installed Base ARR by Industry Vertical',
+        chartSub: 'Concentration and net expansion velocity across primary customer cohorts',
+        bars: [
+          { label: 'Cloud, Edge & Developer Infrastructure', pct: 92, meta: '$7.40M ARR · 138% NRR', color: 'bg-cobalt' },
+          { label: 'Global FinTech, Payments & Treasury', pct: 81, meta: '$5.20M ARR · 132% NRR', color: 'bg-emeraldExec' },
+          { label: 'Enterprise SaaS & Collaborative Design', pct: 70, meta: '$3.85M ARR · 126% NRR', color: 'bg-violetExec' },
+          { label: 'Genomics, Supply Chain & Industrial', pct: 48, meta: '$1.95M ARR · 114% NRR', color: 'bg-amberExec' }
+        ],
+        svgPts: '14,124 94,110 174,96 254,84 334,68 414,52 486,38',
+        svgColor: '#059669',
+        tableTitle: 'Strategic Account Expansion & QBR Schedule',
+        cols: ['Account Name', 'Contract ARR', 'Seat Utilization', 'Whitespace', 'Account Action'],
+        rows: [
+          { c1: 'Atlassian Team Graph', c2: '$710,000', c3: '980 / 1,000 (98%)', c4: '+$180K Tier Uplift', action: 'Pitch Uplift', done: 'Proposed' },
+          { c1: 'Cloudflare Global Net', c2: '$640,000', c3: '840 / 850 (99%)', c4: '+$150K Add-On', action: 'Schedule QBR', done: 'Booked' },
+          { c1: 'Shopify Merchant Core', c2: '$520,000', c3: '610 / 650 (94%)', c4: '+$110K Analytics', action: 'Schedule QBR', done: 'Booked' },
+          { c1: 'Gustav Payroll Systems', c2: '$395,000', c3: '412 / 440 (94%)', c4: '+$85K Sandbox', action: 'Pitch Uplift', done: 'Proposed' },
+          { c1: 'Northstar BioLabs Corp', c2: '$285,000', c3: '142 / 300 (47%)', c4: 'Adoption Enablement', action: 'Assign CSM', done: 'Assigned' }
+        ]
+      },
+      'Customer Health': {
+        tag: 'PRODUCT TELEMETRY & CHURN GUARD',
+        subtitle: 'Composite health scoring powered by weekly active seat ratio, API webhook depth, support CSAT, and sponsor engagement.',
+        ctaLabel: 'Run Churn Radar Scan',
+        ctaToast: 'Completed telemetry scan: 40 Healthy accounts, 2 Churn-Risk accounts isolated',
+        kpis: [
+          { label: 'Mean Health Score', val: '91.4 / 100', badge: '+2.8 pts', tone: 'emerald', sub: 'Weighted by contract ARR' },
+          { label: 'Gross Retention (GRR)', val: '97.8%', badge: 'Best-in-Class', tone: 'cobalt', sub: 'Enterprise $100K+ cohort' },
+          { label: 'At-Risk ARR Isolated', val: '$475,000', badge: '2 Accounts', tone: 'amber', sub: 'Executive save-plays active' },
+          { label: 'Executive NPS Pulse', val: '+68 NPS', badge: '184 Replies', tone: 'violet', sub: 'Q4 sponsor survey verified' }
+        ],
+        chartTitle: 'Composite Health Signal Weighting & Cohort Score',
+        chartSub: 'Real-time product telemetry indicators driving automated CSM playbooks',
+        bars: [
+          { label: 'Weekly Active Seat Ratio (DAU/MAU Stickiness)', pct: 91, meta: '91.2% Healthy Benchmark', color: 'bg-emeraldExec' },
+          { label: 'Core Workflow & CRM Webhook Automation Depth', pct: 88, meta: '88.4% Multi-Integration', color: 'bg-cobalt' },
+          { label: 'Executive Sponsor QBR Cadence (<90d Touch)', pct: 94, meta: '94.0% On-Schedule', color: 'bg-violetExec' },
+          { label: 'Support Ticket P1/P2 Resolution Sentiment', pct: 96, meta: '96.5% CSAT · 14m First Reply', color: 'bg-amberExec' }
+        ],
+        svgPts: '14,120 94,108 174,98 254,86 334,76 414,62 486,48',
+        svgColor: '#D97706',
+        tableTitle: 'Telemetry Health Watchlist & Intervention Queue',
+        cols: ['Enterprise Account', 'Health Index', 'Primary Signal', 'Renewal Date', 'Playbook'],
+        rows: [
+          { c1: 'Northstar BioLabs Corp', c2: '52 / 100 (Risk)', c3: 'Seat active drop -24% MoM', c4: 'Dec 12, 2026', action: 'Launch Save Play', done: 'Active' },
+          { c1: 'Helios Freight Logistics', c2: '58 / 100 (Risk)', c3: 'New VP Ops stakeholder', c4: 'Dec 04, 2026', action: 'Exec Intro', done: 'Scheduled' },
+          { c1: 'Gustav Payroll Systems', c2: '90 / 100 (Healthy)', c3: '94% seat utilization', c4: 'Mar 19, 2027', action: 'Request Case Study', done: 'Requested' },
+          { c1: 'Shopify Merchant Core', c2: '93 / 100 (Healthy)', c3: '14 custom webhooks live', c4: 'Jan 15, 2027', action: 'Early Renewal', done: 'Sent' },
+          { c1: 'Cloudflare Global Net', c2: '96 / 100 (Healthy)', c3: '99% seat cap reached', c4: 'Nov 30, 2026', action: 'Auto-Renew +15%', done: 'Queued' }
+        ]
+      },
+      'Playbooks & Workflows': {
+        tag: 'AUTONOMOUS REVOPS ENGINE',
+        subtitle: 'Declarative MEDDPICC stage gates, Slack #deal-desk approval routing, and automated churn-risk escalation triggers.',
+        ctaLabel: 'Create Workflow Rule',
+        ctaToast: 'Provisioned new MEDDPICC stage-gate rule in active simulation mode',
+        kpis: [
+          { label: 'Active Playbook Rules', val: '18 Rules', badge: '100% Healthy', tone: 'cobalt', sub: 'Zero failed webhook runs' },
+          { label: '30d Automated Actions', val: '4,820', badge: '310 hrs Saved', tone: 'emerald', sub: 'CRM hygiene & Slack alerts' },
+          { label: 'Deal-Desk Approval SLA', val: '22 mins', badge: '-4.2 hrs', tone: 'violet', sub: 'Via Slack interactive buttons' },
+          { label: 'CRM Field Completeness', val: '98.4%', badge: '+19.0%', tone: 'amber', sub: 'AI call-transcript auto-fill' }
+        ],
+        chartTitle: 'Workflow Execution Volume by Trigger Domain',
+        chartSub: 'Automated RevOps orchestration across pipeline hygiene, pricing, and renewals',
+        bars: [
+          { label: 'AI Call Transcript -> MEDDPICC Field Sync', pct: 95, meta: '1,940 Runs · 99.4% Accuracy', color: 'bg-cobalt' },
+          { label: 'Discount >15% Slack Deal-Desk Escalation', pct: 82, meta: '410 Approvals · 22m Median', color: 'bg-violetExec' },
+          { label: 'Seat Cap >92% Expansion Opportunity Create', pct: 88, meta: '620 Triggers · $1.1M Pipe', color: 'bg-emeraldExec' },
+          { label: 'Health Score <65 VP + CSM Save-Play Alert', pct: 76, meta: '94 Escalations · 100% Triaged', color: 'bg-amberExec' }
+        ],
+        svgPts: '14,128 94,114 174,102 254,88 334,74 414,58 486,42',
+        svgColor: '#2563EB',
+        tableTitle: 'Configured Governance & Automation Playbooks',
+        cols: ['Playbook Name', 'Trigger Condition', 'Target Action', '30d Hits', 'Rule Control'],
+        rows: [
+          { c1: 'MEDDPICC Economic Buyer Gate', c2: 'Stage -> Proposal Sent', c3: 'Require EB contact + ROI doc', c4: '148 checks', action: 'Test Trigger', done: 'Verified' },
+          { c1: 'Non-Standard Discount Guard', c2: 'Discount > 15% on ACV', c3: 'Route to #vp-deal-desk', c4: '34 approvals', action: 'Test Trigger', done: 'Verified' },
+          { c1: 'Expansion Auto-Opportunity', c2: 'Seat utilization >= 93%', c3: 'Draft +25% uplift quote', c4: '19 created', action: 'Run Sweep', done: 'Executed' },
+          { c1: 'Stale Negotiation Nudge', c2: 'No activity > 5 days', c3: 'Alert AE + Sales Director', c4: '42 nudges', action: 'Test Trigger', done: 'Verified' },
+          { c1: '60-Day Renewal Health Audit', c2: 'Renewal <= 60d & Health < 70', c3: 'Open Executive Save Room', c4: '6 rooms', action: 'Run Sweep', done: 'Executed' }
+        ]
+      },
+      'RevOps Settings': {
+        tag: 'CRM SYNC & QUOTA GOVERNANCE',
+        subtitle: 'Bi-directional Salesforce/Snowflake warehouse sync, territory quota hierarchies, CPQ pricebooks, and SOC2 audit logs.',
+        ctaLabel: 'Force Warehouse Sync',
+        ctaToast: 'Completed bi-directional Snowflake + Stripe + Salesforce delta sync in 1.4s',
+        kpis: [
+          { label: 'Warehouse Sync Lag', val: '1.4 sec', badge: 'Real-Time CDC', tone: 'emerald', sub: 'Snowflake + Salesforce + Stripe' },
+          { label: 'Licensed RevOps Seats', val: '64 / 70', badge: 'SSO SAML', tone: 'cobalt', sub: 'Okta SCIM auto-provisioned' },
+          { label: 'FY26 Pricebook SKUs', val: '14 Active', badge: 'CPQ Locked', tone: 'violet', sub: 'Multi-currency USD/EUR/GBP' },
+          { label: 'Audit Trail Integrity', val: '100.0%', badge: 'SOC2 Type II', tone: 'amber', sub: 'Immutable field-level diff' }
+        ],
+        chartTitle: 'Connected Revenue Stack API Health & Quota',
+        chartSub: 'Daily webhook throughput and schema parity across enterprise GTM systems',
+        bars: [
+          { label: 'Salesforce Enterprise REST + Bulk CDC', pct: 94, meta: '48,200 API calls/d · 99.99% OK', color: 'bg-cobalt' },
+          { label: 'Snowflake Product Telemetry Reverse-ETL', pct: 88, meta: '1.2M rows/hr · 1.4s Freshness', color: 'bg-emeraldExec' },
+          { label: 'Stripe Billing & DocuSign eSignature', pct: 96, meta: '100% Order-to-Cash Reconciled', color: 'bg-violetExec' },
+          { label: 'Gong Call Intelligence Transcript Ingest', pct: 82, meta: '310 calls/wk · Auto-Parsed', color: 'bg-amberExec' }
+        ],
+        svgPts: '14,116 94,108 174,100 254,92 334,82 414,72 486,62',
+        svgColor: '#059669',
+        tableTitle: 'RevOps Connectors & Governance Policies',
+        cols: ['Connector / Policy', 'Integration Scope', 'Sync Cadence', 'Status', 'Management'],
+        rows: [
+          { c1: 'Salesforce Bi-Directional CDC', c2: 'Opportunity, Account, Contact, Quote', c3: 'Sub-2s Webhook', c4: 'Connected', action: 'Re-Sync', done: 'Synced' },
+          { c1: 'Snowflake Usage Reverse-ETL', c2: 'Seat telemetry & API consumption', c3: 'Every 60 sec', c4: 'Connected', action: 'Re-Sync', done: 'Synced' },
+          { c1: 'Stripe + NetSuite CPQ Bridge', c2: 'ASC 606 revenue recognition rules', c3: 'Real-Time', c4: 'Verified', action: 'Audit Ledger', done: 'Audited' },
+          { c1: 'Okta SAML 2.0 + Role Hierarchy', c2: 'CRO -> VP -> Director -> AE visibility', c3: 'Continuous', c4: 'Enforced', action: 'Verify RBAC', done: 'Verified' },
+          { c1: 'FY27 Territory Carve & Quotas', c2: 'Balanced $24.8M annual quota tree', c3: 'Draft Ready', c4: 'Staged', action: 'Validate Plan', done: 'Validated' }
+        ]
+      }
+    };
+
+    function handleCrmSubAction(btn, msg, doneText) {
+      btn.textContent = doneText;
+      btn.className = 'rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 font-mono text-xs font-semibold text-emeraldExec transition';
+      notify(msg);
+    }
+
+    function renderCrmSubpage(section) {
+      const cfg = crmSubpages[section];
+      if (!cfg) return;
+      const container = document.getElementById('tabSubpageView');
+
+      const kpisHtml = cfg.kpis.map((k) => {
+        const pill = k.tone === 'emerald'
+          ? 'bg-emerald-50 text-emeraldExec border-emerald-200/80'
+          : k.tone === 'violet'
+            ? 'bg-violet-50 text-violetExec border-violet-200/80'
+            : k.tone === 'amber'
+              ? 'bg-amber-50 text-amberExec border-amber-200/80'
+              : 'bg-blue-50 text-cobalt border-blue-200/80';
+        return `
+          <article class="bento-surface rounded-2xl p-5 flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-semibold text-slate-500">${k.label}</span>
+                <p class="mt-2.5 font-mono text-2xl font-bold tracking-tight text-slate-900 tabular-nums">${k.val}</p>
+              </div>
+              <span class="rounded-full border px-2.5 py-0.5 font-mono text-xs font-semibold tabular-nums ${pill}">${k.badge}</span>
+            </div>
+            <div class="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">${k.sub}</div>
+          </article>
+        `;
+      }).join('');
+
+      const barsHtml = cfg.bars.map((b) => `
+        <div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-700">${b.label}</span>
+            <span class="font-mono text-slate-500 tabular-nums">${b.meta}</span>
+          </div>
+          <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200/60">
+            <div class="h-full rounded-full ${b.color}" style="width:${b.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const rowsHtml = cfg.rows.map((r) => `
+        <tr class="hover:bg-slate-50/90 transition">
+          <td class="py-3.5 pr-3 font-bold text-slate-900">${r.c1}</td>
+          <td class="py-3.5 px-3 text-slate-600 font-medium">${r.c2}</td>
+          <td class="py-3.5 px-3 font-mono font-semibold text-slate-900 tabular-nums">${r.c3}</td>
+          <td class="py-3.5 px-3 text-slate-600">${r.c4}</td>
+          <td class="py-3.5 pl-3 text-right">
+            <button onclick="handleCrmSubAction(this, '${section}: ${r.c1} -> ${r.done}', '${r.done}')" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-cobalt hover:text-cobalt shadow-sm transition">
+              ${r.action}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <section class="bento-surface rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="switchCrmSection('Revenue Overview')" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-alabaster px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-cobalt hover:bg-white hover:text-cobalt transition">
+                <svg class="h-3.5 w-3.5 text-cobalt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Overview</span>
+              </button>
+              <span class="rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-xs font-semibold text-cobalt border border-blue-200/80">${cfg.tag}</span>
+            </div>
+            <h2 class="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 pt-1">${section}</h2>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-2xl">${cfg.subtitle}</p>
+          </div>
+          <button onclick="notify('${cfg.ctaToast}')" class="self-start sm:self-center inline-flex items-center gap-1.5 rounded-xl bg-cobalt px-4 py-2.5 text-xs font-semibold text-white shadow-sm shadow-cobalt/25 hover:bg-blue-700 transition shrink-0">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span>${cfg.ctaLabel}</span>
+          </button>
+        </section>
+
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          ${kpisHtml}
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div class="bento-surface rounded-2xl p-5 sm:p-6 lg:col-span-5 flex flex-col justify-between space-y-5">
+            <div>
+              <h3 class="font-heading text-base font-bold text-slate-900">${cfg.chartTitle}</h3>
+              <p class="mt-0.5 text-xs text-slate-500">${cfg.chartSub}</p>
+            </div>
+            <div class="rounded-xl border border-slate-200/80 bg-alabaster p-4">
+              <svg class="h-36 w-full overflow-visible" viewBox="0 0 500 150" fill="none">
+                <defs>
+                  <linearGradient id="crmSubSvgGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${cfg.svgColor}" stop-opacity="0.20" />
+                    <stop offset="100%" stop-color="${cfg.svgColor}" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <line x1="14" y1="35" x2="486" y2="35" stroke="#E2E8F0" stroke-dasharray="3 3" />
+                <line x1="14" y1="85" x2="486" y2="85" stroke="#E2E8F0" stroke-dasharray="3 3" />
+                <line x1="14" y1="132" x2="486" y2="132" stroke="#CBD5E1" />
+                <polygon points="${cfg.svgPts} 486,132 14,132" fill="url(#crmSubSvgGrad)" />
+                <polyline points="${cfg.svgPts}" fill="none" stroke="${cfg.svgColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                <text x="14" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">Q1</text>
+                <text x="236" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="12">Q3</text>
+                <text x="448" y="147" fill="#0F172A" font-family="JetBrains Mono" font-size="12">Q4TD</text>
+              </svg>
+            </div>
+            <div class="space-y-3.5">
+              ${barsHtml}
+            </div>
+          </div>
+
+          <div class="bento-surface rounded-2xl p-5 sm:p-6 lg:col-span-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-3 border-b border-slate-200/80 pb-3.5">
+                <div>
+                  <h3 class="font-heading text-base font-bold text-slate-900">${cfg.tableTitle}</h3>
+                  <p class="mt-0.5 text-xs text-slate-500">Interactive RevOps execution queue with live status updates</p>
+                </div>
+                <span class="rounded-lg bg-emerald-50 px-2.5 py-1 font-mono text-xs font-bold text-emeraldExec border border-emerald-200/80">Live Sync</span>
+              </div>
+              <div class="mt-3 overflow-x-auto">
+                <table class="w-full min-w-[580px] text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <th class="py-2.5 pr-3">${cfg.cols[0]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[1]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[2]}</th>
+                      <th class="py-2.5 px-3">${cfg.cols[3]}</th>
+                      <th class="py-2.5 pl-3 text-right">${cfg.cols[4]}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-xs">
+                    ${rowsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-4 border-t border-slate-100 pt-3 flex items-center justify-between font-mono text-xs text-slate-500">
+              <span>Clarity RevOps Warehouse · 1.4s CDC</span>
+              <span class="text-cobalt font-semibold">MEDDPICC Verified</span>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function switchCrmSection(section) {
+      document.querySelectorAll('#execNav .crm-nav-btn').forEach((b) => {
+        const isActive = b.getAttribute('data-section') === section;
+        b.className = isActive
+          ? 'crm-nav-btn flex w-full items-center justify-between rounded-xl bg-blue-50/90 px-3 py-2.5 text-left text-xs font-semibold text-cobalt ring-1 ring-inset ring-cobalt/20 transition'
+          : 'crm-nav-btn flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition';
+        const svg = b.querySelector('svg');
+        if (svg) {
+          svg.classList.toggle('text-cobalt', isActive);
+          svg.classList.toggle('text-slate-400', !isActive);
+        }
+      });
+
+      document.getElementById('topHeaderTitle').textContent = section === 'Revenue Overview' ? 'Executive Revenue Command' : section;
+
+      const defaultView = document.getElementById('defaultDashboardView');
+      const subpageView = document.getElementById('tabSubpageView');
+      if (section === 'Revenue Overview') {
+        subpageView.classList.add('hidden');
+        defaultView.classList.remove('hidden');
+        renderForecastChart();
+      } else {
+        defaultView.classList.add('hidden');
+        subpageView.classList.remove('hidden');
+        renderCrmSubpage(section);
+      }
+
+      toggleMobileNav(false);
+    }
+
+    document.querySelectorAll('#execNav .crm-nav-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        switchCrmSection(btn.getAttribute('data-section'));
+      });
+    });
+
+    function formatCurrency(val) {
+      if (val >= 1000000) return '$' + (val / 1000000).toFixed(2) + 'M';
+      return '$' + Math.round(val / 1000) + 'K';
+    }
+
+    // Segment Switcher
+    function setSegment(seg) {
+      activeSegment = seg;
+      document.getElementById('activeSegmentBadge').textContent = seg;
+
+      document.querySelectorAll('#segmentTabs .seg-btn').forEach((b) => {
+        b.className = b.getAttribute('data-seg') === seg
+          ? 'seg-btn rounded-lg bg-white px-3 py-1 text-xs font-semibold text-slate-900 shadow-sm transition'
+          : 'seg-btn rounded-lg px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+      });
+      document.querySelectorAll('#segmentTabsMobile .seg-btn-m').forEach((b) => {
+        b.className = b.getAttribute('data-seg') === seg
+          ? 'seg-btn-m flex-1 rounded-lg bg-cobalt px-2.5 py-1.5 text-center text-xs font-semibold text-white'
+          : 'seg-btn-m flex-1 rounded-lg px-2.5 py-1.5 text-center text-xs font-medium text-slate-600';
+      });
+
+      const k = segmentKpis[seg];
+      document.getElementById('crmKpiPipe').textContent = k.pipe;
+      document.getElementById('crmKpiPipeBadge').textContent = k.pipeBadge;
+      document.getElementById('crmKpiPipeSub').innerHTML = `Weighted <strong class="font-mono font-semibold text-slate-700">${k.pipeSub}</strong>`;
+      document.getElementById('crmKpiWon').textContent = k.won;
+      document.getElementById('crmKpiWonBadge').textContent = k.wonBadge;
+      document.getElementById('crmKpiWonSub').innerHTML = `<strong class="font-mono font-semibold text-slate-700">${k.wonLogos}</strong> enterprise logos`;
+      document.getElementById('crmKpiCycle').textContent = k.cycle;
+      document.getElementById('crmKpiCycleBadge').textContent = k.cycleBadge;
+      document.getElementById('crmKpiHealth').innerHTML = `${k.health} <span class="text-sm font-medium text-slate-400">/ 100</span>`;
+
+      renderPipeline();
+      notify('Pipeline filtered: ' + seg);
+    }
+
+    document.querySelectorAll('#segmentTabs .seg-btn, #segmentTabsMobile .seg-btn-m').forEach((btn) => {
+      btn.addEventListener('click', () => setSegment(btn.getAttribute('data-seg')));
+    });
+
+    // Quarterly Grouped Bar SVG Chart
+    function renderForecastChart() {
+      const svg = document.getElementById('arrForecastSvg');
+      const rows = forecastHorizons[activeQuarterView];
+
+      const W = 680;
+      const H = 245;
+      const padL = 46;
+      const padR = 16;
+      const padT = 18;
+      const padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const maxVal = Math.max(...rows.map((r) => r.pipe)) * 1.12;
+
+      let gridHtml = '';
+      for (let i = 0; i <= 4; i++) {
+        const gy = padT + (plotH / 4) * i;
+        const val = (maxVal * (1 - i / 4)).toFixed(1);
+        gridHtml += `
+          <line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="#E2E8F0" stroke-dasharray="3 3" />
+          <text x="${padL - 8}" y="${gy + 4}" text-anchor="end" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10">$${val}M</text>
+        `;
+      }
+
+      const groupW = plotW / rows.length;
+      const barW = 22;
+      const gap = 6;
+
+      let barsHtml = '';
+      let hoverHtml = '';
+
+      rows.forEach((r, idx) => {
+        const cx = padL + idx * groupW + groupW / 2;
+        const totalBarsW = barW * 3 + gap * 2;
+        const startX = cx - totalBarsW / 2;
+
+        const hCommit = (r.commit / maxVal) * plotH;
+        const hBest = (r.best / maxVal) * plotH;
+        const hPipe = (r.pipe / maxVal) * plotH;
+        const yQuota = padT + plotH - (r.quota / maxVal) * plotH;
+
+        barsHtml += `
+          <g>
+            <rect x="${startX}" y="${padT + plotH - hCommit}" width="${barW}" height="${hCommit}" rx="4" fill="#2563EB" />
+            <rect x="${startX + barW + gap}" y="${padT + plotH - hBest}" width="${barW}" height="${hBest}" rx="4" fill="#7C3AED" />
+            <rect x="${startX + (barW + gap) * 2}" y="${padT + plotH - hPipe}" width="${barW}" height="${hPipe}" rx="4" fill="#059669" fill-opacity="0.88" />
+            <line x1="${startX - 8}" y1="${yQuota}" x2="${startX + totalBarsW + 8}" y2="${yQuota}" stroke="#D97706" stroke-width="2" stroke-dasharray="4 3" />
+            <text x="${cx}" y="${H - 9}" text-anchor="middle" fill="#475569" font-family="Plus Jakarta Sans, sans-serif" font-weight="600" font-size="11">${r.q}</text>
+          </g>
+        `;
+
+        hoverHtml += `<rect x="${padL + idx * groupW}" y="${padT}" width="${groupW}" height="${plotH}" fill="transparent" class="cursor-pointer" data-qidx="${idx}" />`;
+      });
+
+      svg.innerHTML = `${gridHtml}${barsHtml}<g id="forecastHoverZones">${hoverHtml}</g>`;
+
+      const tooltip = document.getElementById('forecastTooltip');
+      svg.querySelectorAll('#forecastHoverZones rect').forEach((rect) => {
+        rect.addEventListener('mouseenter', () => {
+          const i = Number(rect.getAttribute('data-qidx'));
+          const r = rows[i];
+          document.getElementById('ftQuarter').textContent = r.q;
+          document.getElementById('ftQuota').textContent = `Quota $${r.quota.toFixed(2)}M`;
+          document.getElementById('ftCommit').textContent = `$${r.commit.toFixed(2)}M`;
+          document.getElementById('ftBest').textContent = `$${r.best.toFixed(2)}M`;
+          document.getElementById('ftPipe').textContent = `$${r.pipe.toFixed(2)}M`;
+          tooltip.classList.remove('hidden');
+          const leftPx = Math.min(Math.max(8, ((i + 0.5) / rows.length) * svg.clientWidth - 95), Math.max(8, svg.clientWidth - 200));
+          tooltip.style.transform = `translate(${leftPx}px, 4px)`;
+        });
+      });
+
+      svg.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+    }
+
+    document.querySelectorAll('#quarterTabs .q-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeQuarterView = btn.getAttribute('data-qview');
+        document.querySelectorAll('#quarterTabs .q-tab').forEach((b) => {
+          b.className = b === btn
+            ? 'q-tab rounded-lg bg-white px-2.5 py-1 font-mono text-[12.5px] font-semibold text-slate-900 shadow-sm transition'
+            : 'q-tab rounded-lg px-2.5 py-1 font-mono text-[12.5px] font-medium text-slate-600 hover:text-slate-900 transition';
+        });
+        renderForecastChart();
+      });
+    });
+
+    // Pipeline Board View vs Table View
+    function setPipelineView(mode) {
+      activePipelineView = mode;
+      const board = document.getElementById('kanbanBoardContainer');
+      const table = document.getElementById('pipelineTableContainer');
+      const btnB = document.getElementById('btnBoardView');
+      const btnT = document.getElementById('btnTableView');
+
+      if (mode === 'board') {
+        board.classList.remove('hidden');
+        table.classList.add('hidden');
+        btnB.className = 'inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition';
+        btnT.className = 'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+      } else {
+        board.classList.add('hidden');
+        table.classList.remove('hidden');
+        btnT.className = 'inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition';
+        btnB.className = 'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+      }
+      renderPipeline();
+    }
+
+    function probPillClasses(prob) {
+      if (prob >= 85) return 'bg-emerald-50 text-emeraldExec border-emerald-200';
+      if (prob >= 70) return 'bg-blue-50 text-cobalt border-blue-200';
+      if (prob >= 50) return 'bg-violet-50 text-violetExec border-violet-200';
+      return 'bg-slate-100 text-slate-600 border-slate-200';
+    }
+
+    function getFilteredDeals() {
+      const q = globalDealQuery.trim().toLowerCase();
+      return deals.filter((d) => {
+        const segMatch = q ? true : d.segment === activeSegment || activeSegment === 'Q4 Enterprise' && d.segment === 'Q4 Enterprise';
+        const textMatch = !q ||
+          d.company.toLowerCase().includes(q) ||
+          d.owner.toLowerCase().includes(q) ||
+          d.nextStep.toLowerCase().includes(q) ||
+          d.stage.toLowerCase().includes(q);
+        return (q ? textMatch : d.segment === activeSegment);
+      });
+    }
+
+    function advanceDealStage(dealId) {
+      const item = deals.find((d) => d.id === dealId);
+      if (!item) return;
+      const idx = STAGES.indexOf(item.stage);
+      const nextIdx = (idx + 1) % STAGES.length;
+      item.stage = STAGES[nextIdx];
+      item.prob = STAGE_PROB[item.stage];
+      renderPipeline();
+      notify(`${item.company} moved to ${item.stage} (${item.prob}%)`);
+    }
+
+    function renderPipeline() {
+      const filtered = getFilteredDeals();
+      document.getElementById('navDealCount').textContent = deals.length;
+
+      // Render 4-Column Kanban Board
+      const boardEl = document.getElementById('kanbanBoardContainer');
+      boardEl.innerHTML = STAGES.map((stage) => {
+        const stageDeals = filtered.filter((d) => d.stage === stage);
+        const stageSum = stageDeals.reduce((acc, d) => acc + d.arr, 0);
+
+        const cardsHtml = stageDeals.length
+          ? stageDeals.map((d) => `
+            <article class="deal-card rounded-xl p-3.5">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${d.badgeBg} font-heading text-[12.5px] font-bold text-white shadow-sm">${d.code}</span>
+                  <div class="min-w-0">
+                    <h4 class="truncate text-xs font-bold text-slate-900">${d.company}</h4>
+                    <span class="text-xs font-medium text-slate-400">${d.segment}</span>
+                  </div>
+                </div>
+                <span class="rounded-full border px-2 py-0.5 font-mono text-xs font-semibold tabular-nums ${probPillClasses(d.prob)}">${d.prob}%</span>
+              </div>
+
+              <div class="mt-3 flex items-baseline justify-between border-t border-slate-100 pt-2.5">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">ARR Value</span>
+                <span class="font-mono text-sm font-bold text-slate-900 tabular-nums">$${d.arr.toLocaleString()}</span>
+              </div>
+
+              <div class="mt-2.5 flex items-center gap-1.5 rounded-lg bg-alabaster px-2.5 py-1.5 text-[12.5px] text-slate-600">
+                <svg class="h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <span class="truncate">${d.nextStep}</span>
+              </div>
+
+              <div class="mt-3 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 font-mono text-xs font-bold text-slate-700 border border-slate-200">${d.owner}</span>
+                  <span class="text-[12.5px] text-slate-500">Owner</span>
+                </div>
+                <button onclick="advanceDealStage('${d.id}')" class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:border-cobalt hover:text-cobalt transition">
+                  <span>Advance</span>
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6" /></svg>
+                </button>
+              </div>
+            </article>
+          `).join('')
+          : `<div class="rounded-xl border border-dashed border-slate-200 py-8 text-center text-xs text-slate-400">No deals in ${stage}</div>`;
+
+        return `
+          <div class="flex flex-col rounded-2xl border border-slate-200/80 bg-alabaster/80 p-3">
+            <div class="mb-3 flex items-center justify-between px-1">
+              <div class="flex items-center gap-2">
+                <h3 class="font-heading text-xs font-bold text-slate-800">${stage}</h3>
+                <span class="rounded-full bg-white px-2 py-0.5 font-mono text-xs font-bold text-slate-600 border border-slate-200">${stageDeals.length}</span>
+              </div>
+              <span class="font-mono text-xs font-bold text-slate-700 tabular-nums">${formatCurrency(stageSum)}</span>
+            </div>
+            <div class="space-y-2.5">${cardsHtml}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Pipeline Table View
+      const tbody = document.getElementById('pipelineTableBody');
+      tbody.innerHTML = filtered.map((d) => `
+        <tr class="hover:bg-slate-50/90 transition">
+          <td class="py-3 pr-3">
+            <div class="flex items-center gap-2.5">
+              <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${d.badgeBg} font-heading text-xs font-bold text-white">${d.code}</span>
+              <div>
+                <div class="font-bold text-slate-900">${d.company}</div>
+                <div class="text-[12.5px] text-slate-400">${d.segment}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-3">
+            <span class="rounded-lg bg-slate-100 px-2.5 py-1 font-medium text-slate-700">${d.stage}</span>
+          </td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">$${d.arr.toLocaleString()}</td>
+          <td class="py-3 px-3">
+            <span class="rounded-full border px-2 py-0.5 font-mono text-xs font-semibold tabular-nums ${probPillClasses(d.prob)}">${d.prob}%</span>
+          </td>
+          <td class="py-3 px-3 text-slate-600">${d.nextStep}</td>
+          <td class="py-3 pl-3 text-right">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 font-mono text-xs font-bold text-slate-700 border border-slate-200">${d.owner}</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Enterprise Accounts & Churn Risk Table
+    function renderAccountsTable() {
+      const q = document.getElementById('accountSearchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('accountsTableBody');
+
+      const filtered = enterpriseAccounts.filter((a) => {
+        const matchRisk = activeRiskFilter === 'All' || a.risk === activeRiskFilter;
+        const matchText = !q ||
+          a.name.toLowerCase().includes(q) ||
+          a.industry.toLowerCase().includes(q) ||
+          a.sponsor.toLowerCase().includes(q);
+        return matchRisk && matchText;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-xs text-slate-400">No enterprise accounts match current filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((a) => {
+        const barColor = a.health >= 80 ? 'bg-emeraldExec' : 'bg-amberExec';
+        const pillHtml = a.risk === 'Healthy'
+          ? `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-xs font-semibold text-emeraldExec border border-emerald-200"><span class="h-1.5 w-1.5 rounded-full bg-emeraldExec"></span>Healthy</span>`
+          : `<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 font-mono text-xs font-semibold text-amberExec border border-amber-200"><span class="h-1.5 w-1.5 rounded-full bg-amberExec"></span>Churn Risk</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="py-3.5 pr-3">
+              <div class="font-bold text-slate-900">${a.name}</div>
+              <div class="text-[12.5px] text-slate-500">${a.industry} &middot; Exec: ${a.sponsor}</div>
+            </td>
+            <td class="py-3.5 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">${a.arr}</td>
+            <td class="py-3.5 px-3 font-mono text-[12.5px] text-slate-600 tabular-nums">${a.seats}</td>
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-2.5">
+                <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100 border border-slate-200/60">
+                  <div class="h-full rounded-full ${barColor}" style="width:${a.health}%"></div>
+                </div>
+                <span class="w-9 text-right font-mono text-xs font-bold text-slate-800 tabular-nums">${a.health}</span>
+              </div>
+            </td>
+            <td class="py-3.5 px-3 font-mono text-[12.5px] text-slate-600 tabular-nums">${a.renewal}</td>
+            <td class="py-3.5 pl-3 text-right">${pillHtml}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    document.querySelectorAll('#accountRiskTabs .risk-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeRiskFilter = btn.getAttribute('data-risk');
+        document.querySelectorAll('#accountRiskTabs .risk-tab').forEach((b) => {
+          b.className = b === btn
+            ? 'risk-tab rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-slate-900 shadow-sm transition'
+            : 'risk-tab rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+        });
+        renderAccountsTable();
+      });
+    });
+
+    function syncGlobalSearch(val) {
+      globalDealQuery = val;
+      document.getElementById('accountSearchInput').value = val;
+      renderPipeline();
+      renderAccountsTable();
+    }
+
+    // + New Deal Modal
+    function openNewDealModal() {
+      const m = document.getElementById('newDealModal');
+      document.getElementById('dealSegmentInput').value = activeSegment;
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      setTimeout(() => document.getElementById('dealCompanyInput').focus(), 40);
+    }
+
+    function closeNewDealModal() {
+      const m = document.getElementById('newDealModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function submitNewDeal(e) {
+      e.preventDefault();
+      const company = document.getElementById('dealCompanyInput').value.trim();
+      const arr = Number(document.getElementById('dealArrInput').value) || 180000;
+      const stage = document.getElementById('dealStageInput').value;
+      const segment = document.getElementById('dealSegmentInput').value;
+      const owner = document.getElementById('dealOwnerInput').value;
+      const nextStep = document.getElementById('dealNextStepInput').value.trim();
+
+      const words = company.split(/\s+/);
+      const code = (words[0][0] + (words[1] ? words[1][0] : words[0][1] || 'X')).toUpperCase();
+
+      deals.unshift({
+        id: 'dl_' + Date.now(),
+        company,
+        code,
+        badgeBg: 'bg-cobalt',
+        arr,
+        stage,
+        prob: STAGE_PROB[stage] || 55,
+        segment,
+        nextStep,
+        owner
+      });
+
+      setSegment(segment);
+      closeNewDealModal();
+      document.getElementById('newDealForm').reset();
+      notify(`Created deal: ${company} ($${arr.toLocaleString()})`);
+    }
+
+    window.addEventListener('resize', () => renderForecastChart());
+
+    // Initial render
+    renderForecastChart();
+    renderPipeline();
+    renderAccountsTable();
+  </script>
+</body>
+</html>

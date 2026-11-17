@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRM Pro — 10. Customer Cards, Sales Pipeline &amp; Activity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      color: #18181B;
+      background:
+        radial-gradient(circle at 86% 42%, rgba(254, 226, 185, 0.85) 0%, rgba(254, 226, 185, 0) 42%),
+        radial-gradient(circle at 14% 18%, rgba(196, 219, 234, 0.9) 0%, rgba(196, 219, 234, 0) 48%),
+        linear-gradient(160deg, #BBD0DF 0%, #D9E4EC 44%, #EFE3D3 72%, #7D9EB0 100%);
+      transition: background 0.35s ease, color 0.3s ease;
+    }
+    html.dark body {
+      color: #F4F4F5;
+      background:
+        radial-gradient(circle at 82% 35%, rgba(198, 125, 67, 0.18) 0%, transparent 45%),
+        linear-gradient(160deg, #090D16 0%, #111827 55%, #0B1320 100%);
+    }
+    /* VisionOS Frosted Outer Bezel */
+    .vision-bezel {
+      background: rgba(255, 255, 255, 0.34);
+      border: 1.5px solid rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 28px 70px -18px rgba(15, 23, 42, 0.22), 0 4px 20px rgba(255, 255, 255, 0.35) inset;
+    }
+    html.dark .vision-bezel {
+      background: rgba(15, 23, 42, 0.55);
+      border-color: rgba(148, 163, 184, 0.22);
+      box-shadow: 0 28px 70px -18px rgba(0, 0, 0, 0.75);
+    }
+    .crm-workspace {
+      background: #F6F6F5;
+      transition: background 0.3s ease;
+    }
+    html.dark .crm-workspace {
+      background: #0F1420;
+    }
+    .crm-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(228, 228, 231, 0.85);
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.025);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.25s ease;
+    }
+    .crm-card:hover {
+      border-color: #D4D4D8;
+      box-shadow: 0 10px 24px -10px rgba(15, 23, 42, 0.08);
+    }
+    html.dark .crm-card {
+      background: #171E2E;
+      border-color: rgba(63, 63, 70, 0.55);
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.55rem 0.85rem;
+      border-radius: 11px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #52525B;
+      transition: all 0.18s ease;
+    }
+    .nav-item:hover {
+      background: #F4F4F5;
+      color: #18181B;
+    }
+    html.dark .nav-item {
+      color: #A1A1AA;
+    }
+    html.dark .nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+    .nav-item.active {
+      background: #111111;
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+    }
+    html.dark .nav-item.active {
+      background: #F4F4F5;
+      color: #111111;
+    }
+    @keyframes areaReveal {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .area-fade {
+      animation: areaReveal 0.85s ease forwards;
+    }
+    .pipeline-node {
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), filter 0.22s ease;
+      transform-box: fill-box;
+      transform-origin: center;
+      cursor: pointer;
+    }
+    .pipeline-node:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.18));
+    }
+  </style>
+</head>
+<body class="p-1.5 sm:p-2.5">
+
+  <!-- Frosted Glass Outer Frame -->
+  <div class="vision-bezel max-w-[1500px] mx-auto rounded-[26px] p-1.5">
+    <div class="crm-workspace rounded-[20px] overflow-hidden flex">
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           LEFT CLEAN WHITE SIDEBAR
+      ══════════════════════════════════════════════════════════════════ -->
+      <aside class="w-[204px] bg-white dark:bg-[#131926] border-r border-zinc-200/80 dark:border-zinc-800 flex-shrink-0 hidden md:flex flex-col justify-between p-3.5 select-none">
+        <div>
+          <!-- CRM Pro Brand -->
+          <div onclick="returnToCrmOverview()" class="flex items-center gap-2.5 px-1 py-1 cursor-pointer">
+            <div class="w-8 h-8 rounded-lg bg-[#111111] dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center shadow-sm">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+              </svg>
+            </div>
+            <span class="font-display text-base font-extrabold tracking-tight text-zinc-900 dark:text-white">CRM Pro</span>
+          </div>
+
+          <p class="text-xs font-medium text-zinc-400 px-2 mt-5 mb-2">Menu</p>
+
+          <!-- Navigation Links -->
+          <nav class="space-y-1">
+            <button data-crm-nav="Dashboard" onclick="switchCrmSection(this, 'Dashboard')" class="nav-item active cursor-pointer">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                <span>Dashboard</span>
+              </span>
+            </button>
+
+            <button data-crm-nav="Customers" onclick="switchCrmSection(this, 'Customers')" class="nav-item cursor-pointer">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+                <span>Customers</span>
+              </span>
+            </button>
+
+            <button data-crm-nav="Sales" onclick="switchCrmSection(this, 'Sales')" class="nav-item cursor-pointer">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                <span>Sales</span>
+              </span>
+              <span class="rounded-md bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300">3</span>
+            </button>
+
+            <button data-crm-nav="Calendar" onclick="switchCrmSection(this, 'Calendar')" class="nav-item cursor-pointer">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Calendar</span>
+              </span>
+            </button>
+
+            <button data-crm-nav="Messages" onclick="switchCrmSection(this, 'Messages')" class="nav-item cursor-pointer">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Messages</span>
+              </span>
+              <span class="rounded-md bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300">12</span>
+            </button>
+
+            <button data-crm-nav="Settings" onclick="switchCrmSection(this, 'Settings')" class="nav-item cursor-pointer">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+                <span>Settings</span>
+              </span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Bottom Profile + Log Out -->
+        <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+          <div class="flex items-center gap-2.5 px-1">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-700 via-stone-700 to-zinc-900 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+              JD
+            </div>
+            <div class="leading-tight">
+              <p class="text-xs font-bold text-zinc-900 dark:text-white">John Doe</p>
+              <p class="text-xs text-zinc-400">Admin</p>
+            </div>
+          </div>
+
+          <button onclick="showCrmToast('Session saved · Signed in as John Doe (Admin)')" class="flex items-center gap-2 px-2 py-1 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition cursor-pointer">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Log Out</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           MAIN CRM WORKSPACE
+      ══════════════════════════════════════════════════════════════════ -->
+      <main class="flex-1 px-5 py-3 space-y-3 min-w-0">
+        <!-- Mobile Navigation Bar -->
+        <nav class="md:hidden flex items-center gap-1.5 overflow-x-auto pb-1">
+          <button data-crm-nav="Dashboard" onclick="switchCrmSection(this, 'Dashboard')" class="nav-item active w-auto whitespace-nowrap cursor-pointer">Dashboard</button>
+          <button data-crm-nav="Customers" onclick="switchCrmSection(this, 'Customers')" class="nav-item w-auto whitespace-nowrap cursor-pointer">Customers</button>
+          <button data-crm-nav="Sales" onclick="switchCrmSection(this, 'Sales')" class="nav-item w-auto whitespace-nowrap cursor-pointer">Sales</button>
+          <button data-crm-nav="Calendar" onclick="switchCrmSection(this, 'Calendar')" class="nav-item w-auto whitespace-nowrap cursor-pointer">Calendar</button>
+          <button data-crm-nav="Messages" onclick="switchCrmSection(this, 'Messages')" class="nav-item w-auto whitespace-nowrap cursor-pointer">Messages</button>
+          <button data-crm-nav="Settings" onclick="switchCrmSection(this, 'Settings')" class="nav-item w-auto whitespace-nowrap cursor-pointer">Settings</button>
+        </nav>
+
+        <div id="defaultDashboardView" class="space-y-3">
+
+        <!-- TOP HEADER -->
+        <header class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 id="crmPageTitle" class="font-display text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
+              Dashboard
+            </h1>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">Welcome back, John</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="document.getElementById('custSearchInput').focus()" class="w-9 h-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 transition cursor-pointer" title="Search Customers">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </button>
+
+            <button onclick="showCrmToast('Reminder: Renewal call with Acme Corp scheduled in 15 mins')" class="relative w-9 h-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 transition cursor-pointer" title="Alerts">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <span class="absolute top-2 right-2.5 w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            </button>
+
+            <button onclick="toggleDarkCrm()" class="w-9 h-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 transition cursor-pointer" title="Toggle Light / Dark Mode">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </button>
+
+            <button
+              onclick="openAddCustomerModal()"
+              class="inline-flex items-center gap-1.5 rounded-xl bg-white dark:bg-zinc-100 hover:bg-zinc-900 hover:text-white dark:hover:bg-white text-zinc-900 border border-zinc-200/90 px-3.5 py-2 text-xs font-semibold shadow-sm transition cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Add Customer</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ROW 1: 4 TWO-TIER CUSTOMER & PIPELINE KPI CARDS
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+
+          <!-- KPI 1: Total Customers -->
+          <div class="crm-card overflow-hidden flex flex-col justify-between">
+            <div class="p-3.5 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Customers</p>
+                <p id="statCustomers" class="font-display text-xl font-extrabold text-zinc-900 dark:text-white leading-tight mt-0.5">1,250</p>
+              </div>
+            </div>
+            <div class="bg-[#FAFAFA] dark:bg-zinc-900/60 border-t border-zinc-100 dark:border-zinc-800 px-3.5 py-2 flex items-center justify-between text-xs">
+              <span class="text-zinc-400">From last month</span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-400">+12.5%</span>
+            </div>
+          </div>
+
+          <!-- KPI 2: New Leads -->
+          <div class="crm-card overflow-hidden flex flex-col justify-between">
+            <div class="p-3.5 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">New Leads</p>
+                <p id="statLeads" class="font-display text-xl font-extrabold text-zinc-900 dark:text-white leading-tight mt-0.5">120</p>
+              </div>
+            </div>
+            <div class="bg-[#FAFAFA] dark:bg-zinc-900/60 border-t border-zinc-100 dark:border-zinc-800 px-3.5 py-2 flex items-center justify-between text-xs">
+              <span class="text-zinc-400">From last month</span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-400">+8.2%</span>
+            </div>
+          </div>
+
+          <!-- KPI 3: Conversion Rate -->
+          <div class="crm-card overflow-hidden flex flex-col justify-between">
+            <div class="p-3.5 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Conversion Rate</p>
+                <p class="font-display text-xl font-extrabold text-zinc-900 dark:text-white leading-tight mt-0.5">18.4%</p>
+              </div>
+            </div>
+            <div class="bg-[#FAFAFA] dark:bg-zinc-900/60 border-t border-zinc-100 dark:border-zinc-800 px-3.5 py-2 flex items-center justify-between text-xs">
+              <span class="text-zinc-400">From last month</span>
+              <span class="font-bold text-rose-500">-2.1%</span>
+            </div>
+          </div>
+
+          <!-- KPI 4: Monthly Revenue -->
+          <div class="crm-card overflow-hidden flex flex-col justify-between">
+            <div class="p-3.5 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Monthly Revenue</p>
+                <p id="statMrr" class="font-display text-xl font-extrabold text-zinc-900 dark:text-white leading-tight mt-0.5">$45,280</p>
+              </div>
+            </div>
+            <div class="bg-[#FAFAFA] dark:bg-zinc-900/60 border-t border-zinc-100 dark:border-zinc-800 px-3.5 py-2 flex items-center justify-between text-xs">
+              <span class="text-zinc-400">From last month</span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-400">+24.3%</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ROW 2: REVENUE OVERVIEW (8 COLS) + SALES PIPELINE BUBBLE HUB (4 COLS)
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-3.5 items-stretch">
+
+          <!-- Left: Warm Peach-Terracotta Dashed Revenue Trajectory -->
+          <div class="crm-card p-3.5 sm:px-5 xl:col-span-8 flex flex-col">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h2 class="font-display text-base font-bold text-zinc-900 dark:text-white">Revenue Overview</h2>
+                <p id="revSubCaption" class="text-xs text-zinc-400">Monthly revenue for 2024</p>
+              </div>
+
+              <div class="inline-flex rounded-lg bg-zinc-100 dark:bg-zinc-800 p-0.5 text-xs font-semibold">
+                <button id="yr24Btn" onclick="switchRevYear('2024')" class="rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white px-2.5 py-1 shadow-sm cursor-pointer">2024</button>
+                <button id="yr25Btn" onclick="switchRevYear('2025')" class="rounded-md text-zinc-500 dark:text-zinc-400 px-2.5 py-1 cursor-pointer">2025</button>
+              </div>
+            </div>
+
+            <div class="relative w-full flex-1 flex items-center">
+              <svg id="crmRevenueSvg" viewBox="0 0 760 205" class="w-full h-48 overflow-visible select-none"></svg>
+            </div>
+          </div>
+
+          <!-- Right: Sales Pipeline Orbital Bubble Network -->
+          <div class="crm-card p-3.5 sm:px-5 xl:col-span-4 flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <div>
+                <h2 class="font-display text-base font-bold text-zinc-900 dark:text-white">Sales Pipeline</h2>
+                <p id="pipelineSubLabel" class="text-xs text-zinc-400">Lead conversion funnel</p>
+              </div>
+              <span id="stageHighlightBadge" class="rounded-md bg-teal-50 dark:bg-teal-500/15 px-2 py-0.5 text-xs font-semibold text-teal-600 dark:text-teal-300">5 Stages</span>
+            </div>
+
+            <!-- 5-Bubble Hub & Spoke Constellation SVG -->
+            <div class="flex justify-center my-1">
+              <svg viewBox="0 0 250 132" class="w-56 h-28 overflow-visible select-none">
+                <!-- Connector Spokes -->
+                <line id="spoke1" x1="125" y1="66" x2="72" y2="24" stroke="#CBD5E1" stroke-width="1.6"/>
+                <line id="spoke2" x1="125" y1="66" x2="178" y2="24" stroke="#CBD5E1" stroke-width="1.6"/>
+                <line id="spoke3" x1="125" y1="66" x2="74" y2="108" stroke="#CBD5E1" stroke-width="1.6"/>
+                <line id="spoke4" x1="125" y1="66" x2="176" y2="108" stroke="#CBD5E1" stroke-width="1.6"/>
+
+                <!-- Kinetic Traveling Lead Pulses -->
+                <circle r="2.6" fill="#2563EB">
+                  <animateMotion dur="2.6s" repeatCount="indefinite" path="M125,66 L72,24"/>
+                </circle>
+                <circle r="2.6" fill="#F97316">
+                  <animateMotion dur="3.0s" repeatCount="indefinite" path="M125,66 L178,24"/>
+                </circle>
+                <circle r="2.6" fill="#DC2626">
+                  <animateMotion dur="3.4s" repeatCount="indefinite" path="M125,66 L74,108"/>
+                </circle>
+                <circle r="2.6" fill="#0D9488">
+                  <animateMotion dur="2.8s" repeatCount="indefinite" path="M125,66 L176,108"/>
+                </circle>
+
+                <!-- Top-Left Satellite: Contacted (98k) -->
+                <g class="pipeline-node" onclick="inspectPipelineStage('Contacted', '32 leads · $98,000')">
+                  <circle cx="72" cy="24" r="16" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.5"/>
+                  <circle cx="72" cy="24" r="12.5" fill="#1D4ED8"/>
+                  <text x="72" y="28" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">98k</text>
+                </g>
+
+                <!-- Top-Right Satellite: Qualified (67k) -->
+                <g class="pipeline-node" onclick="inspectPipelineStage('Qualified', '18 leads · $67,000')">
+                  <circle cx="178" cy="24" r="16" fill="#FFFFFF" stroke="#FDBA74" stroke-width="1.5"/>
+                  <circle cx="178" cy="24" r="12.5" fill="#EA580C"/>
+                  <text x="178" y="28" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">67k</text>
+                </g>
+
+                <!-- Bottom-Left Satellite: Proposal (54k) -->
+                <g class="pipeline-node" onclick="inspectPipelineStage('Proposal', '12 leads · $54,000')">
+                  <circle cx="74" cy="108" r="16" fill="#FFFFFF" stroke="#FCA5A5" stroke-width="1.5"/>
+                  <circle cx="74" cy="108" r="12.5" fill="#DC2626"/>
+                  <text x="74" y="112" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">54k</text>
+                </g>
+
+                <!-- Bottom-Right Satellite: Closed Won (42k) -->
+                <g class="pipeline-node" onclick="inspectPipelineStage('Closed Won', '8 deals · $42,000')">
+                  <circle cx="176" cy="108" r="16" fill="#FFFFFF" stroke="#5EEAD4" stroke-width="1.5"/>
+                  <circle cx="176" cy="108" r="12.5" fill="#0D9488"/>
+                  <text x="176" y="112" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">42k</text>
+                </g>
+
+                <!-- Center Hub: New Leads (125k) -->
+                <g class="pipeline-node" onclick="inspectPipelineStage('New Leads', '45 leads · $125,000')">
+                  <circle cx="125" cy="66" r="29" fill="#FFFFFF" stroke="#5EEAD4" stroke-width="2"/>
+                  <circle cx="125" cy="66" r="24" fill="#14D2BA"/>
+                  <text x="125" y="71" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="800">125k</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- 2-Column Stage Breakdown -->
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+              <div class="flex items-start gap-2">
+                <span class="w-2.5 h-2.5 rounded-sm bg-[#14D2BA] mt-1 flex-shrink-0"></span>
+                <div class="leading-tight">
+                  <p class="font-semibold text-zinc-700 dark:text-zinc-200">New Leads</p>
+                  <p class="text-xs text-zinc-400">45 leads</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-2.5 h-2.5 rounded-sm bg-[#DC2626] mt-1 flex-shrink-0"></span>
+                <div class="leading-tight">
+                  <p class="font-semibold text-zinc-700 dark:text-zinc-200">Proposal</p>
+                  <p class="text-xs text-zinc-400">12 leads</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-2.5 h-2.5 rounded-sm bg-[#1D4ED8] mt-1 flex-shrink-0"></span>
+                <div class="leading-tight">
+                  <p class="font-semibold text-zinc-700 dark:text-zinc-200">Contacted</p>
+                  <p class="text-xs text-zinc-400">32 leads</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-2.5 h-2.5 rounded-sm bg-[#0D9488] mt-1 flex-shrink-0"></span>
+                <div class="leading-tight">
+                  <p class="font-semibold text-zinc-700 dark:text-zinc-200">Closed Won</p>
+                  <p class="text-xs text-zinc-400">8 leads</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-2.5 h-2.5 rounded-sm bg-[#EA580C] mt-1 flex-shrink-0"></span>
+                <div class="leading-tight">
+                  <p class="font-semibold text-zinc-700 dark:text-zinc-200">Qualified</p>
+                  <p class="text-xs text-zinc-400">18 leads</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 mt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+              <span class="text-zinc-500 font-medium">Total Pipeline Value</span>
+              <span id="pipelineTotalVal" class="font-display text-sm font-extrabold text-zinc-900 dark:text-white">$386,000</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ROW 3: CUSTOMERS TABLE (7 COLS) + RECENT ACTIVITY FEED (5 COLS)
+        ══════════════════════════════════════════════════════════════ -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+
+          <!-- Left: Customers Relationship Table -->
+          <div class="crm-card p-3.5 sm:px-5 lg:col-span-7 flex flex-col justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h3 class="font-display text-base font-bold text-zinc-900 dark:text-white">Customers</h3>
+                <p class="text-xs text-zinc-400">Manage your customer relationships</p>
+              </div>
+
+              <div class="relative w-48 sm:w-56">
+                <svg class="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input
+                  id="custSearchInput"
+                  oninput="renderCustomersTable()"
+                  type="text"
+                  placeholder="Search customers..."
+                  class="w-full rounded-xl bg-zinc-100/90 dark:bg-zinc-800 pl-8 pr-3 py-1.5 text-xs text-zinc-700 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                />
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-zinc-100 dark:border-zinc-800 text-xs font-medium text-zinc-400">
+                    <th class="pb-2 font-medium">Customer</th>
+                    <th class="pb-2 font-medium">Status</th>
+                    <th class="pb-2 font-medium">Revenue</th>
+                    <th class="pb-2 font-medium">Last Contact</th>
+                    <th class="pb-2 font-medium text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody" class="divide-y divide-zinc-100 dark:divide-zinc-800/80 text-xs"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Recent Activity Stream -->
+          <div class="crm-card p-3.5 sm:px-5 lg:col-span-5 flex flex-col justify-between">
+            <div class="mb-2">
+              <h3 class="font-display text-base font-bold text-zinc-900 dark:text-white">Recent Activity</h3>
+              <p class="text-xs text-zinc-400">Your latest updates and tasks</p>
+            </div>
+
+            <div id="activityFeedList" class="space-y-2 my-auto"></div>
+          </div>
+
+        </section>
+        </div>
+        <div id="tabSubpageView" class="hidden"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Customer Interactive Modal -->
+  <div id="addCustModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display text-lg font-bold text-zinc-900 dark:text-white">Add New Customer</h3>
+        <button onclick="closeAddCustomerModal()" class="text-zinc-400 hover:text-zinc-700 cursor-pointer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form onsubmit="submitNewCustomer(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-zinc-600 dark:text-zinc-300 mb-1">Full Name</label>
+          <input id="newCustName" required type="text" placeholder="e.g. Olivia Vance" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3.5 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none"/>
+        </div>
+        <div>
+          <label class="block font-semibold text-zinc-600 dark:text-zinc-300 mb-1">Work Email</label>
+          <input id="newCustEmail" required type="email" placeholder="olivia@stripe.com" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3.5 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-zinc-600 dark:text-zinc-300 mb-1">Deal Value ($)</label>
+            <input id="newCustRev" required type="number" min="500" step="100" value="14500" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3.5 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none"/>
+          </div>
+          <div>
+            <label class="block font-semibold text-zinc-600 dark:text-zinc-300 mb-1">Status</label>
+            <select id="newCustStatus" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-white">
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAddCustomerModal()" class="rounded-xl px-4 py-2 font-semibold text-zinc-500 hover:bg-zinc-100 cursor-pointer">Cancel</button>
+          <button type="submit" class="rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-2 font-semibold cursor-pointer">Save Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="crmToast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 rounded-xl bg-zinc-900 text-white px-4 py-2.5 text-xs font-semibold shadow-xl flex items-center gap-2.5">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="crmToastText">Updated</span>
+  </div>
+
+  <script>
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const REV_SERIES = {
+      '2024': [19.5, 27.8, 28.6, 30.8, 35.4, 36.2, 39.5, 43.8, 44.6, 48.9, 51.8, 53.2],
+      '2025': [24.2, 31.0, 33.4, 36.8, 40.2, 42.9, 45.3, 49.4, 51.2, 54.6, 57.5, 59.4],
+    };
+
+    let activeRevYear = '2024';
+    let hoverMonthIdx = 10; // Nov/Dec highlight
+
+    const CUSTOMERS = [
+      {
+        name: 'Sarah Johnson',
+        email: 'sarah@acme.com',
+        initials: 'SJ',
+        grad: 'from-amber-600 to-rose-700',
+        status: 'Active',
+        revenue: 12500,
+        lastContact: '2 hours ago',
+      },
+      {
+        name: 'Michael Chen',
+        email: 'm.chen@techcorp.io',
+        initials: 'MC',
+        grad: 'from-slate-700 to-indigo-800',
+        status: 'Active',
+        revenue: 8900,
+        lastContact: '5 hours ago',
+      },
+      {
+        name: 'Emily Rodriguez',
+        email: 'emily.r@nova.co',
+        initials: 'ER',
+        grad: 'from-emerald-600 to-teal-800',
+        status: 'Pending',
+        revenue: 3200,
+        lastContact: '1 day ago',
+      },
+    ];
+
+    const ACTIVITIES = [
+      {
+        title: 'Call with Sarah Johnson',
+        desc: 'Discussed enterprise renewal options',
+        time: '10 mins ago',
+        status: 'Completed',
+        tone: 'teal',
+      },
+      {
+        title: 'Proposal sent to Michael Chen',
+        desc: 'Shared Q4 multi-seat licensing deck',
+        time: '42 mins ago',
+        status: 'Completed',
+        tone: 'violet',
+      },
+      {
+        title: 'Onboarding sync · Emily Rodriguez',
+        desc: 'Workspace SSO & CRM webhook setup',
+        time: 'Today, 4:00 PM',
+        status: 'Completed',
+        tone: 'emerald',
+      },
+    ];
+
+    function smoothPath(pts) {
+      let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i === 0 ? i : i - 1];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    function renderRevenueChart() {
+      const svg = document.getElementById('crmRevenueSvg');
+      const vals = REV_SERIES[activeRevYear];
+      const leftX = 46;
+      const rightX = 742;
+      const topY = 18;
+      const botY = 176;
+      const w = rightX - leftX;
+      const h = botY - topY;
+      const maxK = 60;
+
+      const pts = vals.map((v, i) => ({
+        x: leftX + (i / (vals.length - 1)) * w,
+        y: botY - (v / maxK) * h,
+        v,
+        m: MONTHS[i],
+      }));
+
+      const curve = smoothPath(pts);
+      const area = `${curve} L ${pts[pts.length - 1].x.toFixed(1)} ${botY} L ${pts[0].x.toFixed(1)} ${botY} Z`;
+
+      const yAxisTicks = [0, 15, 30, 45, 60]
+        .map((k) => {
+          const y = (botY - (k / maxK) * h).toFixed(1);
+          return `
+            <line x1="${leftX}" y1="${y}" x2="${rightX}" y2="${y}" stroke="currentColor" class="text-zinc-200/75 dark:text-zinc-800" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="${leftX - 10}" y="${Number(y) + 4}" text-anchor="end" class="fill-zinc-400 text-[12px] font-medium">$${k}k</text>
+          `;
+        })
+        .join('');
+
+      const xLabels = pts
+        .map(
+          (p, idx) => `
+          <text x="${p.x.toFixed(1)}" y="198" text-anchor="middle" class="${idx === hoverMonthIdx ? 'fill-amber-700 dark:fill-amber-400 font-bold' : 'fill-zinc-400 font-medium'} text-[12px] cursor-pointer">${p.m}</text>
+          <rect x="${(p.x - 24).toFixed(1)}" y="${topY}" width="48" height="${h + 24}" fill="transparent" class="cursor-pointer" onmouseenter="hoverRevMonth(${idx})" onclick="hoverRevMonth(${idx})"/>
+        `
+        )
+        .join('');
+
+      const hp = pts[hoverMonthIdx];
+      const tipX = Math.min(Math.max(hp.x - 42, leftX), rightX - 84);
+      const tipY = Math.max(hp.y - 32, 2);
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="warmPeachArea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#F6B98E" stop-opacity="0.52"/>
+            <stop offset="68%" stop-color="#FAD9C0" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#FAD9C0" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        ${yAxisTicks}
+
+        <path class="area-fade" d="${area}" fill="url(#warmPeachArea)"/>
+        <path d="${curve}" fill="none" stroke="#C57B42" stroke-width="2.2" stroke-dasharray="5 4" stroke-linecap="round"/>
+
+        <!-- Kinetic Traveling Revenue Pulse -->
+        <circle r="3.5" fill="#C57B42">
+          <animateMotion dur="6s" repeatCount="indefinite" path="${curve}"/>
+        </circle>
+
+        <!-- Active Hover Point & Callout -->
+        <line x1="${hp.x.toFixed(1)}" y1="${hp.y.toFixed(1)}" x2="${hp.x.toFixed(1)}" y2="${botY}" stroke="#D97706" stroke-opacity="0.35" stroke-dasharray="3 3"/>
+        <circle cx="${hp.x.toFixed(1)}" cy="${hp.y.toFixed(1)}" r="4.5" fill="#C57B42" stroke="#FFFFFF" stroke-width="2"/>
+        <rect x="${tipX.toFixed(1)}" y="${tipY.toFixed(1)}" width="84" height="22" rx="6" fill="#18181B"/>
+        <text x="${(tipX + 42).toFixed(1)}" y="${(tipY + 15).toFixed(1)}" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">${hp.m} · $${hp.v.toFixed(1)}k</text>
+
+        ${xLabels}
+      `;
+    }
+
+    function hoverRevMonth(idx) {
+      if (hoverMonthIdx === idx) return;
+      hoverMonthIdx = idx;
+      renderRevenueChart();
+    }
+
+    function switchRevYear(yr) {
+      activeRevYear = yr;
+      document.getElementById('revSubCaption').textContent = `Monthly revenue for ${yr}`;
+      const b24 = document.getElementById('yr24Btn');
+      const b25 = document.getElementById('yr25Btn');
+      if (yr === '2024') {
+        b24.className = 'rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white px-2.5 py-1 shadow-sm cursor-pointer';
+        b25.className = 'rounded-md text-zinc-500 dark:text-zinc-400 px-2.5 py-1 cursor-pointer';
+      } else {
+        b25.className = 'rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white px-2.5 py-1 shadow-sm cursor-pointer';
+        b24.className = 'rounded-md text-zinc-500 dark:text-zinc-400 px-2.5 py-1 cursor-pointer';
+      }
+      renderRevenueChart();
+    }
+
+    function inspectPipelineStage(stage, detail) {
+      document.getElementById('stageHighlightBadge').textContent = stage;
+      document.getElementById('pipelineSubLabel').textContent = detail;
+      showCrmToast(`Pipeline Stage · ${stage}: ${detail}`);
+    }
+
+    function renderCustomersTable() {
+      const q = document.getElementById('custSearchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('customersTableBody');
+      const filtered = CUSTOMERS.filter(
+        (c) =>
+          !q ||
+          c.name.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q) ||
+          c.status.toLowerCase().includes(q)
+      );
+
+      tbody.innerHTML = filtered
+        .map((c) => {
+          const isActive = c.status === 'Active';
+          const badgeCls = isActive
+            ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+            : 'bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400';
+
+          return `
+            <tr class="hover:bg-zinc-50/90 dark:hover:bg-zinc-800/40 transition">
+              <td class="py-2.5 pr-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br ${c.grad} text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                    ${c.initials}
+                  </div>
+                  <div class="leading-tight">
+                    <p class="font-semibold text-zinc-800 dark:text-zinc-100">${c.name}</p>
+                    <p class="text-xs text-zinc-400">${c.email}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-2.5">
+                <span class="rounded-md px-2 py-0.5 text-xs font-semibold ${badgeCls}">${c.status}</span>
+              </td>
+              <td class="py-2.5 font-semibold text-zinc-800 dark:text-zinc-100">$${c.revenue.toLocaleString()}</td>
+              <td class="py-2.5 text-zinc-400">${c.lastContact}</td>
+              <td class="py-2.5 text-right">
+                <div class="inline-flex items-center gap-1.5 text-zinc-400">
+                  <button onclick="showCrmToast('Drafting email to ${c.email}')" class="p-1 hover:text-zinc-800 dark:hover:text-white cursor-pointer" title="Email">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  </button>
+                  <button onclick="showCrmToast('Calling ${c.name}...')" class="p-1 hover:text-zinc-800 dark:hover:text-white cursor-pointer" title="Call">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </button>
+                  <button onclick="showCrmToast('Opened ${c.name} CRM timeline')" class="p-1 hover:text-zinc-800 dark:hover:text-white cursor-pointer" title="More">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    function renderActivities() {
+      const toneMap = {
+        teal: {
+          bg: 'bg-teal-50 dark:bg-teal-500/15 text-teal-600 dark:text-teal-300',
+          icon: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+        },
+        violet: {
+          bg: 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300',
+          icon: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+        },
+        emerald: {
+          bg: 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
+          icon: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        },
+      };
+
+      const wrap = document.getElementById('activityFeedList');
+      wrap.innerHTML = ACTIVITIES.map((a, idx) => {
+        const st = toneMap[a.tone];
+        return `
+          <div onclick="toggleActivityState(${idx})" class="rounded-xl bg-[#F8F9FA] dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 p-3 flex items-center justify-between gap-3 transition cursor-pointer">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg ${st.bg} flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${st.icon}</svg>
+              </div>
+              <div class="truncate">
+                <p class="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">${a.title}</p>
+                <p class="text-xs text-zinc-400 truncate">${a.desc}</p>
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0 leading-tight">
+              <p class="text-xs text-zinc-400">${a.time}</p>
+              <p class="text-xs font-semibold ${a.status === 'Completed' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600'} mt-0.5">${a.status}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleActivityState(idx) {
+      ACTIVITIES[idx].status = ACTIVITIES[idx].status === 'Completed' ? 'In Follow-up' : 'Completed';
+      renderActivities();
+      showCrmToast(`${ACTIVITIES[idx].title} → ${ACTIVITIES[idx].status}`);
+    }
+
+    function openAddCustomerModal() {
+      const m = document.getElementById('addCustModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeAddCustomerModal() {
+      const m = document.getElementById('addCustModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function submitNewCustomer(e) {
+      e.preventDefault();
+      const name = document.getElementById('newCustName').value.trim();
+      const email = document.getElementById('newCustEmail').value.trim();
+      const rev = Number(document.getElementById('newCustRev').value) || 5000;
+      const status = document.getElementById('newCustStatus').value;
+      const parts = name.split(' ');
+      const initials = ((parts[0]?.[0] || 'C') + (parts[1]?.[0] || 'P')).toUpperCase();
+
+      CUSTOMERS.unshift({
+        name,
+        email,
+        initials,
+        grad: 'from-violet-600 to-indigo-800',
+        status,
+        revenue: rev,
+        lastContact: 'Just now',
+      });
+
+      ACTIVITIES.unshift({
+        title: `Added ${name} to Pipeline`,
+        desc: `New ${status.toLowerCase()} account ($${rev.toLocaleString()})`,
+        time: 'Just now',
+        status: 'Completed',
+        tone: 'teal',
+      });
+      if (ACTIVITIES.length > 3) ACTIVITIES.pop();
+
+      const totalAccStr = (1250 + CUSTOMERS.length - 3).toLocaleString();
+      document.getElementById('statCustomers').textContent = totalAccStr;
+      CRM_SUBPAGES.Customers.kpis[0].val = totalAccStr;
+      CRM_SUBPAGES.Customers.badge = `${totalAccStr} Active Accounts`;
+      CRM_SUBPAGES.Customers.rows.unshift({
+        c1: `${name} · ${email.split('@')[1] || 'Account'}`,
+        c2: status === 'Active' ? '92 / 100' : '78 / 100',
+        c3: `$${rev.toLocaleString()}`,
+        c4: 'Just added',
+        ok: status === 'Active',
+        btn: 'Log Touchpoint',
+      });
+      if (CRM_SUBPAGES.Customers.rows.length > 5) CRM_SUBPAGES.Customers.rows.pop();
+      const activeNav = document.querySelector('[data-crm-nav].active');
+      if (activeNav && activeNav.dataset.crmNav === 'Customers') {
+        renderCrmSubpage('Customers');
+      }
+      renderCustomersTable();
+      renderActivities();
+      closeAddCustomerModal();
+      e.target.reset();
+      showCrmToast(`Added customer ${name} ($${rev.toLocaleString()})`);
+    }
+
+    const CRM_SUBPAGES = {
+      Customers: {
+        title: 'Customer Directory & Account Health',
+        subtitle: 'Enterprise relationship health, renewal dates, and multi-seat expansion velocity',
+        badge: '1,250 Active Accounts',
+        ctaLabel: 'Add Customer',
+        ctaAction: 'openAddCustomerModal()',
+        kpis: [
+          { label: 'Active Accounts', val: '1,250', foot: 'From last month', delta: '+12.5%', up: true },
+          { label: 'Net Dollar Retention', val: '114.2%', foot: 'Seat expansion lift', delta: '+3.8%', up: true },
+          { label: 'Healthy Renewal Score', val: '91.4%', foot: 'Green NPS accounts', delta: '+4.0%', up: true },
+          { label: 'Upsell Pipeline', val: '$148,500', foot: '28 expansion QBRs', delta: '+19.2%', up: true }
+        ],
+        visualTitle: 'ARR Distribution by Account Segment',
+        visualSub: 'Portfolio health across Enterprise, Mid-Market, and Growth tiers',
+        bars: [
+          { label: 'Enterprise Multi-Year (> $25k)', val: '$264,000', pct: 86, color: 'bg-[#0D9488]', note: '98% annual retention' },
+          { label: 'Mid-Market Teams ($8k–$25k)', val: '$182,400', pct: 68, color: 'bg-[#C57B42]', note: '92% annual retention' },
+          { label: 'Growth Self-Serve (< $8k)', val: '$96,960', pct: 44, color: 'bg-[#1D4ED8]', note: 'Fastest seat upgrades' }
+        ],
+        tableTitle: 'Key Enterprise Accounts',
+        columns: ['Customer & Org', 'Health', 'Annual Value', 'Next QBR', 'Action'],
+        rows: [
+          { c1: 'Sarah Johnson · Acme Corp', c2: '96 / 100', c3: '$42,500', c4: 'In 4 days', ok: true, btn: 'Log Touchpoint' },
+          { c1: 'Michael Chen · TechCorp IO', c2: '91 / 100', c3: '$28,900', c4: 'Next Tue', ok: true, btn: 'Log Touchpoint' },
+          { c1: 'David Kim · LinearOps', c2: '94 / 100', c3: '$36,000', c4: '18 Apr', ok: true, btn: 'Send Deck' },
+          { c1: 'Emily Rodriguez · Nova Co', c2: '74 / 100', c3: '$14,200', c4: 'Tomorrow', ok: false, btn: 'Schedule Check-in' },
+          { c1: 'Hannah Abbott · Veloce AI', c2: '89 / 100', c3: '$26,900', c4: '24 Apr', ok: true, btn: 'Log Touchpoint' }
+        ]
+      },
+      Sales: {
+        title: 'Sales Pipeline & Deal Velocity',
+        subtitle: 'Stage-by-stage opportunity progression, weighted forecast, and executive sign-off',
+        badge: '$386,000 Open Pipeline',
+        ctaLabel: 'New Deal Card',
+        ctaAction: "showCrmToast('Created new Enterprise Deal opportunity draft')",
+        kpis: [
+          { label: 'Total Pipeline Value', val: '$386,000', foot: 'Across 115 active deals', delta: '+24.3%', up: true },
+          { label: 'Weighted Q2 Forecast', val: '$214,800', foot: '89% quota coverage', delta: '+16.1%', up: true },
+          { label: 'Stage Win Rate', val: '31.5%', foot: 'Qualified to Closed Won', delta: '+2.4%', up: true },
+          { label: 'Median Sales Cycle', val: '22 Days', foot: 'Faster legal redlines', delta: '-3 Days', up: true }
+        ],
+        visualTitle: '5-Stage Pipeline Funnel',
+        visualSub: 'Click any deal stage bar to inspect conversion velocity',
+        bars: [
+          { label: '1. New Leads (45 deals)', val: '$125,000', pct: 100, color: 'bg-[#14D2BA]', note: '100% inbound + outbound' },
+          { label: '2. Contacted (32 deals)', val: '$98,000', pct: 78, color: 'bg-[#1D4ED8]', note: '71% discovery booked' },
+          { label: '3. Qualified (18 deals)', val: '$67,000', pct: 54, color: 'bg-[#EA580C]', note: 'Budget & champion verified' },
+          { label: '4. Proposal Sent (12 deals)', val: '$54,000', pct: 43, color: 'bg-[#C57B42]', note: 'MSA + security review' },
+          { label: '5. Closed Won (8 deals)', val: '$42,000', pct: 34, color: 'bg-[#0D9488]', note: 'Signed this month' }
+        ],
+        tableTitle: 'High-Value Active Opportunities',
+        columns: ['Opportunity', 'Stage', 'Deal Value', 'Win Prob.', 'Action'],
+        rows: [
+          { c1: 'Acme Global 250-Seat Expansion', c2: 'Proposal', c3: '$64,000', c4: '80%', ok: true, btn: 'Advance Stage' },
+          { c1: 'TechCorp Enterprise SSO Add-on', c2: 'Qualified', c3: '$38,500', c4: '65%', ok: true, btn: 'Advance Stage' },
+          { c1: 'Veloce AI Annual Platform Lock', c2: 'Proposal', c3: '$52,000', c4: '75%', ok: true, btn: 'Send MSA' },
+          { c1: 'Nordic Cloud FinOps Rollout', c2: 'Contacted', c3: '$29,400', c4: '45%', ok: false, btn: 'Book Demo' },
+          { c1: 'FinSight Analytics Multi-Region', c2: 'Closed Won', c3: '$42,000', c4: '100%', ok: true, btn: 'Countersigned' }
+        ]
+      },
+      Calendar: {
+        title: 'Meetings, Demos & QBR Calendar',
+        subtitle: 'Upcoming executive briefings, product walkthroughs, and automated booking slots',
+        badge: '8 Calls Today',
+        ctaLabel: 'Copy Booking Link',
+        ctaAction: "showCrmToast('Copied crm.pro/john-doe/30min scheduling link')",
+        kpis: [
+          { label: 'Meetings Today', val: '8', foot: '2 Enterprise QBRs', delta: 'On Schedule', up: true },
+          { label: 'Weekly Demos Booked', val: '26', foot: 'From round-robin router', delta: '+14.0%', up: true },
+          { label: 'Prospect Show-Up Rate', val: '92.4%', foot: 'SMS + calendar reminders', delta: '+3.1%', up: true },
+          { label: 'Post-Call Follow-up SLA', val: '18 mins', foot: 'AI recap auto-drafted', delta: '-6 mins', up: true }
+        ],
+        visualTitle: 'Weekly Meeting Allocation (Mon–Fri)',
+        visualSub: 'Distribution of calendar hours across revenue-generating activities',
+        bars: [
+          { label: 'Product Discovery & Live Demos', val: '11.5 hrs', pct: 84, color: 'bg-[#C57B42]', note: '14 prospect sessions' },
+          { label: 'Enterprise Renewal QBRs', val: '6.0 hrs', pct: 56, color: 'bg-[#0D9488]', note: '6 executive accounts' },
+          { label: 'Security & Procurement Redlines', val: '4.5 hrs', pct: 42, color: 'bg-[#1D4ED8]', note: '4 late-stage deals' },
+          { label: 'Pipeline Forecast & Team Sync', val: '3.0 hrs', pct: 28, color: 'bg-zinc-700', note: 'Internal alignment' }
+        ],
+        tableTitle: 'Today & Tomorrow Priority Agenda',
+        columns: ['Time Slot', 'Account & Contact', 'Session Type', 'Room Status', 'Action'],
+        rows: [
+          { c1: '10:30 AM', c2: 'Sarah Johnson · Acme Corp', c3: 'Executive Renewal QBR', c4: 'Confirmed', ok: true, btn: 'Join Room' },
+          { c1: '01:00 PM', c2: 'Michael Chen · TechCorp', c3: 'SSO Architecture Demo', c4: 'Confirmed', ok: true, btn: 'Join Room' },
+          { c1: '03:15 PM', c2: 'Olivia Vance · Stripe Partner', c3: 'Co-Selling Sync', c4: 'Confirmed', ok: true, btn: 'Send Agenda' },
+          { c1: '04:30 PM', c2: 'Emily Rodriguez · Nova Co', c3: 'Onboarding Webhook Setup', c4: 'Awaiting RSVP', ok: false, btn: 'Send Reminder' },
+          { c1: 'Tomorrow, 09:30', c2: 'Hannah Abbott · Veloce AI', c3: 'Security SOC2 Review', c4: 'Confirmed', ok: true, btn: 'Prep Deck' }
+        ]
+      },
+      Messages: {
+        title: 'Inbox, Outreach Sequences & Follow-ups',
+        subtitle: 'Unified customer correspondence, multi-step outbound cadences, and VIP SLA alerts',
+        badge: '12 Unread Threads',
+        ctaLabel: 'New Sequence',
+        ctaAction: "showCrmToast('Opened outbound sequence composer')",
+        kpis: [
+          { label: 'Unread Customer Replies', val: '12', foot: '4 high-value VIP threads', delta: 'SLA Green', up: true },
+          { label: 'Sequence Open Rate', val: '64.8%', foot: 'Verified DKIM/DMARC', delta: '+6.2%', up: true },
+          { label: 'Positive Reply Rate', val: '24.1%', foot: 'Personalized snippets', delta: '+3.5%', up: true },
+          { label: 'Meetings from Inbox', val: '19 Demos', foot: 'Booked this month', delta: '+28.0%', up: true }
+        ],
+        visualTitle: 'Outbound Sequence Engagement',
+        visualSub: '30-day performance across 1,420 personalized prospect touches',
+        bars: [
+          { label: '1. Delivered to Primary Inbox', val: '1,420', pct: 99, color: 'bg-zinc-800', note: '99.4% deliverability' },
+          { label: '2. Opened & Link Clicked', val: '920', pct: 65, color: 'bg-[#C57B42]', note: '64.8% open rate' },
+          { label: '3. Replied with Buying Intent', val: '342', pct: 36, color: 'bg-[#1D4ED8]', note: '24.1% reply rate' },
+          { label: '4. Discovery Call Scheduled', val: '48', pct: 20, color: 'bg-[#0D9488]', note: '14.0% reply-to-demo' }
+        ],
+        tableTitle: 'Priority Customer Inbox',
+        columns: ['Contact', 'Subject & Snippet', 'Received', 'Priority', 'Action'],
+        rows: [
+          { c1: 'Sarah Johnson', c2: 'Re: Acme Q3 Expansion — Legal approved redlines!', c3: '8m ago', c4: 'VIP Deal', ok: true, btn: 'Quick Reply' },
+          { c1: 'Michael Chen', c2: 'Can we add 40 more seats to our Q4 quote?', c3: '27m ago', c4: 'VIP Deal', ok: true, btn: 'Send Quote' },
+          { c1: 'Olivia Vance', c2: 'Shared joint enterprise account mapping sheet', c3: '1h ago', c4: 'Partner', ok: true, btn: 'Quick Reply' },
+          { c1: 'Emily Rodriguez', c2: 'Webhook signing token test succeeded on staging', c3: '3h ago', c4: 'Onboarding', ok: true, btn: 'Mark Done' },
+          { c1: 'Marcus Reid', c2: 'Requesting SOC2 Type II report for procurement', c3: '5h ago', c4: 'Security', ok: false, btn: 'Share Vault' }
+        ]
+      },
+      Settings: {
+        title: 'CRM Pro Workspace & Pipeline Settings',
+        subtitle: 'Configure round-robin lead routing, enrichment credits, webhooks, and glass theme',
+        badge: 'Admin · John Doe',
+        ctaLabel: 'Save CRM Config',
+        ctaAction: "showCrmToast('Saved CRM Pro workspace settings')",
+        kpis: [
+          { label: 'Connected Integrations', val: '4 Synced', foot: 'Gmail · Slack · Stripe · Zoom', delta: 'Healthy', up: true },
+          { label: 'Lead Routing Engine', val: 'Round-Robin', foot: '6 AE seats active', delta: '< 30s SLA', up: true },
+          { label: 'Webhook Uptime', val: '99.98%', foot: 'Bi-directional event sync', delta: '42ms P95', up: true }
+        ],
+        visualTitle: 'Workspace Monthly Quota Usage',
+        visualSub: 'Enrichment, sequence volume, and API webhook consumption',
+        bars: [
+          { label: 'Clearbit & LinkedIn Enrichment Credits', val: '8,420 / 10k', pct: 84, color: 'bg-[#0D9488]', note: 'Resets on 1st of month' },
+          { label: 'Automated Sequence Daily Sends', val: '1,850 / 2.5k', pct: 74, color: 'bg-[#C57B42]', note: 'Warmup score 99/100' },
+          { label: 'Realtime Deal Webhook Events', val: '42k / 100k', pct: 42, color: 'bg-[#1D4ED8]', note: 'Zero dropped payloads' }
+        ],
+        tableTitle: 'Automation & Appearance Controls',
+        toggles: [
+          { title: 'Auto-Enrich New Leads with Company & ARR Data', desc: 'Populates firmographic employee count and tech stack on lead capture', on: true },
+          { title: 'Round-Robin Enterprise Lead Assignment', desc: 'Routes inbound >$15k opportunities evenly across available Account Execs', on: true },
+          { title: 'Instant Slack #deals-won Celebration Webhook', desc: 'Posts deal summary card when pipeline stage moves to Closed Won', on: true },
+          { title: '15-Minute Pre-Call Account Briefing Digest', desc: 'Sends recent ticket & usage snapshot before scheduled renewal calls', on: false },
+          { title: 'CRM Dark Glass Workspace Mode', desc: 'Toggle between VisionOS Warm Light Glass and Deep Midnight Dark mode', isDarkToggle: true }
+        ]
+      }
+    };
+
+    function toggleCrmSubSetting(idx) {
+      const t = CRM_SUBPAGES.Settings.toggles[idx];
+      if (!t) return;
+      if (t.isDarkToggle) {
+        toggleDarkCrm();
+        renderCrmSubpage('Settings');
+        return;
+      }
+      t.on = !t.on;
+      renderCrmSubpage('Settings');
+      showCrmToast(`${t.title}: ${t.on ? 'Enabled' : 'Disabled'}`);
+    }
+
+    function renderCrmSubpage(sectionKey) {
+      const data = CRM_SUBPAGES[sectionKey];
+      const container = document.getElementById('tabSubpageView');
+      if (!data || !container) return;
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const kpiCols = data.kpis.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 xl:grid-cols-4';
+
+      const kpiHtml = data.kpis.map((k) => `
+        <div class="crm-card overflow-hidden flex flex-col justify-between">
+          <div class="p-3.5">
+            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">${k.label}</p>
+            <p class="font-display text-xl font-extrabold text-zinc-900 dark:text-white leading-tight mt-1">${k.val}</p>
+          </div>
+          <div class="bg-[#FAFAFA] dark:bg-zinc-900/60 border-t border-zinc-100 dark:border-zinc-800 px-3.5 py-2 flex items-center justify-between text-xs">
+            <span class="text-zinc-400 truncate pr-2">${k.foot}</span>
+            <span class="font-bold ${k.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600'} flex-shrink-0">${k.delta}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const barsHtml = data.bars.map((b) => `
+        <div onclick="showCrmToast('${b.label}: ${b.val} (${b.note})')" class="rounded-xl bg-[#F8F9FA] dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 p-3 transition cursor-pointer">
+          <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+            <span class="font-bold text-zinc-800 dark:text-zinc-100">${b.label}</span>
+            <span class="font-semibold text-zinc-700 dark:text-zinc-200">${b.val}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-zinc-200/80 dark:bg-zinc-700 overflow-hidden">
+            <div class="h-full rounded-full ${b.color} transition-all duration-500" style="width:${b.pct}%"></div>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1">${b.note}</p>
+        </div>
+      `).join('');
+
+      let rightHtml = '';
+      if (data.toggles) {
+        rightHtml = `
+          <div class="space-y-2.5">
+            ${data.toggles.map((t, idx) => {
+              const activeState = t.isDarkToggle ? isDark : t.on;
+              return `
+                <div onclick="toggleCrmSubSetting(${idx})" class="rounded-xl bg-[#F8F9FA] dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 p-3.5 flex items-center justify-between gap-4 transition cursor-pointer">
+                  <div class="min-w-0">
+                    <p class="text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-100">${t.title}</p>
+                    <p class="text-xs text-zinc-400 mt-0.5">${t.desc}</p>
+                  </div>
+                  <button type="button" aria-pressed="${activeState}" class="w-11 h-6 rounded-full p-0.5 flex items-center flex-shrink-0 transition ${activeState ? 'bg-zinc-900 dark:bg-emerald-500 justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}">
+                    <span class="w-5 h-5 rounded-full bg-white shadow-sm"></span>
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        rightHtml = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-zinc-100 dark:border-zinc-800 text-xs font-medium text-zinc-400">
+                  <th class="pb-2.5 pr-2 font-medium">${data.columns[0]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[1]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[2]}</th>
+                  <th class="pb-2.5 px-2 font-medium">${data.columns[3]}</th>
+                  <th class="pb-2.5 pl-2 font-medium text-right">${data.columns[4]}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/80 text-xs">
+                ${data.rows.map((r) => {
+                  const pillCls = r.ok
+                    ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400';
+                  return `
+                    <tr class="hover:bg-zinc-50/90 dark:hover:bg-zinc-800/40 transition">
+                      <td class="py-3 pr-2 font-semibold text-zinc-800 dark:text-zinc-100">${r.c1}</td>
+                      <td class="py-3 px-2"><span class="rounded-md px-2 py-0.5 text-xs font-semibold ${pillCls}">${r.c2}</span></td>
+                      <td class="py-3 px-2 font-semibold text-zinc-700 dark:text-zinc-200">${r.c3}</td>
+                      <td class="py-3 px-2 text-zinc-400">${r.c4}</td>
+                      <td class="py-3 pl-2 text-right">
+                        <button onclick="showCrmToast('${r.btn}: ${r.c1.replace(/'/g, '')}')" class="rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 px-2.5 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition cursor-pointer">
+                          ${r.btn}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-3.5">
+          <!-- Sub-page Header -->
+          <header class="flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="returnToCrmOverview()" class="inline-flex items-center gap-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Overview</span>
+                </button>
+                <span class="rounded-md bg-teal-50 dark:bg-teal-500/15 px-2.5 py-1 text-xs font-semibold text-teal-600 dark:text-teal-300">${data.badge}</span>
+              </div>
+              <h1 class="font-display text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight pt-0.5">${data.title}</h1>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">${data.subtitle}</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="toggleDarkCrm()" class="w-9 h-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 transition cursor-pointer" title="Toggle Light / Dark Mode">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </button>
+              <button onclick="${data.ctaAction}" class="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 dark:bg-zinc-100 hover:opacity-90 text-white dark:text-zinc-900 px-3.5 py-2 text-xs font-semibold shadow-sm transition cursor-pointer">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>${data.ctaLabel}</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Two-Tier CRM KPI Row -->
+          <section class="grid grid-cols-1 ${kpiCols} gap-3.5">
+            ${kpiHtml}
+          </section>
+
+          <!-- Visual Block + Interactive 5-Row Table / Toggles -->
+          <section class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+            <div class="crm-card p-4 sm:px-5 lg:col-span-5 flex flex-col justify-between">
+              <div class="mb-3">
+                <h2 class="font-display text-base font-bold text-zinc-900 dark:text-white">${data.visualTitle}</h2>
+                <p class="text-xs text-zinc-400">${data.visualSub}</p>
+              </div>
+              <div class="space-y-2.5 my-auto">
+                ${barsHtml}
+              </div>
+            </div>
+
+            <div class="crm-card p-4 sm:px-5 lg:col-span-7 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="font-display text-base font-bold text-zinc-900 dark:text-white">${data.tableTitle}</h2>
+                  <p class="text-xs text-zinc-400">Interactive CRM Pro records with instant actions</p>
+                </div>
+                <span class="rounded-md bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">Live</span>
+              </div>
+              ${rightHtml}
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function setCrmActiveTab(sectionKey) {
+      document.querySelectorAll('[data-crm-nav]').forEach((b) => {
+        b.classList.toggle('active', b.dataset.crmNav === sectionKey);
+      });
+    }
+
+    function returnToCrmOverview(silent = false) {
+      setCrmActiveTab('Dashboard');
+      document.getElementById('tabSubpageView').classList.add('hidden');
+      document.getElementById('defaultDashboardView').classList.remove('hidden');
+      document.getElementById('crmPageTitle').textContent = 'Dashboard';
+      if (!silent) showCrmToast('Returned to CRM Pro Dashboard Overview');
+    }
+
+    function switchCrmSection(btn, sectionKey) {
+      setCrmActiveTab(sectionKey);
+      if (sectionKey === 'Dashboard') {
+        returnToCrmOverview(true);
+        showCrmToast('CRM Pro Dashboard Overview');
+      } else {
+        document.getElementById('defaultDashboardView').classList.add('hidden');
+        const sub = document.getElementById('tabSubpageView');
+        sub.classList.remove('hidden');
+        renderCrmSubpage(sectionKey);
+        showCrmToast(`Opened ${CRM_SUBPAGES[sectionKey]?.title || sectionKey}`);
+      }
+    }
+
+    function toggleDarkCrm() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      const activeBtn = document.querySelector('aside nav .nav-item.active');
+      if (activeBtn && activeBtn.dataset.crmNav === 'Settings') {
+        renderCrmSubpage('Settings');
+      }
+      showCrmToast(isDark ? 'CRM Dark Glass Mode enabled' : 'CRM Clean Light Mode enabled');
+    }
+
+    let crmToastTimer = null;
+    function showCrmToast(msg) {
+      const el = document.getElementById('crmToast');
+      document.getElementById('crmToastText').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(crmToastTimer);
+      crmToastTimer = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+      }, 2600);
+    }
+
+    // Boot
+    renderRevenueChart();
+    renderCustomersTable();
+    renderActivities();
+  </script>
+</body>
+</html>

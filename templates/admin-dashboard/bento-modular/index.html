@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KENTO OS — Modular Bento Product &amp; Revenue Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#F2F4F7',
+            obsidian: '#111827',
+            ink: '#0F172A',
+            indigoAccent: '#4F46E5',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html {
+      font-size: 16px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #F2F4F7;
+      color: #0F172A;
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 65% 45% at 15% 0%, rgba(79, 70, 229, 0.06), transparent 70%),
+        radial-gradient(ellipse 55% 40% at 90% 10%, rgba(16, 185, 129, 0.05), transparent 70%);
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Kinetic Data Visualization Keyframes */
+    @keyframes splineDrawIn {
+      0% {
+        stroke-dashoffset: 1000;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+    @keyframes barGrowUp {
+      0% {
+        transform: scaleY(0.08);
+        opacity: 0.4;
+      }
+      100% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+    @keyframes beaconPing {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.85;
+      }
+      75% {
+        transform: scale(2.3);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(2.3);
+        opacity: 0;
+      }
+    }
+
+    .spline-animate {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 0;
+      animation: splineDrawIn 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .bento-svg-bar {
+      transform-box: fill-box;
+      transform-origin: bottom;
+      animation: barGrowUp 0.68s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      transition: filter 0.22s ease, opacity 0.22s ease;
+    }
+    .bento-svg-bar:hover {
+      filter: brightness(1.08);
+    }
+    .live-beacon {
+      animation: beaconPing 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    }
+
+    /* Tactile 26px Rounded Bento Modules */
+    .bento-tile {
+      background: #FFFFFF;
+      border-radius: 26px;
+      border: 1px solid rgba(15, 23, 42, 0.07);
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 12px 32px -10px rgba(15, 23, 42, 0.06);
+      transition:
+        transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.26s ease;
+    }
+    .bento-tile:hover {
+      border-color: rgba(79, 70, 229, 0.24);
+      box-shadow:
+        0 4px 10px rgba(15, 23, 42, 0.04),
+        0 20px 42px -12px rgba(15, 23, 42, 0.10);
+    }
+
+    /* 1x1 Dark Obsidian Contrast Module (#111827) */
+    .bento-obsidian {
+      background: #111827;
+      color: #F8FAFC;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background-image:
+        radial-gradient(circle at 88% 14%, rgba(16, 185, 129, 0.22), transparent 55%),
+        radial-gradient(circle at 12% 90%, rgba(99, 102, 241, 0.24), transparent 58%);
+      box-shadow:
+        0 18px 40px -12px rgba(17, 24, 39, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.26s ease;
+    }
+    .bento-obsidian:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 22px 48px -12px rgba(17, 24, 39, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    /* Sidebar Collapsible Architecture (264px <-> 78px) */
+    .kento-sidebar {
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-right: 1px solid rgba(15, 23, 42, 0.08);
+      width: 264px;
+      transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .kento-sidebar.collapsed {
+      width: 78px;
+    }
+    .kento-sidebar.collapsed .nav-label,
+    .kento-sidebar.collapsed .nav-pill,
+    .kento-sidebar.collapsed .brand-meta,
+    .kento-sidebar.collapsed .section-title,
+    .kento-sidebar.collapsed .user-meta {
+      display: none;
+    }
+    .kento-sidebar.collapsed .nav-btn {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .kento-sidebar.collapsed .brand-row {
+      justify-content: center;
+    }
+    .kento-sidebar.collapsed .user-row {
+      justify-content: center;
+      padding: 0.5rem;
+    }
+
+    .kento-shell {
+      margin-left: 0;
+      transition: margin-left 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @media (min-width: 1024px) {
+      .kento-shell {
+        margin-left: 264px;
+      }
+      .kento-shell.sidebar-collapsed {
+        margin-left: 78px;
+      }
+    }
+
+    .nav-btn {
+      color: #475569;
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .nav-btn:hover {
+      color: #0F172A;
+      background: rgba(15, 23, 42, 0.05);
+    }
+    .nav-btn.active {
+      color: #0F172A;
+      background: #F2F4F7;
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .nav-btn.active svg {
+      color: #4F46E5;
+    }
+
+    /* Sticky Apple-like Frosted Topbar */
+    .kento-topbar {
+      background: rgba(242, 244, 247, 0.86);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+    }
+
+    /* Segmented Workspace Switcher */
+    .seg-pill {
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .seg-pill.active {
+      background: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.06);
+    }
+
+    /* Quick Action Tactile Micro-interaction */
+    .quick-action-tile {
+      background: #F8FAFC;
+      border: 1px solid rgba(15, 23, 42, 0.07);
+      border-radius: 18px;
+      transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .quick-action-tile:hover {
+      background: #FFFFFF;
+      border-color: rgba(79, 70, 229, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -8px rgba(79, 70, 229, 0.18);
+    }
+    .quick-action-tile:active {
+      transform: translateY(0);
+    }
+
+    /* Smooth Ring & Bar Fill Transitions */
+    .ring-progress {
+      transition: stroke-dashoffset 0.65s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.3s ease;
+    }
+    .proportional-bar {
+      transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900">
+
+  <!-- Global SVG Luminous Glow Filters (<feGaussianBlur>) -->
+  <svg class="sr-only" width="0" height="0" aria-hidden="true">
+    <defs>
+      <filter id="bentoGlowEmerald" x="-30%" y="-40%" width="160%" height="180%">
+        <feGaussianBlur stdDeviation="3.2" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="bentoGlowIndigo" x="-30%" y="-40%" width="160%" height="180%">
+        <feGaussianBlur stdDeviation="3.2" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Mobile Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm hidden lg:hidden" onclick="closeMobileDrawer()"></div>
+
+  <!-- Sleek Collapsible Sidebar (264px <-> 78px) -->
+  <aside id="sidebar" aria-label="Workspace Navigation" class="kento-sidebar fixed inset-y-0 left-0 z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 select-none">
+    <div class="flex flex-col flex-1 min-h-0 overflow-y-auto px-3.5 py-5">
+      <!-- Brand Header -->
+      <div class="brand-row flex items-center justify-between px-2 mb-7">
+        <a href="#bento-overview" onclick="setSidebarActive(event, 'Bento Overview')" class="flex items-center gap-3 focus:outline-none">
+          <div class="w-10 h-10 rounded-2xl bg-[#111827] text-white flex items-center justify-center shrink-0 shadow-md">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="8" height="8" rx="2"></rect>
+              <rect x="13" y="3" width="8" height="5" rx="1.5"></rect>
+              <rect x="13" y="10" width="8" height="11" rx="2"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="2"></rect>
+            </svg>
+          </div>
+          <div class="brand-meta flex items-center gap-2">
+            <span class="font-display text-lg font-bold tracking-tight text-slate-900">KENTO OS</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-700">v3.4</span>
+          </div>
+        </a>
+        <button type="button" onclick="closeMobileDrawer()" class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-900/5" aria-label="Close sidebar">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- WORKSPACE Section -->
+      <div class="mb-6">
+        <p class="section-title px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Modular Views</p>
+        <nav class="space-y-1" aria-label="Modular views">
+          <a href="#overview" data-nav="Bento Overview" onclick="setSidebarActive(event, 'Bento Overview')" title="Bento Overview" class="nav-btn active flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+                <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+                <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+              </svg>
+              <span class="nav-label">Bento Overview</span>
+            </span>
+            <span class="nav-pill px-2 py-0.5 rounded-md bg-slate-900 text-white text-xs font-mono">7</span>
+          </a>
+
+          <a href="#funnel" data-nav="Funnel Velocity" onclick="setSidebarActive(event, 'Funnel Velocity')" title="Funnel Velocity" class="nav-btn flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                <polyline points="16 7 22 7 22 13"></polyline>
+              </svg>
+              <span class="nav-label">Funnel Velocity</span>
+            </span>
+          </a>
+
+          <a href="#copilot" data-nav="AI Autopilot" onclick="setSidebarActive(event, 'AI Autopilot')" title="AI Autopilot" class="nav-btn flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+              </svg>
+              <span class="nav-label">AI Autopilot</span>
+            </span>
+            <span class="nav-pill px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 text-xs font-semibold">Live</span>
+          </a>
+
+          <a href="#cohorts" data-nav="Cohort Matrix" onclick="setSidebarActive(event, 'Cohort Matrix')" title="Cohort Matrix" class="nav-btn flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <path d="M3 9h18M3 15h18M9 3v18M15 3v18"></path>
+              </svg>
+              <span class="nav-label">Cohort Matrix</span>
+            </span>
+          </a>
+
+          <a href="#edge" data-nav="Edge Regions" onclick="setSidebarActive(event, 'Edge Regions')" title="Edge Regions" class="nav-btn flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <span class="nav-label">Edge Regions</span>
+            </span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- OPERATIONS Section -->
+      <div>
+        <p class="section-title px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Operations</p>
+        <nav class="space-y-1" aria-label="Operations">
+          <a href="#releases" data-nav="Release Sprints" onclick="setSidebarActive(event, 'Release Sprints')" title="Release Sprints" class="nav-btn flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              <span class="nav-label">Release Sprints</span>
+            </span>
+          </a>
+
+          <a href="#keys" data-nav="API & Vault" onclick="setSidebarActive(event, 'API & Vault')" title="API & Vault" class="nav-btn flex items-center justify-between min-h-[42px] px-3.5 rounded-xl text-sm">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+              </svg>
+              <span class="nav-label">API &amp; Vault</span>
+            </span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Bottom User Card -->
+    <div class="p-3.5 border-t border-slate-900/5">
+      <button type="button" onclick="openModal('inviteModal')" class="user-row w-full flex items-center gap-3 p-2.5 rounded-2xl bg-[#F2F4F7] hover:bg-slate-200/80 transition text-left">
+        <div class="relative shrink-0">
+          <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-display text-sm font-bold flex items-center justify-center">
+            ML
+          </div>
+          <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+        </div>
+        <div class="user-meta min-w-0 flex-1">
+          <p class="text-sm font-semibold text-slate-900 truncate">Maya Lin</p>
+          <p class="text-xs text-slate-500 truncate">Principal Product Lead</p>
+        </div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace Shell -->
+  <div id="mainShell" class="kento-shell min-h-screen flex flex-col">
+
+    <!-- Topbar with Bento Workspace Switcher -->
+    <header class="kento-topbar sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Drawer Button -->
+        <button type="button" onclick="openMobileDrawer()" class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-900/10 text-slate-700 hover:bg-slate-50 transition" aria-label="Open menu">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+
+        <!-- Desktop Collapse Rail Button -->
+        <button type="button" onclick="toggleDesktopRail()" class="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-900/10 text-slate-600 hover:text-slate-900 shadow-sm transition" aria-label="Toggle sidebar rail" title="Collapse or expand sidebar">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <rect x="3" y="3" width="18" height="18" rx="2.5"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </button>
+
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold tracking-tight text-slate-900">Bento Workspace</h1>
+            <button type="button" onclick="toggleLivePulse()" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 transition" title="Toggle live telemetry simulation">
+              <span class="relative flex h-2 w-2">
+                <span id="topBeaconPing" class="live-beacon absolute inline-flex h-full w-full rounded-full bg-emerald-500"></span>
+                <span id="topBeaconCore" class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+              </span>
+              <span id="topBeaconText">Synced Live</span>
+            </button>
+          </div>
+          <p id="topbarSubtext" class="text-xs text-slate-500 hidden md:block">Asymmetric Product Telemetry &middot; Q3 FY26 Cycle</p>
+        </div>
+      </div>
+
+      <!-- Center: Bento Workspace Switcher (Product Growth | Engineering Velocity | AI Revenue) -->
+      <div class="order-3 xl:order-2 w-full xl:w-auto flex justify-start xl:justify-center overflow-x-auto">
+        <div class="inline-flex items-center p-1 rounded-2xl bg-slate-900/5 border border-slate-900/5" role="tablist" aria-label="Bento Workspace Mode">
+          <button type="button" data-ws="growth" onclick="switchWorkspace('growth')" class="ws-tab seg-pill active min-h-[40px] px-4 rounded-xl text-sm font-semibold whitespace-nowrap">
+            Product Growth
+          </button>
+          <button type="button" data-ws="engineering" onclick="switchWorkspace('engineering')" class="ws-tab seg-pill min-h-[40px] px-4 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap">
+            Engineering Velocity
+          </button>
+          <button type="button" data-ws="ai" onclick="switchWorkspace('ai')" class="ws-tab seg-pill min-h-[40px] px-4 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap">
+            AI Revenue
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Deploy CTA -->
+      <div class="order-2 xl:order-3 flex items-center gap-2.5">
+        <button type="button" onclick="openModal('deployModal')" class="inline-flex items-center gap-2 h-10 sm:h-11 px-4 rounded-xl bg-[#111827] hover:bg-slate-800 text-white text-sm font-semibold shadow-sm transition">
+          <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Deploy Edge</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Asymmetric 12-Column Bento Grid Canvas -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-[1600px] w-full mx-auto">
+      <div id="defaultDashboardView">
+      <div class="grid grid-cols-12 gap-5">
+
+        <!-- ========================================================================= -->
+        <!-- TILE A: col-span-12 lg:col-span-6 lg:row-span-2 — Hero 2x2 Module         -->
+        <!-- Net ARR & Product Funnel Velocity + W1..W8 Chart + Animated 3-Step Stream -->
+        <!-- ========================================================================= -->
+        <section id="tileHero" class="bento-tile col-span-12 lg:col-span-6 lg:row-span-2 p-6 sm:p-7 flex flex-col justify-between">
+          <div>
+            <!-- Top Row -->
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <span id="heroEyebrow" class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  <span class="relative flex h-2.5 w-2.5">
+                    <span class="live-beacon absolute inline-flex h-full w-full rounded-full bg-indigo-500"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
+                  </span>
+                  Net ARR &amp; Product Funnel Velocity
+                </span>
+                <div class="flex items-baseline gap-3 mt-2">
+                  <h2 id="heroPrimaryMetric" class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 tabular-nums">$1.84M ARR</h2>
+                  <span id="heroDeltaBadge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 tabular-nums">
+                    <svg class="w-3 h-3" viewBox="0 0 12 12" fill="currentColor"><path d="M6 2L11 9H1L6 2Z"/></svg>
+                    <span>+24.8% QoQ</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Timeframe Window Switcher -->
+              <div class="inline-flex items-center p-1 rounded-xl bg-[#F2F4F7]">
+                <button type="button" data-tf="8w" onclick="switchHeroWindow('8w')" class="hero-tf min-h-[38px] px-3.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-sm transition">W1&ndash;W8</button>
+                <button type="button" data-tf="q3" onclick="switchHeroWindow('q3')" class="hero-tf min-h-[38px] px-3.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition">Q3 Target</button>
+              </div>
+            </div>
+
+            <!-- Interactive SVG Multi-Bar + Spline Overlay Chart (W1..W8) with Crosshairs -->
+            <div class="relative mt-6 pt-2">
+              <div id="heroChartTooltip" class="pointer-events-none absolute z-20 hidden px-3.5 py-2 rounded-xl bg-[#111827] text-white shadow-xl text-xs transition-all duration-100">
+                <p id="heroTipWeek" class="text-slate-400 font-mono">Week 8</p>
+                <p id="heroTipVal" class="font-display text-sm font-bold mt-0.5">$248k Net</p>
+              </div>
+
+              <svg id="heroSvgChart" class="w-full h-[220px] sm:h-[240px] overflow-visible select-none" viewBox="0 0 600 220" aria-label="Net ARR and velocity multi-bar spline chart">
+                <defs>
+                  <linearGradient id="bentoBarGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.92" />
+                    <stop offset="100%" stop-color="#818CF8" stop-opacity="0.58" />
+                  </linearGradient>
+                  <linearGradient id="bentoBarMuted" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#CBD5E1" stop-opacity="0.80" />
+                    <stop offset="100%" stop-color="#E2E8F0" stop-opacity="0.45" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Horizontal Gridlines -->
+                <g stroke="rgba(15,23,42,0.07)" stroke-dasharray="4 4">
+                  <line x1="40" y1="26" x2="584" y2="26" />
+                  <line x1="40" y1="84" x2="584" y2="84" />
+                  <line x1="40" y1="142" x2="584" y2="142" />
+                </g>
+                <line x1="40" y1="190" x2="584" y2="190" stroke="rgba(15,23,42,0.12)" />
+
+                <!-- Y Labels -->
+                <g class="font-mono" font-size="12" fill="#64748B" text-anchor="end">
+                  <text x="34" y="30" id="heroY3">$260k</text>
+                  <text x="34" y="88" id="heroY2">$190k</text>
+                  <text x="34" y="146" id="heroY1">$120k</text>
+                </g>
+
+                <!-- Interactive Hover Crosshairs -->
+                <line id="heroCrosshairX" x1="100" y1="18" x2="100" y2="190" stroke="rgba(79, 70, 229, 0.45)" stroke-width="1.5" stroke-dasharray="3 3" opacity="0" />
+                <line id="heroCrosshairY" x1="40" y1="80" x2="584" y2="80" stroke="rgba(16, 185, 129, 0.40)" stroke-width="1.2" stroke-dasharray="3 3" opacity="0" />
+
+                <!-- Bars Group -->
+                <g id="heroBarsGroup"></g>
+
+                <!-- Smooth Glowing Spline Overlay + Traveling Particle -->
+                <path id="heroSplinePath" class="spline-animate" d="" fill="none" stroke="#10B981" stroke-width="3.2" stroke-linecap="round" filter="url(#bentoGlowEmerald)" />
+                <circle r="4.2" fill="#10B981" filter="url(#bentoGlowEmerald)">
+                  <animateMotion dur="4.2s" repeatCount="indefinite">
+                    <mpath href="#heroSplinePath" />
+                  </animateMotion>
+                </circle>
+                <g id="heroSplineDots"></g>
+
+                <!-- X Labels (W1..W8) -->
+                <g id="heroXLabels" class="font-mono" font-size="12" fill="#475569"></g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Embedded 3-Step Conversion Data Flow with Animated SVG Bezier Particle Stream -->
+          <div class="mt-4 pt-4 border-t border-slate-900/10">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">3-Step Conversion Data Stream</span>
+              <span id="funnelOverallRate" class="font-mono text-xs font-semibold text-indigo-600">3.02% End-to-End CVR</span>
+            </div>
+
+            <!-- Animated SVG Bezier Stream Connecting Step 1 -> Step 2 -> Step 3 -->
+            <svg class="hidden sm:block w-full h-7 overflow-visible mb-1" viewBox="0 0 560 28" aria-hidden="true">
+              <path id="funnelBezier1" d="M 92,18 C 145,2 215,2 280,18" fill="none" stroke="rgba(79, 70, 229, 0.28)" stroke-width="2" stroke-dasharray="4 4" />
+              <path id="funnelBezier2" d="M 280,18 C 345,2 415,2 468,18" fill="none" stroke="rgba(16, 185, 129, 0.32)" stroke-width="2" stroke-dasharray="4 4" />
+              <circle r="3.5" fill="#4F46E5" filter="url(#bentoGlowIndigo)">
+                <animateMotion dur="2.1s" repeatCount="indefinite"><mpath href="#funnelBezier1" /></animateMotion>
+              </circle>
+              <circle r="3" fill="#818CF8">
+                <animateMotion dur="2.1s" begin="1.05s" repeatCount="indefinite"><mpath href="#funnelBezier1" /></animateMotion>
+              </circle>
+              <circle r="3.5" fill="#10B981" filter="url(#bentoGlowEmerald)">
+                <animateMotion dur="1.9s" repeatCount="indefinite"><mpath href="#funnelBezier2" /></animateMotion>
+              </circle>
+              <circle r="3" fill="#34D399">
+                <animateMotion dur="1.9s" begin="0.95s" repeatCount="indefinite"><mpath href="#funnelBezier2" /></animateMotion>
+              </circle>
+              <circle cx="92" cy="18" r="3.5" fill="#64748B" />
+              <circle cx="280" cy="18" r="4" fill="#4F46E5" />
+              <circle cx="468" cy="18" r="4" fill="#10B981" />
+            </svg>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+              <!-- Step 1: Visitors -->
+              <div class="relative p-3.5 rounded-2xl bg-[#F2F4F7] border border-slate-900/5">
+                <p class="text-xs font-medium text-slate-500">1. Visitors</p>
+                <p id="step1Val" class="font-display text-xl font-bold text-slate-900 tabular-nums mt-0.5">142k</p>
+                <span class="inline-block mt-1 text-xs font-mono text-slate-600">Top-of-funnel</span>
+              </div>
+
+              <!-- Step 2: Trial -->
+              <div class="relative p-3.5 rounded-2xl bg-indigo-500/5 border border-indigo-500/20">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs font-medium text-indigo-700">2. Trial</p>
+                  <span class="text-xs font-mono font-semibold text-indigo-600">13.0%</span>
+                </div>
+                <p id="step2Val" class="font-display text-xl font-bold text-slate-900 tabular-nums mt-0.5">18.4k</p>
+                <span class="inline-block mt-1 text-xs font-mono text-indigo-700">Product-qualified</span>
+              </div>
+
+              <!-- Step 3: Paid -->
+              <div class="relative p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs font-medium text-emerald-800">3. Paid</p>
+                  <span class="text-xs font-mono font-semibold text-emerald-700">23.3%</span>
+                </div>
+                <p id="step3Val" class="font-display text-xl font-bold text-slate-900 tabular-nums mt-0.5">4,290</p>
+                <span class="inline-block mt-1 text-xs font-mono text-emerald-800">Active seats</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TILE B: col-span-12 sm:col-span-6 lg:col-span-3 — 1x1 Dark Obsidian       -->
+        <!-- AI Copilot Autopilot (#111827) + Radial Ring + Live Stream + Boost        -->
+        <!-- ========================================================================= -->
+        <section id="tileCopilot" class="bento-obsidian col-span-12 sm:col-span-6 lg:col-span-3 p-6 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="live-beacon absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                </span>
+                AI Copilot Autopilot
+              </span>
+              <h2 class="font-display text-lg font-bold text-white mt-1">Autonomous Triage</h2>
+            </div>
+            <span id="copilotModeBadge" class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-white/10 text-slate-200">Standard</span>
+          </div>
+
+          <!-- Glowing Emerald/Indigo Radial Ring + Live Telemetry Wave -->
+          <div class="my-4 flex items-center gap-4">
+            <div class="relative w-24 h-24 shrink-0">
+              <svg class="w-24 h-24 -rotate-90 overflow-visible" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="copilotRingGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#34D399" />
+                    <stop offset="100%" stop-color="#818CF8" />
+                  </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="9" />
+                <circle id="copilotRingCircle" class="ring-progress" cx="50" cy="50" r="40" fill="none" stroke="url(#copilotRingGrad)" stroke-width="9" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="14.5" filter="url(#bentoGlowEmerald)" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span id="copilotResValue" class="font-display text-lg font-bold text-white tabular-nums">94.2%</span>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Resolution</p>
+              <p id="copilotRpsTicker" class="font-mono text-base font-bold text-emerald-400 tabular-nums mt-0.5">1,420 req/s</p>
+              <!-- Mini Live Neural Wave with Traveling Particle -->
+              <svg class="w-full h-6 mt-1 overflow-visible" viewBox="0 0 120 24" aria-hidden="true">
+                <path id="neuralWavePath" d="M 0,16 C 20,4 38,22 58,12 C 78,2 98,20 120,8" fill="none" stroke="rgba(52, 211, 153, 0.55)" stroke-width="2" />
+                <circle r="3" fill="#6EE7B7" filter="url(#bentoGlowEmerald)">
+                  <animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#neuralWavePath" /></animateMotion>
+                </circle>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Interactive Boost Compute Toggle -->
+          <button type="button" id="boostComputeBtn" onclick="toggleBoostCompute()" aria-pressed="false" class="w-full min-h-[42px] px-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-between text-sm font-semibold text-white transition">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Boost Compute</span>
+            </span>
+            <span id="boostSwitchTrack" class="w-10 h-6 rounded-full bg-white/20 p-0.5 flex items-center transition">
+              <span id="boostSwitchKnob" class="w-5 h-5 rounded-full bg-white transition-transform"></span>
+            </span>
+          </button>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TILE C: col-span-12 sm:col-span-6 lg:col-span-3 — 1x1 KPI Accent Module   -->
+        <!-- Net Promoter Score (NPS) (78 World-Class) + Segmented Sentiment Bar       -->
+        <!-- ========================================================================= -->
+        <section id="tileNps" class="bento-tile col-span-12 sm:col-span-6 lg:col-span-3 p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Customer Sentiment</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-700">World-Class</span>
+            </div>
+            <h2 class="text-sm font-semibold text-slate-700 mt-2">Net Promoter Score (NPS)</h2>
+            <div class="flex items-baseline gap-3 mt-2">
+              <span id="npsScoreValue" class="font-display text-5xl font-bold tracking-tight text-slate-900 tabular-nums">78</span>
+              <span id="npsHoverLabel" class="text-xs font-semibold text-emerald-600">+6 pts QoQ</span>
+            </div>
+          </div>
+
+          <!-- Interactive Segmented Sentiment Bar -->
+          <div class="my-4">
+            <div class="w-full h-3.5 rounded-full overflow-hidden flex gap-1 bg-slate-100 p-0.5">
+              <div id="npsBarPromoters" onmouseenter="previewNpsSegment('Promoters: 4,028 advocates')" onmouseleave="resetNpsSegment()" class="proportional-bar h-full rounded-l-full bg-emerald-500 cursor-pointer" style="width: 82%;"></div>
+              <div id="npsBarPassives" onmouseenter="previewNpsSegment('Passives: 688 neutral')" onmouseleave="resetNpsSegment()" class="proportional-bar h-full bg-amber-400 cursor-pointer" style="width: 14%;"></div>
+              <div id="npsBarDetractors" onmouseenter="previewNpsSegment('Detractors: 196 flagged')" onmouseleave="resetNpsSegment()" class="proportional-bar h-full rounded-r-full bg-rose-500 cursor-pointer" style="width: 4%;"></div>
+            </div>
+
+            <div class="mt-3.5 space-y-1.5 text-sm">
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-slate-600">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Promoters
+                </span>
+                <span id="npsPromoterPct" class="font-mono text-xs font-semibold text-slate-900 tabular-nums">82%</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-slate-600">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Passives
+                </span>
+                <span id="npsPassivePct" class="font-mono text-xs font-semibold text-slate-900 tabular-nums">14%</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-slate-600">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Detractors
+                </span>
+                <span id="npsDetractorPct" class="font-mono text-xs font-semibold text-slate-900 tabular-nums">4%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TILE D: col-span-12 lg:col-span-6 — 2x1 Wide Module                       -->
+        <!-- Global Edge Traffic & Regional Revenue Split + Live Latency Pills         -->
+        <!-- ========================================================================= -->
+        <section id="tileRegions" class="bento-tile col-span-12 lg:col-span-6 p-6 flex flex-col justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="font-display text-lg font-bold text-slate-900">Global Edge Traffic &amp; Regional Revenue Split</h2>
+              <p id="regionHoverReadout" class="text-sm text-slate-500 mt-0.5">Multi-region routing across 28 PoP edge clusters</p>
+            </div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-700">
+              <span class="relative flex h-2 w-2">
+                <span class="live-beacon absolute inline-flex h-full w-full rounded-full bg-emerald-500"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+              </span>
+              99.99% Global SLA
+            </span>
+          </div>
+
+          <!-- Combined Proportional Split Bar -->
+          <div class="w-full h-4 rounded-full bg-[#F2F4F7] p-0.5 flex gap-1 mb-5">
+            <div id="regBarNA" onmouseenter="setRegionSubtitle('North America: $883k ARR · 12 Edge PoPs')" onmouseleave="resetRegionSubtitle()" class="proportional-bar h-full rounded-l-full bg-indigo-600 cursor-pointer" style="width: 48%;"></div>
+            <div id="regBarEU" onmouseenter="setRegionSubtitle('Europe: $570k ARR · 9 Edge PoPs')" onmouseleave="resetRegionSubtitle()" class="proportional-bar h-full bg-sky-500 cursor-pointer" style="width: 31%;"></div>
+            <div id="regBarAPAC" onmouseenter="setRegionSubtitle('APAC: $386k ARR · 7 Edge PoPs')" onmouseleave="resetRegionSubtitle()" class="proportional-bar h-full rounded-r-full bg-emerald-500 cursor-pointer" style="width: 21%;"></div>
+          </div>
+
+          <!-- 3 Interactive Regional Rows with Live Latency Pills -->
+          <div class="space-y-3">
+            <button type="button" onclick="showToast('North America Edge (us-east / us-west): $883k ARR · 18ms P95.', 'indigo')" class="w-full flex items-center justify-between gap-4 p-3 rounded-2xl bg-[#F2F4F7]/80 hover:bg-[#F2F4F7] transition text-left">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="w-3 h-3 rounded-full bg-indigo-600 shrink-0"></span>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">North America</p>
+                  <p class="text-xs text-slate-500">Virginia &middot; Oregon &middot; Montreal</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span id="latPillNA" class="px-2.5 py-1 rounded-lg bg-white border border-slate-900/5 font-mono text-xs font-semibold text-emerald-700 tabular-nums">18ms</span>
+                <span id="regPctNA" class="font-display text-base font-bold text-slate-900 tabular-nums w-12 text-right">48%</span>
+              </div>
+            </button>
+
+            <button type="button" onclick="showToast('Europe Edge (eu-central / eu-west): $570k ARR · 24ms P95.', 'indigo')" class="w-full flex items-center justify-between gap-4 p-3 rounded-2xl bg-[#F2F4F7]/80 hover:bg-[#F2F4F7] transition text-left">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="w-3 h-3 rounded-full bg-sky-500 shrink-0"></span>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">Europe</p>
+                  <p class="text-xs text-slate-500">Frankfurt &middot; London &middot; Stockholm</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span id="latPillEU" class="px-2.5 py-1 rounded-lg bg-white border border-slate-900/5 font-mono text-xs font-semibold text-emerald-700 tabular-nums">24ms</span>
+                <span id="regPctEU" class="font-display text-base font-bold text-slate-900 tabular-nums w-12 text-right">31%</span>
+              </div>
+            </button>
+
+            <button type="button" onclick="showToast('APAC Edge (ap-northeast / ap-south): $386k ARR · 31ms P95.', 'indigo')" class="w-full flex items-center justify-between gap-4 p-3 rounded-2xl bg-[#F2F4F7]/80 hover:bg-[#F2F4F7] transition text-left">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 shrink-0"></span>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">APAC</p>
+                  <p class="text-xs text-slate-500">Tokyo &middot; Singapore &middot; Sydney</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span id="latPillAPAC" class="px-2.5 py-1 rounded-lg bg-white border border-slate-900/5 font-mono text-xs font-semibold text-amber-700 tabular-nums">31ms</span>
+                <span id="regPctAPAC" class="font-display text-base font-bold text-slate-900 tabular-nums w-12 text-right">21%</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TILE E: col-span-12 lg:col-span-4 — Modular Sprint & Release Bento Card   -->
+        <!-- Interactive Checklist recalculates Sprint Progress Ring (75% -> 100%)     -->
+        <!-- ========================================================================= -->
+        <section id="tileSprints" class="bento-tile col-span-12 lg:col-span-4 p-6 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Sprint 24 &middot; Release Train</span>
+              <h2 class="font-display text-lg font-bold text-slate-900 mt-1">Modular Release Milestones</h2>
+              <p id="sprintStatusCaption" class="text-xs text-slate-500 mt-0.5">3 of 4 milestones verified</p>
+            </div>
+
+            <!-- Dynamic Progress Ring with Glow Filter -->
+            <div class="relative w-16 h-16 shrink-0">
+              <svg class="w-16 h-16 -rotate-90 overflow-visible" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="26" fill="none" stroke="#E2E8F0" stroke-width="6" />
+                <circle id="sprintProgressCircle" class="ring-progress" cx="32" cy="32" r="26" fill="none" stroke="#4F46E5" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="40.84" filter="url(#bentoGlowIndigo)" />
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span id="sprintProgressText" class="font-display text-sm font-bold text-slate-900 tabular-nums">75%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toggleable Milestones Checklist -->
+          <div id="milestoneList" class="space-y-2.5">
+            <!-- Rendered interactively via JS -->
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TILE F: col-span-12 sm:col-span-6 lg:col-span-4 — Cohort Retention Matrix -->
+        <!-- Crisp 5x5 Color-Graded Indigo Grid + Floating Interactive Tooltip         -->
+        <!-- ========================================================================= -->
+        <section id="tileCohorts" class="bento-tile col-span-12 sm:col-span-6 lg:col-span-4 p-6 flex flex-col justify-between relative">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Logo Stickiness</span>
+              <h2 class="font-display text-lg font-bold text-slate-900 mt-1">Cohort Retention Matrix</h2>
+            </div>
+            <span id="cohortReadoutPill" class="px-2.5 py-1 rounded-lg bg-indigo-500/10 font-mono text-xs font-semibold text-indigo-700 tabular-nums">W4: 68.4%</span>
+          </div>
+
+          <!-- Floating Heatmap Cell Tooltip -->
+          <div id="cohortFloatingTip" class="pointer-events-none absolute z-30 hidden px-3 py-2 rounded-xl bg-[#111827] text-white shadow-xl text-xs">
+            <p id="cohortTipTitle" class="font-mono text-slate-300">May W1 · Week 4</p>
+            <p id="cohortTipDetail" class="font-display text-sm font-bold text-emerald-400 mt-0.5">68.4% (586 teams)</p>
+          </div>
+
+          <!-- Column Headers -->
+          <div class="grid grid-cols-6 gap-1.5 text-center font-mono text-xs font-semibold text-slate-500 mb-1.5">
+            <span class="text-left">Cohort</span>
+            <span>W0</span>
+            <span>W1</span>
+            <span>W2</span>
+            <span>W3</span>
+            <span>W4</span>
+          </div>
+
+          <!-- 5x5 Matrix Rows -->
+          <div id="cohortGridContainer" class="space-y-1.5">
+            <!-- Populated via JS -->
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-900/5 flex items-center justify-between text-xs text-slate-500">
+            <span>Hover any cell to inspect cohort seats</span>
+            <span class="font-mono font-semibold text-slate-700">N = 4,290 teams</span>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TILE G: col-span-12 sm:col-span-6 lg:col-span-4 — Live Team & Actions     -->
+        <!-- Active Builders Online + 4 Tactile Bento Quick-Launch Tiles               -->
+        <!-- ========================================================================= -->
+        <section id="tileTeamActions" class="bento-tile col-span-12 sm:col-span-6 lg:col-span-4 p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-700">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="live-beacon absolute inline-flex h-full w-full rounded-full bg-emerald-500"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+                </span>
+                10 Builders Online
+              </span>
+              <span class="text-xs font-mono text-slate-400">SF &middot; LDN &middot; TYO</span>
+            </div>
+
+            <div class="flex items-center justify-between mt-3 pb-4 border-b border-slate-900/5">
+              <div class="flex -space-x-2.5">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-display text-xs font-bold flex items-center justify-center ring-2 ring-white" title="Maya Lin — Product">ML</div>
+                <div class="w-10 h-10 rounded-full bg-emerald-600 text-white font-display text-xs font-bold flex items-center justify-center ring-2 ring-white" title="Liam Chen — Infra">LC</div>
+                <div class="w-10 h-10 rounded-full bg-sky-600 text-white font-display text-xs font-bold flex items-center justify-center ring-2 ring-white" title="Sora Takahashi — Design">ST</div>
+                <div class="w-10 h-10 rounded-full bg-amber-500 text-white font-display text-xs font-bold flex items-center justify-center ring-2 ring-white" title="Noah Patel — AI">NP</div>
+                <div class="w-10 h-10 rounded-full bg-[#111827] text-white font-mono text-xs font-semibold flex items-center justify-center ring-2 ring-white">+6</div>
+              </div>
+              <span class="text-xs font-medium text-slate-500">2 deploys queued</span>
+            </div>
+          </div>
+
+          <!-- 4 Tactile Bento Quick-Launch Tiles -->
+          <div class="mt-4">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Quick Launch</p>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" onclick="openModal('deployModal')" class="quick-action-tile p-3.5 text-left flex flex-col justify-between min-h-[78px]">
+                <svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span class="text-sm font-semibold text-slate-900 mt-2">Deploy Edge</span>
+              </button>
+
+              <button type="button" onclick="exportBentoCsv()" class="quick-action-tile p-3.5 text-left flex flex-col justify-between min-h-[78px]">
+                <svg class="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span class="text-sm font-semibold text-slate-900 mt-2">Export CSV</span>
+              </button>
+
+              <button type="button" onclick="openModal('apiModal')" class="quick-action-tile p-3.5 text-left flex flex-col justify-between min-h-[78px]">
+                <svg class="w-5 h-5 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span class="text-sm font-semibold text-slate-900 mt-2">API Keys</span>
+              </button>
+
+              <button type="button" onclick="openModal('inviteModal')" class="quick-action-tile p-3.5 text-left flex flex-col justify-between min-h-[78px]">
+                <svg class="w-5 h-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                <span class="text-sm font-semibold text-slate-900 mt-2">Invite Team</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+      </div>
+      <div id="tabSubpageView" class="hidden"></div>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- INTERACTIVE MODALS & TOASTS                -->
+  <!-- ========================================== -->
+
+  <!-- Deploy Edge Modal -->
+  <div id="deployModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="deployModalTitle">
+    <div class="bento-tile w-full max-w-md p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="deployModalTitle" class="font-display text-xl font-bold text-slate-900">Deploy Bento Edge Release</h3>
+        <button type="button" onclick="closeModal('deployModal')" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form onsubmit="confirmEdgeDeploy(event)" class="space-y-4">
+        <div>
+          <label for="edgeBranch" class="block text-sm font-medium text-slate-700 mb-1.5">Release Branch / Tag</label>
+          <input id="edgeBranch" type="text" value="release/v3.4-bento-sdk" required class="w-full h-11 px-3.5 rounded-xl bg-[#F2F4F7] border border-slate-900/10 text-sm font-mono text-slate-900 focus:outline-none focus:border-indigo-600" />
+        </div>
+        <div>
+          <label for="edgeTarget" class="block text-sm font-medium text-slate-700 mb-1.5">Rollout Strategy</label>
+          <select id="edgeTarget" class="w-full h-11 px-3.5 rounded-xl bg-[#F2F4F7] border border-slate-900/10 text-sm text-slate-900 focus:outline-none focus:border-indigo-600">
+            <option>Global Progressive Canary (10% -&gt; 100%)</option>
+            <option>Instant Multi-Region Atomic Cutover</option>
+            <option>North America + Europe PoPs Only</option>
+          </select>
+        </div>
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeModal('deployModal')" class="h-11 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-medium text-slate-700">Cancel</button>
+          <button type="submit" class="h-11 px-5 rounded-xl bg-[#111827] hover:bg-slate-800 text-sm font-semibold text-white">Trigger Rollout</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- API Keys Modal -->
+  <div id="apiModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="apiModalTitle">
+    <div class="bento-tile w-full max-w-md p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="apiModalTitle" class="font-display text-xl font-bold text-slate-900">Workspace API Keys</h3>
+        <button type="button" onclick="closeModal('apiModal')" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <p class="text-sm text-slate-600 mb-3">Production Edge SDK token with read/write telemetry scope.</p>
+      <div class="flex items-center justify-between gap-2 p-3 rounded-xl bg-[#F2F4F7] border border-slate-900/10">
+        <code class="font-mono text-xs text-slate-800 truncate">knto_live_98a4f2c10e7b3d84a19c</code>
+        <button type="button" onclick="closeModal('apiModal'); showToast('Production API key copied to clipboard.', 'emerald')" class="h-9 px-3 rounded-lg bg-white border border-slate-900/10 text-xs font-semibold text-slate-900 hover:bg-slate-50">Copy</button>
+      </div>
+      <div class="mt-5 flex justify-end">
+        <button type="button" onclick="closeModal('apiModal')" class="h-11 px-5 rounded-xl bg-[#111827] text-sm font-semibold text-white">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invite Team Modal -->
+  <div id="inviteModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle">
+    <div class="bento-tile w-full max-w-md p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="inviteModalTitle" class="font-display text-xl font-bold text-slate-900">Invite Builder to Kento OS</h3>
+        <button type="button" onclick="closeModal('inviteModal')" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600" aria-label="Close modal">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form onsubmit="submitTeamInvite(event)" class="space-y-4">
+        <div>
+          <label for="inviteEmail" class="block text-sm font-medium text-slate-700 mb-1.5">Work Email</label>
+          <input id="inviteEmail" type="email" required placeholder="alex@company.com" class="w-full h-11 px-3.5 rounded-xl bg-[#F2F4F7] border border-slate-900/10 text-sm text-slate-900 focus:outline-none focus:border-indigo-600" />
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('inviteModal')" class="h-11 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-medium text-slate-700">Cancel</button>
+          <button type="submit" class="h-11 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white">Send Invite</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <script>
+    // ==========================================
+    // SIDEBAR COLLAPSE & DRAWER
+    // ==========================================
+    const sidebar = document.getElementById('sidebar');
+    const mainShell = document.getElementById('mainShell');
+    const mobileBackdrop = document.getElementById('mobileBackdrop');
+
+    function toggleDesktopRail() {
+      sidebar.classList.toggle('collapsed');
+      mainShell.classList.toggle('sidebar-collapsed');
+    }
+
+    function openMobileDrawer() {
+      sidebar.classList.remove('-translate-x-full');
+      mobileBackdrop.classList.remove('hidden');
+    }
+
+    function closeMobileDrawer() {
+      sidebar.classList.add('-translate-x-full');
+      mobileBackdrop.classList.add('hidden');
+    }
+
+    const kentoSubpageData = {
+      'Funnel Velocity': {
+        title: 'Funnel Velocity & Stage Conversion',
+        subtitle: 'Multi-touch PLG attribution, trial activation speed & expansion cohorts',
+        badge: '3.02% End-to-End CVR',
+        badgeTone: 'indigo',
+        ctaLabel: 'Export Funnel CSV',
+        ctaAction: "showToast('Exported Kento_Funnel_Velocity_Q3.csv (142,840 sessions).', 'emerald')",
+        kpis: [
+          { label: 'Top-of-Funnel Visitors', val: '142,840', delta: '+18.4% MoM', sub: 'Unique developer sessions' },
+          { label: 'PQL Trial Workspaces', val: '18,420', delta: '12.9% CVR', sub: 'SDK token initialized' },
+          { label: 'Paid Team Conversions', val: '4,290', delta: '23.3% Trial-to-Paid', sub: 'Avg 6.4 seats / team' },
+          { label: 'Median Time-to-Value', val: '14.2m', delta: '-4.1m faster', sub: 'First edge event ingested', obsidian: true }
+        ],
+        visualTitle: '5-Stage Product-Led Conversion Waterfall',
+        visualSub: 'Click any funnel stage bar to inspect drop-off telemetry',
+        bars: [
+          { label: '1. Docs & Landing Visits', val: '142,840', pct: 100, color: 'bg-slate-800', note: '100% baseline traffic' },
+          { label: '2. CLI / SDK Snippet Copied', val: '65,706', pct: 46, color: 'bg-indigo-600', note: '46.0% intent capture' },
+          { label: '3. Sandbox Workspace Created', val: '34,280', pct: 24, color: 'bg-indigo-500', note: '52.2% step retention' },
+          { label: '4. PQL Multi-Seat Activated', val: '18,420', pct: 13, color: 'bg-sky-500', note: '53.7% team invite rate' },
+          { label: '5. Paid Pro / Enterprise Plan', val: '4,290', pct: 7, color: 'bg-emerald-500', note: '23.3% trial checkout' }
+        ],
+        tableTitle: 'Acquisition Channel Velocity',
+        columns: ['Channel Source', 'Visitors', 'PQL Rate', 'Net ARR', 'Action'],
+        rows: [
+          { c1: 'Developer Docs & Guides', c2: '58,400', c3: '16.4%', c4: '$792,000', btn: 'Inspect Cohort', toast: 'Docs organic channel: 94% W4 retention across 1,890 teams.' },
+          { c1: 'GitHub Actions Marketplace', c2: '34,120', c3: '14.8%', c4: '$486,000', btn: 'Inspect Cohort', toast: 'GitHub Marketplace: 11.2m median setup time.' },
+          { c1: 'Next.js & Edge Starter Kits', c2: '24,900', c3: '11.2%', c4: '$294,000', btn: 'Inspect Cohort', toast: 'Edge Starter Kits: +38% QoQ template clones.' },
+          { c1: 'Product Hunt v3.4 Launch', c2: '15,620', c3: '8.9%', c4: '$148,000', btn: 'Inspect Cohort', toast: 'Launch spike cohort converting at 19.4% to Pro.' },
+          { c1: 'Enterprise Solutions Outbound', c2: '9,800', c3: '6.4%', c4: '$120,000', btn: 'Inspect Cohort', toast: 'Enterprise outbound: $28.4k ACV across SOC2 buyers.' }
+        ]
+      },
+      'AI Autopilot': {
+        title: 'AI Autopilot & Neural Triage',
+        subtitle: 'Autonomous support resolution, H100 inference lanes & semantic guardrails',
+        badge: '94.2% Auto-Resolved',
+        badgeTone: 'emerald',
+        ctaLabel: 'Calibrate Guardrails',
+        ctaAction: "showToast('Neural triage confidence threshold verified at 0.92.', 'emerald')",
+        kpis: [
+          { label: 'Inference Throughput', val: '1,420 req/s', delta: '99.98% Availability', sub: 'Multi-region tensor mesh' },
+          { label: 'Autonomous Resolution', val: '94.2%', delta: '+3.8% vs Sprint 23', sub: 'Zero human escalation' },
+          { label: 'Unit Cost per Ticket', val: '$0.018', delta: '-28% cached tokens', sub: 'Semantic vector hit 71%' },
+          { label: 'P95 Triage Latency', val: '210ms', delta: 'H100 Turbo Ready', sub: 'Streaming first-token 64ms', obsidian: true }
+        ],
+        visualTitle: 'Model Lane Routing & Token Allocation',
+        visualSub: 'Real-time traffic split across specialized copilot pipelines',
+        bars: [
+          { label: 'SDK & Auth Triage Router', val: '612 req/s', pct: 86, color: 'bg-emerald-500', note: '97.1% accuracy' },
+          { label: 'Semantic Docs RAG Cache', val: '448 req/s', pct: 68, color: 'bg-indigo-600', note: '0ms LLM cold-start' },
+          { label: 'Billing & Quota Reconciler', val: '234 req/s', pct: 44, color: 'bg-sky-500', note: 'Strict deterministic tool-use' },
+          { label: 'Human Escalation Handoff', val: '126 req/s', pct: 22, color: 'bg-amber-500', note: '5.8% complex edge cases' }
+        ],
+        tableTitle: 'Autonomous Copilot Workflows',
+        toggles: [
+          { id: 'ai-t1', title: 'Auto-resolve SDK Token & CORS Tickets', desc: 'Verifies workspace origin headers and dispatches signed fix snippet', on: true },
+          { id: 'ai-t2', title: 'Semantic Prompt Cache Deduplication', desc: 'Serves verified embeddings within 0.96 cosine similarity threshold', on: true },
+          { id: 'ai-t3', title: 'Proactive Churn Risk Slack Escalation', desc: 'Alerts Account Lead when workspace API volume drops >35% WoW', on: true },
+          { id: 'ai-t4', title: 'Canary Regression Rollback Guard', desc: 'Halts rollout automatically if 5xx error delta exceeds 0.25%', on: false },
+          { id: 'ai-t5', title: 'Nightly Fine-Tune Dataset Curation', desc: 'Anonymizes thumbs-up resolutions into weekly eval benchmark', on: true }
+        ]
+      },
+      'Cohort Matrix': {
+        title: 'Cohort Matrix & Net Dollar Retention',
+        subtitle: 'Longitudinal seat stickiness & expansion velocity across 4,290 workspaces',
+        badge: '118.4% Net Dollar Retention',
+        badgeTone: 'indigo',
+        ctaLabel: 'Export Cohort Matrix',
+        ctaAction: "showToast('Exported Kento_Cohort_Retention_Matrix.csv.', 'emerald')",
+        kpis: [
+          { label: 'Week-4 Logo Stickiness', val: '74.1%', delta: '+5.7 pts YoY', sub: 'Jun W1 cohort leading' },
+          { label: 'Net Dollar Retention', val: '118.4%', delta: '+4.2% QoQ', sub: 'Driven by seat expansion' },
+          { label: 'Expansion ARR Added', val: '$312k', delta: '38% of new bookings', sub: 'Self-serve tier upgrades' },
+          { label: 'Monthly Logo Churn', val: '1.1%', delta: 'Best-in-class SaaS', sub: 'Annual contract lock 64%', obsidian: true }
+        ],
+        visualTitle: 'Retention Curve by Plan Tier (Week 12)',
+        visualSub: 'Comparison of active workspace retention across subscription tiers',
+        bars: [
+          { label: 'Enterprise SOC2 Annual', val: '96.4%', pct: 96, color: 'bg-indigo-600', note: '132% NDR · 640 orgs' },
+          { label: 'Scale Bento Team Plan', val: '84.2%', pct: 84, color: 'bg-emerald-500', note: '116% NDR · 1,820 orgs' },
+          { label: 'Pro Builder Monthly', val: '71.8%', pct: 72, color: 'bg-sky-500', note: '104% NDR · 1,830 orgs' },
+          { label: 'Sandbox Free Trial (W4)', val: '42.5%', pct: 43, color: 'bg-slate-500', note: 'Converting to Pro at 23.3%' }
+        ],
+        tableTitle: 'High-Expansion Customer Cohorts',
+        columns: ['Cohort Segment', 'Active Teams', 'W8 Retention', 'Net Retention', 'Action'],
+        rows: [
+          { c1: 'Q2 Enterprise Annual Batch', c2: '412 teams', c3: '95.8%', c4: '134.2%', btn: 'View Accounts', toast: 'Q2 Enterprise Batch: +1,420 seats added post-onboarding.' },
+          { c1: 'AI-Native Series A Startups', c2: '890 teams', c3: '86.4%', c4: '126.8%', btn: 'View Accounts', toast: 'AI-Native segment: highest Copilot Turbo attach rate (61%).' },
+          { c1: 'EU FinTech & Regulated SaaS', c2: '645 teams', c3: '83.1%', c4: '119.0%', btn: 'View Accounts', toast: 'EU FinTech cluster pinned to Frankfurt & Stockholm PoPs.' },
+          { c1: 'YC & Founder Partner Batch', c2: '1,210 teams', c3: '78.5%', c4: '112.4%', btn: 'View Accounts', toast: 'Founder batch: 78.5% active weekly deployments.' },
+          { c1: 'APAC Cloud DevTools', c2: '1,133 teams', c3: '74.9%', c4: '109.6%', btn: 'View Accounts', toast: 'APAC DevTools: +29% Tokyo & Singapore traffic growth.' }
+        ]
+      },
+      'Edge Regions': {
+        title: 'Global Edge Regions & PoP Telemetry',
+        subtitle: 'Anycast routing health, KV state replication & P95 latency across 28 PoPs',
+        badge: '99.99% Global SLA',
+        badgeTone: 'emerald',
+        ctaLabel: 'Deploy Edge Release',
+        ctaAction: "openModal('deployModal')",
+        kpis: [
+          { label: 'Healthy Edge PoPs', val: '28 / 28', delta: 'Zero packet loss', sub: 'NA · EU · APAC · LATAM' },
+          { label: 'Global P95 Latency', val: '21ms', delta: '-3ms vs last cycle', sub: 'TLS 1.3 0-RTT resumption' },
+          { label: 'Edge Cache Hit Ratio', val: '96.8%', delta: '+1.4% stale-while-rev', sub: '41.2 TB/day offloaded' },
+          { label: 'Global KV Sync Lag', val: '8.4ms', delta: ' Raft Quorum Green', sub: 'Sub-10ms cross-region', obsidian: true }
+        ],
+        visualTitle: 'Regional Edge Traffic & Capacity Load',
+        visualSub: 'Live compute utilization across primary continental clusters',
+        bars: [
+          { label: 'us-east-1 · Northern Virginia', val: '18ms P95', pct: 74, color: 'bg-indigo-600', note: '482k req/min · 74% load' },
+          { label: 'eu-central-1 · Frankfurt', val: '22ms P95', pct: 63, color: 'bg-sky-500', note: '318k req/min · 63% load' },
+          { label: 'us-west-2 · Oregon', val: '19ms P95', pct: 56, color: 'bg-indigo-500', note: '274k req/min · 56% load' },
+          { label: 'ap-northeast-1 · Tokyo', val: '29ms P95', pct: 49, color: 'bg-emerald-500', note: '219k req/min · 49% load' }
+        ],
+        tableTitle: 'Primary Edge PoP Clusters',
+        columns: ['Cluster Region', 'Throughput', 'P95 Latency', 'Health Status', 'Action'],
+        rows: [
+          { c1: 'iad-01 · Ashburn, US-East', c2: '482k rpm', c3: '18ms', c4: 'Optimal', btn: 'Run Synthetic Ping', toast: 'iad-01 synthetic check: 17.6ms TLS handshake · 100% healthy.' },
+          { c1: 'fra-02 · Frankfurt, EU-Central', c2: '318k rpm', c3: '22ms', c4: 'Optimal', btn: 'Run Synthetic Ping', toast: 'fra-02 synthetic check: 21.8ms · GDPR data residency active.' },
+          { c1: 'lhr-01 · London, EU-West', c2: '246k rpm', c3: '20ms', c4: 'Optimal', btn: 'Run Synthetic Ping', toast: 'lhr-01 synthetic check: 19.9ms · zero queued workers.' },
+          { c1: 'hnd-01 · Tokyo, AP-Northeast', c2: '219k rpm', c3: '29ms', c4: 'Optimal', btn: 'Run Synthetic Ping', toast: 'hnd-01 synthetic check: 28.4ms · Anycast BGP optimal.' },
+          { c1: 'sin-01 · Singapore, AP-South', c2: '164k rpm', c3: '32ms', c4: 'Optimal', btn: 'Run Synthetic Ping', toast: 'sin-01 synthetic check: 31.5ms · KV replica synced.' }
+        ]
+      },
+      'Release Sprints': {
+        title: 'Release Sprints & Deployment Train',
+        subtitle: 'Sprint 24 engineering milestones, canary verification & DORA velocity',
+        badge: 'Sprint 24 · Day 11/14',
+        badgeTone: 'indigo',
+        ctaLabel: 'Trigger Canary Cutover',
+        ctaAction: "openModal('deployModal')",
+        kpis: [
+          { label: 'Sprint Completion', val: '80%', delta: '4 of 5 gates passed', sub: 'Target cutover Friday' },
+          { label: 'Production Deploys', val: '148', delta: '10.5 deploys / day', sub: 'Zero manual rollbacks' },
+          { label: 'Change Failure Rate', val: '0.4%', delta: 'Elite DORA tier', sub: 'Automated canary halt' },
+          { label: 'Mean Time to Recovery', val: '4m 12s', delta: 'Instant atomic revert', sub: 'Immutable edge snapshots', obsidian: true }
+        ],
+        visualTitle: 'Sprint 24 Release Pipeline Stages',
+        visualSub: 'Progressive verification across build, staging, and global canary',
+        bars: [
+          { label: 'Architecture RFC & Schema Lock', val: '100%', pct: 100, color: 'bg-emerald-500', note: 'Signed off by Principal Eng' },
+          { label: 'TypeScript Edge SDK v3.4 Build', val: '100%', pct: 100, color: 'bg-emerald-500', note: 'Bundle size 11.4 kB gzip' },
+          { label: 'Canary 10% Production Traffic', val: '90%', pct: 90, color: 'bg-indigo-600', note: 'Soaking across 4 PoPs' },
+          { label: 'Global GA Multi-Region Rollout', val: '45%', pct: 45, color: 'bg-amber-500', note: 'Awaiting billing load test' }
+        ],
+        tableTitle: 'Sprint 24 Release Checklist',
+        toggles: [
+          { id: 'sp-t1', title: 'v3.4 Bento Edge SDK Package', desc: 'Zero-dependency TypeScript client with automatic retry backoff', on: true },
+          { id: 'sp-t2', title: 'HMAC SHA-256 Webhook Signatures', desc: 'Replay-resistant timestamp headers & dual-secret zero-downtime rotation', on: true },
+          { id: 'sp-t3', title: 'SOC2 Type II KMS Envelope Vault', desc: 'Per-tenant DEK encryption backed by hardware security modules', on: true },
+          { id: 'sp-t4', title: 'Sub-Second Usage Metering Pipeline', desc: 'ClickHouse streaming rollup for real-time AI token billing', on: false },
+          { id: 'sp-t5', title: 'Automated Canary Latency Guardrail', desc: 'Blocks GA promotion if P95 regresses >4ms on any region', on: true }
+        ]
+      },
+      'API & Vault': {
+        title: 'API Keys & Zero-Trust KMS Vault',
+        subtitle: 'Scoped SDK credentials, HMAC webhook secrets & hardware envelope encryption',
+        badge: 'SOC2 Type II Enforced',
+        badgeTone: 'emerald',
+        ctaLabel: 'Inspect Live SDK Key',
+        ctaAction: "openModal('apiModal')",
+        kpis: [
+          { label: 'Active Scoped Keys', val: '14', delta: 'Zero wildcard tokens', sub: 'RBAC least-privilege' },
+          { label: '24h Authenticated Calls', val: '48.2M', delta: '99.98% 2xx success', sub: '0 unauthorized spikes' },
+          { label: 'Webhook Delivery SLA', val: '99.96%', delta: '38ms median delivery', sub: 'Exponential retry queue' },
+          { label: 'KMS Envelope Rotation', val: '30 Days', delta: 'Next auto-rotate in 9d', sub: 'FIPS 140-3 HSM backed', obsidian: true }
+        ],
+        visualTitle: 'API Scope Traffic & Security Posture',
+        visualSub: '24-hour request distribution by credential permission boundary',
+        bars: [
+          { label: 'Edge Telemetry Ingest (Write-Only)', val: '31.4M req', pct: 88, color: 'bg-indigo-600', note: 'TLS client-cert pinned' },
+          { label: 'Dashboard Analytics Query (Read)', val: '11.8M req', pct: 58, color: 'bg-emerald-500', note: 'Row-level tenant isolation' },
+          { label: 'Signed Webhook Dispatchers', val: '3.9M req', pct: 34, color: 'bg-sky-500', note: 'HMAC-SHA256 verified' },
+          { label: 'CI/CD Control Plane Deploy', val: '1.1M req', pct: 16, color: 'bg-slate-700', note: 'Short-lived OIDC tokens' }
+        ],
+        tableTitle: 'Active Workspace Credentials & Secrets',
+        columns: ['Key Label', 'Token Prefix', 'Scope', 'Last Active', 'Action'],
+        rows: [
+          { c1: 'Production Edge SDK', c2: 'knto_live_98a4...a19c', c3: 'telemetry:write', c4: '2 sec ago', btn: 'Copy Prefix', toast: 'Copied knto_live_98a4...a19c key identifier to clipboard.' },
+          { c1: 'Analytics Read-Only Replica', c2: 'knto_read_41f0...88b2', c3: 'metrics:read', c4: '14 sec ago', btn: 'Rotate Key', toast: 'Scheduled 24h dual-key grace rotation for Analytics Read-Only.' },
+          { c1: 'Stripe Usage Metering Hook', c2: 'whsec_77c9...30e1', c3: 'billing:webhook', c4: '1 min ago', btn: 'Verify HMAC', toast: 'Webhook test ping returned HTTP 200 OK in 34ms.' },
+          { c1: 'GitHub Actions OIDC Deploy', c2: 'knto_ci_19d2...f40a', c3: 'edge:deploy', c4: '18 mins ago', btn: 'Audit Log', toast: '148 verified OIDC deployments this sprint · 0 anomalies.' },
+          { c1: 'Staging Sandbox Workspace', c2: 'knto_test_55e8...12c4', c3: 'sandbox:all', c4: '42 mins ago', btn: 'Rotate Key', toast: 'Rotated Staging Sandbox key immediately.' }
+        ]
+      }
+    };
+
+    function toggleKentoSubToggle(pageKey, idx) {
+      const page = kentoSubpageData[pageKey];
+      if (!page || !page.toggles || !page.toggles[idx]) return;
+      page.toggles[idx].on = !page.toggles[idx].on;
+      const item = page.toggles[idx];
+      renderKentoSubpage(pageKey);
+      showToast(`${item.title}: ${item.on ? 'Enabled' : 'Paused'}`, item.on ? 'emerald' : 'indigo');
+    }
+
+    function renderKentoSubpage(label) {
+      const data = kentoSubpageData[label];
+      const container = document.getElementById('tabSubpageView');
+      if (!data || !container) return;
+
+      const badgeStyle = data.badgeTone === 'emerald'
+        ? 'bg-emerald-500/10 text-emerald-700'
+        : 'bg-indigo-500/10 text-indigo-700';
+
+      const kpiHtml = data.kpis.map(k => k.obsidian ? `
+        <div class="bento-obsidian p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">${k.label}</span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-white/10 text-slate-200">${k.delta}</span>
+          </div>
+          <p class="font-display text-3xl font-bold text-white tabular-nums mt-3">${k.val}</p>
+          <p class="text-xs text-slate-400 mt-2">${k.sub}</p>
+        </div>
+      ` : `
+        <div class="bento-tile p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">${k.label}</span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700">${k.delta}</span>
+          </div>
+          <p class="font-display text-3xl font-bold text-slate-900 tabular-nums mt-3">${k.val}</p>
+          <p class="text-xs text-slate-500 mt-2">${k.sub}</p>
+        </div>
+      `).join('');
+
+      const barsHtml = data.bars.map(b => `
+        <div onclick="showToast('${b.label}: ${b.val} (${b.note})', 'indigo')" class="p-3 rounded-2xl bg-[#F2F4F7]/80 hover:bg-[#F2F4F7] transition cursor-pointer">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-semibold text-slate-800">${b.label}</span>
+            <span class="font-mono font-semibold text-slate-900 tabular-nums">${b.val} <span class="text-slate-400 font-normal">&middot; ${b.note}</span></span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-white overflow-hidden p-0.5">
+            <div class="h-full rounded-full ${b.color} transition-all duration-500" style="width: ${b.pct}%;"></div>
+          </div>
+        </div>
+      `).join('');
+
+      let interactiveBlockHtml = '';
+      if (data.toggles) {
+        interactiveBlockHtml = `
+          <div class="space-y-2.5">
+            ${data.toggles.map((t, idx) => `
+              <div onclick="toggleKentoSubToggle('${label.replace(/'/g, "\\'")}', ${idx})" class="p-3.5 rounded-2xl border ${t.on ? 'bg-indigo-500/5 border-indigo-500/20' : 'bg-[#F2F4F7]/70 border-slate-900/5'} flex items-center justify-between gap-4 cursor-pointer transition">
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-slate-900">${t.title}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">${t.desc}</p>
+                </div>
+                <button type="button" aria-pressed="${t.on}" class="w-11 h-6 rounded-full p-0.5 flex items-center shrink-0 transition ${t.on ? 'bg-indigo-600 justify-end' : 'bg-slate-300 justify-start'}">
+                  <span class="w-5 h-5 rounded-full bg-white shadow-sm"></span>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        interactiveBlockHtml = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-900/10 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="pb-3 pr-3">${data.columns[0]}</th>
+                  <th class="pb-3 px-3">${data.columns[1]}</th>
+                  <th class="pb-3 px-3">${data.columns[2]}</th>
+                  <th class="pb-3 px-3">${data.columns[3]}</th>
+                  <th class="pb-3 pl-3 text-right">${data.columns[4]}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-900/5 text-sm">
+                ${data.rows.map(r => `
+                  <tr class="hover:bg-[#F2F4F7]/60 transition">
+                    <td class="py-3 pr-3 font-semibold text-slate-900">${r.c1}</td>
+                    <td class="py-3 px-3 font-mono text-xs text-slate-600 tabular-nums">${r.c2}</td>
+                    <td class="py-3 px-3 font-mono text-xs font-semibold text-indigo-600 tabular-nums">${r.c3}</td>
+                    <td class="py-3 px-3 font-mono text-xs font-semibold text-emerald-700 tabular-nums">${r.c4}</td>
+                    <td class="py-3 pl-3 text-right">
+                      <button type="button" onclick="showToast('${r.toast.replace(/'/g, "\\'")}', 'indigo')" class="px-3 py-1.5 rounded-xl bg-[#F2F4F7] hover:bg-slate-900 hover:text-white text-xs font-semibold text-slate-800 transition">
+                        ${r.btn}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-5">
+          <!-- Sub-page Header -->
+          <div class="bento-tile p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" onclick="returnToBentoOverview()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F4F7] hover:bg-slate-200/80 text-xs font-semibold text-slate-700 transition">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  <span>Overview</span>
+                </button>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold ${badgeStyle}">${data.badge}</span>
+              </div>
+              <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900 pt-1">${data.title}</h2>
+              <p class="text-sm text-slate-500">${data.subtitle}</p>
+            </div>
+            <button type="button" onclick="${data.ctaAction}" class="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-[#111827] hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+              <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>${data.ctaLabel}</span>
+            </button>
+          </div>
+
+          <!-- 4 Module KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            ${kpiHtml}
+          </div>
+
+          <!-- Visual Block + Interactive 5-Row Table / Toggles -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <section class="bento-tile lg:col-span-5 p-6 flex flex-col justify-between">
+              <div class="mb-4">
+                <h3 class="font-display text-lg font-bold text-slate-900">${data.visualTitle}</h3>
+                <p class="text-xs text-slate-500 mt-0.5">${data.visualSub}</p>
+              </div>
+              <div class="space-y-3 my-auto">
+                ${barsHtml}
+              </div>
+            </section>
+
+            <section class="bento-tile lg:col-span-7 p-6 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-2 mb-4">
+                <div>
+                  <h3 class="font-display text-lg font-bold text-slate-900">${data.tableTitle}</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Interactive live controls synced with Kento OS telemetry</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-[#F2F4F7] font-mono text-xs font-semibold text-slate-600">5 Active Rows</span>
+              </div>
+              ${interactiveBlockHtml}
+            </section>
+          </div>
+        </div>
+      `;
+    }
+
+    function returnToBentoOverview(silent = false) {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.nav === 'Bento Overview');
+      });
+      document.getElementById('tabSubpageView').classList.add('hidden');
+      document.getElementById('defaultDashboardView').classList.remove('hidden');
+      document.getElementById('topbarSubtext').textContent = workspaces[currentWs].subtext;
+      renderHeroBentoChart();
+      if (!silent) showToast('Returned to Bento Overview.', 'indigo');
+    }
+
+    function setSidebarActive(e, label) {
+      if (e) e.preventDefault();
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.nav === label);
+      });
+      if (window.innerWidth < 1024) closeMobileDrawer();
+
+      if (label === 'Bento Overview') {
+        returnToBentoOverview(true);
+        showToast('Focused Bento module: Bento Overview', 'indigo');
+      } else {
+        document.getElementById('defaultDashboardView').classList.add('hidden');
+        const sub = document.getElementById('tabSubpageView');
+        sub.classList.remove('hidden');
+        if (kentoSubpageData[label]) {
+          document.getElementById('topbarSubtext').textContent = kentoSubpageData[label].subtitle;
+        }
+        renderKentoSubpage(label);
+        showToast(`Opened ${label} module`, 'indigo');
+      }
+    }
+
+    // ==========================================
+    // WORKSPACE SWITCHER DATA (UPDATES ALL TILES)
+    // ==========================================
+    const workspaces = {
+      growth: {
+        subtext: 'Asymmetric Product Telemetry · Q3 FY26 Cycle',
+        heroMetric: '$1.84M ARR',
+        heroDelta: '+24.8% QoQ',
+        yLabels: ['$120k', '$190k', '$260k'],
+        bars: [132, 148, 162, 158, 184, 206, 224, 248],
+        unitPrefix: '$',
+        unitSuffix: 'k Net',
+        funnelCvr: '3.02% End-to-End CVR',
+        steps: ['142k', '18.4k', '4,290'],
+        copilotRes: 94.2,
+        copilotRps: 1420,
+        nps: 78,
+        sentiment: [82, 14, 4],
+        regions: [48, 31, 21]
+      },
+      engineering: {
+        subtext: 'Platform Delivery & Edge Throughput · Sprint 24',
+        heroMetric: '1,284 Deploys',
+        heroDelta: '+31.4% Sprint',
+        yLabels: ['80', '140', '200'],
+        bars: [96, 112, 128, 135, 152, 168, 179, 196],
+        unitPrefix: '',
+        unitSuffix: ' deploys',
+        funnelCvr: '98.6% CI Pass-to-Prod',
+        steps: ['4,820 PRs', '4,690 Green', '1,284 Prod'],
+        copilotRes: 96.8,
+        copilotRps: 2180,
+        nps: 84,
+        sentiment: [87, 10, 3],
+        regions: [44, 35, 21]
+      },
+      ai: {
+        subtext: 'Autonomous Copilot Monetization & Token Margin',
+        heroMetric: '$640k AI ARR',
+        heroDelta: '+62.0% QoQ',
+        yLabels: ['$40k', '$75k', '$110k'],
+        bars: [42, 51, 60, 68, 79, 88, 97, 108],
+        unitPrefix: '$',
+        unitSuffix: 'k AI',
+        funnelCvr: '34.8% Seat Attach Rate',
+        steps: ['42.0k Users', '19.5k Active', '14,610 Pro'],
+        copilotRes: 97.4,
+        copilotRps: 3090,
+        nps: 81,
+        sentiment: [85, 11, 4],
+        regions: [52, 28, 20]
+      }
+    };
+
+    let currentWs = 'growth';
+    let heroWindowMode = '8w';
+    let computeBoosted = false;
+    let livePulseEnabled = true;
+    let activeHeroPoints = [];
+
+    function renderHeroBentoChart() {
+      const ws = workspaces[currentWs];
+      const multiplier = heroWindowMode === 'q3' ? 1.12 : 1;
+      const values = ws.bars.map(v => Math.round(v * multiplier));
+      const maxVal = Math.max(...values) * 1.08;
+      const minVal = Math.min(...values) * 0.65;
+
+      document.getElementById('heroY1').textContent = ws.yLabels[0];
+      document.getElementById('heroY2').textContent = ws.yLabels[1];
+      document.getElementById('heroY3').textContent = ws.yLabels[2];
+
+      const barsGroup = document.getElementById('heroBarsGroup');
+      const dotsGroup = document.getElementById('heroSplineDots');
+      const xLabels = document.getElementById('heroXLabels');
+      barsGroup.innerHTML = '';
+      dotsGroup.innerHTML = '';
+      xLabels.innerHTML = '';
+
+      const xStart = 72;
+      const step = 68;
+      const chartBottom = 190;
+      const chartHeight = 152;
+
+      const splineCoords = [];
+
+      values.forEach((val, idx) => {
+        const cx = xStart + idx * step;
+        const norm = (val - minVal) / (maxVal - minVal);
+        const barH = Math.max(28, Math.round(norm * chartHeight));
+        const barY = chartBottom - barH;
+        const splineY = barY - 8;
+        const labelStr = `${ws.unitPrefix}${val}${ws.unitSuffix}`;
+        splineCoords.push({ x: cx, y: splineY, barY, val, labelStr, week: `Week ${idx + 1}` });
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', cx - 18);
+        rect.setAttribute('y', barY);
+        rect.setAttribute('width', '36');
+        rect.setAttribute('height', barH);
+        rect.setAttribute('rx', '9');
+        rect.setAttribute('class', 'bento-svg-bar');
+        rect.style.animationDelay = `${idx * 35}ms`;
+        rect.setAttribute('fill', idx >= 6 ? 'url(#bentoBarGrad)' : 'url(#bentoBarMuted)');
+        rect.style.cursor = 'pointer';
+        rect.addEventListener('mouseenter', () => showHeroTip(cx, splineY, `Week ${idx + 1}`, labelStr));
+        rect.addEventListener('click', () => showHeroTip(cx, splineY, `Week ${idx + 1}`, labelStr));
+        barsGroup.appendChild(rect);
+
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x', cx);
+        lbl.setAttribute('y', '212');
+        lbl.setAttribute('text-anchor', 'middle');
+        lbl.textContent = `W${idx + 1}`;
+        xLabels.appendChild(lbl);
+      });
+
+      activeHeroPoints = splineCoords;
+
+      let d = `M ${splineCoords[0].x},${splineCoords[0].y}`;
+      for (let i = 0; i < splineCoords.length - 1; i++) {
+        const p0 = splineCoords[i];
+        const p1 = splineCoords[i + 1];
+        const midX = (p0.x + p1.x) / 2;
+        d += ` C ${midX},${p0.y} ${midX},${p1.y} ${p1.x},${p1.y}`;
+      }
+      const splineEl = document.getElementById('heroSplinePath');
+      splineEl.setAttribute('d', d);
+      splineEl.classList.remove('spline-animate');
+      void splineEl.offsetWidth;
+      splineEl.classList.add('spline-animate');
+
+      splineCoords.forEach(pt => {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', pt.x);
+        dot.setAttribute('cy', pt.y);
+        dot.setAttribute('r', '4.8');
+        dot.setAttribute('fill', '#FFFFFF');
+        dot.setAttribute('stroke', '#10B981');
+        dot.setAttribute('stroke-width', '2.6');
+        dotsGroup.appendChild(dot);
+      });
+
+      hideHeroTip();
+    }
+
+    function showHeroTip(svgX, svgY, weekText, valText) {
+      const tip = document.getElementById('heroChartTooltip');
+      const crossX = document.getElementById('heroCrosshairX');
+      const crossY = document.getElementById('heroCrosshairY');
+      const svg = document.getElementById('heroSvgChart');
+      const rect = svg.getBoundingClientRect();
+
+      document.getElementById('heroTipWeek').textContent = weekText;
+      document.getElementById('heroTipVal').textContent = valText;
+
+      crossX.setAttribute('x1', svgX);
+      crossX.setAttribute('x2', svgX);
+      crossX.setAttribute('opacity', '1');
+
+      crossY.setAttribute('y1', svgY);
+      crossY.setAttribute('y2', svgY);
+      crossY.setAttribute('opacity', '1');
+
+      const leftPx = (svgX / 600) * rect.width;
+      const topPx = (svgY / 220) * rect.height;
+      tip.style.left = `${Math.min(Math.max(leftPx - 52, 6), rect.width - 125)}px`;
+      tip.style.top = `${Math.max(topPx - 54, 0)}px`;
+      tip.classList.remove('hidden');
+    }
+
+    function hideHeroTip() {
+      document.getElementById('heroChartTooltip').classList.add('hidden');
+      document.getElementById('heroCrosshairX').setAttribute('opacity', '0');
+      document.getElementById('heroCrosshairY').setAttribute('opacity', '0');
+    }
+
+    // Magnetic hover crosshair across Hero SVG
+    document.getElementById('heroSvgChart').addEventListener('mousemove', (e) => {
+      if (!activeHeroPoints.length) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const svgX = ((e.clientX - rect.left) / rect.width) * 600;
+      let nearest = activeHeroPoints[0];
+      let minDist = Math.abs(svgX - nearest.x);
+      activeHeroPoints.forEach(pt => {
+        const dist = Math.abs(svgX - pt.x);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = pt;
+        }
+      });
+      showHeroTip(nearest.x, nearest.y, nearest.week, nearest.labelStr);
+    });
+    document.getElementById('heroSvgChart').addEventListener('mouseleave', hideHeroTip);
+
+    function switchHeroWindow(tf) {
+      heroWindowMode = tf;
+      document.querySelectorAll('.hero-tf').forEach(btn => {
+        const active = btn.dataset.tf === tf;
+        btn.className = active
+          ? 'hero-tf min-h-[38px] px-3.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-sm transition'
+          : 'hero-tf min-h-[38px] px-3.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition';
+      });
+      renderHeroBentoChart();
+    }
+
+    function switchWorkspace(wsKey) {
+      currentWs = wsKey;
+      const ws = workspaces[wsKey];
+
+      // If currently viewing a sidebar sub-page, switch back to Bento Overview cleanly
+      const subView = document.getElementById('tabSubpageView');
+      if (subView && !subView.classList.contains('hidden')) {
+        subView.classList.add('hidden');
+        document.getElementById('defaultDashboardView').classList.remove('hidden');
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.nav === 'Bento Overview');
+        });
+      }
+
+      document.querySelectorAll('.ws-tab').forEach(btn => {
+        const active = btn.dataset.ws === wsKey;
+        btn.className = active
+          ? 'ws-tab seg-pill active min-h-[40px] px-4 rounded-xl text-sm font-semibold whitespace-nowrap'
+          : 'ws-tab seg-pill min-h-[40px] px-4 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap';
+      });
+
+      document.getElementById('topbarSubtext').textContent = ws.subtext;
+      document.getElementById('heroPrimaryMetric').textContent = ws.heroMetric;
+      document.getElementById('heroDeltaBadge').innerHTML = `<svg class="w-3 h-3" viewBox="0 0 12 12" fill="currentColor"><path d="M6 2L11 9H1L6 2Z"/></svg><span>${ws.heroDelta}</span>`;
+      document.getElementById('funnelOverallRate').textContent = ws.funnelCvr;
+      document.getElementById('step1Val').textContent = ws.steps[0];
+      document.getElementById('step2Val').textContent = ws.steps[1];
+      document.getElementById('step3Val').textContent = ws.steps[2];
+
+      updateCopilotDisplay();
+
+      document.getElementById('npsScoreValue').textContent = ws.nps;
+      document.getElementById('npsBarPromoters').style.width = `${ws.sentiment[0]}%`;
+      document.getElementById('npsBarPassives').style.width = `${ws.sentiment[1]}%`;
+      document.getElementById('npsBarDetractors').style.width = `${ws.sentiment[2]}%`;
+      document.getElementById('npsPromoterPct').textContent = `${ws.sentiment[0]}%`;
+      document.getElementById('npsPassivePct').textContent = `${ws.sentiment[1]}%`;
+      document.getElementById('npsDetractorPct').textContent = `${ws.sentiment[2]}%`;
+
+      document.getElementById('regBarNA').style.width = `${ws.regions[0]}%`;
+      document.getElementById('regBarEU').style.width = `${ws.regions[1]}%`;
+      document.getElementById('regBarAPAC').style.width = `${ws.regions[2]}%`;
+      document.getElementById('regPctNA').textContent = `${ws.regions[0]}%`;
+      document.getElementById('regPctEU').textContent = `${ws.regions[1]}%`;
+      document.getElementById('regPctAPAC').textContent = `${ws.regions[2]}%`;
+
+      renderHeroBentoChart();
+    }
+
+    function previewNpsSegment(txt) {
+      document.getElementById('npsHoverLabel').textContent = txt;
+    }
+    function resetNpsSegment() {
+      document.getElementById('npsHoverLabel').textContent = '+6 pts QoQ';
+    }
+    function setRegionSubtitle(txt) {
+      document.getElementById('regionHoverReadout').textContent = txt;
+    }
+    function resetRegionSubtitle() {
+      document.getElementById('regionHoverReadout').textContent = 'Multi-region routing across 28 PoP edge clusters';
+    }
+
+    // ==========================================
+    // TILE B & LIVE REAL-TIME TELEMETRY PULSE
+    // ==========================================
+    function updateCopilotDisplay() {
+      const ws = workspaces[currentWs];
+      const res = computeBoosted ? Math.min(99.4, +(ws.copilotRes + 2.4).toFixed(1)) : ws.copilotRes;
+      const rps = computeBoosted ? Math.round(ws.copilotRps * 1.65) : ws.copilotRps;
+      const circumference = 251.2;
+      const offset = circumference - (res / 100) * circumference;
+
+      document.getElementById('copilotRingCircle').style.strokeDashoffset = offset.toFixed(2);
+      document.getElementById('copilotResValue').textContent = `${res}%`;
+      document.getElementById('copilotRpsTicker').textContent = `${rps.toLocaleString()} req/s`;
+    }
+
+    function toggleBoostCompute() {
+      computeBoosted = !computeBoosted;
+      const btn = document.getElementById('boostComputeBtn');
+      const track = document.getElementById('boostSwitchTrack');
+      const knob = document.getElementById('boostSwitchKnob');
+      const badge = document.getElementById('copilotModeBadge');
+
+      btn.setAttribute('aria-pressed', String(computeBoosted));
+      if (computeBoosted) {
+        track.className = 'w-10 h-6 rounded-full bg-emerald-500 p-0.5 flex items-center transition';
+        knob.style.transform = 'translateX(16px)';
+        badge.textContent = 'Turbo GPU';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-500/20 text-emerald-300';
+        showToast('Boost Compute enabled — dedicated H100 tensor lane active.', 'emerald');
+      } else {
+        track.className = 'w-10 h-6 rounded-full bg-white/20 p-0.5 flex items-center transition';
+        knob.style.transform = 'translateX(0px)';
+        badge.textContent = 'Standard';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-mono bg-white/10 text-slate-200';
+      }
+      updateCopilotDisplay();
+    }
+
+    function toggleLivePulse() {
+      livePulseEnabled = !livePulseEnabled;
+      document.getElementById('topBeaconPing').classList.toggle('hidden', !livePulseEnabled);
+      document.getElementById('topBeaconText').textContent = livePulseEnabled ? 'Synced Live' : 'Paused';
+      showToast(livePulseEnabled ? 'Live Bento telemetry pulse resumed.' : 'Live Bento telemetry paused.', 'indigo');
+    }
+
+    setInterval(() => {
+      if (!livePulseEnabled) return;
+      const ws = workspaces[currentWs];
+      const base = computeBoosted ? Math.round(ws.copilotRps * 1.65) : ws.copilotRps;
+      const jitter = Math.floor(Math.random() * 34) - 16;
+      document.getElementById('copilotRpsTicker').textContent = `${(base + jitter).toLocaleString()} req/s`;
+
+      // Micro-pulse edge PoP latencies
+      const na = 17 + Math.floor(Math.random() * 3);
+      const eu = 23 + Math.floor(Math.random() * 3);
+      const ap = 30 + Math.floor(Math.random() * 3);
+      document.getElementById('latPillNA').textContent = `${na}ms`;
+      document.getElementById('latPillEU').textContent = `${eu}ms`;
+      document.getElementById('latPillAPAC').textContent = `${ap}ms`;
+    }, 2500);
+
+    // ==========================================
+    // TILE E: SPRINT RELEASE CHECKLIST (75% -> 100%)
+    // ==========================================
+    const milestones = [
+      { id: 'sdk', title: 'v3.4 Bento SDK', meta: 'TypeScript + Edge Runtime', done: true },
+      { id: 'webhooks', title: 'Realtime Webhooks', meta: 'HMAC SHA-256 signed delivery', done: true },
+      { id: 'soc2', title: 'SOC2 Type II Vault', meta: 'Zero-trust KMS key rotation', done: true },
+      { id: 'billing', title: 'Edge Billing API', meta: 'Sub-second usage metering', done: false }
+    ];
+
+    function renderMilestones() {
+      const container = document.getElementById('milestoneList');
+      container.innerHTML = '';
+
+      milestones.forEach((m, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `w-full min-h-[50px] px-3.5 py-2.5 rounded-2xl border flex items-center justify-between gap-3 transition text-left ${
+          m.done
+            ? 'bg-indigo-500/5 border-indigo-500/20 text-slate-900'
+            : 'bg-[#F2F4F7]/80 hover:bg-[#F2F4F7] border-slate-900/5 text-slate-700'
+        }`;
+        btn.onclick = () => {
+          milestones[idx].done = !milestones[idx].done;
+          renderMilestones();
+          const completed = milestones.filter(i => i.done).length;
+          if (completed === milestones.length) {
+            showToast('100% Sprint 24 Release Milestones verified and ready!', 'emerald');
+          }
+        };
+
+        btn.innerHTML = `
+          <span class="flex items-center gap-3 min-w-0">
+            <span class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 transition ${
+              m.done ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-300 text-transparent'
+            }">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span class="min-w-0">
+              <span class="block text-sm font-semibold truncate ${m.done ? 'text-slate-900' : 'text-slate-700'}">${m.title}</span>
+              <span class="block text-xs text-slate-500 truncate">${m.meta}</span>
+            </span>
+          </span>
+          <span class="font-mono text-xs font-semibold px-2 py-0.5 rounded-md shrink-0 ${
+            m.done ? 'bg-emerald-500/10 text-emerald-700' : 'bg-white text-slate-500'
+          }">${m.done ? 'Shipped' : 'Pending'}</span>
+        `;
+        container.appendChild(btn);
+      });
+
+      const doneCount = milestones.filter(i => i.done).length;
+      const pct = Math.round((doneCount / milestones.length) * 100);
+      const circumference = 163.36;
+      const offset = circumference - (pct / 100) * circumference;
+
+      document.getElementById('sprintProgressCircle').style.strokeDashoffset = offset.toFixed(2);
+      document.getElementById('sprintProgressCircle').setAttribute('stroke', pct === 100 ? '#10B981' : '#4F46E5');
+      document.getElementById('sprintProgressText').textContent = `${pct}%`;
+      document.getElementById('sprintStatusCaption').textContent = `${doneCount} of ${milestones.length} milestones verified`;
+    }
+
+    // ==========================================
+    // TILE F: 5x5 COHORT RETENTION HEATMAP MATRIX
+    // ==========================================
+    const cohortMatrix = [
+      { name: 'May W1', baseTeams: 856, cells: [100, 88.4, 79.2, 73.1, 68.4] },
+      { name: 'May W2', baseTeams: 812, cells: [100, 90.1, 81.5, 75.0, 69.8] },
+      { name: 'May W3', baseTeams: 890, cells: [100, 91.2, 83.0, 76.4, 71.2] },
+      { name: 'May W4', baseTeams: 842, cells: [100, 92.6, 84.8, 78.9, 72.6] },
+      { name: 'Jun W1', baseTeams: 890, cells: [100, 94.0, 86.2, 80.5, 74.1] }
+    ];
+
+    function getHeatCellStyle(val) {
+      if (val >= 95) return 'bg-indigo-600 text-white';
+      if (val >= 85) return 'bg-indigo-500 text-white';
+      if (val >= 78) return 'bg-indigo-500/80 text-white';
+      if (val >= 72) return 'bg-indigo-500/50 text-slate-900';
+      return 'bg-indigo-500/20 text-indigo-950';
+    }
+
+    function renderCohortMatrix() {
+      const container = document.getElementById('cohortGridContainer');
+      const readout = document.getElementById('cohortReadoutPill');
+      const floatTip = document.getElementById('cohortFloatingTip');
+      const tileCohorts = document.getElementById('tileCohorts');
+      container.innerHTML = '';
+
+      cohortMatrix.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'grid grid-cols-6 gap-1.5 items-center';
+
+        const label = document.createElement('span');
+        label.className = 'font-mono text-xs font-medium text-slate-600 truncate';
+        label.textContent = row.name;
+        rowEl.appendChild(label);
+
+        row.cells.forEach((val, wIdx) => {
+          const retainedTeams = Math.round((val / 100) * row.baseTeams);
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = `h-10 rounded-xl font-mono text-xs font-semibold tabular-nums transition transform hover:scale-105 hover:ring-2 hover:ring-indigo-400 focus:outline-none ${getHeatCellStyle(val)}`;
+          cell.textContent = val === 100 ? '100%' : `${val}%`;
+
+          cell.addEventListener('mouseenter', (ev) => {
+            readout.textContent = `${row.name} · W${wIdx}: ${val}%`;
+            document.getElementById('cohortTipTitle').textContent = `${row.name} · Week ${wIdx}`;
+            document.getElementById('cohortTipDetail').textContent = `${val}% (${retainedTeams} teams)`;
+            const tileRect = tileCohorts.getBoundingClientRect();
+            const cellRect = ev.currentTarget.getBoundingClientRect();
+            floatTip.style.left = `${Math.min(Math.max(cellRect.left - tileRect.left - 34, 12), tileRect.width - 155)}px`;
+            floatTip.style.top = `${Math.max(cellRect.top - tileRect.top - 56, 8)}px`;
+            floatTip.classList.remove('hidden');
+          });
+          cell.addEventListener('mouseleave', () => {
+            floatTip.classList.add('hidden');
+          });
+          cell.addEventListener('click', () => {
+            showToast(`Cohort ${row.name} Week ${wIdx}: ${val}% (${retainedTeams} retained teams).`, 'indigo');
+          });
+          rowEl.appendChild(cell);
+        });
+
+        container.appendChild(rowEl);
+      });
+    }
+
+    // ==========================================
+    // MODALS, CSV EXPORT & TOASTS
+    // ==========================================
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+
+    function confirmEdgeDeploy(e) {
+      e.preventDefault();
+      const branch = document.getElementById('edgeBranch').value.trim();
+      closeModal('deployModal');
+      showToast(`Deploying ${branch} across 28 global PoP edge clusters.`, 'indigo');
+    }
+
+    function submitTeamInvite(e) {
+      e.preventDefault();
+      const email = document.getElementById('inviteEmail');
+      const addr = email.value.trim();
+      closeModal('inviteModal');
+      email.value = '';
+      showToast(`Workspace invitation dispatched to ${addr}.`, 'emerald');
+    }
+
+    function exportBentoCsv() {
+      showToast('Exported Kento_OS_Bento_Telemetry_Q3.csv (18.4 KB).', 'emerald');
+    }
+
+    function showToast(message, tone = 'indigo') {
+      const container = document.getElementById('toastContainer');
+      const badgeColor = tone === 'emerald' ? 'bg-emerald-500' : 'bg-indigo-500';
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-[#111827] text-white shadow-xl text-sm font-medium';
+      toast.innerHTML = `
+        <span class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full ${badgeColor} shrink-0"></span>
+          <span>${message}</span>
+        </span>
+        <button type="button" class="text-slate-400 hover:text-white shrink-0" aria-label="Dismiss">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+      toast.querySelector('button').onclick = () => toast.remove();
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+      }, 4000);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        ['deployModal', 'apiModal', 'inviteModal'].forEach(closeModal);
+      }
+    });
+
+    // Initialize All Bento Modules
+    renderHeroBentoChart();
+    renderMilestones();
+    renderCohortMatrix();
+  </script>
+</body>
+</html>

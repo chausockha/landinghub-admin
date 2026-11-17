@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERDANT OS — Autonomous Renewable Grid &amp; ESG Carbon Telemetry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            mist: '#EEF4F0',
+            forest: '#14532D',
+            forestDeep: '#0D3B20',
+            emeraldEco: '#059669',
+            bioLime: '#65A30D',
+            bioLimeBright: '#84CC16',
+            solarAmber: '#D97706',
+            slateEco: '#475569',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-canvas: #EEF4F0;
+      --ink-forest: #14532D;
+      --emerald: #059669;
+      --biolime: #65A30D;
+      --biolime-bright: #84CC16;
+      --amber: #D97706;
+      --slate: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      background-image:
+        radial-gradient(circle at 14% 12%, rgba(22, 163, 74, 0.10) 0%, rgba(22, 163, 74, 0) 44%),
+        radial-gradient(circle at 86% 18%, rgba(132, 204, 22, 0.10) 0%, rgba(132, 204, 22, 0) 42%),
+        radial-gradient(circle at 52% 88%, rgba(5, 150, 105, 0.08) 0%, rgba(5, 150, 105, 0) 48%);
+      background-attachment: fixed;
+      color: #0F291E;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Frosted Dew Glass Bento Surface */
+    .dew-glass {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(24px) saturate(170%);
+      -webkit-backdrop-filter: blur(24px) saturate(170%);
+      border: 1px solid rgba(255, 255, 255, 0.94);
+      box-shadow:
+        0 20px 46px -12px rgba(20, 83, 45, 0.08),
+        0 4px 12px rgba(20, 83, 45, 0.04),
+        inset 0 1px 0 #FFFFFF;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.28s ease;
+    }
+
+    .dew-glass-hover:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 26px 54px -12px rgba(20, 83, 45, 0.12),
+        0 8px 18px rgba(20, 83, 45, 0.06),
+        inset 0 1px 0 #FFFFFF;
+      border-color: #FFFFFF;
+    }
+
+    /* Soft Recessed Tactile Well */
+    .soft-well {
+      background: rgba(238, 244, 240, 0.72);
+      border: 1px solid rgba(20, 83, 45, 0.07);
+      box-shadow:
+        inset 0 2px 5px rgba(20, 83, 45, 0.05),
+        0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* Soft Pill Button */
+    .tactile-btn {
+      background: linear-gradient(180deg, #196738 0%, #14532D 100%);
+      color: #FFFFFF;
+      box-shadow:
+        0 10px 22px -6px rgba(20, 83, 45, 0.38),
+        0 2px 6px rgba(20, 83, 45, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .tactile-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 14px 26px -6px rgba(20, 83, 45, 0.46),
+        0 4px 10px rgba(20, 83, 45, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    }
+    .tactile-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Sidebar Collapse Mechanics */
+    #sidebar {
+      width: 264px;
+      transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.sidebar-collapsed #sidebar {
+      width: 84px;
+    }
+    body.sidebar-collapsed .sidebar-label,
+    body.sidebar-collapsed .sidebar-card-expanded,
+    body.sidebar-collapsed .brand-subtitle {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      pointer-events: none;
+      display: none;
+    }
+    body.sidebar-collapsed .nav-item {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    body.sidebar-collapsed #collapseIcon {
+      transform: rotate(180deg);
+    }
+
+    #mainShell {
+      margin-left: 264px;
+      transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.sidebar-collapsed #mainShell {
+      margin-left: 84px;
+    }
+
+    @media (max-width: 1023px) {
+      #sidebar {
+        transform: translateX(-105%);
+        width: 264px !important;
+      }
+      body.mobile-nav-open #sidebar {
+        transform: translateX(0);
+      }
+      #mainShell,
+      body.sidebar-collapsed #mainShell {
+        margin-left: 0 !important;
+      }
+    }
+
+    /* Nav Item Active Pill */
+    .nav-item {
+      transition: all 0.2s ease;
+    }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(20, 83, 45, 0.96) 0%, rgba(5, 150, 105, 0.92) 100%);
+      color: #FFFFFF;
+      box-shadow:
+        0 10px 22px -6px rgba(20, 83, 45, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    }
+    .nav-item:not(.active):hover {
+      background: rgba(20, 83, 45, 0.06);
+      color: #14532D;
+    }
+
+    /* Hero 3D Tilt Card */
+    .hero-tilt-wrap {
+      perspective: 1200px;
+    }
+    #heroBannerCard {
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out, box-shadow 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    #heroSpecular {
+      pointer-events: none;
+      background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 35%), rgba(255, 255, 255, 0.34), transparent 62%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #heroBannerCard:hover #heroSpecular {
+      opacity: 1;
+    }
+
+    /* SVG Pipeline Animated Dash & Node Glow */
+    @keyframes flowDash {
+      to {
+        stroke-dashoffset: -48;
+      }
+    }
+    .conduit-dash {
+      stroke-dasharray: 8 8;
+      animation: flowDash 1.6s linear infinite;
+    }
+    body.flow-paused .conduit-dash {
+      animation-play-state: paused;
+    }
+
+    .pipeline-node-group {
+      cursor: pointer;
+      transition: transform 0.22s ease;
+    }
+    .pipeline-node-group .node-card-bg {
+      transition: stroke 0.24s ease, stroke-width 0.24s ease, filter 0.24s ease;
+    }
+    .pipeline-node-group.active-node .node-card-bg {
+      stroke: #059669;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 10px 18px rgba(5, 150, 105, 0.22));
+    }
+    .pipeline-node-group.active-node .node-ring-pulse {
+      opacity: 1;
+    }
+    .node-ring-pulse {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Radial Gauge Smooth Transition */
+    .gauge-ring {
+      transition: stroke-dashoffset 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Subtle pulse dot */
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.75); opacity: 0; }
+    }
+    .pulse-halo {
+      animation: livePulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(238, 244, 240, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(20, 83, 45, 0.2);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(20, 83, 45, 0.35);
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-emerald-600/20 selection:text-forest">
+
+  <!-- Mobile Backdrop -->
+  <div id="mobileOverlay" class="fixed inset-0 bg-forestDeep/25 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleMobileNav()"></div>
+
+  <!-- Collapsible Soft-Glass Left Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 bottom-0 z-50 p-3.5 flex flex-col">
+    <div class="dew-glass rounded-3xl h-full flex flex-col justify-between p-3.5 overflow-hidden">
+      <!-- Brand Header -->
+      <div>
+        <div class="flex items-center justify-between gap-2 px-1.5 pt-1 pb-4 border-b border-forest/10">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-forest via-emeraldEco to-bioLime flex items-center justify-center shrink-0 shadow-md shadow-forest/20 ring-2 ring-white">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2v6m0 0L9 5m3 3 3-3" />
+                <path d="M6.8 9.2A7 7 0 1 0 19 14c0-3.8-3.2-6.8-7-12" />
+                <path d="M12 22v-7" />
+              </svg>
+            </div>
+            <div class="min-w-0 sidebar-label">
+              <div class="flex items-center gap-1.5">
+                <span class="font-display font-extrabold text-[15px] tracking-tight text-forest truncate">VERDANT OS</span>
+                <span class="px-1.5 py-0.5 text-xs font-mono font-semibold uppercase rounded-md bg-emeraldEco/10 text-emeraldEco border border-emeraldEco/20">v4.8</span>
+              </div>
+              <p class="text-[12.5px] text-slateEco truncate brand-subtitle">Autonomous Microgrid &amp; DAC</p>
+            </div>
+          </div>
+
+          <button id="collapseBtn" onclick="toggleSidebar()" title="Collapse or expand navigation" class="hidden lg:flex w-8 h-8 rounded-xl soft-well items-center justify-center text-forest hover:bg-white transition shrink-0">
+            <svg id="collapseIcon" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="mt-4 space-y-1" role="navigation" aria-label="Primary Grid Modules">
+          <p class="px-3 pb-1.5 text-xs font-mono font-semibold uppercase tracking-wider text-slateEco/75 sidebar-label">Grid Telemetry</p>
+
+          <button onclick="selectNav(this, 'Grid Overview', '#sec-overview')" class="nav-item active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="2" />
+              <rect x="14" y="3" width="7" height="7" rx="2" />
+              <rect x="14" y="14" width="7" height="7" rx="2" />
+              <rect x="3" y="14" width="7" height="7" rx="2" />
+            </svg>
+            <span class="sidebar-label truncate">Grid Overview</span>
+          </button>
+
+          <button onclick="selectNav(this, 'Solar & Wind Arrays', '#sec-chart')" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateEco">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+            </svg>
+            <span class="sidebar-label truncate">Solar &amp; Wind Arrays</span>
+            <span class="sidebar-label ml-auto text-[12.5px] font-mono text-emeraldEco font-semibold bg-emeraldEco/10 px-2 py-0.5 rounded-full">99.4%</span>
+          </button>
+
+          <button onclick="selectNav(this, 'BESS Storage', '#sec-pipeline')" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateEco">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="18" height="10" rx="2.5" />
+              <path d="M22 11v2" />
+              <path d="M7 10v4m4-4v4m4-4v4" />
+            </svg>
+            <span class="sidebar-label truncate">BESS Storage</span>
+          </button>
+
+          <button onclick="selectNav(this, 'Carbon DAC', '#sec-pipeline')" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateEco">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+              <path d="M12 13v5m-2-2 2 2 2-2" />
+            </svg>
+            <span class="sidebar-label truncate">Carbon DAC</span>
+          </button>
+
+          <button onclick="selectNav(this, 'ESG Audit', '#sec-esg')" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateEco">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            <span class="sidebar-label truncate">ESG Audit</span>
+          </button>
+
+          <button onclick="selectNav(this, 'Microgrids', '#sec-esg')" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13.5px] font-medium text-slateEco">
+            <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="6" r="3" />
+              <circle cx="18" cy="6" r="3" />
+              <circle cx="12" cy="18" r="3" />
+              <path d="M8.6 7.5 10.8 15.3M15.4 7.5l-2.2 7.8M9 6h6" />
+            </svg>
+            <span class="sidebar-label truncate">Microgrids</span>
+            <span class="sidebar-label ml-auto text-[12.5px] font-mono text-forest bg-forest/10 px-2 py-0.5 rounded-full">12</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Autonomous Frequency Card -->
+      <div class="space-y-3">
+        <div class="sidebar-card-expanded soft-well rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[12.5px] font-semibold text-forest flex items-center gap-1.5">
+              <span class="relative flex h-2 w-2">
+                <span class="pulse-halo absolute inline-flex h-full w-full rounded-full bg-emeraldEco"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emeraldEco"></span>
+              </span>
+              Synchrophasor Lock
+            </span>
+            <span id="sidebarHz" class="font-mono text-[12.5px] font-semibold text-emeraldEco tabular-nums">50.02 Hz</span>
+          </div>
+          <div class="w-full h-1.5 rounded-full bg-forest/10 overflow-hidden mb-2">
+            <div class="h-full rounded-full bg-gradient-to-r from-emeraldEco to-bioLimeBright" style="width: 96.4%" id="sidebarRenewableBar"></div>
+          </div>
+          <div class="flex items-center justify-between text-[12.5px] text-slateEco">
+            <span>Grid Inertia</span>
+            <span class="font-mono font-medium text-forest tabular-nums">Nominal · Tier 1</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 px-1.5 pt-1">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-forest to-emeraldEco text-white font-display font-bold text-xs flex items-center justify-center shrink-0 ring-2 ring-white shadow-xs">
+            EL
+          </div>
+          <div class="sidebar-label min-w-0 flex-1">
+            <p class="text-xs font-semibold text-forest truncate">Astrid Lindqvist</p>
+            <p class="text-[12.5px] text-slateEco truncate">Lead Grid Dispatch Eng.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace Shell -->
+  <div id="mainShell" class="min-h-screen flex flex-col">
+
+    <!-- Sticky Frosted Topbar -->
+    <header class="sticky top-0 z-30 px-4 sm:px-6 lg:px-8 pt-3.5 pb-2">
+      <div class="dew-glass rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <!-- Left: Mobile Trigger + Breadcrumb + Active Module -->
+        <div class="flex items-center gap-3">
+          <button onclick="toggleMobileNav()" class="lg:hidden w-9 h-9 rounded-xl soft-well flex items-center justify-center text-forest" aria-label="Open menu">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M4 7h16M4 12h16M4 17h10" />
+            </svg>
+          </button>
+          <div>
+            <div class="flex items-center gap-2 text-xs text-slateEco">
+              <span class="font-medium text-forest/80">Verdant Autonomous Grid</span>
+              <svg class="w-3.5 h-3.5 text-slateEco/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+              <span id="activeModuleCrumb" class="font-semibold text-forest">Grid Overview</span>
+            </div>
+            <p class="text-[12.5px] text-slateEco hidden sm:block">ISO-14064 Real-Time Carbon Telemetry &amp; Sub-Second Inverter Autobalancing</p>
+          </div>
+        </div>
+
+        <!-- Center/Right: Region Switcher + Quick Actions -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Region Switcher Segmented Control -->
+          <div class="soft-well p-1 rounded-xl flex items-center gap-1" role="tablist" aria-label="Grid Region Switcher">
+            <button onclick="switchRegion('nordic')" data-region="nordic" class="region-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-forest shadow-xs flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emeraldEco"></span>
+              <span>Nordic Hydro-Wind</span>
+            </button>
+            <button onclick="switchRegion('california')" data-region="california" class="region-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slateEco hover:text-forest transition-all flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-solarAmber"></span>
+              <span>California Solar</span>
+            </button>
+            <button onclick="switchRegion('singapore')" data-region="singapore" class="region-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slateEco hover:text-forest transition-all flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-bioLime"></span>
+              <span>Singapore Microgrid</span>
+            </button>
+          </div>
+
+          <!-- Export ESG Report -->
+          <button onclick="triggerToast('ISO-14064 Carbon Ledger exported (SHA-256 verified CSV).')" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/85 hover:bg-white border border-forest/10 text-xs font-semibold text-forest shadow-2xs transition">
+            <svg class="w-3.5 h-3.5 text-emeraldEco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>ESG Ledger</span>
+          </button>
+
+          <!-- Primary CTA -->
+          <button onclick="openDispatchModal()" class="tactile-btn px-3.5 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-bioLimeBright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span>AI Autobalance</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-4 max-w-[1600px] w-full mx-auto">
+      <div id="defaultDashboardView" class="space-y-6">
+
+      <!-- 1. HERO ECO-GLASS VISUAL BANNER CARD -->
+      <section id="sec-overview" class="hero-tilt-wrap">
+        <div id="heroBannerCard" class="dew-glass rounded-[28px] p-2.5 sm:p-3.5">
+          <div id="heroSpecular" class="absolute inset-0 z-20 rounded-[28px]"></div>
+
+          <div class="relative rounded-[22px] overflow-hidden min-h-[268px] sm:min-h-[296px] flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-br from-[#0D3B20] via-[#14532D] to-[#1E6B3B]">
+            <!-- Fallback Architectural Eco-Tech SVG Canvas Underneath -->
+            <svg class="absolute inset-0 w-full h-full object-cover opacity-45 pointer-events-none" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="ecoSky" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#0D3B20" />
+                  <stop offset="55%" stop-color="#14532D" />
+                  <stop offset="100%" stop-color="#365314" />
+                </linearGradient>
+                <radialGradient id="sunGlow" cx="78%" cy="28%" r="45%">
+                  <stop offset="0%" stop-color="#84CC16" stop-opacity="0.55" />
+                  <stop offset="55%" stop-color="#059669" stop-opacity="0.18" />
+                  <stop offset="100%" stop-color="#0D3B20" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+              <rect width="1200" height="420" fill="url(#ecoSky)" />
+              <rect width="1200" height="420" fill="url(#sunGlow)" />
+              <path d="M0 320 Q260 230 540 285 T1200 245 L1200 420 L0 420 Z" fill="#059669" fill-opacity="0.28" />
+              <path d="M0 355 Q340 285 690 330 T1200 295 L1200 420 L0 420 Z" fill="#84CC16" fill-opacity="0.18" />
+              <!-- Stylized Offshore Wind Silhouettes -->
+              <g stroke="#ECFDF5" stroke-opacity="0.36" stroke-width="2" fill="none">
+                <line x1="880" y1="145" x2="880" y2="305" />
+                <path d="M880 145 L842 95 M880 145 L936 135 M880 145 L868 202" />
+                <line x1="985" y1="170" x2="985" y2="315" />
+                <path d="M985 170 L954 128 M985 170 L1032 162 M985 170 L975 218" />
+                <line x1="1075" y1="192" x2="1075" y2="325" />
+                <path d="M1075 192 L1050 158 M1075 192 L1114 185 M1075 192 L1068 232" />
+              </g>
+            </svg>
+
+            <!-- Embedded Visual Banner Art -->
+            <img
+              src="/templates/assets/ecotech-visual.jpg"
+              onerror="if(!this.dataset.rel){this.dataset.rel='1';this.src='../../assets/ecotech-visual.jpg';}else{this.style.opacity='0';}"
+              alt="Verdant OS Renewable Solar, Offshore Wind and Direct Air Carbon Capture Complex"
+              class="absolute inset-0 w-full h-full object-cover object-center mix-blend-luminosity opacity-80 transition-opacity duration-500"
+            />
+
+            <!-- Soft Botanical Frosted Gradient Veil -->
+            <div class="absolute inset-0 bg-gradient-to-r from-[#092917]/90 via-[#14532D]/70 to-[#0F291E]/35"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#092917]/65 via-transparent to-white/5"></div>
+
+            <!-- Top Row Badges inside Hero -->
+            <div class="relative z-10 flex flex-wrap items-center justify-between gap-3">
+              <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-white text-forest shadow-lg shadow-black/10">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="pulse-halo absolute inline-flex h-full w-full rounded-full bg-emeraldEco"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emeraldEco"></span>
+                </span>
+                <span class="text-[12.5px] font-semibold tracking-wide uppercase text-forest/75">Live Carbon Intensity</span>
+                <span id="heroIntensityBadge" class="font-mono text-xs font-bold text-forest tabular-nums">18g CO2/kWh · 96.4% Renewable</span>
+              </div>
+
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-forestDeep/65 backdrop-blur-md border border-white/20 text-white/95 text-xs font-mono tabular-nums">
+                <svg class="w-3.5 h-3.5 text-bioLimeBright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4" />
+                </svg>
+                <span id="heroRegionTag">NO-04 NORDIC HYDRO-WIND CLUSTER</span>
+              </div>
+            </div>
+
+            <!-- Hero Main Copy & Floating Frosted Telemetry Pill -->
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end pt-8">
+              <div class="lg:col-span-7 space-y-2.5">
+                <h1 class="font-display font-extrabold text-2xl sm:text-3xl lg:text-[34px] text-white leading-tight tracking-tight">
+                  Autonomous Clean Microgrid &amp; Direct Air Carbon Telemetry
+                </h1>
+                <p id="heroSubcopy" class="text-sm sm:text-[15px] text-emerald-50/90 max-w-2xl leading-relaxed">
+                  AI-orchestrated hydro-wind dispatch paired with solid-sorbent Direct Air Capture scrubbers. Sub-second inverter Curtailment Zeroing keeps regional grid inertia locked at 50.02 Hz.
+                </p>
+              </div>
+
+              <!-- Right Frosted Glass Mini Readout Card -->
+              <div class="lg:col-span-5">
+                <div class="rounded-2xl bg-white/85 backdrop-blur-xl border border-white p-4 shadow-xl shadow-black/15 text-forest">
+                  <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-forest/10">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-emeraldEco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                      </svg>
+                      <span class="text-xs font-bold uppercase tracking-wider text-forest">Net-Negative Dispatch Balance</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-md bg-bioLime/15 text-bioLime font-mono text-[12.5px] font-bold">CURTAILMENT 0.0%</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-3">
+                    <div>
+                      <p class="text-[12.5px] text-slateEco">Surplus Export</p>
+                      <p id="heroSurplus" class="font-mono font-bold text-sm sm:text-base text-forest tabular-nums">+38.4 MW</p>
+                    </div>
+                    <div>
+                      <p class="text-[12.5px] text-slateEco">DAC Draw</p>
+                      <p id="heroDacDraw" class="font-mono font-bold text-sm sm:text-base text-emeraldEco tabular-nums">22.6 MW</p>
+                    </div>
+                    <div>
+                      <p class="text-[12.5px] text-slateEco">Spot Price</p>
+                      <p id="heroSpotPrice" class="font-mono font-bold text-sm sm:text-base text-solarAmber tabular-nums">$41.80/MWh</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. FOUR SOFT-UI KPI BENTO CARDS WITH SVG AREA SPARKLINES -->
+      <section aria-label="Key Grid Performance Indicators" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+        <!-- KPI 1: Clean Generation -->
+        <article class="dew-glass dew-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateEco">Clean Generation</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <h2 id="kpiGenVal" class="font-mono font-bold text-2xl sm:text-[28px] text-forest tabular-nums tracking-tight">142.8 MW</h2>
+              </div>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-emeraldEco/10 border border-emeraldEco/20 flex items-center justify-center text-emeraldEco shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sparkGenGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#059669" stop-opacity="0.32" />
+                  <stop offset="100%" stop-color="#059669" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <path id="sparkGenArea" d="M0 38 C25 34, 42 28, 65 30 C92 32, 110 16, 138 14 C156 12, 168 6, 180 5 L180 46 L0 46 Z" fill="url(#sparkGenGrad)" />
+              <path id="sparkGenLine" d="M0 38 C25 34, 42 28, 65 30 C92 32, 110 16, 138 14 C156 12, 168 6, 180 5" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-forest/10">
+            <span id="kpiGenDelta" class="inline-flex items-center gap-1 font-mono font-semibold text-emeraldEco bg-emeraldEco/10 px-2 py-0.5 rounded-full tabular-nums">
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 7-7 7 7M12 19V5"/></svg>
+              +14.2%
+            </span>
+            <span id="kpiGenSub" class="text-slateEco font-medium">88.4 MW Wind · 54.4 MW Solar</span>
+          </div>
+        </article>
+
+        <!-- KPI 2: Battery BESS Reserve -->
+        <article class="dew-glass dew-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateEco">Battery BESS Reserve</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <h2 id="kpiBessVal" class="font-mono font-bold text-2xl sm:text-[28px] text-forest tabular-nums tracking-tight">94.2%</h2>
+                <span id="kpiBessCap" class="font-mono text-xs font-semibold text-bioLime tabular-nums">380 MWh</span>
+              </div>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-bioLime/10 border border-bioLime/25 flex items-center justify-center text-bioLime shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="18" height="10" rx="2.5" />
+                <line x1="22" y1="11" x2="22" y2="13" />
+                <line x1="6" y1="10" x2="6" y2="14" />
+                <line x1="10" y1="10" x2="10" y2="14" />
+                <line x1="14" y1="10" x2="14" y2="14" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sparkBessGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#65A30D" stop-opacity="0.30" />
+                  <stop offset="100%" stop-color="#65A30D" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <path id="sparkBessArea" d="M0 32 C30 30, 50 24, 78 21 C106 18, 130 14, 154 11 C166 9, 174 8, 180 7 L180 46 L0 46 Z" fill="url(#sparkBessGrad)" />
+              <path id="sparkBessLine" d="M0 32 C30 30, 50 24, 78 21 C106 18, 130 14, 154 11 C166 9, 174 8, 180 7" fill="none" stroke="#65A30D" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-forest/10">
+            <span id="kpiBessDelta" class="inline-flex items-center gap-1 font-mono font-semibold text-bioLime bg-bioLime/10 px-2 py-0.5 rounded-full tabular-nums">
+              Charging +16.4 MW
+            </span>
+            <span id="kpiBessSub" class="text-slateEco font-medium">LFP Cell Temp 23.4°C</span>
+          </div>
+        </article>
+
+        <!-- KPI 3: Direct Air Carbon Captured -->
+        <article class="dew-glass dew-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateEco">Direct Air Carbon Captured</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <h2 id="kpiDacVal" class="font-mono font-bold text-2xl sm:text-[28px] text-forest tabular-nums tracking-tight">-1,842 tCO2e</h2>
+              </div>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center text-forest shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sparkDacGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#14532D" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#14532D" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <path id="sparkDacArea" d="M0 40 C28 36, 52 33, 80 25 C108 17, 132 15, 158 9 C168 7, 175 6, 180 5 L180 46 L0 46 Z" fill="url(#sparkDacGrad)" />
+              <path id="sparkDacLine" d="M0 40 C28 36, 52 33, 80 25 C108 17, 132 15, 158 9 C168 7, 175 6, 180 5" fill="none" stroke="#14532D" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-forest/10">
+            <span id="kpiDacDelta" class="inline-flex items-center gap-1 font-mono font-semibold text-emeraldEco bg-emeraldEco/10 px-2 py-0.5 rounded-full tabular-nums">
+              +22.6% vs Target
+            </span>
+            <span id="kpiDacSub" class="text-slateEco font-medium">Mineralized Basalt Lock</span>
+          </div>
+        </article>
+
+        <!-- KPI 4: Grid Balancing Revenue -->
+        <article class="dew-glass dew-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slateEco">Grid Balancing Revenue</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <h2 id="kpiRevVal" class="font-mono font-bold text-2xl sm:text-[28px] text-forest tabular-nums tracking-tight">$284,900</h2>
+              </div>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-solarAmber/10 border border-solarAmber/25 flex items-center justify-center text-solarAmber shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="my-3 h-12 w-full">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 180 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sparkRevGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#D97706" stop-opacity="0.28" />
+                  <stop offset="100%" stop-color="#D97706" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <path id="sparkRevArea" d="M0 36 C24 38, 48 26, 76 28 C102 29, 126 16, 152 12 C166 10, 174 7, 180 6 L180 46 L0 46 Z" fill="url(#sparkRevGrad)" />
+              <path id="sparkRevLine" d="M0 36 C24 38, 48 26, 76 28 C102 29, 126 16, 152 12 C166 10, 174 7, 180 6" fill="none" stroke="#D97706" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-forest/10">
+            <span id="kpiRevDelta" class="inline-flex items-center gap-1 font-mono font-semibold text-solarAmber bg-solarAmber/10 px-2 py-0.5 rounded-full tabular-nums">
+              +18.4% Arbitrage
+            </span>
+            <span id="kpiRevSub" class="text-slateEco font-medium">FCR-N + Carbon Credits</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- 3. INTERACTIVE SMART-GRID ENERGY DATA FLOW PIPELINE (FULL-WIDTH BENTO) -->
+      <section id="sec-pipeline" class="dew-glass rounded-[28px] p-5 sm:p-7">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[12.5px] font-mono font-semibold uppercase bg-emeraldEco/10 text-emeraldEco border border-emeraldEco/20">Live Power &amp; Carbon Bus</span>
+              <span class="text-xs font-mono text-slateEco tabular-nums">HVDC 380kV · 12ms SCADA Poll</span>
+            </div>
+            <h2 class="font-display font-bold text-lg sm:text-xl text-forest mt-1">Interactive Smart-Grid Energy &amp; Carbon Data Flow</h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slateEco hidden md:inline">Click any node to inspect live bus telemetry</span>
+            <button id="flowToggleBtn" onclick="togglePipelineFlow()" class="px-3 py-1.5 rounded-xl soft-well text-xs font-semibold text-forest hover:bg-white transition inline-flex items-center gap-1.5">
+              <svg id="flowToggleIcon" class="w-3.5 h-3.5 text-emeraldEco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+              <span id="flowToggleLabel">Pause Stream</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Animated SVG Energy Flow Diagram -->
+        <div class="w-full overflow-x-auto pb-2">
+          <div class="min-w-[860px]">
+            <svg id="energyFlowSvg" class="w-full h-auto select-none" viewBox="0 0 1120 215" fill="none" role="img" aria-label="Interactive 4-Node Smart Grid Energy Data Flow Pipeline">
+              <defs>
+                <linearGradient id="conduitGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#059669" />
+                  <stop offset="50%" stop-color="#84CC16" />
+                  <stop offset="100%" stop-color="#14532D" />
+                </linearGradient>
+                <filter id="packetGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="cardSoftShadow" x="-10%" y="-12%" width="120%" height="130%">
+                  <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#14532D" flood-opacity="0.08" />
+                </filter>
+
+                <!-- Motion Paths between Nodes -->
+                <path id="flowPath1" d="M 248 108 C 276 108, 286 78, 314 108" />
+                <path id="flowPath2" d="M 538 108 C 566 108, 576 138, 604 108" />
+                <path id="flowPath3" d="M 828 108 C 856 108, 866 78, 894 108" />
+              </defs>
+
+              <!-- Base Conduit Tracks -->
+              <path d="M 248 108 C 276 108, 286 78, 314 108" stroke="#D7E6DC" stroke-width="7" stroke-linecap="round" />
+              <path d="M 538 108 C 566 108, 576 138, 604 108" stroke="#D7E6DC" stroke-width="7" stroke-linecap="round" />
+              <path d="M 828 108 C 856 108, 866 78, 894 108" stroke="#D7E6DC" stroke-width="7" stroke-linecap="round" />
+
+              <!-- Animated Dashed Energy Conduits -->
+              <path class="conduit-dash" d="M 248 108 C 276 108, 286 78, 314 108" stroke="url(#conduitGrad)" stroke-width="3" stroke-linecap="round" />
+              <path class="conduit-dash" d="M 538 108 C 566 108, 576 138, 604 108" stroke="url(#conduitGrad)" stroke-width="3" stroke-linecap="round" />
+              <path class="conduit-dash" d="M 828 108 C 856 108, 866 78, 894 108" stroke="url(#conduitGrad)" stroke-width="3" stroke-linecap="round" />
+
+              <!-- Glowing Streaming Energy Packets (<circle><animateMotion>) -->
+              <g class="energy-packets" filter="url(#packetGlow)">
+                <circle r="5.5" fill="#84CC16">
+                  <animateMotion dur="1.7s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#flowPath1" />
+                  </animateMotion>
+                </circle>
+                <circle r="4" fill="#059669">
+                  <animateMotion dur="1.7s" begin="0.85s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#flowPath1" />
+                  </animateMotion>
+                </circle>
+
+                <circle r="5.5" fill="#059669">
+                  <animateMotion dur="1.8s" begin="0.2s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#flowPath2" />
+                  </animateMotion>
+                </circle>
+                <circle r="4" fill="#84CC16">
+                  <animateMotion dur="1.8s" begin="1.1s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#flowPath2" />
+                  </animateMotion>
+                </circle>
+
+                <circle r="5.5" fill="#84CC16">
+                  <animateMotion dur="1.6s" begin="0.4s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#flowPath3" />
+                  </animateMotion>
+                </circle>
+                <circle r="4" fill="#14532D">
+                  <animateMotion dur="1.6s" begin="1.2s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#flowPath3" />
+                  </animateMotion>
+                </circle>
+              </g>
+
+              <!-- NODE 01: Solar & Offshore Wind -->
+              <g class="pipeline-node-group active-node" data-node="0" onclick="selectPipelineNode(0)" transform="translate(18, 28)">
+                <rect class="node-ring-pulse" x="-4" y="-4" width="238" height="168" rx="26" fill="none" stroke="#84CC16" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="node-card-bg" x="0" y="0" width="230" height="160" rx="22" fill="#FFFFFF" fill-opacity="0.94" stroke="#DCE8E0" stroke-width="1.5" filter="url(#cardSoftShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#ECFDF5" stroke="#A7F3D0" />
+                <g transform="translate(25, 25)" stroke="#059669" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="10" cy="10" r="3.5" />
+                  <path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M4 4l1.5 1.5M14.5 14.5 16 16M16 4l-1.5 1.5M5.5 14.5 4 16" />
+                </g>
+                <text x="178" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#059669">NODE 01</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14.5" font-weight="700" fill="#14532D">Solar &amp; Offshore Wind</text>
+                <text id="svgNode0Metric" x="16" y="106" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" fill="#059669">142.8 MW</text>
+                <rect x="16" y="124" width="198" height="20" rx="10" fill="#EEF4F0" />
+                <text x="26" y="138" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">CF 68.4% · Bifacial + 15MW Turbines</text>
+              </g>
+
+              <!-- NODE 02: AI Load Inverter -->
+              <g class="pipeline-node-group" data-node="1" onclick="selectPipelineNode(1)" transform="translate(308, 28)">
+                <rect class="node-ring-pulse" x="-4" y="-4" width="238" height="168" rx="26" fill="none" stroke="#84CC16" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="node-card-bg" x="0" y="0" width="230" height="160" rx="22" fill="#FFFFFF" fill-opacity="0.94" stroke="#DCE8E0" stroke-width="1.5" filter="url(#cardSoftShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#F7FEE7" stroke="#BEF264" />
+                <g transform="translate(25, 25)" stroke="#65A30D" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="2" width="16" height="16" rx="3" />
+                  <path d="M6 10h2.5l1.5-3 2 6 1.5-3H16" />
+                </g>
+                <text x="178" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#65A30D">NODE 02</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14.5" font-weight="700" fill="#14532D">AI Load Inverter</text>
+                <text id="svgNode1Metric" x="16" y="106" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" fill="#65A30D">99.4% Eff</text>
+                <rect x="16" y="124" width="198" height="20" rx="10" fill="#EEF4F0" />
+                <text x="26" y="138" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">SiC Grid-Forming · THD 0.38%</text>
+              </g>
+
+              <!-- NODE 03: Megapack BESS Storage -->
+              <g class="pipeline-node-group" data-node="2" onclick="selectPipelineNode(2)" transform="translate(598, 28)">
+                <rect class="node-ring-pulse" x="-4" y="-4" width="238" height="168" rx="26" fill="none" stroke="#84CC16" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="node-card-bg" x="0" y="0" width="230" height="160" rx="22" fill="#FFFFFF" fill-opacity="0.94" stroke="#DCE8E0" stroke-width="1.5" filter="url(#cardSoftShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#ECFDF5" stroke="#A7F3D0" />
+                <g transform="translate(25, 25)" stroke="#059669" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="5" width="16" height="10" rx="2" />
+                  <path d="M19 8v4M5 8v4M9 8v4M13 8v4" />
+                </g>
+                <text x="178" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#059669">NODE 03</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14.5" font-weight="700" fill="#14532D">Megapack BESS Storage</text>
+                <text id="svgNode2Metric" x="16" y="106" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" fill="#14532D">380 MWh</text>
+                <rect x="16" y="124" width="198" height="20" rx="10" fill="#EEF4F0" />
+                <text x="26" y="138" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">SoC 94.2% · 4-Hour Peak Reserve</text>
+              </g>
+
+              <!-- NODE 04: Zero-Carbon City & DAC Plant -->
+              <g class="pipeline-node-group" data-node="3" onclick="selectPipelineNode(3)" transform="translate(888, 28)">
+                <rect class="node-ring-pulse" x="-4" y="-4" width="222" height="168" rx="26" fill="none" stroke="#84CC16" stroke-width="2" stroke-dasharray="6 4" />
+                <rect class="node-card-bg" x="0" y="0" width="214" height="160" rx="22" fill="#FFFFFF" fill-opacity="0.94" stroke="#DCE8E0" stroke-width="1.5" filter="url(#cardSoftShadow)" />
+                <rect x="16" y="16" width="38" height="38" rx="12" fill="#F0FDF4" stroke="#BBF7D0" />
+                <g transform="translate(25, 25)" stroke="#14532D" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 18h14M5 18V8l5-4 5 4v10M9 18v-4h2v4" />
+                </g>
+                <text x="162" y="34" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#14532D">NODE 04</text>
+                <text x="16" y="80" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700" fill="#14532D">Zero-Carbon City &amp; DAC</text>
+                <text id="svgNode3Metric" x="16" y="106" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" fill="#059669">-1,842 tCO2</text>
+                <rect x="16" y="124" width="182" height="20" rx="10" fill="#EEF4F0" />
+                <text x="24" y="138" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569">98.6k Homes + 14 Scrubbers</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Live Interactive Node Telemetry Readout Bar -->
+        <div class="mt-3 soft-well rounded-2xl p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-forest text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-sm" id="readoutNodeBadge">
+              N01
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 id="readoutNodeTitle" class="font-display font-bold text-sm sm:text-base text-forest">01 · Solar &amp; Offshore Wind Array Cluster</h3>
+                <span id="readoutStatusPill" class="px-2 py-0.5 rounded-full text-[12.5px] font-mono font-semibold bg-emeraldEco/10 text-emeraldEco">OPTIMAL MPPT LOCK</span>
+              </div>
+              <p id="readoutNodeDesc" class="text-xs text-slateEco mt-0.5">36 offshore 15MW direct-drive turbines + 72-hectare bifacial solar tracker field feeding HVDC collector bus.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 pt-3 lg:pt-0 border-t lg:border-t-0 border-forest/10">
+            <div>
+              <p class="text-xs font-mono uppercase text-slateEco">Voltage Bus</p>
+              <p id="readoutVoltage" class="font-mono font-bold text-xs sm:text-sm text-forest tabular-nums">380.4 kV AC</p>
+            </div>
+            <div>
+              <p class="text-xs font-mono uppercase text-slateEco">Thermal State</p>
+              <p id="readoutThermal" class="font-mono font-bold text-xs sm:text-sm text-emeraldEco tabular-nums">31.2°C Nominal</p>
+            </div>
+            <div>
+              <p class="text-xs font-mono uppercase text-slateEco">SCADA Latency</p>
+              <p id="readoutLatency" class="font-mono font-bold text-xs sm:text-sm text-forest tabular-nums">4.1 ms Fiber</p>
+            </div>
+            <div>
+              <p class="text-xs font-mono uppercase text-slateEco">Carbon Flux</p>
+              <p id="readoutCarbon" class="font-mono font-bold text-xs sm:text-sm text-bioLime tabular-nums">-76.8 tCO2e/hr</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. DUAL VISUAL DATA BENTO ROW (8 COLS AREA CHART + 4 COLS ESG RADIAL GAUGE) -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- Left (8 Cols): Interactive 24h / 7d / 30d Solar + Wind Generation vs Demand Smooth SVG Area Chart -->
+        <div id="sec-chart" class="lg:col-span-8 dew-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 class="font-display font-bold text-lg sm:text-xl text-forest">Clean Generation vs. Regional Grid Demand</h2>
+              <p class="text-xs text-slateEco mt-0.5">Combined Offshore Wind + Bifacial Solar output against municipal &amp; DAC load (MW)</p>
+            </div>
+
+            <!-- Timeframe Switcher -->
+            <div class="flex items-center gap-3">
+              <div class="soft-well p-1 rounded-xl inline-flex items-center gap-1" role="tablist" aria-label="Chart Horizon">
+                <button onclick="switchChartHorizon('24h')" data-horizon="24h" class="horizon-tab px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-white text-forest shadow-2xs transition">24H</button>
+                <button onclick="switchChartHorizon('7d')" data-horizon="7d" class="horizon-tab px-3 py-1 rounded-lg text-xs font-mono font-medium text-slateEco hover:text-forest transition">7D</button>
+                <button onclick="switchChartHorizon('30d')" data-horizon="30d" class="horizon-tab px-3 py-1 rounded-lg text-xs font-mono font-medium text-slateEco hover:text-forest transition">30D</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legend Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-4 text-xs">
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="inline-flex items-center gap-2 font-medium text-forest">
+                <span class="w-3 h-3 rounded-full bg-emeraldEco inline-block ring-2 ring-emeraldEco/25"></span>
+                Solar + Wind Generation (MW)
+              </span>
+              <span class="inline-flex items-center gap-2 font-medium text-slateEco">
+                <span class="w-3.5 h-0.5 bg-solarAmber inline-block"></span>
+                Municipal + DAC Demand (MW)
+              </span>
+            </div>
+            <div class="font-mono text-xs text-emeraldEco font-semibold tabular-nums" id="chartNetSummary">
+              Peak Clean Surplus: +38.4 MW → BESS + DAC
+            </div>
+          </div>
+
+          <!-- Interactive SVG Area Chart Container -->
+          <div class="relative w-full h-[290px] sm:h-[320px] select-none" id="areaChartWrap">
+            <svg id="genDemandSvg" class="w-full h-full overflow-visible" viewBox="0 0 760 285" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="genAreaFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#059669" stop-opacity="0.34" />
+                  <stop offset="65%" stop-color="#84CC16" stop-opacity="0.12" />
+                  <stop offset="100%" stop-color="#059669" stop-opacity="0.0" />
+                </linearGradient>
+                <linearGradient id="demandAreaFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#D97706" stop-opacity="0.12" />
+                  <stop offset="100%" stop-color="#D97706" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+
+              <!-- Horizontal Grid Lines -->
+              <g stroke="#14532D" stroke-opacity="0.08" stroke-dasharray="4 4" stroke-width="1">
+                <line x1="44" y1="28" x2="746" y2="28" />
+                <line x1="44" y1="84" x2="746" y2="84" />
+                <line x1="44" y1="140" x2="746" y2="140" />
+                <line x1="44" y1="196" x2="746" y2="196" />
+                <line x1="44" y1="252" x2="746" y2="252" />
+              </g>
+
+              <!-- Y-Axis Labels -->
+              <g font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B" text-anchor="end">
+                <text x="36" y="32" id="yMaxLbl">180</text>
+                <text x="36" y="88" id="yQ3Lbl">135</text>
+                <text x="36" y="144" id="yMidLbl">90</text>
+                <text x="36" y="200" id="yQ1Lbl">45</text>
+                <text x="36" y="256">0</text>
+              </g>
+
+              <!-- Dynamic Smooth Curves -->
+              <path id="demandAreaPath" d="" fill="url(#demandAreaFill)" />
+              <path id="genAreaPath" d="" fill="url(#genAreaFill)" />
+              <path id="demandLinePath" d="" fill="none" stroke="#D97706" stroke-width="2.2" stroke-dasharray="6 4" stroke-linecap="round" />
+              <path id="genLinePath" d="" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" />
+
+              <!-- X-Axis Labels Group -->
+              <g id="xAxisLabels" font-family="JetBrains Mono, monospace" font-size="12" fill="#64748B" text-anchor="middle"></g>
+
+              <!-- Hover Crosshair Group -->
+              <g id="chartCrosshair" class="opacity-0 transition-opacity duration-150 pointer-events-none">
+                <line id="crosshairLine" x1="200" y1="22" x2="200" y2="252" stroke="#14532D" stroke-width="1.3" stroke-dasharray="3 3" />
+                <circle id="crosshairGenDot" cx="200" cy="90" r="6" fill="#059669" stroke="#FFFFFF" stroke-width="2.5" />
+                <circle id="crosshairDemDot" cx="200" cy="120" r="5" fill="#D97706" stroke="#FFFFFF" stroke-width="2" />
+              </g>
+
+              <!-- Invisible Mouse Capture Overlay -->
+              <rect id="chartHitbox" x="44" y="18" width="702" height="240" fill="transparent" class="cursor-crosshair" />
+            </svg>
+
+            <!-- Floating Frosted Tooltip -->
+            <div id="chartTooltip" class="pointer-events-none opacity-0 transition-opacity duration-150 absolute top-3 left-14 z-20 rounded-2xl bg-white/95 backdrop-blur-xl border border-forest/15 shadow-xl px-3.5 py-2.5 min-w-[196px]">
+              <div class="flex items-center justify-between gap-3 pb-1.5 mb-1.5 border-b border-forest/10">
+                <span id="ttLabel" class="font-mono text-[12.5px] font-bold text-forest">14:00 UTC</span>
+                <span id="ttSurplus" class="font-mono text-xs font-semibold px-1.5 py-0.5 rounded bg-emeraldEco/10 text-emeraldEco">+30.8 MW</span>
+              </div>
+              <div class="space-y-1 text-xs">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slateEco flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emeraldEco"></span>Clean Gen</span>
+                  <span id="ttGen" class="font-mono font-bold text-forest tabular-nums">142.8 MW</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slateEco flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-solarAmber"></span>Grid Demand</span>
+                  <span id="ttDem" class="font-mono font-semibold text-slateEco tabular-nums">112.0 MW</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right (4 Cols): ESG Net-Zero Scope 1 · 2 · 3 Radial SVG Multi-Ring Gauge + Microgrid Node Status Bars -->
+        <div id="sec-esg" class="lg:col-span-4 dew-glass rounded-[28px] p-5 sm:p-7 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <h2 class="font-display font-bold text-lg text-forest">ESG Net-Zero Scope 1·2·3</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-[12.5px] font-mono font-bold bg-emeraldEco/10 text-emeraldEco">AAA RATED</span>
+            </div>
+            <p class="text-xs text-slateEco mt-0.5">SBTi Verified Decarbonization Compliance</p>
+
+            <!-- Multi-Ring Radial SVG Gauge -->
+            <div class="my-5 flex items-center gap-5">
+              <div class="relative w-36 h-36 shrink-0">
+                <svg class="w-full h-full" viewBox="0 0 160 160" aria-label="ESG Scope 1, 2, and 3 Radial Compliance Gauge">
+                  <!-- Track Rings -->
+                  <circle cx="80" cy="80" r="64" fill="none" stroke="#E2ECE5" stroke-width="9" />
+                  <circle cx="80" cy="80" r="49" fill="none" stroke="#E2ECE5" stroke-width="9" />
+                  <circle cx="80" cy="80" r="34" fill="none" stroke="#E2ECE5" stroke-width="9" />
+
+                  <!-- Scope 1 Outer Ring (circumference = 2*pi*64 = 402.12) -->
+                  <circle id="ringScope1" class="gauge-ring" cx="80" cy="80" r="64" fill="none" stroke="#14532D" stroke-width="9" stroke-linecap="round" stroke-dasharray="402.12" stroke-dashoffset="8.04" />
+                  <!-- Scope 2 Middle Ring (circumference = 2*pi*49 = 307.88) -->
+                  <circle id="ringScope2" class="gauge-ring" cx="80" cy="80" r="49" fill="none" stroke="#059669" stroke-width="9" stroke-linecap="round" stroke-dasharray="307.88" stroke-dashoffset="12.31" />
+                  <!-- Scope 3 Inner Ring (circumference = 2*pi*34 = 213.63) -->
+                  <circle id="ringScope3" class="gauge-ring" cx="80" cy="80" r="34" fill="none" stroke="#84CC16" stroke-width="9" stroke-linecap="round" stroke-dasharray="213.63" stroke-dashoffset="32.04" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span id="esgCompositeVal" class="font-mono font-extrabold text-lg text-forest tabular-nums">94.8%</span>
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slateEco">Net-Zero</span>
+                </div>
+              </div>
+
+              <!-- Scope Legend Breakdown -->
+              <div class="flex-1 space-y-2.5 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="flex items-center gap-2 font-medium text-forest">
+                    <span class="w-2.5 h-2.5 rounded-full bg-forest"></span>Scope 1 Direct
+                  </span>
+                  <span id="lblScope1" class="font-mono font-bold text-forest tabular-nums">98.0%</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="flex items-center gap-2 font-medium text-forest">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emeraldEco"></span>Scope 2 Grid
+                  </span>
+                  <span id="lblScope2" class="font-mono font-bold text-emeraldEco tabular-nums">96.0%</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="flex items-center gap-2 font-medium text-forest">
+                    <span class="w-2.5 h-2.5 rounded-full bg-bioLimeBright"></span>Scope 3 Supply
+                  </span>
+                  <span id="lblScope3" class="font-mono font-bold text-bioLime tabular-nums">85.0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Microgrid Node Status Bars -->
+          <div class="pt-4 border-t border-forest/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-forest">Microgrid Node Health</h3>
+              <span class="text-[12.5px] font-mono text-emeraldEco font-semibold">4 / 4 Synced</span>
+            </div>
+
+            <div id="microgridBars" class="space-y-3">
+              <!-- Populated dynamically by JS per region -->
+            </div>
+          </div>
+        </div>
+
+      </section>
+      </div>
+
+      <!-- Dedicated Sidebar Sub-Page View -->
+      <div id="tabSubpageView" class="hidden space-y-6"></div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="px-4 sm:px-6 lg:px-8 py-4 mt-2">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slateEco border-t border-forest/10 pt-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emeraldEco"></span>
+          <span class="font-medium text-forest">VERDANT OS Autonomous Grid Kernel</span>
+          <span>· IEC 61850 &amp; IEEE 2030.5 Compliant</span>
+        </div>
+        <div class="font-mono text-[12.5px] tabular-nums">
+          Telemetry Checksum: <span class="text-forest font-semibold">0x9F4A·ECO·2026</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- AI Autobalance Dispatch Modal -->
+  <div id="dispatchModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-forestDeep/35 backdrop-blur-sm">
+    <div class="dew-glass rounded-[28px] max-w-md w-full p-6 space-y-4 border border-white shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emeraldEco/10 text-emeraldEco flex items-center justify-center">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-base text-forest">AI Inverter Autobalance</h3>
+            <p class="text-xs text-slateEco">Zero-Curtailment Dispatch Optimizer</p>
+          </div>
+        </div>
+        <button onclick="closeDispatchModal()" class="w-8 h-8 rounded-xl soft-well flex items-center justify-center text-slateEco hover:text-forest">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="soft-well rounded-2xl p-4 space-y-3 text-xs">
+        <div class="flex justify-between">
+          <span class="text-slateEco">Selected Grid Cluster</span>
+          <span id="modalRegionName" class="font-mono font-bold text-forest">Nordic Hydro-Wind</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slateEco">BESS Peak-Shaving Allocation</span>
+          <span class="font-mono font-semibold text-emeraldEco">62% Reserve / 38% Arbitrage</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slateEco">DAC Scrubber Ramp Target</span>
+          <span class="font-mono font-semibold text-bioLime">+4.8 MW Surplus Absorb</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label for="dacSlider" class="flex justify-between text-xs font-medium text-forest">
+          <span>Carbon Scrubber Priority Weight</span>
+          <span id="dacSliderVal" class="font-mono font-bold text-emeraldEco">85%</span>
+        </label>
+        <input id="dacSlider" type="range" min="40" max="100" value="85" oninput="document.getElementById('dacSliderVal').textContent = this.value + '%'" class="w-full accent-emerald-600 cursor-pointer" />
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button onclick="closeDispatchModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slateEco hover:bg-white/70 transition">Cancel</button>
+        <button onclick="commitAutobalance()" class="tactile-btn px-4 py-2 rounded-xl text-xs font-semibold">Commit Dispatch Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtle Floating Notification Toast -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300 dew-glass rounded-2xl px-4 py-3 flex items-center gap-2.5 shadow-xl">
+    <span class="w-2.5 h-2.5 rounded-full bg-emeraldEco shrink-0"></span>
+    <span id="toastText" class="text-xs font-semibold text-forest">Action synchronized.</span>
+  </div>
+
+  <script>
+    // Regional Telemetry Dataset
+    const REGIONS = {
+      nordic: {
+        name: 'Nordic Hydro-Wind',
+        tag: 'NO-04 NORDIC HYDRO-WIND CLUSTER',
+        intensity: '18g CO2/kWh · 96.4% Renewable',
+        renewablePct: 96.4,
+        hz: '50.02 Hz',
+        subcopy: 'AI-orchestrated hydro-wind dispatch paired with solid-sorbent Direct Air Capture scrubbers. Sub-second inverter Curtailment Zeroing keeps regional grid inertia locked at 50.02 Hz.',
+        surplus: '+38.4 MW',
+        dacDraw: '22.6 MW',
+        spot: '$41.80/MWh',
+        kpis: {
+          genVal: '142.8 MW', genDelta: '+14.2%', genSub: '88.4 MW Wind · 54.4 MW Solar',
+          bessVal: '94.2%', bessCap: '380 MWh', bessDelta: 'Charging +16.4 MW', bessSub: 'LFP Cell Temp 23.4°C',
+          dacVal: '-1,842 tCO2e', dacDelta: '+22.6% vs Target', dacSub: 'Mineralized Basalt Lock',
+          revVal: '$284,900', revDelta: '+18.4% Arbitrage', revSub: 'FCR-N + Carbon Credits'
+        },
+        nodeMetrics: ['142.8 MW', '99.4% Eff', '380 MWh', '-1,842 tCO2'],
+        esg: { composite: '94.8%', s1: 98.0, s2: 96.0, s3: 85.0 },
+        microgrids: [
+          { name: 'Stavanger Offshore HVDC', load: '94%', mw: '64.2 MW', color: '#059669' },
+          { name: 'Bergen Fjord Pumped-Hydro', load: '88%', mw: '41.0 MW', color: '#65A30D' },
+          { name: 'Tromso Basalt DAC Plant', load: '91%', mw: '22.6 MW', color: '#14532D' },
+          { name: 'Oslo District V2G Fleet', load: '79%', mw: '15.0 MW', color: '#84CC16' }
+        ],
+        charts: {
+          '24h': {
+            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+            gen: [108, 114, 129, 156, 148, 136, 142.8],
+            dem: [84, 80, 104, 118, 122, 115, 104.4],
+            yMax: 180,
+            summary: 'Peak Clean Surplus: +38.4 MW → BESS + DAC'
+          },
+          '7d': {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            gen: [128, 135, 149, 141, 158, 146, 142.8],
+            dem: [106, 112, 115, 118, 121, 98, 101],
+            yMax: 180,
+            summary: '7-Day Net Carbon Capture: -12,480 tCO2e'
+          },
+          '30d': {
+            labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Now'],
+            gen: [119, 126, 138, 144, 151, 147, 142.8],
+            dem: [102, 108, 111, 114, 116, 109, 104.4],
+            yMax: 180,
+            summary: '30-Day Renewable Availability: 99.94%'
+          }
+        }
+      },
+      california: {
+        name: 'California Solar',
+        tag: 'CAISO-SP15 MOJAVE SOLAR + BESS',
+        intensity: '24g CO2/kWh · 93.8% Renewable',
+        renewablePct: 93.8,
+        hz: '60.00 Hz',
+        subcopy: 'High-irradiance Mojave bifacial tracker arrays coupled with 620 MWh utility Megapacks eliminating evening duck-curve ramp stress with zero gas peaker dispatch.',
+        surplus: '+54.2 MW',
+        dacDraw: '28.0 MW',
+        spot: '$52.40/MWh',
+        kpis: {
+          genVal: '218.6 MW', genDelta: '+19.8%', genSub: '176.2 MW Solar · 42.4 MW Wind',
+          bessVal: '96.8%', bessCap: '620 MWh', bessDelta: 'Charging +26.2 MW', bessSub: 'Liquid Cooled 25.1°C',
+          dacVal: '-2,310 tCO2e', dacDelta: '+27.4% vs Target', dacSub: 'Saline Aquifer Sequestration',
+          revVal: '$412,600', revDelta: '+24.1% Arbitrage', revSub: 'CAISO Peak Evening Spread'
+        },
+        nodeMetrics: ['218.6 MW', '99.6% Eff', '620 MWh', '-2,310 tCO2'],
+        esg: { composite: '93.2%', s1: 97.0, s2: 94.0, s3: 83.0 },
+        microgrids: [
+          { name: 'Mojave Tracker Alpha', load: '97%', mw: '112.4 MW', color: '#059669' },
+          { name: 'Kern Valley Megapack Hub', load: '96%', mw: '63.8 MW', color: '#65A30D' },
+          { name: 'Bakersfield DAC Contactor', load: '89%', mw: '28.0 MW', color: '#14532D' },
+          { name: 'Bay Area Campus Microgrid', load: '82%', mw: '14.4 MW', color: '#D97706' }
+        ],
+        charts: {
+          '24h': {
+            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+            gen: [92, 88, 164, 234, 226, 172, 158],
+            dem: [104, 96, 128, 162, 178, 168, 134],
+            yMax: 260,
+            summary: 'Solar Midday Peak: 234.0 MW · Zero Clipping'
+          },
+          '7d': {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            gen: [198, 212, 225, 219, 231, 224, 218.6],
+            dem: [154, 162, 168, 171, 175, 149, 152],
+            yMax: 260,
+            summary: '7-Day Duck-Curve Peak Shaved: 1.48 GWh'
+          },
+          '30d': {
+            labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Now'],
+            gen: [184, 196, 208, 215, 222, 220, 218.6],
+            dem: [148, 155, 160, 166, 169, 158, 154],
+            yMax: 260,
+            summary: '30-Day LCFS + Carbon Credit Yield: $1.84M'
+          }
+        }
+      },
+      singapore: {
+        name: 'Singapore Microgrid',
+        tag: 'SG-JURONG FLOATING SOLAR & MARINE GRID',
+        intensity: '31g CO2/kWh · 91.2% Renewable',
+        renewablePct: 91.2,
+        hz: '50.00 Hz',
+        subcopy: 'High-density coastal floating PV arrays integrated with subsea HVDC import interconnectors and tropical district-cooling thermal storage.',
+        surplus: '+19.8 MW',
+        dacDraw: '14.2 MW',
+        spot: '$64.10/MWh',
+        kpis: {
+          genVal: '96.4 MW', genDelta: '+11.6%', genSub: '74.0 MW Floating PV · 22.4 MW Import',
+          bessVal: '91.5%', bessCap: '240 MWh', bessDelta: 'Balancing +9.8 MW', bessSub: 'Marine-Grade Enclosure 26.2°C',
+          dacVal: '-1,120 tCO2e', dacDelta: '+16.9% vs Target', dacSub: 'Green Concrete Mineralization',
+          revVal: '$196,400', revDelta: '+15.2% Arbitrage', revSub: 'EMA Demand Response Tier 1'
+        },
+        nodeMetrics: ['96.4 MW', '99.2% Eff', '240 MWh', '-1,120 tCO2'],
+        esg: { composite: '91.4%', s1: 96.0, s2: 92.0, s3: 81.0 },
+        microgrids: [
+          { name: 'Tengeh Floating PV Array', load: '93%', mw: '48.2 MW', color: '#059669' },
+          { name: 'Jurong Island BESS Vault', load: '91%', mw: '24.0 MW', color: '#65A30D' },
+          { name: 'Tuas Marine Carbon Mineralizer', load: '86%', mw: '14.2 MW', color: '#14532D' },
+          { name: 'Marina District Cooling Loop', load: '78%', mw: '10.0 MW', color: '#84CC16' }
+        ],
+        charts: {
+          '24h': {
+            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+            gen: [68, 66, 88, 112, 106, 89, 96.4],
+            dem: [62, 60, 78, 89, 92, 84, 76.6],
+            yMax: 140,
+            summary: 'Floating PV Cooling Gain: +8.4% Panel Yield'
+          },
+          '7d': {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            gen: [88, 92, 97, 95, 102, 99, 96.4],
+            dem: [76, 79, 82, 84, 85, 74, 76.6],
+            yMax: 140,
+            summary: '7-Day District Cooling Offset: 610 MWh'
+          },
+          '30d': {
+            labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Now'],
+            gen: [84, 89, 91, 94, 98, 97, 96.4],
+            dem: [74, 77, 79, 81, 82, 78, 76.6],
+            yMax: 140,
+            summary: '30-Day Tropical Grid Resilience: 100.0%'
+          }
+        }
+      }
+    };
+
+    const PIPELINE_NODES = [
+      {
+        badge: 'N01',
+        title: '01 · Solar & Offshore Wind Array Cluster',
+        status: 'OPTIMAL MPPT LOCK',
+        desc: '36 offshore 15MW direct-drive turbines + 72-hectare bifacial solar tracker field feeding HVDC collector bus.',
+        voltage: '380.4 kV AC',
+        thermal: '31.2°C Nominal',
+        latency: '4.1 ms Fiber',
+        carbon: '-76.8 tCO2e/hr'
+      },
+      {
+        badge: 'N02',
+        title: '02 · Silicon-Carbide AI Grid-Forming Inverter',
+        status: 'SYNTHETIC INERTIA ON',
+        desc: 'Autonomous neural harmonic cancellation maintaining <0.4% THD and sub-cycle reactive power compensation.',
+        voltage: '380.0 kV DC/AC',
+        thermal: '38.6°C Liquid',
+        latency: '0.8 ms FPGA',
+        carbon: '99.4% Conversion'
+      },
+      {
+        badge: 'N03',
+        title: '03 · Utility LFP Megapack BESS Vault',
+        status: 'PEAK RESERVE 94.2%',
+        desc: 'Cell-level EIS impedance telemetry across 96 modular LFP enclosures providing 4-hour blackout islanding.',
+        voltage: '1,500 V DC Bus',
+        thermal: '23.4°C Balanced',
+        latency: '2.3 ms BMS',
+        carbon: '0.0% Curtailment'
+      },
+      {
+        badge: 'N04',
+        title: '04 · Zero-Carbon Municipal Grid & DAC Scrubbers',
+        status: 'MINERALIZING CO2',
+        desc: 'Powers 98,600 zero-emission households while routing surplus clean megawatts into 14 solid-sorbent DAC contactors.',
+        voltage: '132.0 kV Dist',
+        thermal: '88.0°C Regen',
+        latency: '6.4 ms ISO-Verified',
+        carbon: '-1,842 tCO2e/day'
+      }
+    ];
+
+    let currentRegion = 'nordic';
+    let currentHorizon = '24h';
+    let currentNodeIdx = 0;
+    let flowPaused = false;
+
+    // Sidebar Collapse & Mobile Drawer
+    function toggleSidebar() {
+      document.body.classList.toggle('sidebar-collapsed');
+    }
+
+    function toggleMobileNav() {
+      const open = document.body.classList.toggle('mobile-nav-open');
+      document.getElementById('mobileOverlay').classList.toggle('hidden', !open);
+    }
+
+    let activeEcoModule = 'Grid Overview';
+
+    const ECO_SUBPAGES = {
+      'Solar & Wind Arrays': {
+        badge: 'MPPT & OFFSHORE TURBINE SCADA',
+        title: 'Solar & Offshore Wind Array Telemetry',
+        subtitle: 'Sub-second bifacial tracker pitch optimization, offshore direct-drive nacelle telemetry, and zero-clipping HVDC collector routing.',
+        kpis: [
+          { label: 'Combined Clean Output', val: '142.8 MW', delta: '+14.2% Yield', tone: 'emerald', sub: '88.4 MW Wind · 54.4 MW Solar' },
+          { label: 'MPPT Inverter Efficiency', val: '99.4%', delta: 'SiC Grid-Forming', tone: 'lime', sub: 'THD < 0.35% harmonic lock' },
+          { label: 'Curtailment Loss Ratio', val: '0.00%', delta: 'Surplus -> DAC', tone: 'emerald', sub: 'Zero spilled megawatt-hours' },
+          { label: 'Mean Rotor Wind Speed', val: '11.8 m/s', delta: '36 / 36 Turbines', tone: 'amber', sub: 'North Sea HVDC Corridor' }
+        ],
+        visualTitle: 'Collector Array Capacity Factor & Irradiance',
+        visualSub: 'Real-time generation efficiency across wind and bifacial PV sectors',
+        curve: 'M 14,92 C 78,74 145,58 212,42 C 278,30 335,24 388,18',
+        bars: [
+          { name: 'Offshore Wind String Alpha (18x 15MW)', pct: 94, val: '52.4 MW · Yaw Locked', color: '#059669' },
+          { name: 'Offshore Wind String Beta (18x 15MW)', pct: 86, val: '36.0 MW · Optimal Pitch', color: '#14532D' },
+          { name: 'Bifacial Tracker Field North', pct: 91, val: '31.8 MW · +9% Albedo Gain', color: '#65A30D' },
+          { name: 'Floating Reservoir PV Array', pct: 84, val: '22.6 MW · Water-Cooled', color: '#D97706' }
+        ],
+        tableTitle: 'Active Generation Strings & Inverter Controls',
+        actionCol: 'SCADA Action',
+        rows: [
+          { id: 'ARR-W01', col1: 'Stavanger Offshore String A', col2: '18 Direct-Drive 15MW', col3: '52.4 MW @ 380kV', status: 'MPPT Locked', done: 'Yaw Optimized', btn: 'Trim Wake Yaw', toast: 'Applied AI wake-steering yaw +2.4 deg on Stavanger String A.' },
+          { id: 'ARR-W02', col1: 'Stavanger Offshore String B', col2: '18 Direct-Drive 15MW', col3: '36.0 MW @ 380kV', status: 'Nominal', done: 'Inertia Boosted', btn: 'Sync Inertia', toast: 'Synthetic inertia droop curve synchronized on Offshore String B.' },
+          { id: 'ARR-S01', col1: 'Bifacial Single-Axis Sector 1', col2: '38,000 N-Type TOPCon', col3: '31.8 MW DC/AC', status: 'Peak Sun', done: 'Trackers +4 deg', btn: 'Align Albedo', toast: 'Bifacial tilt adjusted for diffused cloud-edge irradiance.' },
+          { id: 'ARR-S02', col1: 'Hydro-Basin Floating PV', col2: '24,000 Marine Modules', col3: '22.6 MW DC/AC', status: '21.4 C Panel', done: 'Soiling Cleared', btn: 'Run Dry-Sweep', toast: 'Dispatched autonomous dry-brush cleaning robots across Floating PV.' },
+          { id: 'ARR-INV', col1: 'SiC HVDC Collector Substation', col2: 'Dual Redundant Bus', col3: '99.42% Conv.', status: 'Lossless', done: 'Harmonics <0.3%', btn: 'Calibrate THD', toast: 'Active harmonic filter recalibrated to 0.28% THD.' }
+        ]
+      },
+      'BESS Storage': {
+        badge: 'UTILITY LFP MEGAPACK VAULT',
+        title: 'Battery Energy Storage System (BESS) & BMS',
+        subtitle: 'Cell-level electrochemical impedance spectroscopy (EIS), 4-hour islanding reserves, and FCR-N frequency arbitrage.',
+        kpis: [
+          { label: 'State of Charge (SoC)', val: '94.2%', delta: '380 MWh Stored', tone: 'lime', sub: 'Charging +16.4 MW clean' },
+          { label: 'State of Health (SoH)', val: '99.1%', delta: 'Cycle #418', tone: 'emerald', sub: 'Zero thermal runaway alerts' },
+          { label: 'Sub-Cycle Grid Response', val: '14 ms', delta: 'FCR-N / FFR Ready', tone: 'emerald', sub: 'Beats 150ms ISO requirement' },
+          { label: 'Mean LFP Enclosure Temp', val: '23.4 C', delta: 'Glycol Balanced', tone: 'amber', sub: 'Cell delta < 0.8 C' }
+        ],
+        visualTitle: 'Enclosure SoC Balance & Dispatch Reserve',
+        visualSub: 'Real-time charge distribution across modular 1,500V DC vaults',
+        curve: 'M 14,88 C 82,78 148,62 214,48 C 280,34 336,26 388,20',
+        bars: [
+          { name: 'Vault Block A — Primary Frequency FFR', pct: 96, val: '96.0% SoC · 120 MWh', color: '#059669' },
+          { name: 'Vault Block B — Evening Peak Shaving', pct: 95, val: '95.2% SoC · 120 MWh', color: '#65A30D' },
+          { name: 'Vault Block C — Black-Start Islanding', pct: 98, val: '98.0% SoC · 80 MWh', color: '#14532D' },
+          { name: 'Vault Block D — Spot Price Arbitrage', pct: 86, val: '86.4% SoC · 60 MWh', color: '#D97706' }
+        ],
+        tableTitle: 'LFP Rack Telemetry & BMS Dispatch Schedule',
+        actionCol: 'BMS Command',
+        rows: [
+          { id: 'BESS-01', col1: 'Megapack Block A (Racks 01-24)', col2: '1,500V DC · FFR Mode', col3: '96.0% · 23.1 C', status: 'Charging', done: 'Cells Balanced', btn: 'Balance Cells', toast: 'Active cell-voltage balancing completed (< 2mV spread) on Block A.' },
+          { id: 'BESS-02', col1: 'Megapack Block B (Racks 25-48)', col2: '1,500V DC · Peak Shave', col3: '95.2% · 23.6 C', status: 'Armed 17:00', done: 'Bid Locked $68', btn: 'Lock Peak Bid', toast: 'Evening peak discharge bid locked at $68.40/MWh.' },
+          { id: 'BESS-03', col1: 'Megapack Block C (Racks 49-72)', col2: 'Hospital & Port Backup', col3: '98.0% · 22.9 C', status: 'Island Ready', done: 'Transfer Tested', btn: 'Test Islanding', toast: 'Zero-blink 8ms microgrid islanding simulation verified on Block C.' },
+          { id: 'BESS-04', col1: 'Megapack Block D (Racks 73-96)', col2: 'Intraday Arbitrage', col3: '86.4% · 24.0 C', status: 'Absorbing', done: 'Ramped +6 MW', btn: 'Absorb Surplus', toast: 'Increased clean wind surplus charge rate by +6.0 MW on Block D.' },
+          { id: 'BESS-THM', col1: 'Closed-Loop Glycol Chiller Bus', col2: 'COP 4.8 Heat Recovery', col3: 'Delta-T 0.7 C', status: 'Optimal', done: 'Routed to DAC', btn: 'Recover Heat', toast: 'Waste inverter heat routed to pre-warm solid-sorbent DAC beds.' }
+        ]
+      },
+      'Carbon DAC': {
+        badge: 'SOLID-SORBENT DIRECT AIR CAPTURE',
+        title: 'Carbon DAC Scrubbers & Basalt Mineralization',
+        subtitle: 'Surplus renewable power converted into permanent geological carbon removal via amine-functionalized contactors.',
+        kpis: [
+          { label: 'Daily Net CO2 Captured', val: '-1,842 t', delta: '+22.6% vs Plan', tone: 'emerald', sub: 'ISO-14064 metered mass flow' },
+          { label: 'Active DAC Contactors', val: '14 / 14', delta: '22.6 MW Draw', tone: 'lime', sub: '100% zero-carbon powered' },
+          { label: 'Specific Energy Intensity', val: '1,380 kWh/t', delta: '-9.4% Heat Recov', tone: 'emerald', sub: '88 C vacuum regeneration' },
+          { label: 'Basalt Injection Pressure', val: '42.8 bar', delta: '750m Subsurface', tone: 'amber', sub: 'Carbonate lock < 24 months' }
+        ],
+        visualTitle: 'Contactor Adsorption / Regeneration Cycle Efficiency',
+        visualSub: 'Real-time CO2 capture saturation and mineralization injection throughput',
+        curve: 'M 14,96 C 76,82 142,64 210,46 C 278,32 336,20 388,14',
+        bars: [
+          { name: 'Contactor Train 01-04 (Adsorption Phase)', pct: 94, val: '94% Sorbent Load · 418 ppm->98%', color: '#14532D' },
+          { name: 'Contactor Train 05-08 (Vacuum Steam Regen)', pct: 89, val: '88.0 C Regen · 99.2% Purity', color: '#059669' },
+          { name: 'Liquefaction & Compression Skids', pct: 92, val: '76.8 tCO2/hr · Zero Venting', color: '#65A30D' },
+          { name: 'Deep Basalt Wellhead #3 & #4', pct: 97, val: '42.8 bar · Tracer Verified', color: '#D97706' }
+        ],
+        tableTitle: 'DAC Contactor Trains & Wellhead Sequestration Log',
+        actionCol: 'Plant Control',
+        rows: [
+          { id: 'DAC-T1', col1: 'Sorbent Contactor Train 01-04', col2: 'Airflow 480,000 m3/h', col3: '-24.6 tCO2/hr', status: 'Adsorbing', done: 'Switched Regen', btn: 'Cycle Regen', toast: 'Initiated low-pressure 88 C vacuum regeneration on Train 01-04.' },
+          { id: 'DAC-T2', col1: 'Sorbent Contactor Train 05-08', col2: 'Waste-Heat Assisted', col3: '-26.1 tCO2/hr', status: 'Regenerating', done: 'Purged Pure CO2', btn: 'Verify Purity', toast: 'Gas chromatograph confirmed 99.4% CO2 stream purity.' },
+          { id: 'DAC-T3', col1: 'Sorbent Contactor Train 09-14', col2: 'Dynamic Wind-Following', col3: '-26.1 tCO2/hr', status: 'Ramping Up', done: 'Ramped +3.2 MW', btn: 'Ramp Surplus', toast: 'Ramped fan velocity +12% to absorb offshore wind gust surplus.' },
+          { id: 'INJ-W3', col1: 'Tromso Basalt Injection Well #03', col2: '780m Mafic Formation', col3: '42.8 bar Steady', status: 'Mineralizing', done: 'Isotope Logged', btn: 'Sample C-14', toast: 'Logged inline C-14 isotope tracer confirming rapid carbonate mineralization.' },
+          { id: 'MRV-09', col1: 'Puro.earth / Isometric Digital MRV', col2: 'Cryptographic Mass Meter', col3: '1,842 tCO2e Ready', status: 'Pending Sign', done: 'Minted Batch', btn: 'Mint CORCs', toast: 'Submitted signed SCADA mass-balance batch for 1,842 Removal Credits.' }
+        ]
+      },
+      'ESG Audit': {
+        badge: 'ISO-14064 & SBTi AAA COMPLIANCE',
+        title: 'Autonomous ESG Audit & Carbon Ledger Vault',
+        subtitle: 'Tamper-evident SHA-256 telemetry signing, hourly 24/7 Carbon-Free Energy (CFE) matching, and EU CSRD reporting.',
+        kpis: [
+          { label: 'Composite Net-Zero Score', val: '94.8%', delta: 'AAA Rated', tone: 'emerald', sub: 'SBTi 1.5C Science-Aligned' },
+          { label: 'Scope 1 & 2 Hourly CFE', val: '97.2%', delta: 'Granular I-REC', tone: 'lime', sub: '15-minute timestamp matched' },
+          { label: 'Scope 3 Supplier Coverage', val: '85.0%', delta: '+11.4% YoY', tone: 'emerald', sub: 'Primary LCA + EPD data' },
+          { label: 'Signed SCADA Checksums', val: '1.42M', delta: '0 Discrepancies', tone: 'amber', sub: 'External auditor read-only API' }
+        ],
+        visualTitle: 'Statutory ESG Framework Readiness',
+        visualSub: 'Automated evidence collection across global climate standards',
+        curve: 'M 14,86 C 80,74 148,58 216,44 C 282,30 338,22 388,16',
+        bars: [
+          { name: 'ISO 14064-1 GHG Inventory Verification', pct: 99, val: '99.4% Complete · DNV Ready', color: '#14532D' },
+          { name: 'EU CSRD ESRS E1 Climate Change Disclosure', pct: 96, val: '96.0% Tagged XBRL', color: '#059669' },
+          { name: 'EnergyTag 24/7 Granular Certificate Match', pct: 97, val: '97.2% Sub-Hourly Match', color: '#65A30D' },
+          { name: 'Taskforce TCFD Physical Grid Resilience', pct: 92, val: 'Scenario 1.5C & 2.0C', color: '#D97706' }
+        ],
+        tableTitle: 'Cryptographic Audit Trails & Regulatory Exports',
+        actionCol: 'Ledger Op',
+        rows: [
+          { id: 'AUD-101', col1: 'Q4 ISO-14064-1 Verification Bundle', col2: 'Scope 1, 2 & DAC Removals', col3: 'SHA-256 Verified', status: 'Ready', done: 'Exported Signed', btn: 'Export Bundle', toast: 'Signed ISO-14064-1 evidence bundle exported with Merkle proof.' },
+          { id: 'AUD-102', col1: 'EnergyTag 15-Min Granular GOO Log', col2: 'Nordic + CAISO + SG', col3: '97.2% Hourly CFE', status: 'Synced', done: 'Retired 840 MWh', btn: 'Stamp Certificates', toast: 'Timestamped 840 MWh of 15-minute granular Guarantees of Origin.' },
+          { id: 'AUD-103', col1: 'EU CSRD ESRS E1 Double Materiality', col2: 'Machine-Readable XBRL', col3: 'Zero Gaps', status: 'Validated', done: 'Filed Staging', btn: 'Validate XBRL', toast: 'ESRS E1 XBRL taxonomy validation passed with 0 warnings.' },
+          { id: 'AUD-104', col1: 'Hardware Lifecycle Embodied Carbon', col2: 'Turbine & LFP Cradle-Gate', col3: 'EPD Attached', status: '85% Audited', done: 'Updated LCA', btn: 'Refresh LCA', toast: 'Updated recycled-lithium & low-carbon steel EPD factors.' },
+          { id: 'AUD-105', col1: 'External Auditor Read-Only Enclave', col2: 'KPMG / DNV Node Access', col3: 'TLS 1.3 Active', status: 'Live Access', done: 'Token Rotated', btn: 'Rotate Key', toast: 'Rotated external auditor zero-trust API session certificate.' }
+        ]
+      },
+      'Microgrids': {
+        badge: '12 AUTONOMOUS REGIONAL CLUSTERS',
+        title: 'Distributed Microgrid Mesh & Synchrophasor Lock',
+        subtitle: 'IEEE 2030.5 distributed energy orchestration, V2G EV fleet dispatch, and phase-locked islanding resilience.',
+        kpis: [
+          { label: 'Synced Microgrid Clusters', val: '12 / 12', delta: '50.02 Hz Locked', tone: 'emerald', sub: 'PMU phase angle < 0.4 deg' },
+          { label: 'Connected V2G Bi-Dir EVs', val: '4,820', delta: '38.6 MW Flex', tone: 'lime', sub: 'Municipal & fleet chargers' },
+          { label: 'District Thermal Recovery', val: '64.0 MWt', delta: 'COP 4.9 Loop', tone: 'emerald', sub: 'Substation -> municipal heat' },
+          { label: 'IEEE 2030.5 Mesh Latency', val: '11.4 ms', delta: '99.998% Uptime', tone: 'amber', sub: 'Fiber + private 5G slice' }
+        ],
+        visualTitle: 'Cluster Load Factor & Local Self-Sufficiency',
+        visualSub: 'Real-time clean autonomy across Nordic, California, and Singapore nodes',
+        curve: 'M 14,90 C 80,76 146,66 212,50 C 278,38 335,28 388,20',
+        bars: [
+          { name: 'Stavanger Offshore HVDC Hub', pct: 94, val: '64.2 MW · 100% Clean Self-Supply', color: '#059669' },
+          { name: 'Bergen Fjord Pumped-Hydro Loop', pct: 88, val: '41.0 MW · Synchrophasor Master', color: '#65A30D' },
+          { name: 'Oslo V2G Bi-Directional Fleet', pct: 79, val: '15.0 MW · 4,820 EVs Online', color: '#14532D' },
+          { name: 'Jurong Tropical Cooling Microgrid', pct: 91, val: '48.2 MW · District Chiller Sync', color: '#D97706' }
+        ],
+        tableTitle: 'Regional Microgrid Controllers & Islanding Readiness',
+        actionCol: 'Grid Switch',
+        rows: [
+          { id: 'MG-NO1', col1: 'Stavanger Port & HVDC Microgrid', col2: '64.2 MW · Master Clock', col3: '50.02 Hz · 0.1 deg', status: 'Grid-Tied', done: 'Phase Verified', btn: 'Sync PMU', toast: 'Synchrophasor PMU phase angle verified within 0.08 degrees.' },
+          { id: 'MG-NO2', col1: 'Oslo Municipal V2G Aggregator', col2: '4,820 EVs · ISO 15118', col3: '+15.0 MW Reserve', status: 'Flex Armed', done: 'Dispatched +4MW', btn: 'Dispatch V2G', toast: 'Dispatched +4.0 MW V2G frequency support from Oslo EV fleet.' },
+          { id: 'MG-CA1', col1: 'Mojave Campus Solar-Storage Node', col2: '63.8 MW · 60.00 Hz', col3: '98% Autonomous', status: 'Peak Shave', done: 'Zero Import', btn: 'Zero Grid Import', toast: 'Switched Mojave Campus node to 100% self-supplied solar+BESS.' },
+          { id: 'MG-SG1', col1: 'Marina District Thermal-PV Loop', col2: '24.0 MW · Chiller Storage', col3: 'COP 4.9 Optimal', status: 'Pre-Cooling', done: 'Stored 40 MWh-t', btn: 'Pre-Cool Tank', toast: 'Activated midday solar thermal ice-storage pre-cooling cycle.' },
+          { id: 'MG-ARC', col1: 'Svalbard Arctic Research Microgrid', col2: '8.4 MW Wind + H2 Fuel Cell', col3: '100% Islanded', status: 'Islanded OK', done: 'H2 Reserve 96%', btn: 'Check H2 Tank', toast: 'Svalbard green hydrogen seasonal reserve verified at 96.2%.' }
+        ]
+      }
+    };
+
+    function renderEcoSubpage(label) {
+      const cfg = ECO_SUBPAGES[label];
+      const subEl = document.getElementById('tabSubpageView');
+      if (!cfg || !subEl) return;
+
+      const reg = REGIONS[currentRegion];
+      const toneClasses = {
+        emerald: 'bg-emeraldEco/10 text-emeraldEco border border-emeraldEco/20',
+        lime: 'bg-bioLime/10 text-bioLime border border-bioLime/20',
+        amber: 'bg-solarAmber/10 text-solarAmber border border-solarAmber/20'
+      };
+
+      subEl.innerHTML = `
+        <!-- Sub-page Dew-Glass Header -->
+        <section class="dew-glass rounded-[28px] p-5 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold uppercase bg-emeraldEco/10 text-emeraldEco border border-emeraldEco/20">${cfg.badge}</span>
+                <span id="ecoSubRegionTag" class="text-xs font-mono text-slateEco">${reg.tag}</span>
+              </div>
+              <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-forest mt-2 tracking-tight">${cfg.title}</h1>
+              <p class="text-sm text-slateEco mt-1 max-w-3xl">${cfg.subtitle}</p>
+            </div>
+            <button type="button" onclick="returnToEcoOverview()" class="px-4 py-2.5 rounded-2xl soft-well hover:bg-white text-xs sm:text-sm font-semibold text-forest transition inline-flex items-center gap-2 shrink-0">
+              <svg class="w-4 h-4 text-emeraldEco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>
+              <span>&larr; Overview</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 4 Soft-UI Eco KPI Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+          ${cfg.kpis.map(k => `
+            <article class="dew-glass dew-glass-hover rounded-[24px] p-5 flex flex-col justify-between">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slateEco">${k.label}</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-mono font-semibold ${toneClasses[k.tone] || toneClasses.emerald}">${k.delta}</span>
+              </div>
+              <div class="mt-3 font-mono font-bold text-2xl sm:text-[28px] text-forest tabular-nums">${k.val}</div>
+              <p class="mt-2 pt-2 border-t border-forest/10 text-xs text-slateEco font-medium">${k.sub}</p>
+            </article>
+          `).join('')}
+        </section>
+
+        <!-- SVG Telemetry Visual + Interactive 5-Row Control Table -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-5 dew-glass rounded-[28px] p-5 sm:p-6 flex flex-col justify-between">
+            <div>
+              <h2 class="font-display font-bold text-lg text-forest">${cfg.visualTitle}</h2>
+              <p class="text-xs text-slateEco mt-0.5">${cfg.visualSub}</p>
+
+              <div class="mt-4 soft-well rounded-2xl p-4">
+                <div class="flex items-center justify-between text-xs font-mono mb-2">
+                  <span class="text-forest font-semibold">SCADA HARMONIC STREAM</span>
+                  <span class="text-emeraldEco font-bold">${reg.hz} LOCKED</span>
+                </div>
+                <svg class="w-full h-28 overflow-visible" viewBox="0 0 400 110">
+                  <line x1="14" y1="24" x2="388" y2="24" stroke="rgba(20,83,45,0.08)" stroke-dasharray="4 4"/>
+                  <line x1="14" y1="62" x2="388" y2="62" stroke="rgba(20,83,45,0.08)" stroke-dasharray="4 4"/>
+                  <line x1="14" y1="100" x2="388" y2="100" stroke="rgba(20,83,45,0.16)"/>
+                  <path d="${cfg.curve}" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round"/>
+                  <circle r="4.5" fill="#65A30D">
+                    <animateMotion dur="3.4s" repeatCount="indefinite" path="${cfg.curve}"/>
+                  </circle>
+                </svg>
+              </div>
+
+              <div class="mt-5 space-y-3.5">
+                ${cfg.bars.map(b => `
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-semibold text-forest truncate pr-2">${b.name}</span>
+                      <span class="font-mono text-slateEco tabular-nums">${b.val}</span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-forest/10 overflow-hidden">
+                      <div class="h-full rounded-full transition-all duration-500" style="width: ${b.pct}%; background-color: ${b.color};"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 dew-glass rounded-[28px] p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="font-display font-bold text-lg text-forest">${cfg.tableTitle}</h2>
+                <p class="text-xs text-slateEco mt-0.5">IEC 61850 authenticated dispatch actions with live telemetry feedback</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-emeraldEco/10 text-emeraldEco">5 Active Buses</span>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-forest/10 bg-white/75">
+              <table class="w-full text-left text-sm">
+                <thead class="border-b border-forest/10 bg-mist/80 text-xs font-mono uppercase text-slateEco">
+                  <tr>
+                    <th class="px-4 py-3">Subsystem</th>
+                    <th class="px-4 py-3">Spec</th>
+                    <th class="px-4 py-3">Telemetry</th>
+                    <th class="px-4 py-3">State</th>
+                    <th class="px-4 py-3 text-right">${cfg.actionCol}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-forest/10 text-xs">
+                  ${cfg.rows.map((r, i) => `
+                    <tr class="hover:bg-white transition">
+                      <td class="px-4 py-3.5">
+                        <div class="font-semibold text-sm text-forest">${r.col1}</div>
+                        <div class="font-mono text-slateEco">${r.id}</div>
+                      </td>
+                      <td class="px-4 py-3.5 text-slateEco">${r.col2}</td>
+                      <td class="px-4 py-3.5 font-mono font-semibold text-forest tabular-nums">${r.col3}</td>
+                      <td class="px-4 py-3.5">
+                        <span id="ecoSubState-${i}" class="inline-flex px-2.5 py-0.5 rounded-full font-mono font-semibold bg-forest/10 text-forest">${r.status}</span>
+                      </td>
+                      <td class="px-4 py-3.5 text-right">
+                        <button type="button" data-eco-row="${i}" class="eco-sub-btn px-3 py-1.5 rounded-xl bg-white border border-forest/15 text-xs font-semibold text-forest hover:bg-forest hover:text-white transition">
+                          ${r.btn}
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
+
+      subEl.querySelectorAll('.eco-sub-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.getAttribute('data-eco-row'), 10);
+          const row = cfg.rows[idx];
+          const stEl = document.getElementById('ecoSubState-' + idx);
+          if (row && stEl) {
+            stEl.textContent = row.done;
+            stEl.className = 'inline-flex px-2.5 py-0.5 rounded-full font-mono font-semibold bg-emeraldEco/15 text-emeraldEco';
+            btn.textContent = 'Synced';
+            btn.className = 'eco-sub-btn px-3 py-1.5 rounded-xl bg-emeraldEco/10 border border-emeraldEco/25 text-xs font-semibold text-emeraldEco';
+            triggerToast(row.toast);
+          }
+        });
+      });
+    }
+
+    function returnToEcoOverview() {
+      const firstNav = document.querySelector('.nav-item');
+      if (firstNav) {
+        selectNav(firstNav, 'Grid Overview', '#sec-overview');
+      }
+    }
+
+    function selectNav(btn, label, targetSelector) {
+      activeEcoModule = label;
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+        el.classList.add('text-slateEco');
+      });
+      btn.classList.add('active');
+      btn.classList.remove('text-slateEco');
+      document.getElementById('activeModuleCrumb').textContent = label;
+
+      if (window.innerWidth < 1024 && document.body.classList.contains('mobile-nav-open')) {
+        toggleMobileNav();
+      }
+
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+
+      if (label === 'Grid Overview' || !ECO_SUBPAGES[label]) {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderEcoSubpage(label);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Hero Banner Subtle 3D Tilt + Specular Highlight
+    const heroCard = document.getElementById('heroBannerCard');
+    heroCard.addEventListener('mousemove', (e) => {
+      const rect = heroCard.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const px = (x / rect.width) * 100;
+      const py = (y / rect.height) * 100;
+      const rotY = ((x / rect.width) - 0.5) * 4.2;
+      const rotX = (0.5 - (y / rect.height)) * 3.6;
+
+      heroCard.style.setProperty('--mx', px.toFixed(1) + '%');
+      heroCard.style.setProperty('--my', py.toFixed(1) + '%');
+      heroCard.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+    });
+
+    heroCard.addEventListener('mouseleave', () => {
+      heroCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+
+    // Interactive Pipeline Node Selection
+    function selectPipelineNode(idx) {
+      currentNodeIdx = idx;
+      document.querySelectorAll('.pipeline-node-group').forEach((g, i) => {
+        g.classList.toggle('active-node', i === idx);
+      });
+
+      const n = PIPELINE_NODES[idx];
+      const reg = REGIONS[currentRegion];
+      document.getElementById('readoutNodeBadge').textContent = n.badge;
+      document.getElementById('readoutNodeTitle').textContent = n.title;
+      document.getElementById('readoutStatusPill').textContent = n.status;
+      document.getElementById('readoutNodeDesc').textContent = n.desc;
+      document.getElementById('readoutVoltage').textContent = n.voltage;
+      document.getElementById('readoutThermal').textContent = n.thermal;
+      document.getElementById('readoutLatency').textContent = n.latency;
+      document.getElementById('readoutCarbon').textContent = idx === 3 ? reg.kpis.dacVal : n.carbon;
+    }
+
+    function togglePipelineFlow() {
+      flowPaused = !flowPaused;
+      document.body.classList.toggle('flow-paused', flowPaused);
+      const svg = document.getElementById('energyFlowSvg');
+      if (flowPaused) {
+        if (svg.pauseAnimations) svg.pauseAnimations();
+        document.getElementById('flowToggleLabel').textContent = 'Resume Stream';
+        document.getElementById('flowToggleIcon').innerHTML = '<polygon points="6 4 20 12 6 20 6 4" />';
+      } else {
+        if (svg.unpauseAnimations) svg.unpauseAnimations();
+        document.getElementById('flowToggleLabel').textContent = 'Pause Stream';
+        document.getElementById('flowToggleIcon').innerHTML = '<rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" />';
+      }
+    }
+
+    // Smooth Catmull-Rom / Cubic Bezier SVG Path Generator
+    function buildSmoothPath(points) {
+      if (!points.length) return '';
+      let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i === 0 ? i : i - 1];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    let activeChartCoords = [];
+
+    function renderAreaChart() {
+      const cfg = REGIONS[currentRegion].charts[currentHorizon];
+      const xStart = 52;
+      const xEnd = 740;
+      const yTop = 28;
+      const yBottom = 252;
+      const yRange = yBottom - yTop;
+      const stepX = (xEnd - xStart) / (cfg.labels.length - 1);
+
+      document.getElementById('yMaxLbl').textContent = cfg.yMax;
+      document.getElementById('yQ3Lbl').textContent = Math.round(cfg.yMax * 0.75);
+      document.getElementById('yMidLbl').textContent = Math.round(cfg.yMax * 0.5);
+      document.getElementById('yQ1Lbl').textContent = Math.round(cfg.yMax * 0.25);
+      document.getElementById('chartNetSummary').textContent = cfg.summary;
+
+      const genPts = cfg.gen.map((v, i) => ({
+        x: xStart + i * stepX,
+        y: yBottom - (v / cfg.yMax) * yRange,
+        val: v
+      }));
+      const demPts = cfg.dem.map((v, i) => ({
+        x: xStart + i * stepX,
+        y: yBottom - (v / cfg.yMax) * yRange,
+        val: v
+      }));
+
+      activeChartCoords = cfg.labels.map((lbl, i) => ({
+        label: lbl,
+        x: genPts[i].x,
+        genY: genPts[i].y,
+        demY: demPts[i].y,
+        genVal: cfg.gen[i],
+        demVal: cfg.dem[i]
+      }));
+
+      const genLine = buildSmoothPath(genPts);
+      const demLine = buildSmoothPath(demPts);
+
+      document.getElementById('genLinePath').setAttribute('d', genLine);
+      document.getElementById('genAreaPath').setAttribute('d', `${genLine} L ${xEnd} ${yBottom} L ${xStart} ${yBottom} Z`);
+
+      document.getElementById('demandLinePath').setAttribute('d', demLine);
+      document.getElementById('demandAreaPath').setAttribute('d', `${demLine} L ${xEnd} ${yBottom} L ${xStart} ${yBottom} Z`);
+
+      // X-Axis Labels
+      const xGroup = document.getElementById('xAxisLabels');
+      xGroup.innerHTML = activeChartCoords
+        .map(pt => `<text x="${pt.x.toFixed(1)}" y="274">${pt.label}</text>`)
+        .join('');
+    }
+
+    // Chart Hover Crosshair & Tooltip
+    const hitbox = document.getElementById('chartHitbox');
+    const crosshair = document.getElementById('chartCrosshair');
+    const tooltip = document.getElementById('chartTooltip');
+    const chartWrap = document.getElementById('areaChartWrap');
+
+    hitbox.addEventListener('mousemove', (e) => {
+      if (!activeChartCoords.length) return;
+      const rect = hitbox.getBoundingClientRect();
+      const relX = ((e.clientX - rect.left) / rect.width) * 702 + 44;
+
+      let nearest = activeChartCoords[0];
+      let minDiff = Math.abs(relX - nearest.x);
+      for (const pt of activeChartCoords) {
+        const diff = Math.abs(relX - pt.x);
+        if (diff < minDiff) {
+          minDiff = diff;
+          nearest = pt;
+        }
+      }
+
+      document.getElementById('crosshairLine').setAttribute('x1', nearest.x);
+      document.getElementById('crosshairLine').setAttribute('x2', nearest.x);
+      document.getElementById('crosshairGenDot').setAttribute('cx', nearest.x);
+      document.getElementById('crosshairGenDot').setAttribute('cy', nearest.genY);
+      document.getElementById('crosshairDemDot').setAttribute('cx', nearest.x);
+      document.getElementById('crosshairDemDot').setAttribute('cy', nearest.demY);
+
+      crosshair.classList.remove('opacity-0');
+      tooltip.classList.remove('opacity-0');
+
+      const surplus = (nearest.genVal - nearest.demVal).toFixed(1);
+      document.getElementById('ttLabel').textContent = nearest.label;
+      document.getElementById('ttGen').textContent = nearest.genVal.toFixed(1) + ' MW';
+      document.getElementById('ttDem').textContent = nearest.demVal.toFixed(1) + ' MW';
+      document.getElementById('ttSurplus').textContent = (surplus >= 0 ? '+' : '') + surplus + ' MW';
+
+      const wrapRect = chartWrap.getBoundingClientRect();
+      const pixelX = ((nearest.x / 760) * wrapRect.width);
+      const tooltipLeft = Math.min(Math.max(12, pixelX - 98), wrapRect.width - 210);
+      tooltip.style.left = tooltipLeft + 'px';
+    });
+
+    hitbox.addEventListener('mouseleave', () => {
+      crosshair.classList.add('opacity-0');
+      tooltip.classList.add('opacity-0');
+    });
+
+    function switchChartHorizon(horizon) {
+      currentHorizon = horizon;
+      document.querySelectorAll('.horizon-tab').forEach(btn => {
+        const active = btn.dataset.horizon === horizon;
+        btn.className = active
+          ? 'horizon-tab px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-white text-forest shadow-2xs transition'
+          : 'horizon-tab px-3 py-1 rounded-lg text-xs font-mono font-medium text-slateEco hover:text-forest transition';
+      });
+      renderAreaChart();
+    }
+
+    // ESG Radial Rings + Microgrid Status Bars
+    function renderEsgAndMicrogrids() {
+      const data = REGIONS[currentRegion];
+      const c1 = 402.12;
+      const c2 = 307.88;
+      const c3 = 213.63;
+
+      document.getElementById('ringScope1').style.strokeDashoffset = (c1 * (1 - data.esg.s1 / 100)).toFixed(2);
+      document.getElementById('ringScope2').style.strokeDashoffset = (c2 * (1 - data.esg.s2 / 100)).toFixed(2);
+      document.getElementById('ringScope3').style.strokeDashoffset = (c3 * (1 - data.esg.s3 / 100)).toFixed(2);
+
+      document.getElementById('esgCompositeVal').textContent = data.esg.composite;
+      document.getElementById('lblScope1').textContent = data.esg.s1.toFixed(1) + '%';
+      document.getElementById('lblScope2').textContent = data.esg.s2.toFixed(1) + '%';
+      document.getElementById('lblScope3').textContent = data.esg.s3.toFixed(1) + '%';
+
+      const container = document.getElementById('microgridBars');
+      container.innerHTML = data.microgrids.map(node => `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-medium text-forest truncate pr-2">${node.name}</span>
+            <span class="font-mono font-semibold text-slateEco tabular-nums">${node.mw} · <span class="text-forest">${node.load}</span></span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-forest/10 overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500" style="width: ${node.load}; background-color: ${node.color};"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Region Switcher
+    function switchRegion(regionKey) {
+      currentRegion = regionKey;
+      const d = REGIONS[regionKey];
+
+      document.querySelectorAll('.region-tab').forEach(btn => {
+        const isAct = btn.dataset.region === regionKey;
+        btn.classList.toggle('bg-white', isAct);
+        btn.classList.toggle('text-forest', isAct);
+        btn.classList.toggle('shadow-xs', isAct);
+        btn.classList.toggle('font-semibold', isAct);
+        btn.classList.toggle('text-slateEco', !isAct);
+        btn.classList.toggle('font-medium', !isAct);
+      });
+
+      document.getElementById('heroIntensityBadge').textContent = d.intensity;
+      document.getElementById('heroRegionTag').textContent = d.tag;
+      document.getElementById('heroSubcopy').textContent = d.subcopy;
+      document.getElementById('heroSurplus').textContent = d.surplus;
+      document.getElementById('heroDacDraw').textContent = d.dacDraw;
+      document.getElementById('heroSpotPrice').textContent = d.spot;
+
+      document.getElementById('sidebarHz').textContent = d.hz;
+      document.getElementById('sidebarRenewableBar').style.width = d.renewablePct + '%';
+
+      document.getElementById('kpiGenVal').textContent = d.kpis.genVal;
+      document.getElementById('kpiGenDelta').textContent = d.kpis.genDelta;
+      document.getElementById('kpiGenSub').textContent = d.kpis.genSub;
+
+      document.getElementById('kpiBessVal').textContent = d.kpis.bessVal;
+      document.getElementById('kpiBessCap').textContent = d.kpis.bessCap;
+      document.getElementById('kpiBessDelta').textContent = d.kpis.bessDelta;
+      document.getElementById('kpiBessSub').textContent = d.kpis.bessSub;
+
+      document.getElementById('kpiDacVal').textContent = d.kpis.dacVal;
+      document.getElementById('kpiDacDelta').textContent = d.kpis.dacDelta;
+      document.getElementById('kpiDacSub').textContent = d.kpis.dacSub;
+
+      document.getElementById('kpiRevVal').textContent = d.kpis.revVal;
+      document.getElementById('kpiRevDelta').textContent = d.kpis.revDelta;
+      document.getElementById('kpiRevSub').textContent = d.kpis.revSub;
+
+      d.nodeMetrics.forEach((m, idx) => {
+        const el = document.getElementById(`svgNode${idx}Metric`);
+        if (el) el.textContent = m;
+      });
+
+      document.getElementById('modalRegionName').textContent = d.name;
+      const subRegEl = document.getElementById('ecoSubRegionTag');
+      if (subRegEl) subRegEl.textContent = d.tag;
+
+      selectPipelineNode(currentNodeIdx);
+      renderAreaChart();
+      renderEsgAndMicrogrids();
+      triggerToast(`Switched telemetry stream to ${d.name}`);
+    }
+
+    // Modal & Toast Helpers
+    function openDispatchModal() {
+      const m = document.getElementById('dispatchModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeDispatchModal() {
+      const m = document.getElementById('dispatchModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function commitAutobalance() {
+      const weight = document.getElementById('dacSlider').value;
+      closeDispatchModal();
+      triggerToast(`AI Autobalance committed: ${weight}% DAC scrubber priority locked.`);
+    }
+
+    let toastTimer = null;
+    function triggerToast(message) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastText').textContent = message;
+      banner.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        banner.classList.add('opacity-0', 'translate-y-3');
+      }, 3200);
+    }
+
+    // Initialize Dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAreaChart();
+      renderEsgAndMicrogrids();
+      selectPipelineNode(0);
+    });
+  </script>
+</body>
+</html>

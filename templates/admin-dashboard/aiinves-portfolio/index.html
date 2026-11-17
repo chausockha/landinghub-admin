@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AiInves — Modern AI Portfolio &amp; Investment Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            aiblue: {
+              DEFAULT: '#295BFF',
+              dark: '#1D46DB',
+              soft: '#EEF3FF',
+            },
+            aicoral: '#FF6B4A',
+            aiviolet: '#7C3AED',
+            aigreen: '#10B981',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #EBEEF4;
+      color: #111827;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .ai-card {
+      background: #FFFFFF;
+      border: 1px solid #EAEEF5;
+      border-radius: 22px;
+      box-shadow: 0 10px 28px -10px rgba(17, 24, 39, 0.05);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+    .ai-card:hover {
+      border-color: rgba(41, 91, 255, 0.22);
+      box-shadow: 0 18px 36px -12px rgba(41, 91, 255, 0.09);
+    }
+
+    /* Soft Periwinkle AI Copilot Card (Bottom Right Signature!) */
+    .ai-copilot-card {
+      background: linear-gradient(155deg, #EEF2FF 0%, #E4EAFF 55%, #EEF4FF 100%);
+      border: 1px solid #D5DFFF;
+      border-radius: 22px;
+      box-shadow: 0 14px 34px -10px rgba(41, 91, 255, 0.12);
+    }
+
+    /* Smooth Line Draw & Ticker Marquee */
+    @keyframes drawLine {
+      from { stroke-dashoffset: 950; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .chart-line-draw {
+      stroke-dasharray: 950;
+      animation: drawLine 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes segPop {
+      from { transform: scaleX(0.3); opacity: 0.4; }
+      to   { transform: scaleX(1); opacity: 1; }
+    }
+    .seg-anim {
+      transform-origin: left;
+      animation: segPop 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Expandable Menu Column */
+    #expandedMenu {
+      width: 236px;
+      transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+    }
+    body.menu-collapsed #expandedMenu {
+      width: 0px;
+      opacity: 0;
+      overflow: hidden;
+      border-right-width: 0px;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-5 lg:p-6">
+
+  <!-- WORKSPACE LAYOUT: FLOATING DETACHED ICON RAIL + MAIN ROUNDED APP SHELL -->
+  <div class="max-w-[1540px] mx-auto flex gap-4 min-h-[880px]">
+
+    <!-- 1. DETACHED FLOATING MINI ICON RAIL (LEFTMOST SIGNATURE PILL RAIL!) -->
+    <aside class="hidden xl:flex w-[68px] flex-shrink-0 bg-white rounded-[24px] border border-[#EAEEF5] shadow-sm flex-col items-center justify-between py-5 select-none">
+      <div class="flex flex-col items-center gap-6">
+        <button onclick="toggleMenuDrawer()" title="Toggle Full Menu" class="h-11 w-11 rounded-2xl bg-aiblue text-white flex items-center justify-center shadow-md shadow-aiblue/30 hover:scale-105 transition cursor-pointer">
+          <!-- Diamond Dot-Matrix Logo SVG -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="1.8"/><circle cx="8.5" cy="8.5" r="1.8"/><circle cx="15.5" cy="8.5" r="1.8"/>
+            <circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="1.8"/>
+            <circle cx="8.5" cy="15.5" r="1.8"/><circle cx="15.5" cy="15.5" r="1.8"/><circle cx="12" cy="19" r="1.8"/>
+          </svg>
+        </button>
+
+        <div class="flex flex-col items-center gap-2.5">
+          <button data-ainav="dashboard" onclick="navigateAiTab('dashboard')" class="rail-ai-btn h-10 w-10 rounded-xl bg-aiblue-soft text-aiblue flex items-center justify-center transition cursor-pointer" title="Dashboard">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </button>
+          <button data-ainav="portfolio" onclick="navigateAiTab('portfolio')" class="rail-ai-btn h-10 w-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="My Portfolio">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </button>
+          <button data-ainav="risk" onclick="navigateAiTab('risk')" class="rail-ai-btn h-10 w-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="Risk Map">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </button>
+          <button data-ainav="forecast" onclick="navigateAiTab('forecast')" class="rail-ai-btn h-10 w-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="AI Forecast">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
+          <button data-ainav="explore" onclick="navigateAiTab('explore')" class="rail-ai-btn h-10 w-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="Explore Opportunities">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+          <button data-ainav="transactions" onclick="navigateAiTab('transactions')" class="rail-ai-btn h-10 w-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="Transactions">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col items-center gap-3 text-slate-400">
+        <button data-ainav="settings" onclick="navigateAiTab('settings')" class="rail-ai-btn h-10 w-10 rounded-xl hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center cursor-pointer" title="Settings">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+        </button>
+        <button data-ainav="help" onclick="navigateAiTab('help')" class="rail-ai-btn h-10 w-10 rounded-xl hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center cursor-pointer" title="Help">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN APP SHELL (SIDEBAR DRAWER + PORTFOLIO CANVAS) -->
+    <div class="flex-1 bg-[#F7F9FC] rounded-[26px] border border-[#EAEEF5] shadow-xl overflow-hidden flex min-w-0">
+
+      <!-- EXPANDED SIDEBAR MENU -->
+      <aside id="expandedMenu" class="hidden lg:flex bg-white border-r border-[#EAEEF5] flex-shrink-0 flex-col justify-between select-none">
+        <div>
+          <!-- Brand -->
+          <div class="h-[72px] px-6 flex items-center justify-between">
+            <div onclick="navigateAiTab('dashboard')" class="flex items-center gap-3 cursor-pointer">
+              <div class="h-9 w-9 rounded-xl bg-aiblue text-white flex items-center justify-center shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="2"/><circle cx="8" cy="9" r="2"/><circle cx="16" cy="9" r="2"/>
+                  <circle cx="5" cy="13" r="2"/><circle cx="12" cy="13" r="2"/><circle cx="19" cy="13" r="2"/>
+                  <circle cx="12" cy="18" r="2"/>
+                </svg>
+              </div>
+              <span class="font-display text-lg font-extrabold tracking-tight text-slate-900">AiInves</span>
+            </div>
+          </div>
+
+          <div class="px-4 py-2">
+            <p class="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Main Menu</p>
+            <nav class="space-y-1">
+              <button data-ainav="dashboard" onclick="navigateAiTab('dashboard')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-left whitespace-nowrap bg-aiblue-soft text-aiblue transition cursor-pointer">
+                <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                Dashboard
+              </button>
+
+              <button data-ainav="portfolio" onclick="navigateAiTab('portfolio')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                My Portfolio
+              </button>
+
+              <button data-ainav="risk" onclick="navigateAiTab('risk')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Risk Map
+              </button>
+
+              <button data-ainav="forecast" onclick="navigateAiTab('forecast')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 14 3-3 2 2 3-4"/></svg>
+                Forecast
+              </button>
+
+              <button data-ainav="explore" onclick="navigateAiTab('explore')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Explore Opportunities
+              </button>
+
+              <button data-ainav="transactions" onclick="navigateAiTab('transactions')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                Transactions
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-100">
+          <p class="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Help Center</p>
+          <div class="space-y-1">
+            <button data-ainav="settings" onclick="navigateAiTab('settings')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+              Settings
+            </button>
+            <button data-ainav="help" onclick="navigateAiTab('help')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Help Center
+            </button>
+            <button data-ainav="support" onclick="navigateAiTab('support')" class="menu-item w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              Support
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN PORTFOLIO CONTENT -->
+      <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- Top Search Bar -->
+        <header class="bg-white h-[72px] px-6 border-b border-[#EAEEF5] flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <button onclick="toggleMenuDrawer()" class="lg:inline-flex h-9 w-9 rounded-xl border border-slate-200 items-center justify-center text-slate-500 hover:text-slate-900 cursor-pointer" title="Toggle menu">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+
+            <div class="relative">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+              <input
+                id="stockSearch"
+                oninput="renderHoldings()"
+                type="text"
+                placeholder="Search stock, crypto, ETF..."
+                class="rounded-full border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2 w-60 sm:w-72 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-aiblue focus:bg-white transition"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            <button onclick="simulateMarketTick(); showToast('Live market quotes refreshed')" class="h-10 w-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-aiblue hover:text-aiblue transition cursor-pointer" title="Refresh quotes">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            </button>
+            <button onclick="showToast('AI Alert: ENPH crossed +12.5% momentum target')" class="relative h-10 w-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-aiblue transition cursor-pointer">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <span class="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500"></span>
+            </button>
+            <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-slate-800 to-aiblue text-white font-display text-xs font-bold flex items-center justify-center">
+              AS
+            </div>
+          </div>
+        </header>
+
+        <!-- LIVE MARKET TICKER RIBBON (CLICKABLE!) -->
+        <div class="bg-white px-6 py-2.5 border-b border-[#EAEEF5] flex items-center gap-6 overflow-x-auto whitespace-nowrap text-xs">
+          <button onclick="loadStockIntoAi('AAPL', 'Apple Inc.', 172.30, '+9.4% (3 Months)', '8% Allocation')" class="inline-flex items-center gap-2 hover:opacity-80 cursor-pointer">
+            <span class="h-4 w-4 rounded-full bg-slate-900 inline-block"></span>
+            <strong class="font-bold text-slate-900">AAPL</strong>
+            <span class="text-slate-500 font-mono">$172.30</span>
+            <span class="font-mono font-bold text-emerald-600">▲ 1.25%</span>
+          </button>
+
+          <button onclick="loadStockIntoAi('TSLA', 'Tesla Motors', 186.45, '+14.2% (3 Months)', '4% Allocation')" class="inline-flex items-center gap-2 hover:opacity-80 cursor-pointer">
+            <span class="h-4 w-4 rounded-full bg-rose-600 inline-block"></span>
+            <strong class="font-bold text-slate-900">TSLA</strong>
+            <span class="text-slate-500 font-mono">$186.45</span>
+            <span class="font-mono font-bold text-rose-500">▼ 0.82%</span>
+          </button>
+
+          <button onclick="loadStockIntoAi('AMZN', 'Amazon.com Inc.', 126.80, '+11.0% (3 Months)', '7% Allocation')" class="inline-flex items-center gap-2 hover:opacity-80 cursor-pointer">
+            <span class="h-4 w-4 rounded-full bg-slate-950 inline-block"></span>
+            <strong class="font-bold text-slate-900">AMZN</strong>
+            <span class="text-slate-500 font-mono">$126.80</span>
+            <span class="font-mono font-bold text-emerald-600">▲ 0.45%</span>
+          </button>
+
+          <button onclick="loadStockIntoAi('MSFT', 'Microsoft Corp.', 413.90, '+10.8% (3 Months)', '9% Allocation')" class="inline-flex items-center gap-2 hover:opacity-80 cursor-pointer">
+            <span class="h-4 w-4 rounded-full bg-amber-400 inline-block"></span>
+            <strong class="font-bold text-slate-900">MSFT</strong>
+            <span class="text-slate-500 font-mono">$413.90</span>
+            <span class="font-mono font-bold text-emerald-600">▲ 0.18%</span>
+          </button>
+
+          <button onclick="loadStockIntoAi('NVDA', 'NVIDIA Corp.', 950.10, '+18.6% (3 Months)', '10% Allocation')" class="inline-flex items-center gap-2 hover:opacity-80 cursor-pointer">
+            <span class="h-4 w-4 rounded-full bg-lime-500 inline-block"></span>
+            <strong class="font-bold text-slate-900">NVDA</strong>
+            <span class="text-slate-500 font-mono">$950.10</span>
+            <span class="font-mono font-bold text-emerald-600">▲ 3.42%</span>
+          </button>
+
+          <button onclick="loadStockIntoAi('ENPH', 'Enphase Energy', 128.40, '+12.5% (3 Months)', '6% Allocation')" class="inline-flex items-center gap-2 hover:opacity-80 cursor-pointer">
+            <span class="h-4 w-4 rounded-full bg-aiblue inline-block"></span>
+            <strong class="font-bold text-slate-900">ENPH</strong>
+            <span class="text-slate-500 font-mono">$128.40</span>
+            <span class="font-mono font-bold text-emerald-600">▲ 2.64%</span>
+          </button>
+        </div>
+
+        <!-- MAIN GRID BODY -->
+        <main class="p-6 space-y-6 flex-1 overflow-y-auto">
+
+          <div id="defaultDashboardView" class="space-y-6">
+          <!-- ROW 1: TOTAL ASSETS + SEGMENTED ALLOCATION (4 COLS) & PERFORMANCE CHART (8 COLS) -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+
+            <!-- Left Card: Total Assets & Chunky Segmented Allocation -->
+            <div class="ai-card p-6 xl:col-span-4 flex flex-col justify-between">
+              <div>
+                <h2 class="font-display text-base font-bold text-slate-900">Total Assets</h2>
+
+                <p id="totalAssetsVal" class="font-display text-3xl sm:text-[34px] font-extrabold tracking-tight text-slate-900 mt-3">
+                  $126,450.00
+                </p>
+
+                <div class="flex items-center gap-1.5 mt-1.5 text-xs">
+                  <span class="font-bold text-emerald-600">▲ 15.5%</span>
+                  <span class="text-slate-400 font-medium">this year</span>
+                </div>
+
+                <!-- Segmented Pill Progress Bar -->
+                <div class="mt-6">
+                  <p class="text-xs font-bold text-slate-800 mb-2.5">Asset Allocation</p>
+                  <div class="flex items-center gap-1.5 h-6 w-full">
+                    <div id="segStocks" style="width: 42%" class="seg-anim h-full rounded-lg bg-aiblue transition-all duration-500" title="Stocks 42%"></div>
+                    <div id="segCrypto" style="width: 28%" class="seg-anim h-full rounded-lg bg-aicoral transition-all duration-500" title="Crypto 28%"></div>
+                    <div id="segEtfs"   style="width: 15%" class="seg-anim h-full rounded-lg bg-aiviolet transition-all duration-500" title="ETFs 15%"></div>
+                    <div id="segCash"   style="width: 15%" class="seg-anim h-full rounded-lg bg-aigreen transition-all duration-500" title="Cash 15%"></div>
+                  </div>
+                </div>
+
+                <!-- 4-Row Breakdown List -->
+                <div class="mt-5 divide-y divide-slate-100 text-xs">
+                  <div class="py-2.5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="h-2 w-2 rounded-full bg-aiblue"></span>
+                      <span class="font-bold text-slate-800">Stocks</span>
+                      <span id="pctStocks" class="text-slate-400">42%</span>
+                    </div>
+                    <span id="valStocks" class="font-mono font-bold text-slate-900">$53,109.00</span>
+                  </div>
+
+                  <div class="py-2.5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="h-2 w-2 rounded-full bg-aicoral"></span>
+                      <span class="font-bold text-slate-800">Crypto</span>
+                      <span id="pctCrypto" class="text-slate-400">28%</span>
+                    </div>
+                    <span id="valCrypto" class="font-mono font-bold text-slate-900">$35,406.00</span>
+                  </div>
+
+                  <div class="py-2.5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="h-2 w-2 rounded-full bg-aiviolet"></span>
+                      <span class="font-bold text-slate-800">ETFs</span>
+                      <span id="pctEtfs" class="text-slate-400">15%</span>
+                    </div>
+                    <span id="valEtfs" class="font-mono font-bold text-slate-900">$18,967.50</span>
+                  </div>
+
+                  <div class="py-2.5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="h-2 w-2 rounded-full bg-aigreen"></span>
+                      <span class="font-bold text-slate-800">Cash</span>
+                      <span id="pctCash" class="text-slate-400">15%</span>
+                    </div>
+                    <span id="valCash" class="font-mono font-bold text-slate-900">$18,967.50</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onclick="openRebalanceModal()"
+                class="mt-4 w-full rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 py-2.5 px-4 text-xs font-bold text-slate-800 transition cursor-pointer"
+              >
+                Adjust Portfolio
+              </button>
+            </div>
+
+            <!-- Right Card: Performance Chart with Floating Dark Callout Tooltip -->
+            <div class="ai-card p-6 xl:col-span-8 flex flex-col justify-between">
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h2 class="font-display text-lg font-bold text-slate-900">Performance Chart</h2>
+                  <div class="flex items-center gap-5 mt-2 text-xs font-medium text-slate-500">
+                    <span class="flex items-center gap-1.5">
+                      <span class="h-2.5 w-2.5 rounded-full bg-aiblue"></span> Your Portfolio
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                      <span class="h-2.5 w-2.5 rounded-full bg-aicoral"></span> S&amp;P 500 Index
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs font-bold">
+                  <button onclick="switchPerfRange('1M', this)" class="perf-tab rounded-lg bg-white text-slate-900 shadow-sm px-3 py-1.5 cursor-pointer">1M</button>
+                  <button onclick="switchPerfRange('3M', this)" class="perf-tab rounded-lg text-slate-500 hover:text-slate-900 px-3 py-1.5 cursor-pointer">3M</button>
+                  <button onclick="switchPerfRange('6M', this)" class="perf-tab rounded-lg text-slate-500 hover:text-slate-900 px-3 py-1.5 cursor-pointer">6M</button>
+                  <button onclick="switchPerfRange('1Y', this)" class="perf-tab rounded-lg text-slate-500 hover:text-slate-900 px-3 py-1.5 cursor-pointer">1Y</button>
+                </div>
+              </div>
+
+              <!-- Interactive Dual-Line SVG Chart + Floating Charcoal Callout -->
+              <div class="relative mt-4">
+                <svg id="perfSvg" viewBox="0 0 720 265" class="w-full h-64 overflow-visible"></svg>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ROW 2: HOLDINGS DETAIL TABLE (8 COLS) + AIINVES AI COPILOT QUICK-BUY CARD (4 COLS) -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+
+            <!-- Left Card: Holdings Detail Table -->
+            <div class="ai-card p-6 xl:col-span-8 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <h2 class="font-display text-lg font-bold text-slate-900">Holdings Detail</h2>
+
+                  <div class="flex items-center gap-2">
+                    <button onclick="sortHoldingsByGain()" title="Sort by Gain/Loss" class="h-9 w-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-aiblue hover:border-aiblue cursor-pointer">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    </button>
+                    <button onclick="document.getElementById('stockSearch').focus()" title="Search holdings" class="h-9 w-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-aiblue hover:border-aiblue cursor-pointer">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Underline Filter Tabs -->
+                <div class="flex items-center gap-6 border-b border-slate-100 text-xs font-semibold mb-3">
+                  <button onclick="filterAssetClass('all', this)" class="hold-tab pb-2.5 border-b-2 border-aiblue text-aiblue font-bold cursor-pointer">All</button>
+                  <button onclick="filterAssetClass('Stocks', this)" class="hold-tab pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 cursor-pointer">Stocks</button>
+                  <button onclick="filterAssetClass('Crypto', this)" class="hold-tab pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 cursor-pointer">Crypto</button>
+                  <button onclick="filterAssetClass('ETFs', this)" class="hold-tab pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 cursor-pointer">ETFs</button>
+                  <button onclick="filterAssetClass('Cash', this)" class="hold-tab pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 cursor-pointer">Cash</button>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="bg-slate-50/80 text-xs font-semibold text-slate-400">
+                        <th class="py-2.5 px-3 rounded-l-lg">Asset ⇅</th>
+                        <th class="py-2.5 px-3">QTY</th>
+                        <th class="py-2.5 px-3">Avg. Buy Price</th>
+                        <th class="py-2.5 px-3">Current Price</th>
+                        <th class="py-2.5 px-3 text-right rounded-r-lg">Gain/Loss</th>
+                      </tr>
+                    </thead>
+                    <tbody id="holdingsBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Card: Signature Soft Periwinkle AiInves AI Opportunity & Quick-Buy Card -->
+            <div class="ai-copilot-card p-6 xl:col-span-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="inline-flex items-center gap-1.5 text-xs font-extrabold text-aiblue">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L14.6 9.4L22 12L14.6 14.6L12 22L9.4 14.6L2 12L9.4 9.4L12 2Z" />
+                    </svg>
+                    AiInves AI
+                  </div>
+                  <button onclick="cycleAiOpportunity()" class="rounded-full bg-white/80 hover:bg-white px-2.5 py-1 text-xs font-semibold text-aiblue shadow-sm cursor-pointer">
+                    Next Pick →
+                  </button>
+                </div>
+
+                <h3 id="aiStockTitle" class="font-display text-lg font-extrabold text-slate-900">
+                  ENPH – Enphase Energy
+                </h3>
+
+                <div class="mt-2.5 space-y-1 text-xs font-bold text-aiblue">
+                  <p id="aiForecastText">AI Forecast: +12.5% (3 Months)</p>
+                  <p id="aiAllocText">Suggested Allocation: 6% Allocation</p>
+                </div>
+
+                <p id="aiReasonText" class="mt-3 text-xs leading-relaxed text-slate-600">
+                  Strong fundamentals and low correlation with current tech assets. Recommended for clean-energy alpha diversification.
+                </p>
+
+                <div class="mt-4">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-600 mb-1.5">
+                    <span>Shares to Buy</span>
+                    <span id="aiUnitPriceLabel" class="font-mono text-slate-500">@ $128.40 / sh</span>
+                  </div>
+                  <input
+                    id="aiSharesInput"
+                    type="number"
+                    min="1"
+                    value="10"
+                    oninput="updateAiOrderTotal()"
+                    class="w-full rounded-xl border border-indigo-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-900 focus:outline-none focus:border-aiblue"
+                  />
+                </div>
+
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="font-semibold text-slate-500">Estimated Total Cost</span>
+                  <span id="aiTotalCost" class="font-mono text-sm font-extrabold text-slate-900">$1,284.00</span>
+                </div>
+              </div>
+
+              <div class="mt-5 grid grid-cols-12 gap-2.5">
+                <button
+                  onclick="executeQuickBuy()"
+                  class="col-span-7 rounded-xl bg-aiblue hover:bg-aiblue-dark text-white font-display text-xs font-bold py-3 px-4 shadow-md shadow-aiblue/25 transition cursor-pointer"
+                >
+                  Quick Buy
+                </button>
+                <button
+                  onclick="showToast('Added ' + currentAiPick.ticker + ' to AI Watchlist')"
+                  class="col-span-5 rounded-xl bg-white hover:bg-slate-50 border border-indigo-100 text-slate-800 font-display text-xs font-bold py-3 px-3 transition cursor-pointer"
+                >
+                  Watchlist
+                </button>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+          <!-- SUB-PAGE VIEW CONTAINER -->
+          <div id="tabSubpageView" class="hidden space-y-6"></div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adjust Portfolio Allocation Modal -->
+  <div id="rebalanceModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/45 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display text-lg font-bold text-slate-900">Adjust Target Allocation</h3>
+        <button onclick="closeRebalanceModal()" class="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs text-slate-500">Select an AI-optimized risk profile to rebalance your $126,450 portfolio:</p>
+      <div class="space-y-2.5">
+        <button onclick="applyPresetAllocation(42,28,15,15,'Balanced Growth')" class="w-full rounded-2xl border border-slate-200 hover:border-aiblue p-3.5 text-left cursor-pointer">
+          <p class="text-sm font-bold text-slate-900">Balanced AI Growth (Current)</p>
+          <p class="text-xs text-slate-500 mt-0.5">42% Stocks · 28% Crypto · 15% ETFs · 15% Cash</p>
+        </button>
+        <button onclick="applyPresetAllocation(58,15,20,7,'Aggressive Tech Alpha')" class="w-full rounded-2xl border border-slate-200 hover:border-aiblue p-3.5 text-left cursor-pointer">
+          <p class="text-sm font-bold text-slate-900">Aggressive Tech Alpha</p>
+          <p class="text-xs text-slate-500 mt-0.5">58% Stocks · 15% Crypto · 20% ETFs · 7% Cash</p>
+        </button>
+        <button onclick="applyPresetAllocation(35,10,35,20,'Defensive Yield Shield')" class="w-full rounded-2xl border border-slate-200 hover:border-aiblue p-3.5 text-left cursor-pointer">
+          <p class="text-sm font-bold text-slate-900">Defensive Yield Shield</p>
+          <p class="text-xs text-slate-500 mt-0.5">35% Stocks · 10% Crypto · 35% ETFs · 20% Cash</p>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="aiToast" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="rounded-2xl bg-slate-900 text-white px-5 py-3.5 shadow-2xl flex items-center gap-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-aiblue"></span>
+      <span id="aiToastMsg" class="text-sm font-semibold">Executed</span>
+    </div>
+  </div>
+
+  <script>
+    let totalPortfolioValue = 126450.00;
+    let selectedAssetFilter = 'all';
+    let activeTooltipIdx = 6;
+
+    const PERF_SERIES = {
+      '1M': {
+        dates: ['May 14', 'May 17', 'May 21', 'May 24', 'May 28', 'May 31', 'June 7', 'June 11', 'June 14'],
+        portfolio: [119200, 124100, 118800, 119400, 122600, 122100, 125400, 128900, 126450],
+        sp500:     [97500,  103800, 100400, 101200, 98600,  102400, 106200, 109500, 107800],
+      },
+      '3M': {
+        dates: ['Apr 1', 'Apr 12', 'Apr 24', 'May 5', 'May 16', 'May 27', 'June 4', 'June 10', 'June 14'],
+        portfolio: [108500, 112400, 110200, 116800, 119900, 121500, 125400, 127800, 126450],
+        sp500:     [94200,  96800,  95900,  99400,  101800, 103100, 106200, 107400, 107800],
+      },
+      '6M': {
+        dates: ['Jan', 'Feb', 'Mar 1', 'Mar 20', 'Apr 10', 'May 1', 'May 20', 'Jun 5', 'Jun 14'],
+        portfolio: [101200, 106800, 109400, 113200, 115600, 119800, 123400, 127200, 126450],
+        sp500:     [91000,  93500,  95800,  97200,  99100,  101500, 104200, 106800, 107800],
+      },
+      '1Y': {
+        dates: ['Jul', 'Sep', 'Oct', 'Nov', 'Jan', 'Feb', 'Apr', 'May', 'Jun'],
+        portfolio: [96400, 101200, 99800, 107500, 112400, 116900, 121200, 125400, 126450],
+        sp500:     [88500, 91200,  90400, 94800,  98200,  100900, 103500, 106200, 107800],
+      },
+    };
+    let currentPerfKey = '1M';
+
+    let holdings = [
+      { ticker: 'AAPL', name: 'AAPL', type: 'Stocks', color: '#111827', qty: 52, avg: 148.20, price: 172.30 },
+      { ticker: 'BTC', name: 'BTC', type: 'Crypto', color: '#F59E0B', qty: 0.55, avg: 58200.00, price: 69200.00 },
+      { ticker: 'NVDA', name: 'NVDA', type: 'Stocks', color: '#65A30D', qty: 10, avg: 845.00, price: 950.10 },
+      { ticker: 'USDC', name: 'USDC', type: 'Cash', color: '#0284C7', qty: null, avg: null, price: null, fixedVal: 3200.00 },
+      { ticker: 'ARKK', name: 'ARKK (ETF)', type: 'ETFs', color: '#1E293B', qty: 35, avg: 43.50, price: 48.75 },
+    ];
+
+    const AI_PICKS = [
+      {
+        ticker: 'ENPH',
+        title: 'ENPH – Enphase Energy',
+        price: 128.40,
+        forecast: 'AI Forecast: +12.5% (3 Months)',
+        alloc: 'Suggested Allocation: 6% Allocation',
+        reason: 'Strong fundamentals and low correlation with current tech assets. Recommended for clean-energy alpha diversification.',
+      },
+      {
+        ticker: 'AVGO',
+        title: 'AVGO – Broadcom Inc.',
+        price: 168.20,
+        forecast: 'AI Forecast: +16.8% (3 Months)',
+        alloc: 'Suggested Allocation: 8% Allocation',
+        reason: 'Accelerating custom AI ASIC hyperscaler demand and expanding free cash flow margin.',
+      },
+      {
+        ticker: 'VOO',
+        title: 'VOO – Vanguard S&P 500',
+        price: 512.00,
+        forecast: 'AI Forecast: +7.4% (3 Months)',
+        alloc: 'Suggested Allocation: 12% Allocation',
+        reason: 'Core low-expense index anchor stabilizing portfolio Sharpe ratio during macro rate transitions.',
+      },
+    ];
+    let aiPickIdx = 0;
+    let currentAiPick = AI_PICKS[0];
+
+    function renderPerformanceChart() {
+      const data = PERF_SERIES[currentPerfKey];
+      const svg = document.getElementById('perfSvg');
+      const W = 720, H = 265, leftPad = 56, rightPad = 18, topPad = 24, botPad = 34;
+      const plotW = W - leftPad - rightPad;
+      const plotH = H - topPad - botPad;
+      const minV = 85000, maxV = 145000;
+
+      const mapX = i => leftPad + (i / (data.dates.length - 1)) * plotW;
+      const mapY = v => topPad + plotH - ((v - minV) / (maxV - minV)) * plotH;
+
+      const portPts = data.portfolio.map((v, i) => `${i === 0 ? 'M' : 'L'} ${mapX(i).toFixed(1)} ${mapY(v).toFixed(1)}`).join(' ');
+      const spPts   = data.sp500.map((v, i) => `${i === 0 ? 'M' : 'L'} ${mapX(i).toFixed(1)} ${mapY(v).toFixed(1)}`).join(' ');
+
+      const portArea = `${portPts} L ${mapX(data.dates.length - 1)} ${topPad + plotH} L ${leftPad} ${topPad + plotH} Z`;
+      const spArea   = `${spPts} L ${mapX(data.dates.length - 1)} ${topPad + plotH} L ${leftPad} ${topPad + plotH} Z`;
+
+      let html = `
+        <defs>
+          <linearGradient id="portGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#295BFF" stop-opacity="0.16"/>
+            <stop offset="100%" stop-color="#295BFF" stop-opacity="0.0"/>
+          </linearGradient>
+          <linearGradient id="spGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FF6B4A" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#FF6B4A" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+      `;
+
+      // Gridlines & Y labels
+      [
+        { v: 85000, label: '0' },
+        { v: 100000, label: '$100K' },
+        { v: 115000, label: '$120K' },
+        { v: 130000, label: '$130K' },
+        { v: 142000, label: '$140K' },
+      ].forEach(row => {
+        const y = mapY(row.v);
+        html += `<line x1="${leftPad}" y1="${y}" x2="${W - rightPad}" y2="${y}" stroke="#EEF2F7" stroke-dasharray="4 4" />`;
+        html += `<text x="${leftPad - 12}" y="${y + 4}" text-anchor="end" fill="#94A3B8" font-size="12" font-weight="500">${row.label}</text>`;
+      });
+
+      // X-axis date labels (every 2nd point)
+      data.dates.forEach((dStr, i) => {
+        if (i % 2 === 1 || i === data.dates.length - 1) {
+          html += `<text x="${mapX(i)}" y="${H - 6}" text-anchor="middle" fill="#94A3B8" font-size="12" font-weight="500">${dStr}</text>`;
+        }
+      });
+
+      html += `<path d="${spArea}" fill="url(#spGrad)" />`;
+      html += `<path d="${portArea}" fill="url(#portGrad)" />`;
+      html += `<path d="${spPts}" fill="none" stroke="#FF6B4A" stroke-width="2.3" stroke-linejoin="round" class="chart-line-draw" />`;
+      html += `<path d="${portPts}" fill="none" stroke="#295BFF" stroke-width="2.6" stroke-linejoin="round" class="chart-line-draw" />`;
+
+      // Gliding kinetic blue orb along portfolio curve
+      html += `
+        <circle r="4" fill="#295BFF">
+          <animateMotion dur="5s" repeatCount="indefinite" path="${portPts}" />
+        </circle>
+      `;
+
+      // Active Hover / Selected Node Vertical Dashed Line & Dark Floating Callout Card
+      const ax = mapX(activeTooltipIdx);
+      const ay = mapY(data.portfolio[activeTooltipIdx]);
+      const pVal = data.portfolio[activeTooltipIdx];
+      const sVal = data.sp500[activeTooltipIdx];
+      const boxW = 196, boxH = 74;
+      const boxX = Math.min(W - boxW - 10, Math.max(leftPad + 6, ax - boxW / 2));
+      const boxY = Math.max(4, ay - boxH - 16);
+
+      html += `
+        <line x1="${ax}" y1="${ay}" x2="${ax}" y2="${topPad + plotH}" stroke="#295BFF" stroke-width="1.6" stroke-dasharray="5 4" />
+        <circle cx="${ax}" cy="${ay}" r="5" fill="#295BFF" stroke="#FFFFFF" stroke-width="2.5" />
+
+        <g transform="translate(${boxX}, ${boxY})">
+          <rect width="${boxW}" height="${boxH}" rx="12" fill="#262932" opacity="0.96" />
+          <circle cx="16" cy="22" r="3.5" fill="#295BFF" />
+          <text x="25" y="26" fill="#E2E8F0" font-size="12" font-weight="500">Your Portfolio</text>
+          <text x="${boxW - 14}" y="26" text-anchor="end" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">$${pVal.toLocaleString()}</text>
+
+          <circle cx="16" cy="43" r="3.5" fill="#FF6B4A" />
+          <text x="25" y="47" fill="#CBD5E1" font-size="12" font-weight="500">S&amp;P 500 Index</text>
+          <text x="${boxW - 14}" y="47" text-anchor="end" fill="#FFFFFF" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">$${sVal.toLocaleString()}</text>
+
+          <text x="${boxW / 2}" y="65" text-anchor="middle" fill="#94A3B8" font-size="12">${data.dates[activeTooltipIdx]}</text>
+        </g>
+      `;
+
+      // Invisible hover columns to move the dark callout card interactively!
+      data.dates.forEach((_, i) => {
+        const colW = plotW / data.dates.length;
+        html += `<rect x="${mapX(i) - colW / 2}" y="${topPad}" width="${colW}" height="${plotH}" fill="transparent" class="cursor-pointer" onmouseenter="setPerfHover(${i})" />`;
+      });
+
+      svg.innerHTML = html;
+    }
+
+    function setPerfHover(idx) {
+      if (activeTooltipIdx === idx) return;
+      activeTooltipIdx = idx;
+      renderPerformanceChart();
+    }
+
+    function switchPerfRange(key, btn) {
+      currentPerfKey = key;
+      activeTooltipIdx = 6;
+      document.querySelectorAll('.perf-tab').forEach(b => {
+        b.className = 'perf-tab rounded-lg text-slate-500 hover:text-slate-900 px-3 py-1.5 cursor-pointer';
+      });
+      btn.className = 'perf-tab rounded-lg bg-white text-slate-900 shadow-sm px-3 py-1.5 cursor-pointer';
+      renderPerformanceChart();
+    }
+
+    function renderHoldings() {
+      const q = document.getElementById('stockSearch').value.trim().toLowerCase();
+      const tbody = document.getElementById('holdingsBody');
+
+      const rows = holdings.filter(h => {
+        const matchTab = selectedAssetFilter === 'all' || h.type === selectedAssetFilter;
+        const matchQ = !q || h.name.toLowerCase().includes(q) || h.ticker.toLowerCase().includes(q) || h.type.toLowerCase().includes(q);
+        return matchTab && matchQ;
+      });
+
+      tbody.innerHTML = rows.map(h => {
+        if (h.fixedVal) {
+          return `
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-3.5 px-3 font-bold text-slate-900 flex items-center gap-2.5">
+                <span class="h-5 w-5 rounded-full flex-shrink-0" style="background:${h.color}"></span>
+                ${h.name}
+              </td>
+              <td class="py-3.5 px-3 text-slate-400">-</td>
+              <td class="py-3.5 px-3 text-slate-400">-</td>
+              <td class="py-3.5 px-3 text-slate-400">-</td>
+              <td class="py-3.5 px-3 text-right font-mono font-bold text-slate-900">$${h.fixedVal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            </tr>
+          `;
+        }
+        const gain = (h.price - h.avg) * h.qty;
+        const gainStr = gain >= 0
+          ? `<span class="font-mono font-bold text-emerald-600">+$${gain.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+          : `<span class="font-mono font-bold text-rose-500">-$${Math.abs(gain).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+
+        return `
+          <tr onclick="loadStockIntoAi('${h.ticker}', '${h.name}', ${h.price}, '+11.8% (3 Months)', '7% Allocation')" class="hover:bg-slate-50/80 transition cursor-pointer">
+            <td class="py-3.5 px-3 font-bold text-slate-900">
+              <div class="flex items-center gap-2.5">
+                <span class="h-5 w-5 rounded-full flex-shrink-0" style="background:${h.color}"></span>
+                <span>${h.name}</span>
+              </div>
+            </td>
+            <td class="py-3.5 px-3 font-mono text-slate-500">${h.qty}</td>
+            <td class="py-3.5 px-3 font-mono font-semibold text-slate-800">$${h.avg.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            <td class="py-3.5 px-3 font-mono font-semibold text-slate-800">$${h.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            <td class="py-3.5 px-3 text-right">${gainStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterAssetClass(cls, btn) {
+      selectedAssetFilter = cls;
+      document.querySelectorAll('.hold-tab').forEach(b => {
+        b.className = 'hold-tab pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-700 cursor-pointer';
+      });
+      btn.className = 'hold-tab pb-2.5 border-b-2 border-aiblue text-aiblue font-bold cursor-pointer';
+      renderHoldings();
+    }
+
+    function sortHoldingsByGain() {
+      holdings.sort((a, b) => {
+        const ga = a.fixedVal ? 0 : (a.price - a.avg) * a.qty;
+        const gb = b.fixedVal ? 0 : (b.price - b.avg) * b.qty;
+        return gb - ga;
+      });
+      renderHoldings();
+      showToast('Sorted holdings by highest unrealized gain');
+    }
+
+    function updateAiOrderTotal() {
+      const sh = Math.max(1, parseFloat(document.getElementById('aiSharesInput').value) || 0);
+      const cost = sh * currentAiPick.price;
+      document.getElementById('aiTotalCost').textContent = '$' + cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function cycleAiOpportunity() {
+      aiPickIdx = (aiPickIdx + 1) % AI_PICKS.length;
+      currentAiPick = AI_PICKS[aiPickIdx];
+      document.getElementById('aiStockTitle').textContent = currentAiPick.title;
+      document.getElementById('aiForecastText').textContent = currentAiPick.forecast;
+      document.getElementById('aiAllocText').textContent = currentAiPick.alloc;
+      document.getElementById('aiReasonText').textContent = currentAiPick.reason;
+      document.getElementById('aiUnitPriceLabel').textContent = `@ $${currentAiPick.price.toFixed(2)} / sh`;
+      updateAiOrderTotal();
+    }
+
+    function loadStockIntoAi(ticker, fullName, price, forecast, alloc) {
+      currentAiPick = {
+        ticker,
+        title: `${ticker} – ${fullName}`,
+        price,
+        forecast: `AI Forecast: ${forecast}`,
+        alloc: `Suggested Allocation: ${alloc}`,
+        reason: `Real-time neural sentiment & institutional order-flow accumulation detected on ${ticker}.`,
+      };
+      document.getElementById('aiStockTitle').textContent = currentAiPick.title;
+      document.getElementById('aiForecastText').textContent = currentAiPick.forecast;
+      document.getElementById('aiAllocText').textContent = currentAiPick.alloc;
+      document.getElementById('aiReasonText').textContent = currentAiPick.reason;
+      document.getElementById('aiUnitPriceLabel').textContent = `@ $${price.toFixed(2)} / sh`;
+      updateAiOrderTotal();
+      showToast(`Loaded ${ticker} into AiInves AI Copilot`);
+    }
+
+    function executeQuickBuy() {
+      const sh = Math.max(1, parseFloat(document.getElementById('aiSharesInput').value) || 1);
+      const cost = sh * currentAiPick.price;
+      totalPortfolioValue += cost;
+      document.getElementById('totalAssetsVal').textContent = '$' + totalPortfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const existing = holdings.find(h => h.ticker === currentAiPick.ticker);
+      if (existing && !existing.fixedVal) {
+        existing.qty = +(existing.qty + sh).toFixed(2);
+      } else {
+        holdings.unshift({
+          ticker: currentAiPick.ticker,
+          name: currentAiPick.ticker,
+          type: 'Stocks',
+          color: '#295BFF',
+          qty: sh,
+          avg: +(currentAiPick.price * 0.96).toFixed(2),
+          price: currentAiPick.price,
+        });
+      }
+      renderHoldings();
+      showToast(`Bought ${sh} shares of ${currentAiPick.ticker} ($${cost.toLocaleString('en-US', { minimumFractionDigits: 2 })})`);
+    }
+
+    function openRebalanceModal() {
+      const m = document.getElementById('rebalanceModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeRebalanceModal() {
+      const m = document.getElementById('rebalanceModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    function applyPresetAllocation(s, c, e, cash, label) {
+      document.getElementById('segStocks').style.width = s + '%';
+      document.getElementById('segCrypto').style.width = c + '%';
+      document.getElementById('segEtfs').style.width   = e + '%';
+      document.getElementById('segCash').style.width   = cash + '%';
+      document.getElementById('pctStocks').textContent = s + '%';
+      document.getElementById('pctCrypto').textContent = c + '%';
+      document.getElementById('pctEtfs').textContent   = e + '%';
+      document.getElementById('pctCash').textContent   = cash + '%';
+
+      const fmt = pct => '$' + ((totalPortfolioValue * pct) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('valStocks').textContent = fmt(s);
+      document.getElementById('valCrypto').textContent = fmt(c);
+      document.getElementById('valEtfs').textContent   = fmt(e);
+      document.getElementById('valCash').textContent   = fmt(cash);
+
+      closeRebalanceModal();
+      showToast(`Rebalanced to ${label} Profile`);
+    }
+
+    function toggleMenuDrawer() {
+      document.body.classList.toggle('menu-collapsed');
+    }
+
+    const AI_SUBPAGES = {
+      portfolio: {
+        title: 'My Portfolio & Tax-Lot Breakdown',
+        subtitle: 'Cost-basis tracking, unrealized alpha attribution and tax-loss harvesting lots',
+        cta: 'Adjust Target Allocation',
+        ctaFn: 'openRebalanceModal()',
+        kpis: [
+          { lbl: 'Net Portfolio Value', val: '$126,450.00', sub: '+$16,980.00 YTD', tone: 'text-emerald-600' },
+          { lbl: 'Annualized Yield', val: '2.84%', sub: '$3,591 Est. Dividends', tone: 'text-aiblue' },
+          { lbl: 'Long-Term Tax Lots', val: '82.5%', sub: 'Preferential Cap-Gains', tone: 'text-emerald-600' },
+          { lbl: 'Harvestable Offset', val: '$1,140.00', sub: '2 Wash-Safe Lots', tone: 'text-aiviolet' }
+        ],
+        chartTitle: 'Asset Class Return Contribution (%)',
+        bars: [
+          { lbl: 'Stocks', v: 88, txt: '+18.4%', c: '#295BFF' },
+          { lbl: 'Crypto', v: 76, txt: '+24.1%', c: '#FF6B4A' },
+          { lbl: 'ETFs', v: 58, txt: '+11.8%', c: '#7C3AED' },
+          { lbl: 'Divs', v: 42, txt: '+4.6%', c: '#10B981' },
+          { lbl: 'Cash', v: 36, txt: '+5.1%', c: '#0284C7' }
+        ],
+        tableTitle: 'Open Tax Lots & Cost-Basis Ledger',
+        cols: ['Tax Lot', 'Acquired', 'Cost Basis', 'Market Value', 'Action'],
+        rows: [
+          ['AAPL · 52 Shares', 'Mar 14, 2024', '$7,706.40', '$8,959.60', 'Inspect Lot'],
+          ['BTC · 0.55 Coins', 'Jan 22, 2024', '$32,010.00', '$38,060.00', 'Inspect Lot'],
+          ['NVDA · 10 Shares', 'Feb 09, 2024', '$8,450.00', '$9,501.00', 'Inspect Lot'],
+          ['ARKK · 35 Shares', 'Apr 03, 2024', '$1,522.50', '$1,706.25', 'Rebalance'],
+          ['USDC · Yield Sweep', 'Ongoing', '$18,967.50', '$18,967.50', '5.1% APY']
+        ]
+      },
+      risk: {
+        title: 'AI Portfolio Risk & Correlation Map',
+        subtitle: 'Monte Carlo drawdown stress-testing, S&P 500 beta exposure and factor concentration',
+        cta: 'Run Stress Simulation',
+        kpis: [
+          { lbl: 'Portfolio Beta', val: '0.92', sub: 'Lower Vol vs S&P 500', tone: 'text-emerald-600' },
+          { lbl: 'Sharpe Ratio (1Y)', val: '2.18', sub: 'Top 8% Risk-Adjusted', tone: 'text-aiblue' },
+          { lbl: '95% Daily VaR', val: '-$1,840', sub: '1.45% Tail Bound', tone: 'text-aicoral' },
+          { lbl: 'Diversification Score', val: '91 / 100', sub: 'Low Cross-Correlation', tone: 'text-aiviolet' }
+        ],
+        chartTitle: 'Factor Sensitivity & Volatility Load (%)',
+        bars: [
+          { lbl: 'Tech', v: 74, txt: '38%', c: '#295BFF' },
+          { lbl: 'Rates', v: 42, txt: '18%', c: '#7C3AED' },
+          { lbl: 'Crypto', v: 64, txt: '28%', c: '#FF6B4A' },
+          { lbl: 'Energy', v: 34, txt: '9%', c: '#10B981' },
+          { lbl: 'Cash', v: 26, txt: '7%', c: '#0284C7' }
+        ],
+        tableTitle: 'Macro Scenario Stress-Test Matrix',
+        cols: ['Macro Scenario', 'S&P 500 Shock', 'Your Portfolio', 'AI Hedge', 'Action'],
+        rows: [
+          ['Fed +50 bps Surprise', '-6.80%', '-4.10% (+2.7% Alpha)', 'Cash + Short Dur', 'Simulate'],
+          ['AI Semis Pullback', '-9.20%', '-6.45% (+2.7% Alpha)', 'ENPH Uncorrelated', 'Simulate'],
+          ['CPI Soft Landing Rally', '+8.50%', '+11.40% (+2.9% Beat)', 'Growth Overweight', 'Simulate'],
+          ['Crypto Liquidity Spike', '+4.20%', '+9.80% (+5.6% Beat)', '28% BTC Sleeve', 'Simulate'],
+          ['USD Dollar Surge (+4%)', '-3.40%', '-2.05% (+1.3% Alpha)', 'Domestic Cash', 'Simulate']
+        ]
+      },
+      forecast: {
+        title: 'AI Neural 90-Day Price Forecasts',
+        subtitle: 'Transformer ensemble projections, earnings revision momentum and confidence intervals',
+        cta: 'Cycle Top AI Pick',
+        ctaFn: 'cycleAiOpportunity(); showToast("Updated AI Forecast model weights")',
+        kpis: [
+          { lbl: '90D Projected Value', val: '$138,920', sub: '+9.86% Median Path', tone: 'text-emerald-600' },
+          { lbl: 'Bull Case (P90)', val: '$149,400', sub: '+18.1% Upside Band', tone: 'text-aiblue' },
+          { lbl: 'Model Directional Acc.', val: '81.4%', sub: 'Trailing 4 Quarters', tone: 'text-aiviolet' },
+          { lbl: 'Top Alpha Signal', val: 'AVGO +16.8%', sub: 'Strong Institutional Flow', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'AI Projected 3-Month Upside by Ticker',
+        bars: [
+          { lbl: 'NVDA', v: 92, txt: '+18.6%', c: '#295BFF' },
+          { lbl: 'AVGO', v: 84, txt: '+16.8%', c: '#7C3AED' },
+          { lbl: 'TSLA', v: 72, txt: '+14.2%', c: '#FF6B4A' },
+          { lbl: 'ENPH', v: 65, txt: '+12.5%', c: '#10B981' },
+          { lbl: 'MSFT', v: 56, txt: '+10.8%', c: '#0284C7' }
+        ],
+        tableTitle: 'Neural Ensemble Stock & ETF Projections',
+        cols: ['Ticker', 'Spot Price', '90D AI Target', 'Confidence', 'Quick Load'],
+        rows: [
+          ['NVDA · NVIDIA Corp.', '$950.10', '$1,126.80 (+18.6%)', '91% High', 'NVDA'],
+          ['AVGO · Broadcom Inc.', '$168.20', '$196.45 (+16.8%)', '88% High', 'AVGO'],
+          ['ENPH · Enphase Energy', '$128.40', '$144.45 (+12.5%)', '86% High', 'ENPH'],
+          ['MSFT · Microsoft Corp.', '$413.90', '$458.60 (+10.8%)', '89% High', 'MSFT'],
+          ['AAPL · Apple Inc.', '$172.30', '$188.50 (+9.4%)', '84% High', 'AAPL']
+        ]
+      },
+      explore: {
+        title: 'Explore Alpha Opportunities',
+        subtitle: 'AI-curated thematic baskets, clean-energy disruptors and high-free-cash-flow compounders',
+        cta: 'Refresh AI Screener',
+        kpis: [
+          { lbl: 'Screened Universe', val: '4,280', sub: 'US Equities · ETFs · Crypto', tone: 'text-aiblue' },
+          { lbl: 'Strong Buy Matches', val: '19 Assets', sub: 'AI Score > 85/100', tone: 'text-emerald-600' },
+          { lbl: 'Top Theme Momentum', val: 'AI Infrastructure', sub: '+26.4% 90D Flow', tone: 'text-aiviolet' },
+          { lbl: 'Uncorrelated Gems', val: '6 Picks', sub: 'Beta < 0.65', tone: 'text-aicoral' }
+        ],
+        chartTitle: 'Thematic Basket 90-Day Momentum',
+        bars: [
+          { lbl: 'AI Silicon', v: 94, txt: '+26%', c: '#295BFF' },
+          { lbl: 'Clean Grid', v: 76, txt: '+19%', c: '#10B981' },
+          { lbl: 'CyberSec', v: 68, txt: '+16%', c: '#7C3AED' },
+          { lbl: 'Spot Crypto', v: 82, txt: '+22%', c: '#FF6B4A' },
+          { lbl: 'Quality Div', v: 48, txt: '+9%', c: '#0284C7' }
+        ],
+        tableTitle: 'Top AI Opportunity Picks Today',
+        cols: ['Asset & Theme', 'AI Score', 'Fwd P/E', '3M Upside', 'Action'],
+        rows: [
+          ['ENPH · Clean Grid Storage', '92 / 100', '24.8x', '+12.5%', 'Add Watchlist'],
+          ['AVGO · Custom AI Silicon', '95 / 100', '28.1x', '+16.8%', 'Add Watchlist'],
+          ['CRWD · Cloud Endpoint Sec', '89 / 100', '44.2x', '+14.0%', 'Add Watchlist'],
+          ['SOL · High-Throughput L1', '87 / 100', 'N/A', '+21.5%', 'Add Watchlist'],
+          ['VOO · Core S&P 500 Anchor', '90 / 100', '21.4x', '+7.4%', 'Add Watchlist']
+        ]
+      },
+      transactions: {
+        title: 'Brokerage Fills & Dividend Ledger',
+        subtitle: 'Zero-commission trade executions, automated dividend reinvestments (DRIP) and cash sweeps',
+        cta: 'Export 1099 Tax CSV',
+        kpis: [
+          { lbl: '30D Executed Volume', val: '$24,680', sub: '14 Zero-Fee Fills', tone: 'text-aiblue' },
+          { lbl: 'Dividends Collected', val: '$412.80', sub: 'Auto-DRIP Active', tone: 'text-emerald-600' },
+          { lbl: 'Avg. Price Improvement', val: '$0.04 / sh', sub: 'NBBO Smart Router', tone: 'text-aiviolet' },
+          { lbl: 'Settlement Status', val: '100% T+1', sub: '0 Pending Fails', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'Monthly Net Capital Deployed ($k)',
+        bars: [
+          { lbl: 'Feb', v: 52, txt: '$4.2k', c: '#295BFF' },
+          { lbl: 'Mar', v: 68, txt: '$5.8k', c: '#295BFF' },
+          { lbl: 'Apr', v: 60, txt: '$4.9k', c: '#7C3AED' },
+          { lbl: 'May', v: 84, txt: '$7.4k', c: '#10B981' },
+          { lbl: 'Jun', v: 74, txt: '$6.1k', c: '#FF6B4A' }
+        ],
+        tableTitle: 'Recent Brokerage Executions & Sweeps',
+        cols: ['Date', 'Order Type', 'Asset', 'Total Value', 'Status'],
+        rows: [
+          ['Jun 14, 2025', 'AI Quick Buy · 10 sh', 'ENPH @ $128.40', '$1,284.00', 'Settled T+1'],
+          ['Jun 11, 2025', 'Limit Buy · 4 sh', 'NVDA @ $942.00', '$3,768.00', 'Settled T+1'],
+          ['Jun 07, 2025', 'Quarterly Dividend DRIP', 'AAPL +0.42 sh', '+$72.36', 'Reinvested'],
+          ['Jun 02, 2025', 'Spot Crypto Accumulation', 'BTC · 0.05 Coins', '$3,460.00', 'Settled'],
+          ['May 29, 2025', 'Treasury Cash Sweep', 'USDC Yield Vault', '+$84.20', 'Paid']
+        ]
+      },
+      settings: {
+        title: 'AI Copilot & Rebalancing Settings',
+        subtitle: 'Automated drift thresholds, tax-loss harvesting automation and brokerage API security',
+        cta: 'Open Allocation Presets',
+        ctaFn: 'openRebalanceModal()',
+        isSettings: true,
+        kpis: [
+          { lbl: 'Auto-Rebalance Band', val: '+/- 3.5%', sub: 'Zero-Tax Drift Guard', tone: 'text-aiblue' },
+          { lbl: 'Tax-Loss Harvesting', val: 'Enabled', sub: 'Saved ~$380 YTD', tone: 'text-emerald-600' },
+          { lbl: 'Dividend DRIP Mode', val: 'Smart AI', sub: 'Routes to Underweight', tone: 'text-aiviolet' },
+          { lbl: 'SIPC Custody Shield', val: '$500,000', sub: '2FA Hardware Key', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'Allocation Drift vs Target (%)',
+        bars: [
+          { lbl: 'Stocks', v: 84, txt: '42%', c: '#295BFF' },
+          { lbl: 'Crypto', v: 56, txt: '28%', c: '#FF6B4A' },
+          { lbl: 'ETFs', v: 35, txt: '15%', c: '#7C3AED' },
+          { lbl: 'Cash', v: 35, txt: '15%', c: '#10B981' },
+          { lbl: 'Drift', v: 14, txt: '0.8%', c: '#0284C7' }
+        ]
+      },
+      help: {
+        title: 'AiInves Knowledge Base & Methodology',
+        subtitle: 'Documentation on neural alpha scoring, Modern Portfolio Theory optimization and tax reporting',
+        cta: 'Download Whitepaper PDF',
+        kpis: [
+          { lbl: 'Guided Playbooks', val: '36 Guides', sub: 'AI Investing & Taxes', tone: 'text-aiblue' },
+          { lbl: 'REST & WebSocket API', val: 'v2.4 Live', sub: '99.99% Uptime', tone: 'text-emerald-600' },
+          { lbl: 'Model Audit Cadence', val: 'Weekly', sub: 'Out-of-Sample Verified', tone: 'text-aiviolet' },
+          { lbl: 'Avg. Read Time', val: '4 Mins', sub: 'Interactive Examples', tone: 'text-aicoral' }
+        ],
+        chartTitle: 'Most Read Investor Guides (Views)',
+        bars: [
+          { lbl: 'AI Alpha', v: 92, txt: '4.8k', c: '#295BFF' },
+          { lbl: 'Tax Harvest', v: 78, txt: '3.9k', c: '#10B981' },
+          { lbl: 'Sharpe', v: 66, txt: '3.1k', c: '#7C3AED' },
+          { lbl: 'Crypto ETF', v: 72, txt: '3.5k', c: '#FF6B4A' },
+          { lbl: 'API Keys', v: 50, txt: '2.2k', c: '#0284C7' }
+        ],
+        tableTitle: 'Featured Documentation & Playbooks',
+        cols: ['Guide Title', 'Category', 'Updated', 'Level', 'Read'],
+        rows: [
+          ['How AiInves Scores 90-Day Stock Alpha', 'Quantitative AI', '2 days ago', 'Core', 'Open Guide'],
+          ['Automated Wash-Sale Safe Tax Harvesting', 'Tax Strategy', '1 week ago', 'Pro', 'Open Guide'],
+          ['Balancing Spot BTC Inside a 60/40 Portfolio', 'Asset Allocation', '2 weeks ago', 'Core', 'Open Guide'],
+          ['Connecting Read-Only Portfolio API Keys', 'Developers', 'May 2025', 'API', 'Open Guide'],
+          ['Understanding Beta, VaR & Sharpe Ratios', 'Risk Management', 'May 2025', 'Starter', 'Open Guide']
+        ]
+      },
+      support: {
+        title: 'Wealth Advisor Desk & Priority Support',
+        subtitle: 'Direct fiduciary wealth concierge, brokerage transfer assistance and live ticket status',
+        cta: 'Request Advisor Call',
+        kpis: [
+          { lbl: 'Dedicated Advisor', val: 'Claire Vance', sub: 'CFA · Private Wealth', tone: 'text-aiblue' },
+          { lbl: 'Live Chat SLA', val: '< 3 Mins', sub: 'Priority Queue Active', tone: 'text-emerald-600' },
+          { lbl: 'ACATS Transfer Bonus', val: '1.5% Match', sub: 'Zero Wire Fees', tone: 'text-aiviolet' },
+          { lbl: 'Open Tickets', val: '0 Pending', sub: 'All Inquiries Resolved', tone: 'text-emerald-600' }
+        ],
+        chartTitle: 'Concierge Resolution Speed (Seconds)',
+        bars: [
+          { lbl: 'Chat', v: 32, txt: '48s', c: '#295BFF' },
+          { lbl: 'Tax Q&A', v: 54, txt: '2m', c: '#10B981' },
+          { lbl: 'ACATS', v: 64, txt: '4m', c: '#7C3AED' },
+          { lbl: 'Wire', v: 42, txt: '90s', c: '#FF6B4A' },
+          { lbl: 'API', v: 38, txt: '75s', c: '#0284C7' }
+        ],
+        tableTitle: 'Concierge Channels & Recent Advisories',
+        cols: ['Channel / Topic', 'Specialist', 'Availability', 'SLA', 'Connect'],
+        rows: [
+          ['1-on-1 Portfolio Review', 'Claire Vance, CFA', 'Mon–Fri · 09:00–18:00', '15m Slot', 'Book Slot'],
+          ['ACATS Brokerage Rollover', 'Transfers Desk', '24/7 Automated', 'Instant', 'Start Roll'],
+          ['Tax-Lot & 1099 Concierge', 'CPA Partner Desk', 'Mon–Fri · Extended', '< 1 hr', 'Message'],
+          ['Wire & High-Limit Settlement', 'Treasury Ops', 'Same-Day FedWire', '< 10 min', 'Verify'],
+          ['Institutional API Support', 'Quant Eng Team', '24/7 Slack Bridge', '< 15 min', 'Open Ticket']
+        ]
+      }
+    };
+
+    function renderAiSubpage(tabKey) {
+      const cfg = AI_SUBPAGES[tabKey];
+      if (!cfg) return;
+      const box = document.getElementById('tabSubpageView');
+
+      const svgBars = cfg.bars.map((b, i) => {
+        const x = 36 + i * 72;
+        const h = Math.round((b.v / 100) * 124);
+        const y = 156 - h;
+        return `
+          <g class="cursor-pointer" onclick="showToast('${cfg.chartTitle} — ${b.lbl}: ${b.txt}')">
+            <rect x="${x}" y="28" width="42" height="128" rx="10" fill="#F1F5F9"/>
+            <rect x="${x}" y="${y}" width="42" height="${h}" rx="10" fill="${b.c}"/>
+            <text x="${x + 21}" y="${y - 7}" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="700">${b.txt}</text>
+            <text x="${x + 21}" y="178" text-anchor="middle" fill="#64748B" font-size="12" font-weight="500">${b.lbl}</text>
+          </g>
+        `;
+      }).join('');
+
+      const rightCard = cfg.isSettings
+        ? `
+          <div class="ai-copilot-card p-6 lg:col-span-7 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-base font-extrabold text-slate-900">Autonomous AI Copilot Preferences</h3>
+              <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-aiblue shadow-sm">Active Autopilot</span>
+            </div>
+            <div class="divide-y divide-indigo-200/60 text-xs sm:text-sm">
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-bold text-slate-900">Auto-Rebalance When Asset Class Drifts &gt; 3.5%</p>
+                  <p class="text-xs text-slate-600 mt-0.5">Uses incoming dividends and cash yield first to avoid taxable sales</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated Auto-Rebalance Drift Guard')" class="h-4 w-4 accent-[#295BFF] cursor-pointer"/>
+              </label>
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-bold text-slate-900">Daily Tax-Loss Harvesting Scanner (30-Day Wash Safe)</p>
+                  <p class="text-xs text-slate-600 mt-0.5">Swaps correlated ETFs automatically when unrealized loss exceeds $250</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated Tax-Loss Harvesting Scanner')" class="h-4 w-4 accent-[#295BFF] cursor-pointer"/>
+              </label>
+              <label class="py-3 flex items-center justify-between cursor-pointer">
+                <div>
+                  <p class="font-bold text-slate-900">Real-Time AI Earnings &amp; Momentum Push Alerts</p>
+                  <p class="text-xs text-slate-600 mt-0.5">Notify when neural forecast shifts by more than +/- 4.0%</p>
+                </div>
+                <input type="checkbox" checked onchange="showToast('Updated AI Momentum Push Alerts')" class="h-4 w-4 accent-[#295BFF] cursor-pointer"/>
+              </label>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <button onclick="openRebalanceModal()" class="rounded-xl bg-white hover:bg-slate-50 border border-indigo-200 text-slate-800 px-4 py-2.5 text-xs font-bold cursor-pointer">Change Risk Preset</button>
+              <button onclick="showToast('Saved AiInves Copilot Preferences')" class="rounded-xl bg-aiblue hover:bg-aiblue-dark text-white px-5 py-2.5 text-xs font-bold shadow-md shadow-aiblue/25 cursor-pointer">Save Settings</button>
+            </div>
+          </div>
+        `
+        : `
+          <div class="ai-card p-6 lg:col-span-7 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-display text-base font-bold text-slate-900">${cfg.tableTitle}</h3>
+              <span class="rounded-full bg-aiblue-soft text-aiblue px-3 py-1 text-xs font-bold">AI Verified</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-xs font-semibold text-slate-400">
+                    <th class="py-2.5 px-3 rounded-l-lg">${cfg.cols[0]}</th>
+                    <th class="py-2.5 px-3">${cfg.cols[1]}</th>
+                    <th class="py-2.5 px-3">${cfg.cols[2]}</th>
+                    <th class="py-2.5 px-3">${cfg.cols[3]}</th>
+                    <th class="py-2.5 px-3 text-right rounded-r-lg">${cfg.cols[4]}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+                  ${cfg.rows.map((r) => `
+                    <tr class="hover:bg-slate-50/80 transition">
+                      <td class="py-3 px-3 font-bold text-slate-900">${r[0]}</td>
+                      <td class="py-3 px-3 font-mono text-slate-600">${r[1]}</td>
+                      <td class="py-3 px-3 font-mono font-semibold text-slate-800">${r[2]}</td>
+                      <td class="py-3 px-3 font-semibold text-emerald-600">${r[3]}</td>
+                      <td class="py-3 px-3 text-right">
+                        <button onclick="showToast('${r[4]} · ${r[0]}')" class="rounded-xl bg-aiblue-soft hover:bg-indigo-100 text-aiblue px-3 py-1.5 text-xs font-bold cursor-pointer">${r[4]}</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+      const ctaAttr = cfg.ctaFn ? cfg.ctaFn : `showToast('${cfg.cta} completed')`;
+
+      box.innerHTML = `
+        <div class="ai-card p-5 sm:px-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <button onclick="navigateAiTab('dashboard')" class="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-1.5 text-xs font-bold text-slate-700 inline-flex items-center gap-1.5 transition cursor-pointer">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+                <span>← Overview</span>
+              </button>
+              <h1 class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">${cfg.title}</h1>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1.5">${cfg.subtitle}</p>
+          </div>
+          <button onclick="${ctaAttr}" class="rounded-xl bg-aiblue hover:bg-aiblue-dark text-white px-4 py-2.5 text-xs font-display font-bold shadow-md shadow-aiblue/25 transition cursor-pointer">
+            ${cfg.cta}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          ${cfg.kpis.map((k) => `
+            <div class="ai-card p-5 flex flex-col justify-between">
+              <p class="text-xs font-semibold text-slate-400">${k.lbl}</p>
+              <p class="font-display text-2xl font-extrabold text-slate-900 mt-1.5">${k.val}</p>
+              <p class="text-xs font-bold ${k.tone} mt-1.5">${k.sub}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div class="ai-card p-6 lg:col-span-5 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display text-base font-bold text-slate-900">${cfg.chartTitle}</h3>
+              <span class="text-xs font-bold text-aiblue">AI Live</span>
+            </div>
+            <svg viewBox="0 0 410 190" class="w-full h-48 overflow-visible">
+              <line x1="24" y1="156" x2="394" y2="156" stroke="#E2E8F0" stroke-width="1"/>
+              ${svgBars}
+            </svg>
+          </div>
+          ${rightCard}
+        </div>
+      `;
+    }
+
+    function navigateAiTab(tabKey) {
+      document.querySelectorAll('.menu-item[data-ainav]').forEach((el) => {
+        const active = el.getAttribute('data-ainav') === tabKey;
+        el.className = active
+          ? 'menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-left whitespace-nowrap bg-aiblue-soft text-aiblue transition cursor-pointer'
+          : 'menu-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap text-slate-600 hover:bg-slate-50 transition cursor-pointer';
+      });
+      document.querySelectorAll('.rail-ai-btn[data-ainav]').forEach((el) => {
+        const active = el.getAttribute('data-ainav') === tabKey;
+        el.className = active
+          ? 'rail-ai-btn h-10 w-10 rounded-xl bg-aiblue-soft text-aiblue flex items-center justify-center transition cursor-pointer'
+          : 'rail-ai-btn h-10 w-10 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer';
+      });
+
+      const defView = document.getElementById('defaultDashboardView');
+      const subView = document.getElementById('tabSubpageView');
+
+      if (!tabKey || tabKey === 'dashboard') {
+        subView.classList.add('hidden');
+        defView.classList.remove('hidden');
+        showToast('Switched to Executive Overview');
+      } else {
+        defView.classList.add('hidden');
+        subView.classList.remove('hidden');
+        renderAiSubpage(tabKey);
+        showToast('Opened ' + AI_SUBPAGES[tabKey].title);
+      }
+    }
+
+    function switchMenuTab(btn) {
+      const key = btn && btn.getAttribute('data-ainav');
+      navigateAiTab(key || 'dashboard');
+    }
+
+    function simulateMarketTick() {
+      holdings.forEach(h => {
+        if (!h.fixedVal) {
+          h.price = +(h.price * (1 + (Math.random() * 0.012 - 0.004))).toFixed(2);
+        }
+      });
+      renderHoldings();
+    }
+
+    let toastT = null;
+    function showToast(msg) {
+      const el = document.getElementById('aiToast');
+      document.getElementById('aiToastMsg').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      el.classList.add('opacity-100', 'translate-y-0');
+      if (toastT) clearTimeout(toastT);
+      toastT = setTimeout(() => {
+        el.classList.remove('opacity-100', 'translate-y-0');
+        el.classList.add('opacity-0', 'translate-y-3');
+      }, 2400);
+    }
+
+    renderPerformanceChart();
+    renderHoldings();
+  </script>
+</body>
+</html>

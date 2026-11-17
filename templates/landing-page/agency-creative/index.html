@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATELIER NOIR — Digital Product, Brand &amp; Design Systems Studio</title>
+  <meta name="description" content="Flagship digital product, brand identity, and multi-platform design systems studio crafting category-defining software experiences." />
+
+  <!-- Google Fonts: Syne, Instrument Serif, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0B0A0E',
+            noirCard: '#14131A',
+            noirElevated: '#1B1924',
+            champagne: '#E5C158',
+            champagneSoft: '#F2D98B',
+            vermilion: '#FF4438',
+            stoneWarm: '#A8A29E',
+          },
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            serif: ['"Instrument Serif"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            goldGlow: '0 0 42px -10px rgba(229, 193, 88, 0.35)',
+            vermilionGlow: '0 0 36px -10px rgba(255, 68, 56, 0.4)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --obsidian: #0B0A0E;
+      --surface: #14131A;
+      --champagne: #E5C158;
+      --vermilion: #FF4438;
+      --stone: #A8A29E;
+    }
+
+    body {
+      background-color: var(--obsidian);
+      color: #F5F5F4;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Refined Architectural Hairline Grid */
+    .editorial-grid {
+      background-size: 96px 96px;
+      background-image:
+        linear-gradient(to right, rgba(229, 193, 88, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    }
+
+    .noir-ambient {
+      background:
+        radial-gradient(60% 50% at 50% 0%, rgba(229, 193, 88, 0.11) 0%, rgba(255, 68, 56, 0.04) 48%, transparent 100%),
+        radial-gradient(35% 35% at 15% 20%, rgba(255, 68, 56, 0.07) 0%, transparent 100%);
+    }
+
+    /* Museum-Grade Surface Card */
+    .atelier-card {
+      background: linear-gradient(180deg, rgba(27, 25, 36, 0.65) 0%, rgba(20, 19, 26, 0.96) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+    }
+
+    .atelier-card:hover {
+      border-color: rgba(229, 193, 88, 0.38);
+      transform: translateY(-3px);
+      box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.85), 0 0 32px -14px rgba(229, 193, 88, 0.2);
+    }
+
+    /* Scroll Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Case study filter transition */
+    .work-card {
+      transition: opacity 0.32s ease, transform 0.32s ease;
+    }
+
+    /* Pill toggle active state */
+    .scope-pill.active {
+      background-color: #E5C158;
+      color: #0B0A0E;
+      border-color: #E5C158;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="editorial-grid selection:bg-champagne selection:text-obsidian">
+
+  <!-- Ambient Editorial Glow -->
+  <div class="pointer-events-none fixed inset-x-0 top-0 h-[650px] noir-ambient z-0"></div>
+
+  <!-- 1. FLOATING ARCHITECTURAL GLASS NAVIGATION BAR -->
+  <header class="fixed top-4 inset-x-0 z-50 px-4 sm:px-6">
+    <nav aria-label="Primary Studio Navigation" class="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 rounded-2xl bg-[#0E0D13]/80 backdrop-blur-xl border border-white/10 shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
+      <!-- Brand Identity -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-8 h-8 rounded-lg border border-champagne/50 bg-champagne/10 flex items-center justify-center group-hover:bg-champagne group-hover:text-obsidian text-champagne transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 22 20 2 20 12 2"/>
+            <line x1="12" y1="10" x2="12" y2="20"/>
+          </svg>
+        </div>
+        <span class="font-display font-extrabold tracking-tight text-base sm:text-lg text-white">ATELIER NOIR</span>
+      </a>
+
+      <!-- Center Navigation -->
+      <div class="hidden lg:flex items-center gap-8 text-sm text-stoneWarm">
+        <a href="#works" class="hover:text-white transition-colors">Selected Works</a>
+        <a href="#process" class="hover:text-white transition-colors">Process</a>
+        <a href="#testimonials" class="hover:text-white transition-colors">Partners</a>
+        <a href="#retainers" class="hover:text-white transition-colors">Engagement</a>
+      </div>
+
+      <!-- Studio Availability Indicator + Book Discovery CTA -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-noirCard border border-white/10 text-xs font-mono text-stone-200">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-vermilion opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-vermilion"></span>
+          </span>
+          <span>2 Q2 Retainer Slots Open</span>
+        </div>
+
+        <a href="#inquiry" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-champagne hover:bg-champagneSoft text-obsidian font-semibold text-xs sm:text-sm shadow-goldGlow transition-all">
+          <span>Book Discovery</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+
+        <button id="noirMobileBtn" aria-label="Toggle Menu" class="lg:hidden p-2 rounded-xl border border-white/10 text-stone-300 hover:text-white">
+          <svg id="noirOpenIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 8h16M4 16h16" stroke-linecap="round"/>
+          </svg>
+          <svg id="noirCloseIcon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="noirMobileMenu" class="hidden lg:hidden max-w-7xl mx-auto mt-2 p-5 rounded-2xl bg-[#14131A]/95 backdrop-blur-xl border border-white/10 shadow-2xl space-y-3 text-sm">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/10 font-mono text-xs text-champagne">
+        <span class="w-2 h-2 rounded-full bg-vermilion"></span>
+        <span>2 Q2 Retainer Slots Open — Zurich / NYC / Remote</span>
+      </div>
+      <a href="#works" class="noir-mobile-link block py-1.5 text-stone-200 hover:text-champagne">01 — Selected Works</a>
+      <a href="#process" class="noir-mobile-link block py-1.5 text-stone-200 hover:text-champagne">02 — Capabilities &amp; Process</a>
+      <a href="#testimonials" class="noir-mobile-link block py-1.5 text-stone-200 hover:text-champagne">03 — Partner Verdicts</a>
+      <a href="#retainers" class="noir-mobile-link block py-1.5 text-stone-200 hover:text-champagne">04 — Retainer &amp; Sprint Pricing</a>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+    <!-- 2. OVERSIZED EDITORIAL HERO + CLIENT IMPACT STRIP -->
+    <section class="pt-36 sm:pt-44 pb-16 lg:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="max-w-5xl">
+        <div class="inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.2em] text-champagne mb-6">
+          <span>01 — STUDIO MANIFESTO</span>
+          <span class="w-10 h-px bg-champagne/50"></span>
+          <span class="text-stoneWarm">EST. MMXIX // GENEVA &amp; NEW YORK</span>
+        </div>
+
+        <h1 class="font-display font-extrabold text-4xl sm:text-6xl lg:text-[4.65rem] leading-[1.02] tracking-[-0.03em] text-white">
+          We Craft <span class="font-serif italic font-normal text-champagne tracking-normal text-5xl sm:text-7xl lg:text-[5.3rem]">Category-Defining</span> Digital Products.
+        </h1>
+
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+          <p class="lg:col-span-7 text-base sm:text-lg text-stoneWarm leading-relaxed">
+            ATELIER NOIR partners with venture-backed founders and iconic category leaders to architect flagship AI interfaces, precision fintech platforms, and tokenized multi-brand design systems that compound enterprise valuation.
+          </p>
+
+          <div class="lg:col-span-5 flex flex-wrap lg:justify-end gap-4">
+            <a href="#works" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white text-obsidian hover:bg-champagne font-semibold text-sm transition-colors">
+              <span>Examine Case Studies</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 5v14M19 12l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a href="#inquiry" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-noirCard border border-white/15 hover:border-champagne/50 text-white font-medium text-sm transition-colors">
+              <span>Initiate Q2 Brief</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Impact Metrics Strip -->
+      <div class="mt-16 lg:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/10">
+        <div class="bg-noirCard p-6 sm:p-8">
+          <div class="font-mono text-[12.5px] text-stoneWarm uppercase tracking-widest">01 // Equity Impact</div>
+          <div class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-2">$2.4B<span class="text-champagne">+</span></div>
+          <div class="text-xs sm:text-sm text-stoneWarm mt-1">Client Valuation Created</div>
+        </div>
+        <div class="bg-noirCard p-6 sm:p-8">
+          <div class="font-mono text-[12.5px] text-stoneWarm uppercase tracking-widest">02 // Commercial Delta</div>
+          <div class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-2">+318<span class="text-vermilion">%</span></div>
+          <div class="text-xs sm:text-sm text-stoneWarm mt-1">Avg Conversion Lift</div>
+        </div>
+        <div class="bg-noirCard p-6 sm:p-8">
+          <div class="font-mono text-[12.5px] text-stoneWarm uppercase tracking-widest">03 // Craft Recognition</div>
+          <div class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-2">14 <span class="font-serif italic font-normal text-champagne text-3xl">SOTD</span></div>
+          <div class="text-xs sm:text-sm text-stoneWarm mt-1">Awwwards &amp; FWA Honors</div>
+        </div>
+        <div class="bg-noirCard p-6 sm:p-8">
+          <div class="font-mono text-[12.5px] text-stoneWarm uppercase tracking-widest">04 // Engineering Rigor</div>
+          <div class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-2">99.6</div>
+          <div class="text-xs sm:text-sm text-stoneWarm mt-1">Avg Production Lighthouse</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BENTO SELECTED WORKS & CONVERSION VISUAL DATA -->
+    <section id="works" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-[0.2em] text-champagne mb-3">02 — SELECTED WORKS &amp; TELEMETRY</div>
+          <h2 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white">
+            Measured Beauty. <span class="font-serif italic font-normal text-stone-300">Audited Outcomes.</span>
+          </h2>
+        </div>
+
+        <!-- Category Filter Buttons -->
+        <div class="inline-flex flex-wrap gap-1.5 p-1.5 rounded-xl bg-noirCard border border-white/10" role="tablist" aria-label="Filter Case Studies">
+          <button type="button" data-filter="all" class="work-filter-btn px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-champagne text-obsidian transition-all">All (04)</button>
+          <button type="button" data-filter="fintech" class="work-filter-btn px-4 py-2 rounded-lg text-xs font-mono text-stoneWarm hover:text-white transition-all">Fintech</button>
+          <button type="button" data-filter="ai" class="work-filter-btn px-4 py-2 rounded-lg text-xs font-mono text-stoneWarm hover:text-white transition-all">AI Products</button>
+          <button type="button" data-filter="systems" class="work-filter-btn px-4 py-2 rounded-lg text-xs font-mono text-stoneWarm hover:text-white transition-all">Brand Systems</button>
+        </div>
+      </div>
+
+      <!-- Asymmetric 4-Card Case Study Bento Grid -->
+      <div id="worksGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Case Study 01 (7 cols): VANGUARD TREASURY — Fintech SVG Conversion Curve -->
+        <article data-category="fintech" class="work-card atelier-card rounded-2xl p-6 sm:p-8 lg:col-span-7 flex flex-col justify-between">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <span class="font-mono text-xs text-champagne">INDEX 01 — INSTITUTIONAL FINTECH</span>
+              <span class="px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-champagne/15 text-champagne border border-champagne/30">+284% Onboarding Activation</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl sm:text-3xl text-white">Krono Treasury OS</h3>
+            <p class="text-sm text-stoneWarm mt-2 max-w-xl">
+              Re-architected multi-currency liquidity routing and KYB onboarding for a Series C European treasury desk—compressing time-to-first-wire from 6 days to 11 minutes.
+            </p>
+          </div>
+
+          <!-- Before/After UX Conversion Curve SVG -->
+          <div class="mt-7 p-5 rounded-xl bg-[#0B0A0E] border border-white/10">
+            <div class="flex items-center justify-between text-xs font-mono mb-3">
+              <span class="text-stoneWarm">90-Day Post-Redesign Activation Curve</span>
+              <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1.5 text-stone-500"><span class="w-2.5 h-0.5 bg-stone-600 inline-block"></span>Before (18.2%)</span>
+                <span class="flex items-center gap-1.5 text-champagne"><span class="w-2.5 h-0.5 bg-champagne inline-block"></span>After (69.8%)</span>
+              </div>
+            </div>
+            <svg viewBox="0 0 520 145" class="w-full h-auto" role="img" aria-label="Before and After UX Conversion Curve">
+              <defs>
+                <linearGradient id="goldArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#E5C158" stop-opacity="0.32"/>
+                  <stop offset="100%" stop-color="#E5C158" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="35" x2="520" y2="35" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3 3"/>
+              <line x1="0" y1="75" x2="520" y2="75" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3 3"/>
+              <line x1="0" y1="115" x2="520" y2="115" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3 3"/>
+
+              <!-- Legacy Baseline Curve -->
+              <path d="M0 120 Q 130 118, 260 112 T 520 106" fill="none" stroke="#57534E" stroke-width="2" stroke-dasharray="5 5"/>
+
+              <!-- Atelier Noir Redesign Curve -->
+              <path d="M0 120 C 95 114, 175 68, 275 44 C 365 23, 440 18, 520 14 L 520 145 L 0 145 Z" fill="url(#goldArea)"/>
+              <path d="M0 120 C 95 114, 175 68, 275 44 C 365 23, 440 18, 520 14" fill="none" stroke="#E5C158" stroke-width="2.6"/>
+
+              <!-- Milestone Annotation -->
+              <circle cx="275" cy="44" r="4.5" fill="#FF4438"/>
+              <text x="286" y="48" fill="#F5F5F4" font-family="JetBrains Mono" font-size="10">v2.0 Launch (+3.8x)</text>
+            </svg>
+          </div>
+        </article>
+
+        <!-- Case Study 02 (5 cols): AETHERIA — AI Products Retention & Task Velocity -->
+        <article data-category="ai" class="work-card atelier-card rounded-2xl p-6 sm:p-8 lg:col-span-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="font-mono text-xs text-vermilion">INDEX 02 — GENERATIVE AI WORKSPACE</span>
+              <span class="px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-vermilion/15 text-vermilion border border-vermilion/30">-64% Prompt Abandonment</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-white">Synthetix Canvas 3.0</h3>
+            <p class="text-sm text-stoneWarm mt-2">
+              Replaced brittle chat threads with a spatial multiplayer node canvas for 420,000 enterprise product designers.
+            </p>
+          </div>
+
+          <!-- Before / After Funnel Bars -->
+          <div class="mt-7 p-5 rounded-xl bg-[#0B0A0E] border border-white/10 space-y-4">
+            <div class="text-xs font-mono text-stoneWarm flex justify-between">
+              <span>Session-to-Export Completion</span>
+              <span class="text-white">84.2% D30 Retained</span>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[12.5px] font-mono text-stone-400 mb-1">
+                <span>Legacy Linear Chat UI</span>
+                <span>29% Completed</span>
+              </div>
+              <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                <div class="h-full bg-stone-600 rounded-full" style="width: 29%;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[12.5px] font-mono text-champagne mb-1">
+                <span>Spatial Node Canvas (Atelier Noir)</span>
+                <span>84% Completed</span>
+              </div>
+              <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-vermilion to-champagne rounded-full" style="width: 84%;"></div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[12.5px] font-mono text-stoneWarm">
+              <span>Series B Valuation Outcome</span>
+              <span class="text-white font-semibold">$640M Post-Money</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Case Study 03 (5 cols): MONOLITH LUXURY — Mobile Checkout Funnel Bars -->
+        <article data-category="fintech" class="work-card atelier-card rounded-2xl p-6 sm:p-8 lg:col-span-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="font-mono text-xs text-champagne">INDEX 03 — MOBILE COMMERCE &amp; PAY</span>
+              <span class="px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-champagne/15 text-champagne border border-champagne/30">+$48M Annual GMV</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-white">Veloce Biometric Pay</h3>
+            <p class="text-sm text-stoneWarm mt-2">
+              One-thumb Apple Passkey &amp; WebAuthn luxury checkout flow engineered at 60fps with sub-400ms edge hydration.
+            </p>
+          </div>
+
+          <!-- Mobile Checkout Funnel Visual Bars -->
+          <div class="mt-7 p-5 rounded-xl bg-[#0B0A0E] border border-white/10">
+            <div class="text-xs font-mono text-stoneWarm mb-4">Mobile Checkout Step Retention (%)</div>
+            <div class="grid grid-cols-4 gap-3 items-end h-28 pt-4">
+              <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                <span class="font-mono text-xs text-white">100%</span>
+                <div class="w-full bg-champagne/40 border border-champagne/60 rounded-t-md" style="height: 100%;"></div>
+                <span class="font-mono text-xs text-stoneWarm">Bag</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                <span class="font-mono text-xs text-white">94%</span>
+                <div class="w-full bg-champagne/60 border border-champagne/70 rounded-t-md" style="height: 94%;"></div>
+                <span class="font-mono text-xs text-stoneWarm">Passkey</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                <span class="font-mono text-xs text-white">89%</span>
+                <div class="w-full bg-champagne/80 border border-champagne rounded-t-md" style="height: 89%;"></div>
+                <span class="font-mono text-xs text-stoneWarm">Vault</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                <span class="font-mono text-xs text-vermilion font-bold">86%</span>
+                <div class="w-full bg-vermilion rounded-t-md" style="height: 86%;"></div>
+                <span class="font-mono text-xs text-white">Paid</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Case Study 04 (7 cols): HELIOS — Design Token Adoption Graph -->
+        <article data-category="systems" class="work-card atelier-card rounded-2xl p-6 sm:p-8 lg:col-span-7 flex flex-col justify-between">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <span class="font-mono text-xs text-champagne">INDEX 04 — MULTI-BRAND DESIGN SYSTEM</span>
+              <span class="px-2.5 py-1 rounded-full text-[12.5px] font-mono bg-white/5 text-stone-200 border border-white/15">42 Squads Unified</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl sm:text-3xl text-white">Helios Token Architecture</h3>
+            <p class="text-sm text-stoneWarm mt-2 max-w-xl">
+              Unified 7 acquired B2B SaaS products under a single W3C-compliant Figma-to-GitHub design token pipeline across React, iOS SwiftUI, and Android Compose.
+            </p>
+          </div>
+
+          <!-- Token Adoption & UI Velocity SVG Chart -->
+          <div class="mt-7 p-5 rounded-xl bg-[#0B0A0E] border border-white/10">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono mb-3">
+              <span class="text-stoneWarm">Cross-Repository Token Coverage (Q1 -&gt; Q4)</span>
+              <span class="text-champagne">96.4% Automated CI Sync</span>
+            </div>
+            <svg viewBox="0 0 520 120" class="w-full h-auto" role="img" aria-label="Design Token Adoption Graph">
+              <!-- Bars + Stepped Line -->
+              <g fill="rgba(229,193,88,0.16)" stroke="rgba(229,193,88,0.4)" stroke-width="1">
+                <rect x="20" y="88" width="58" height="24" rx="3"/>
+                <rect x="104" y="68" width="58" height="44" rx="3"/>
+                <rect x="188" y="48" width="58" height="64" rx="3"/>
+                <rect x="272" y="30" width="58" height="82" rx="3"/>
+                <rect x="356" y="18" width="58" height="94" rx="3"/>
+                <rect x="440" y="10" width="58" height="102" rx="3" fill="rgba(255,68,56,0.28)" stroke="#FF4438"/>
+              </g>
+              <polyline points="49,84 133,64 217,44 301,26 385,14 469,7" fill="none" stroke="#E5C158" stroke-width="2.2"/>
+              <g fill="#A8A29E" font-family="JetBrains Mono" font-size="9" text-anchor="middle">
+                <text x="49" y="105">19%</text>
+                <text x="133" y="90">38%</text>
+                <text x="217" y="75">59%</text>
+                <text x="301" y="62">77%</text>
+                <text x="385" y="54">89%</text>
+                <text x="469" y="48" fill="#FFFFFF" font-weight="600">96.4%</text>
+              </g>
+            </svg>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. CAPABILITIES & INTERACTIVE 4-STAGE SPRINT TIMELINE -->
+    <section id="process" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="max-w-3xl mb-14">
+        <div class="font-mono text-xs uppercase tracking-[0.2em] text-champagne mb-3">03 — CAPABILITIES &amp; PROCESS MATRIX</div>
+        <h2 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white">
+          Zero Agency Bloat. <span class="font-serif italic font-normal text-champagne">Principal-Only</span> Execution.
+        </h2>
+        <p class="text-stoneWarm mt-3 text-base sm:text-lg">
+          Every engagement runs on an audited 4-stage sprint architecture with weekly shippable production artifacts. Select a phase below to inspect deliverables.
+        </p>
+      </div>
+
+      <!-- Interactive 4-Stage Timeline Selector -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" role="tablist" aria-label="Studio Process Stages">
+        <button type="button" data-stage="0" class="stage-tab text-left p-5 rounded-2xl border border-champagne bg-noirElevated transition-all">
+          <div class="flex items-center justify-between font-mono text-xs text-champagne mb-3">
+            <span>01 — WEEKS 1–2</span>
+            <span>ACTIVE</span>
+          </div>
+          <div class="font-display font-bold text-lg text-white">Strategy &amp; Research</div>
+          <p class="text-xs text-stoneWarm mt-1">Category positioning, user telemetry audit &amp; product architecture.</p>
+        </button>
+
+        <button type="button" data-stage="1" class="stage-tab text-left p-5 rounded-2xl border border-white/10 bg-noirCard hover:border-white/25 transition-all">
+          <div class="flex items-center justify-between font-mono text-xs text-stoneWarm mb-3">
+            <span>02 — WEEKS 3–5</span>
+            <span>SYSTEMS</span>
+          </div>
+          <div class="font-display font-bold text-lg text-white">Design Systems</div>
+          <p class="text-xs text-stoneWarm mt-1">W3C multi-mode tokens, bespoke typography &amp; Figma component kit.</p>
+        </button>
+
+        <button type="button" data-stage="2" class="stage-tab text-left p-5 rounded-2xl border border-white/10 bg-noirCard hover:border-white/25 transition-all">
+          <div class="flex items-center justify-between font-mono text-xs text-stoneWarm mb-3">
+            <span>03 — WEEKS 6–7</span>
+            <span>KINETICS</span>
+          </div>
+          <div class="font-display font-bold text-lg text-white">Motion &amp; 3D WebGL</div>
+          <p class="text-xs text-stoneWarm mt-1">Custom GLSL shaders, micro-physics choreography &amp; Rive assets.</p>
+        </button>
+
+        <button type="button" data-stage="3" class="stage-tab text-left p-5 rounded-2xl border border-white/10 bg-noirCard hover:border-white/25 transition-all">
+          <div class="flex items-center justify-between font-mono text-xs text-stoneWarm mb-3">
+            <span>04 — WEEKS 8–10</span>
+            <span>PRODUCTION</span>
+          </div>
+          <div class="font-display font-bold text-lg text-white">Full-Stack Engineering</div>
+          <p class="text-xs text-stoneWarm mt-1">Next.js / TypeScript production PRs, WCAG AAA &amp; 99+ Lighthouse.</p>
+        </button>
+      </div>
+
+      <!-- Active Stage Detail Panel -->
+      <div class="atelier-card rounded-2xl p-7 sm:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <div id="stageIndexBadge" class="font-mono text-xs uppercase tracking-widest text-vermilion">STAGE 01 // ARCHITECTURAL DISCOVERY</div>
+            <h3 id="stageTitle" class="font-display font-bold text-2xl sm:text-3xl text-white">Diagnostic UX Audit &amp; Category Narrative</h3>
+            <p id="stageDescription" class="text-stoneWarm text-sm sm:text-base leading-relaxed">
+              We instrument your existing funnel, interview power users and churned enterprise buyers, and establish an unmistakable visual and functional thesis before drawing a single pixel.
+            </p>
+            <div id="stageTags" class="flex flex-wrap gap-2 pt-2">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 p-6 rounded-xl bg-[#0B0A0E] border border-white/10 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+              <span class="font-mono text-xs text-stoneWarm">Lead Principal Allocation</span>
+              <span id="stageAllocation" class="font-mono text-xs text-champagne font-semibold">2 Founding Partners</span>
+            </div>
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+              <span class="font-mono text-xs text-stoneWarm">Cadence &amp; Sync</span>
+              <span id="stageCadence" class="font-mono text-xs text-white">Async Looms + Thu Critique</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-stoneWarm">Exit Gate Artifact</span>
+              <span id="stageArtifact" class="font-mono text-xs text-vermilion font-semibold">Interactive North-Star Prototype</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. CLIENT PARTNER TESTIMONIALS -->
+    <section id="testimonials" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-[0.2em] text-champagne mb-3">04 — PARTNER ENDORSEMENTS</div>
+          <h2 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white">
+            Words from <span class="font-serif italic font-normal text-stone-300">Category Leaders.</span>
+          </h2>
+        </div>
+        <span class="font-mono text-xs text-stoneWarm">94% MULTI-YEAR RETAINER RENEWAL</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <article class="atelier-card rounded-2xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="font-mono text-xs text-champagne mb-5">01 // SERIES C FINTECH</div>
+            <p class="font-serif italic text-xl sm:text-2xl text-stone-100 leading-snug">
+              "Atelier Noir operated with more speed and technical rigor than a 15-person internal product org. Our enterprise demo-to-close rate doubled within 45 days of launch."
+            </p>
+          </div>
+          <div class="mt-8 pt-5 border-t border-white/10">
+            <div class="font-display font-bold text-sm text-white">Henrik Lindqvist</div>
+            <div class="text-xs text-stoneWarm mt-0.5">Co-Founder &amp; CEO, Krono Treasury</div>
+          </div>
+        </article>
+
+        <article class="atelier-card rounded-2xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="font-mono text-xs text-vermilion mb-5">02 // AI WORKSPACE UNICORN</div>
+            <p class="font-serif italic text-xl sm:text-2xl text-stone-100 leading-snug">
+              "Rarely do you find a studio equally fluent in editorial typography, custom WebGL shaders, and clean React Server Components. They defined our entire product category."
+            </p>
+          </div>
+          <div class="mt-8 pt-5 border-t border-white/10">
+            <div class="font-display font-bold text-sm text-white">Camille Beaumont</div>
+            <div class="text-xs text-stoneWarm mt-0.5">VP of Design, Synthetix Labs</div>
+          </div>
+        </article>
+
+        <article class="atelier-card rounded-2xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="font-mono text-xs text-champagne mb-5">03 // PUBLIC CLOUD ENTERPRISE</div>
+            <p class="font-serif italic text-xl sm:text-2xl text-stone-100 leading-snug">
+              "Their Helios token architecture unified seven fragmented engineering teams in one quarter—cutting UI regression bugs by 71% across web and mobile."
+            </p>
+          </div>
+          <div class="mt-8 pt-5 border-t border-white/10">
+            <div class="font-display font-bold text-sm text-white">Soren Takahashi</div>
+            <div class="text-xs text-stoneWarm mt-0.5">SVP Product Engineering, Helios Cloud</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 6. TRANSPARENT RETAINER & SPRINT PRICING -->
+    <section id="retainers" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10 reveal">
+      <div class="max-w-3xl mb-14">
+        <div class="font-mono text-xs uppercase tracking-[0.2em] text-champagne mb-3">05 — TRANSPARENT ENGAGEMENT MODELS</div>
+        <h2 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white">
+          Fixed Commercial Terms. <span class="font-serif italic font-normal text-champagne">Zero Surprise Change-Orders.</span>
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Model 1: Design Sprint -->
+        <div class="atelier-card rounded-2xl p-8 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between font-mono text-xs text-stoneWarm">
+              <span>01 // RAPID VALIDATION</span>
+              <span>2 WEEKS FIXED</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-white mt-3">Design Sprint</h3>
+            <div class="mt-4 flex items-baseline gap-1.5">
+              <span class="font-display font-extrabold text-4xl text-white">$12k</span>
+              <span class="font-mono text-xs text-stoneWarm">/ one-time sprint</span>
+            </div>
+            <p class="text-sm text-stoneWarm mt-3">
+              Ideal for seed-to-Series B teams needing an investor-grade interactive flagship prototype or high-converting product launch page.
+            </p>
+
+            <ul class="mt-6 space-y-3 text-sm text-stone-200">
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Core user flow UX architecture</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Interactive Figma + coded motion prototype</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Foundational visual direction &amp; tokens</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#inquiry" class="mt-8 w-full py-3.5 rounded-xl border border-white/15 hover:border-champagne text-center text-sm font-semibold text-white transition-colors">
+            Reserve 2-Week Sprint
+          </a>
+        </div>
+
+        <!-- Model 2: Embedded Partner (Highlighted) -->
+        <div class="atelier-card rounded-2xl p-8 flex flex-col justify-between relative border-champagne/60 shadow-goldGlow">
+          <div class="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-champagne text-obsidian font-mono text-[12.5px] font-semibold uppercase tracking-wider">
+            2 Q2 Slots Left
+          </div>
+          <div>
+            <div class="flex items-center justify-between font-mono text-xs text-champagne">
+              <span>02 // FLAGSHIP RETAINER</span>
+              <span>PAUSE ANYTIME</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-white mt-3">Embedded Partner</h3>
+            <div class="mt-4 flex items-baseline gap-1.5">
+              <span class="font-display font-extrabold text-4xl text-white">$18k</span>
+              <span class="font-mono text-xs text-stoneWarm">/ month</span>
+            </div>
+            <p class="text-sm text-stoneWarm mt-3">
+              Dedicated Design Director + Staff Creative Technologist embedded directly in your Slack, Linear, and GitHub repositories.
+            </p>
+
+            <ul class="mt-6 space-y-3 text-sm text-white">
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-vermilion shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>End-to-end product design &amp; brand systems</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-vermilion shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Production React / Next.js / WebGL code PRs</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-vermilion shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>48-hour async turnaround on sprint tasks</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-vermilion shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>100% IP ownership from Day 1</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#inquiry" class="mt-8 w-full py-3.5 rounded-xl bg-champagne hover:bg-champagneSoft text-obsidian text-center text-sm font-semibold shadow-goldGlow transition-colors">
+            Apply for Embedded Slot
+          </a>
+        </div>
+
+        <!-- Model 3: Enterprise Transformation -->
+        <div class="atelier-card rounded-2xl p-8 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between font-mono text-xs text-stoneWarm">
+              <span>03 // MULTI-SQUAD SCALE</span>
+              <span>QUARTERLY SCOPE</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-white mt-3">Enterprise Transformation</h3>
+            <div class="mt-4 flex items-baseline gap-1.5">
+              <span class="font-display font-extrabold text-4xl text-white">Custom</span>
+              <span class="font-mono text-xs text-stoneWarm">/ bespoke pod</span>
+            </div>
+            <p class="text-sm text-stoneWarm mt-3">
+              Full multi-platform re-architecture, M&amp;A brand consolidation, and automated W3C design token infrastructure for public &amp; late-stage orgs.
+            </p>
+
+            <ul class="mt-6 space-y-3 text-sm text-stone-200">
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Multi-platform Figma + React/Swift/Kotlin kit</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Internal design team upskilling &amp; governance</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Dedicated security, SOC2 &amp; legal MSA support</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#inquiry" class="mt-8 w-full py-3.5 rounded-xl border border-white/15 hover:border-vermilion text-center text-sm font-semibold text-white transition-colors">
+            Request Executive Proposal
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. PROJECT INQUIRY CTA WITH INTERACTIVE SCOPE SELECTOR PILLS -->
+    <section id="inquiry" class="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-white/10 reveal">
+      <div class="atelier-card rounded-3xl p-8 sm:p-12 lg:p-14 border border-white/15">
+        <div class="max-w-2xl">
+          <div class="font-mono text-xs uppercase tracking-[0.2em] text-vermilion mb-3">06 — INITIATE COMMISSION</div>
+          <h2 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white">
+            Let’s Architect Your <span class="font-serif italic font-normal text-champagne">Unfair Advantage.</span>
+          </h2>
+          <p class="text-stoneWarm mt-3 text-sm sm:text-base">
+            Select your primary disciplines below. Founding partners review every brief personally within 24 hours.
+          </p>
+        </div>
+
+        <form id="inquiryForm" class="mt-9 space-y-7">
+          <!-- Interactive Scope Selector Pills -->
+          <div>
+            <label class="block font-mono text-xs uppercase tracking-wider text-stoneWarm mb-3">
+              Select Scope Disciplines (<span id="selectedScopeCount" class="text-champagne">2</span> selected)
+            </label>
+            <div class="flex flex-wrap gap-2.5" id="scopePillsContainer">
+              <button type="button" data-scope="Product UI/UX" class="scope-pill active px-4 py-2 rounded-full text-xs font-mono border border-white/15 text-stone-200 transition-all">
+                Product UI/UX
+              </button>
+              <button type="button" data-scope="Design Systems" class="scope-pill active px-4 py-2 rounded-full text-xs font-mono border border-white/15 text-stone-200 transition-all">
+                Design Systems
+              </button>
+              <button type="button" data-scope="Brand Identity" class="scope-pill px-4 py-2 rounded-full text-xs font-mono border border-white/15 text-stone-200 hover:border-white/35 transition-all">
+                Brand Identity
+              </button>
+              <button type="button" data-scope="WebGL & Motion" class="scope-pill px-4 py-2 rounded-full text-xs font-mono border border-white/15 text-stone-200 hover:border-white/35 transition-all">
+                WebGL &amp; Motion
+              </button>
+              <button type="button" data-scope="AI Interface" class="scope-pill px-4 py-2 rounded-full text-xs font-mono border border-white/15 text-stone-200 hover:border-white/35 transition-all">
+                AI Interface
+              </button>
+              <button type="button" data-scope="Full-Stack Next.js" class="scope-pill px-4 py-2 rounded-full text-xs font-mono border border-white/15 text-stone-200 hover:border-white/35 transition-all">
+                Full-Stack Next.js
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Fields -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="partnerName" class="block font-mono text-[12.5px] uppercase tracking-wider text-stoneWarm mb-1.5">Your Name &amp; Role</label>
+              <input id="partnerName" type="text" required placeholder="Claire Moreau — Founder" class="w-full px-4 py-3.5 rounded-xl bg-[#0B0A0E] border border-white/15 text-sm text-white placeholder-stone-600 focus:outline-none focus:border-champagne" />
+            </div>
+            <div>
+              <label for="partnerEmail" class="block font-mono text-[12.5px] uppercase tracking-wider text-stoneWarm mb-1.5">Work Email</label>
+              <input id="partnerEmail" type="email" required placeholder="claire@company.com" class="w-full px-4 py-3.5 rounded-xl bg-[#0B0A0E] border border-white/15 text-sm text-white placeholder-stone-600 focus:outline-none focus:border-champagne" />
+            </div>
+          </div>
+
+          <div>
+            <label for="projectVision" class="block font-mono text-[12.5px] uppercase tracking-wider text-stoneWarm mb-1.5">Timeline &amp; Ambition</label>
+            <textarea id="projectVision" rows="3" required placeholder="Tell us about your upcoming product launch, Series A/B milestone, or design system goals..." class="w-full px-4 py-3.5 rounded-xl bg-[#0B0A0E] border border-white/15 text-sm text-white placeholder-stone-600 focus:outline-none focus:border-champagne"></textarea>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <span class="font-mono text-xs text-stoneWarm">NDA Ready Upon Request // Response &lt; 24h</span>
+            <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl bg-champagne hover:bg-champagneSoft text-obsidian font-semibold text-sm shadow-goldGlow transition-all">
+              <span>Transmit Discovery Brief</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div id="inquirySuccess" class="hidden p-4 rounded-xl bg-champagne/15 border border-champagne/40 font-mono text-xs text-champagne">
+            Dossier received. Managing Partner Julian Vance will respond with calendar availability within 1 business day.
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- MINIMAL ARCHITECTURAL FOOTER -->
+  <footer class="border-t border-white/10 bg-[#08070B] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <span class="font-display font-extrabold text-white tracking-tight">ATELIER NOIR</span>
+        <span class="text-stone-600">/</span>
+        <span class="font-mono text-xs text-stoneWarm">GENEVA • NEW YORK • TOKYO</span>
+      </div>
+
+      <div class="flex flex-wrap gap-6 font-mono text-xs text-stoneWarm">
+        <a href="#works" class="hover:text-champagne transition-colors">Index 01–04</a>
+        <a href="#process" class="hover:text-champagne transition-colors">Methodology</a>
+        <a href="#retainers" class="hover:text-champagne transition-colors">Retainers</a>
+        <a href="#inquiry" class="hover:text-champagne transition-colors">Commissions</a>
+      </div>
+
+      <div class="font-mono text-xs text-stone-500">
+        © MMXXVI ATELIER NOIR S.A. ALL RIGHTS RESERVED.
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE VANILLA JAVASCRIPT -->
+  <script>
+    (function () {
+      // 1. Mobile Menu Toggle
+      const mobileBtn = document.getElementById('noirMobileBtn');
+      const mobileMenu = document.getElementById('noirMobileMenu');
+      const openIcon = document.getElementById('noirOpenIcon');
+      const closeIcon = document.getElementById('noirCloseIcon');
+
+      mobileBtn.addEventListener('click', () => {
+        const isHidden = mobileMenu.classList.toggle('hidden');
+        openIcon.classList.toggle('hidden', !isHidden);
+        closeIcon.classList.toggle('hidden', isHidden);
+      });
+
+      document.querySelectorAll('.noir-mobile-link').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          openIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+        });
+      });
+
+      // 2. Selected Works Category Filter
+      const filterBtns = document.querySelectorAll('.work-filter-btn');
+      const workCards = document.querySelectorAll('.work-card');
+
+      filterBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const cat = btn.dataset.filter;
+          filterBtns.forEach((b) => {
+            b.className = 'work-filter-btn px-4 py-2 rounded-lg text-xs font-mono text-stoneWarm hover:text-white transition-all';
+          });
+          btn.className = 'work-filter-btn px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-champagne text-obsidian transition-all';
+
+          workCards.forEach((card) => {
+            if (cat === 'all' || card.dataset.category === cat) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          });
+        });
+      });
+
+      // 3. Interactive 4-Stage Sprint Timeline Matrix
+      const stagesData = [
+        {
+          badge: 'STAGE 01 // ARCHITECTURAL DISCOVERY (WEEKS 1–2)',
+          title: 'Diagnostic UX Audit & Category Narrative',
+          desc: 'We instrument your existing funnel, interview power users and churned enterprise buyers, and establish an unmistakable visual and functional thesis before drawing a single pixel.',
+          tags: ['Telemetry Funnel Audit', 'Category Positioning', 'Information Architecture', 'North-Star Wireflows'],
+          allocation: '2 Founding Partners',
+          cadence: 'Async Looms + Thu Critique',
+          artifact: 'Interactive North-Star Prototype'
+        },
+        {
+          badge: 'STAGE 02 // DESIGN SYSTEMS & TOKENS (WEEKS 3–5)',
+          title: 'Multi-Mode W3C Token & Component Architecture',
+          desc: 'We engineer an atomic Figma-to-code system featuring semantic color variables, bespoke optical typography scales, WCAG AAA contrast guarantees, and zero-detachment component APIs.',
+          tags: ['W3C Design Tokens', 'Figma Auto-Layout Kit', 'Dark & Light Modes', 'Bespoke Iconography'],
+          allocation: 'Design Director + Systems Lead',
+          cadence: 'Daily Figma Branch Syncs',
+          artifact: 'Tokenized Figma + Storybook Kit'
+        },
+        {
+          badge: 'STAGE 03 // MOTION & 3D WEBGL (WEEKS 6–7)',
+          title: 'Choreographed Micro-Physics & Spatial Shaders',
+          desc: 'Tactile spring physics, GPU-accelerated GLSL shaders, and state-driven Rive vector animations that make complex enterprise workflows feel effortless and alive at 120Hz.',
+          tags: ['Custom GLSL Shaders', 'Rive State Machines', 'Spring Micro-Interactions', '60fps Mobile Budget'],
+          allocation: 'Creative Technologist',
+          cadence: 'Live Staging Preview Links',
+          artifact: 'Hardware-Accelerated Motion Spec'
+        },
+        {
+          badge: 'STAGE 04 // FULL-STACK ENGINEERING (WEEKS 8–10)',
+          title: 'Production TypeScript PRs & 99+ Lighthouse Ship',
+          desc: 'Zero handoff loss. Our principal engineers ship clean, accessible React / Next.js components directly into your repository with automated visual regression tests.',
+          tags: ['Next.js App Router', 'Strict TypeScript', 'WCAG 2.2 AA/AAA', '99.6+ Lighthouse Audit'],
+          allocation: 'Principal Frontend Architect',
+          cadence: 'GitHub PR Reviews + CI/CD',
+          artifact: 'Merged Production Release'
+        }
+      ];
+
+      const stageTabs = document.querySelectorAll('.stage-tab');
+      const stageIndexBadge = document.getElementById('stageIndexBadge');
+      const stageTitle = document.getElementById('stageTitle');
+      const stageDescription = document.getElementById('stageDescription');
+      const stageTags = document.getElementById('stageTags');
+      const stageAllocation = document.getElementById('stageAllocation');
+      const stageCadence = document.getElementById('stageCadence');
+      const stageArtifact = document.getElementById('stageArtifact');
+
+      function renderStage(idx) {
+        const s = stagesData[idx];
+        stageIndexBadge.textContent = s.badge;
+        stageTitle.textContent = s.title;
+        stageDescription.textContent = s.desc;
+        stageAllocation.textContent = s.allocation;
+        stageCadence.textContent = s.cadence;
+        stageArtifact.textContent = s.artifact;
+
+        stageTags.innerHTML = '';
+        s.tags.forEach((tag) => {
+          const span = document.createElement('span');
+          span.className = 'px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-champagne';
+          span.textContent = tag;
+          stageTags.appendChild(span);
+        });
+      }
+
+      stageTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const idx = Number(tab.dataset.stage);
+          stageTabs.forEach((t) => {
+            t.className = 'stage-tab text-left p-5 rounded-2xl border border-white/10 bg-noirCard hover:border-white/25 transition-all';
+          });
+          tab.className = 'stage-tab text-left p-5 rounded-2xl border border-champagne bg-noirElevated transition-all';
+          renderStage(idx);
+        });
+      });
+
+      renderStage(0);
+
+      // 4. Interactive Scope Selector Pills
+      const scopePills = document.querySelectorAll('.scope-pill');
+      const selectedScopeCount = document.getElementById('selectedScopeCount');
+
+      function updateScopeCount() {
+        const count = document.querySelectorAll('.scope-pill.active').length;
+        selectedScopeCount.textContent = String(count);
+      }
+
+      scopePills.forEach((pill) => {
+        pill.addEventListener('click', () => {
+          pill.classList.toggle('active');
+          updateScopeCount();
+        });
+      });
+
+      // 5. Inquiry Form Submission
+      document.getElementById('inquiryForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('inquirySuccess').classList.remove('hidden');
+        e.target.reset();
+      });
+
+      // 6. IntersectionObserver Scroll Reveal
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+    })();
+  </script>
+</body>
+</html>

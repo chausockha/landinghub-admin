@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="g17" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="#F1F5F9"/>
+  <!-- Dark Contrast Sidebar -->
+  <rect x="0" y="0" width="150" height="450" fill="#131B26"/>
+  <rect x="16" y="76" width="118" height="28" rx="7" fill="#10B981" fill-opacity="0.18" stroke="#10B981" stroke-opacity="0.45"/>
+  <rect x="26" y="87" width="68" height="6" rx="3" fill="#FFFFFF"/>
+  <rect x="26" y="122" width="62" height="6" rx="3" fill="#64748B"/>
+  <rect x="26" y="148" width="54" height="6" rx="3" fill="#64748B"/>
+  <rect x="26" y="174" width="72" height="6" rx="3" fill="#64748B"/>
+  <rect x="26" y="218" width="58" height="6" rx="3" fill="#475569"/>
+  <rect x="26" y="244" width="66" height="6" rx="3" fill="#475569"/>
+  <!-- Topbar -->
+  <rect x="150" y="0" width="650" height="58" fill="#FFFFFF"/>
+  <line x1="150" y1="58" x2="800" y2="58" stroke="#E2E8F0"/>
+  <rect x="676" y="16" width="104" height="26" rx="7" fill="#10B981"/>
+  <!-- Header Title -->
+  <text x="774" y="84" text-anchor="end" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#64748B">Modern SaaS · Clean Grid + KPI Cards</text>
+  <!-- 6 Clean KPI Cards (3x2) -->
+  <g>
+    <rect x="174" y="108" width="192" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="188" y="128" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748B">TOTAL USERS</text>
+    <text x="188" y="152" font-family="Inter, sans-serif" font-size="19" font-weight="800" fill="#0F172A">2,540</text>
+    <rect x="318" y="140" width="5" height="20" rx="2" fill="#10B981"/><rect x="327" y="132" width="5" height="28" rx="2" fill="#10B981"/><rect x="336" y="136" width="5" height="24" rx="2" fill="#10B981"/><rect x="345" y="124" width="5" height="36" rx="2" fill="#10B981"/>
+
+    <rect x="378" y="108" width="192" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="392" y="128" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748B">AVG SESSION</text>
+    <text x="392" y="152" font-family="Inter, sans-serif" font-size="19" font-weight="800" fill="#0F172A">123.5m</text>
+    <rect x="522" y="138" width="5" height="22" rx="2" fill="#3B82F6"/><rect x="531" y="130" width="5" height="30" rx="2" fill="#3B82F6"/><rect x="540" y="134" width="5" height="26" rx="2" fill="#3B82F6"/><rect x="549" y="125" width="5" height="35" rx="2" fill="#3B82F6"/>
+
+    <rect x="582" y="108" width="196" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="596" y="128" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748B">ORDERS</text>
+    <text x="596" y="152" font-family="Inter, sans-serif" font-size="19" font-weight="800" fill="#0F172A">1,240</text>
+    <rect x="728" y="128" width="5" height="32" rx="2" fill="#F59E0B"/><rect x="737" y="133" width="5" height="27" rx="2" fill="#F59E0B"/><rect x="746" y="138" width="5" height="22" rx="2" fill="#F59E0B"/><rect x="755" y="142" width="5" height="18" rx="2" fill="#F59E0B"/>
+
+    <rect x="174" y="186" width="192" height="64" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="188" y="206" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748B">REVENUE</text>
+    <text x="188" y="227" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#0F172A">$24,567</text>
+    <rect x="188" y="237" width="164" height="5" rx="2.5" fill="#E2E8F0"/><rect x="188" y="237" width="126" height="5" rx="2.5" fill="#10B981"/>
+
+    <rect x="378" y="186" width="192" height="64" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="392" y="206" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748B">CONVERSIONS</text>
+    <text x="392" y="227" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#0F172A">2,315</text>
+    <rect x="392" y="237" width="164" height="5" rx="2.5" fill="#E2E8F0"/><rect x="392" y="237" width="96" height="5" rx="2.5" fill="#EF4444"/>
+
+    <rect x="582" y="186" width="196" height="64" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="596" y="206" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748B">PAGE VIEWS</text>
+    <text x="596" y="227" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#0F172A">47,325</text>
+    <rect x="596" y="237" width="166" height="5" rx="2.5" fill="#E2E8F0"/><rect x="596" y="237" width="132" height="5" rx="2.5" fill="#8B5CF6"/>
+  </g>
+  <!-- Bottom Network Chart + Activity -->
+  <rect x="174" y="262" width="396" height="168" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="192" y="286" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Network Activities · 6,782 (+7%)</text>
+  <path d="M192 385 C240 350, 285 372, 335 338 C385 305, 430 330, 480 302 C515 292, 535 298, 552 295 L552 410 L192 410 Z" fill="url(#g17)"/>
+  <path d="M192 385 C240 350, 285 372, 335 338 C385 305, 430 330, 480 302 C515 292, 535 298, 552 295" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+  <path d="M192 398 C240 372, 285 386, 335 358 C385 332, 430 350, 480 326 C515 318, 535 322, 552 320" fill="none" stroke="#3B82F6" stroke-width="2.2" stroke-dasharray="5 4"/>
+
+  <rect x="582" y="262" width="196" height="168" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="598" y="286" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Recent Activity</text>
+  <circle cx="606" cy="316" r="10" fill="#10B981"/><rect x="624" y="310" width="132" height="6" rx="3" fill="#334155"/><rect x="624" y="321" width="80" height="5" rx="2.5" fill="#94A3B8"/>
+  <circle cx="606" cy="352" r="10" fill="#3B82F6"/><rect x="624" y="346" width="124" height="6" rx="3" fill="#334155"/><rect x="624" y="357" width="72" height="5" rx="2.5" fill="#94A3B8"/>
+  <circle cx="606" cy="388" r="10" fill="#8B5CF6"/><rect x="624" y="382" width="136" height="6" rx="3" fill="#334155"/><rect x="624" y="393" width="88" height="5" rx="2.5" fill="#94A3B8"/>
+</svg>

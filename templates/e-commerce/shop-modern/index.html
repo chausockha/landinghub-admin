@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURA ACOUSTICS — Precision-Machined Sound. Zero Compromise.</title>
+  <meta name="description" content="Flagship spatial audio and CNC-machined industrial acoustic hardware. Planar magnetic headphones, reference monitors, and lossless desktop DAC architectures." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            graphite: '#0B0C10',
+            titanium: '#14161D',
+            titaniumLight: '#1B1E28',
+            titaniumBorder: '#252936',
+            amberAccent: '#F59E0B',
+            iceBlue: '#38BDF8',
+            chalk: '#F8FAFC'
+          },
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      background-color: #0B0C10;
+      color: #F8FAFC;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .cad-grid {
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+    .machined-card {
+      background: linear-gradient(180deg, rgba(27, 30, 40, 0.72) 0%, rgba(20, 22, 29, 0.96) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 20px 40px -24px rgba(0, 0, 0, 0.8);
+    }
+    .machined-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+    .anodized-glow {
+      background: radial-gradient(circle at 50% 45%, var(--hero-glow, rgba(245, 158, 11, 0.16)), transparent 68%);
+    }
+    .curve-transition {
+      transition: d 0.45s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.35s ease;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0C10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #252936;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #384054;
+    }
+  </style>
+</head>
+<body class="bg-graphite text-chalk antialiased selection:bg-amberAccent selection:text-graphite">
+
+  <!-- TOP TELEMETRY ANNOUNCEMENT STRIP -->
+  <div class="border-b border-white/[0.07] bg-[#08090C] text-[12.5px] font-mono tracking-wider uppercase text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-amberAccent animate-pulse"></span>
+        <span>BATCH 04 IN STOCK // CNC MACHINED IN AARHUS &amp; TOKYO</span>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-slate-400">
+        <span>60-DAY STUDIO AUDITION</span>
+        <span class="text-white/20">/</span>
+        <span>3-YEAR HARDWARE WARRANTY</span>
+        <span class="text-white/20">/</span>
+        <span class="text-iceBlue">FREE GLOBAL ARMORED DISPATCH</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING STOREFRONT NAVBAR -->
+  <header class="sticky top-3 z-40 px-4 sm:px-6 lg:px-8 mt-3">
+    <nav class="max-w-7xl mx-auto rounded-2xl bg-titanium/85 backdrop-blur-xl border border-white/10 shadow-2xl px-4 sm:px-6 h-16 flex items-center justify-between" aria-label="Primary Storefront Navigation">
+      <!-- Brand Identity -->
+      <a href="#flagship" class="flex items-center gap-3 group focus:outline-none">
+        <div class="w-9 h-9 rounded-lg bg-graphite border border-white/15 flex items-center justify-center group-hover:border-amberAccent/60 transition-colors">
+          <svg class="w-5 h-5 text-amberAccent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="9" stroke-opacity="0.35" />
+            <circle cx="12" cy="12" r="5" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+            <line x1="12" y1="1" x2="12" y2="4" />
+            <line x1="12" y1="20" x2="12" y2="23" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-display font-extrabold tracking-tight text-sm sm:text-base text-chalk leading-none">AURA ACOUSTICS</span>
+          <span class="font-mono text-xs tracking-widest text-slate-400 mt-1">LABS // REV 4.2</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#flagship" class="hover:text-chalk transition-colors">Flagship One</a>
+        <a href="#acoustics" class="hover:text-chalk transition-colors">Acoustics</a>
+        <a href="#lineup" class="hover:text-chalk transition-colors">Lineup</a>
+        <a href="#reviews" class="hover:text-chalk transition-colors">Reviews</a>
+        <a href="#specs" class="hover:text-chalk transition-colors">Specs</a>
+      </div>
+
+      <!-- Actions + Working Cart Trigger -->
+      <div class="flex items-center gap-3">
+        <a href="#bundle" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 font-mono text-xs text-slate-300 transition-colors">
+          <span class="w-1.5 h-1.5 rounded-full bg-iceBlue"></span>
+          <span>STUDIO BUNDLE -$178</span>
+        </a>
+
+        <button
+          id="openCartBtn"
+          type="button"
+          class="relative inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-chalk text-graphite hover:bg-amberAccent hover:text-graphite font-display font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg"
+          aria-label="Open shopping bag"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Bag</span>
+          <span id="navCartBadge" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md bg-graphite text-chalk font-mono text-xs font-semibold">1</span>
+        </button>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" type="button" class="lg:hidden p-2 rounded-xl border border-white/10 text-slate-300 hover:text-white hover:bg-white/5" aria-label="Toggle Menu">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <line x1="3" y1="7" x2="21" y2="7"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="17" x2="21" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Navigation Dropdown -->
+    <div id="mobileMenu" class="hidden lg:hidden max-w-7xl mx-auto mt-2 rounded-2xl bg-titanium/95 backdrop-blur-xl border border-white/10 p-4 shadow-2xl">
+      <div class="flex flex-col gap-3 text-sm font-medium text-slate-200">
+        <a href="#flagship" class="mobile-nav-link px-3 py-2 rounded-lg hover:bg-white/5">Flagship One</a>
+        <a href="#acoustics" class="mobile-nav-link px-3 py-2 rounded-lg hover:bg-white/5">Acoustics &amp; Telemetry</a>
+        <a href="#lineup" class="mobile-nav-link px-3 py-2 rounded-lg hover:bg-white/5">Hardware Lineup</a>
+        <a href="#reviews" class="mobile-nav-link px-3 py-2 rounded-lg hover:bg-white/5">Verified Reviews</a>
+        <a href="#specs" class="mobile-nav-link px-3 py-2 rounded-lg hover:bg-white/5">Technical Datasheet</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. OVERSIZED FLAGSHIP HERO -->
+    <section id="flagship" class="relative pt-10 pb-20 lg:pt-16 lg:pb-28 cad-grid border-b border-white/[0.07] overflow-hidden">
+      <div id="heroAmbient" class="absolute inset-0 anodized-glow pointer-events-none" style="--hero-glow: rgba(245, 158, 11, 0.14);"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+          
+          <!-- Left Column: Copy, Colorway Switcher & Purchase Action -->
+          <div class="lg:col-span-6 space-y-7">
+            <div class="inline-flex flex-wrap items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-titanium border border-white/10">
+              <span class="px-2 py-0.5 rounded bg-amberAccent/15 text-amberAccent font-mono text-[12.5px] font-semibold tracking-wider">AURA STUDIO ONE</span>
+              <span id="heroSkuTag" class="font-mono text-[12.5px] text-slate-400">SKU: AA-S1-OBS // GRADE-5 TITANIUM</span>
+            </div>
+
+            <div class="space-y-4">
+              <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-[58px] tracking-tight leading-[1.04] text-chalk">
+                Precision-Machined Sound. <span class="text-transparent bg-clip-text bg-gradient-to-r from-amberAccent via-amber-300 to-iceBlue">Zero Compromise.</span>
+              </h1>
+              <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl">
+                Engineered from 5-axis CNC billet aluminum and Grade-5 titanium. Featuring 50mm vapor-deposited Beryllium planar magnetic drivers, <span class="font-mono text-chalk text-sm">-48dB</span> hybrid phase-array ANC, and true 32-bit USB-C lossless studio conversion.
+              </p>
+            </div>
+
+            <!-- Interactive Colorway Finish Switcher -->
+            <div class="p-5 rounded-2xl machined-card space-y-4 max-w-xl">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs uppercase tracking-wider text-slate-400">Anodized Surface Finish</span>
+                <span id="selectedFinishBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/10 font-mono text-xs text-amberAccent">
+                  <span id="finishDot" class="w-2 h-2 rounded-full bg-amberAccent"></span>
+                  <span id="selectedFinishName">Obsidian Black</span>
+                </span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3" role="radiogroup" aria-label="Select Hardware Finish">
+                <button
+                  type="button"
+                  data-finish="obsidian"
+                  class="finish-btn group flex items-center gap-3 p-3 rounded-xl border border-amberAccent bg-white/[0.06] text-left transition-all"
+                >
+                  <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#2A2E3B] via-[#12141B] to-[#060709] ring-2 ring-amberAccent/70 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-display font-bold text-chalk truncate">Obsidian</div>
+                    <div class="font-mono text-xs text-slate-400">DLC Matte</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  data-finish="titanium"
+                  class="finish-btn group flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] text-left transition-all"
+                >
+                  <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#E2E8F0] via-[#94A3B8] to-[#475569] ring-1 ring-white/30 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-display font-bold text-chalk truncate">Raw Titanium</div>
+                    <div class="font-mono text-xs text-slate-400">Bead-Blasted</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  data-finish="copper"
+                  class="finish-btn group flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] text-left transition-all"
+                >
+                  <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#FBBF24] via-[#D97706] to-[#78350F] ring-1 ring-amber-400/40 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-display font-bold text-chalk truncate">Copper</div>
+                    <div class="font-mono text-xs text-slate-400">Anodized Cu</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Primary CTA & Secondary Link -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-1">
+              <button
+                id="heroAddToBagBtn"
+                type="button"
+                class="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-xl bg-amberAccent hover:bg-amber-400 text-graphite font-display font-extrabold text-base tracking-tight transition-all shadow-[0_0_35px_-8px_rgba(245,158,11,0.65)] active:scale-[0.99]"
+              >
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add to Bag</span>
+                <span class="opacity-40">|</span>
+                <span class="font-mono font-bold">$549</span>
+              </button>
+
+              <a
+                href="#acoustics"
+                class="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl bg-titanium hover:bg-titaniumLight border border-white/10 font-display font-semibold text-sm text-chalk transition-colors"
+              >
+                <span>Acoustic Lab Telemetry</span>
+                <svg class="w-4 h-4 text-iceBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                </svg>
+              </a>
+            </div>
+
+            <!-- Hardware Telemetry Spec Strip -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
+              <div>
+                <div class="font-mono text-lg font-bold text-chalk">50mm</div>
+                <div class="font-mono text-[12.5px] text-slate-400 uppercase">Beryllium Planar</div>
+              </div>
+              <div>
+                <div class="font-mono text-lg font-bold text-iceBlue">-48dB</div>
+                <div class="font-mono text-[12.5px] text-slate-400 uppercase">8-Mic Hybrid ANC</div>
+              </div>
+              <div>
+                <div class="font-mono text-lg font-bold text-chalk">0.03%</div>
+                <div class="font-mono text-[12.5px] text-slate-400 uppercase">THD @ 1kHz 100dB</div>
+              </div>
+              <div>
+                <div class="font-mono text-lg font-bold text-amberAccent">60 HRS</div>
+                <div class="font-mono text-[12.5px] text-slate-400 uppercase">USB-C DAC + BT 5.4</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Architectural Hardware SVG Showcase -->
+          <div class="lg:col-span-6">
+            <div class="relative rounded-3xl machined-card p-6 sm:p-8 overflow-hidden">
+              <!-- Top CAD Header Bar -->
+              <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span class="font-mono text-[12.5px] tracking-widest text-slate-400 uppercase">CAD PROJECTION // 1:1 ACOUSTIC CHASSIS</span>
+                </div>
+                <span id="svgFinishPill" class="px-2.5 py-1 rounded bg-amberAccent/15 border border-amberAccent/40 font-mono text-[12.5px] text-amberAccent font-semibold">
+                  FINISH: OBSIDIAN DLC
+                </span>
+              </div>
+
+              <!-- Architectural SVG Illustration of AURA STUDIO ONE Headphones -->
+              <div class="relative flex items-center justify-center py-2">
+                <svg id="heroHeadphoneSvg" viewBox="0 0 560 460" class="w-full max-w-[500px] h-auto drop-shadow-[0_28px_40px_rgba(0,0,0,0.85)]" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AURA STUDIO ONE Architectural Hardware Illustration">
+                  <defs>
+                    <!-- Dynamic Gradients Controlled by Finish Switcher -->
+                    <linearGradient id="shellGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop id="shellStop1" offset="0%" stop-color="#323746" />
+                      <stop id="shellStop2" offset="50%" stop-color="#191C26" />
+                      <stop id="shellStop3" offset="100%" stop-color="#0B0D12" />
+                    </linearGradient>
+                    <linearGradient id="bandGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop id="bandStop1" offset="0%" stop-color="#3A4052" />
+                      <stop id="bandStop2" offset="100%" stop-color="#13161F" />
+                    </linearGradient>
+                    <linearGradient id="yokeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop id="yokeStop1" offset="0%" stop-color="#F59E0B" />
+                      <stop id="yokeStop2" offset="100%" stop-color="#B45309" />
+                    </linearGradient>
+                    <radialGradient id="driverGlow" cx="50%" cy="50%" r="50%">
+                      <stop id="glowStop1" offset="0%" stop-color="#F59E0B" stop-opacity="0.32" />
+                      <stop offset="100%" stop-color="#0B0C10" stop-opacity="0" />
+                    </radialGradient>
+                    <pattern id="acousticMesh" width="6" height="6" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.14)" />
+                    </pattern>
+                  </defs>
+
+                  <!-- Subtle Technical Crosshairs & Radial Calibration Circles -->
+                  <circle cx="280" cy="245" r="195" stroke="rgba(255,255,255,0.06)" stroke-dasharray="4 6" />
+                  <circle cx="280" cy="245" r="145" stroke="rgba(56,189,248,0.12)" stroke-width="1" />
+                  <circle cx="280" cy="245" r="175" fill="url(#driverGlow)" />
+                  <line x1="40" y1="245" x2="520" y2="245" stroke="rgba(255,255,255,0.05)" />
+                  <line x1="280" y1="30" x2="280" y2="430" stroke="rgba(255,255,255,0.05)" />
+
+                  <!-- Outer Spring Steel & Lambskin Headband Arch -->
+                  <path d="M136 228 C136 96, 424 96, 424 228" stroke="url(#bandGrad)" stroke-width="26" stroke-linecap="round" />
+                  <path d="M148 220 C148 114, 412 114, 412 220" stroke="#0D0F14" stroke-width="10" stroke-linecap="round" />
+                  <path id="headbandAccentArc" d="M190 112 C240 88, 320 88, 370 112" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.85" />
+
+                  <!-- CNC Machined Telescoping Stems & Yokes (Left & Right) -->
+                  <rect x="128" y="212" width="16" height="58" rx="6" fill="url(#yokeGrad)" />
+                  <rect x="416" y="212" width="16" height="58" rx="6" fill="url(#yokeGrad)" />
+                  <!-- Yoke Pivot Pins -->
+                  <circle cx="136" cy="264" r="7" fill="#0B0C10" stroke="url(#yokeGrad)" stroke-width="3" />
+                  <circle cx="424" cy="264" r="7" fill="#0B0C10" stroke="url(#yokeGrad)" stroke-width="3" />
+
+                  <!-- Lambskin Memory Foam Ear Cushions (Inner Side) -->
+                  <rect x="168" y="226" width="34" height="138" rx="17" fill="#12141C" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" />
+                  <rect x="358" y="226" width="34" height="138" rx="17" fill="#12141C" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" />
+
+                  <!-- Left CNC Billet Aluminum Earcup Housing -->
+                  <rect x="108" y="232" width="68" height="126" rx="28" fill="url(#shellGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" />
+                  <rect x="118" y="244" width="48" height="102" rx="20" fill="url(#acousticMesh)" stroke="rgba(255,255,255,0.1)" />
+                  <line id="leftTrimRing" x1="142" y1="252" x2="142" y2="338" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" />
+                  <!-- ANC Beamforming Mic Vent Left -->
+                  <rect x="123" y="262" width="6" height="22" rx="3" fill="#090A0E" stroke="rgba(255,255,255,0.25)" />
+
+                  <!-- Right CNC Billet Aluminum Earcup Housing -->
+                  <rect x="384" y="232" width="68" height="126" rx="28" fill="url(#shellGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" />
+                  <rect x="394" y="244" width="48" height="102" rx="20" fill="url(#acousticMesh)" stroke="rgba(255,255,255,0.1)" />
+                  <line id="rightTrimRing" x1="418" y1="252" x2="418" y2="338" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" />
+                  <!-- Knurled Solid Brass/Titanium Digital Volume Crown -->
+                  <rect id="knurledCrown" x="449" y="254" width="11" height="28" rx="4" fill="url(#yokeGrad)" />
+                  <!-- USB-C Lossless Port Indicator Bottom Right -->
+                  <rect x="410" y="357" width="16" height="5" rx="2.5" fill="#38BDF8" />
+
+                  <!-- Center Acoustic Planar Wave Schematic Overlay -->
+                  <g opacity="0.9">
+                    <circle cx="280" cy="295" r="42" fill="#0E1017" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+                    <circle id="centerCoreRing" cx="280" cy="295" r="28" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="3 3" />
+                    <path d="M262 295 Q271 277 280 295 T298 295" stroke="#38BDF8" stroke-width="2" fill="none" />
+                    <text x="280" y="354" text-anchor="middle" fill="#94A3B8" font-family="JetBrains Mono" font-size="9" letter-spacing="1.5">50MM PLANAR CORE</text>
+                  </g>
+
+                  <!-- Architectural Dimension Callout Lines -->
+                  <g font-family="JetBrains Mono" font-size="9.5" fill="#CBD5E1">
+                    <!-- Top Callout -->
+                    <line x1="340" y1="98" x2="392" y2="62" stroke="rgba(255,255,255,0.3)" />
+                    <line x1="392" y1="62" x2="495" y2="62" stroke="rgba(255,255,255,0.3)" />
+                    <circle cx="340" cy="98" r="3" fill="#F59E0B" />
+                    <text x="396" y="56" fill="#F8FAFC">SPRING TITANIUM ARCH</text>
+                    <text x="396" y="74" fill="#64748B" font-size="8.5">4.1N CLAMPING FORCE</text>
+
+                    <!-- Left Callout -->
+                    <line x1="115" y1="315" x2="68" y2="365" stroke="rgba(255,255,255,0.3)" />
+                    <line x1="26" y1="365" x2="68" y2="365" stroke="rgba(255,255,255,0.3)" />
+                    <circle cx="115" cy="315" r="3" fill="#38BDF8" />
+                    <text x="26" y="358" fill="#F8FAFC">CNC 6061-T6 SHELL</text>
+                    <text x="26" y="378" fill="#64748B" font-size="8.5">-48dB PHASE ARRAY</text>
+
+                    <!-- Right Crown Callout -->
+                    <line x1="458" y1="268" x2="492" y2="232" stroke="rgba(255,255,255,0.3)" />
+                    <circle cx="458" cy="268" r="3" fill="#F59E0B" />
+                    <text x="450" y="223" fill="#F8FAFC">OPTICAL CROWN</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Bottom Telemetry Footer inside Hero Hardware Card -->
+              <div class="grid grid-cols-3 gap-3 pt-4 mt-2 border-t border-white/10 text-center sm:text-left">
+                <div class="p-2.5 rounded-xl bg-graphite/70 border border-white/[0.06]">
+                  <div class="font-mono text-xs text-slate-400">DAC ARCHITECTURE</div>
+                  <div class="font-mono text-xs font-semibold text-chalk mt-0.5">Dual ES9281AC PRO</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-graphite/70 border border-white/[0.06]">
+                  <div class="font-mono text-xs text-slate-400">MASS DISTRIBUTION</div>
+                  <div class="font-mono text-xs font-semibold text-chalk mt-0.5">312g Zero-Hotspot</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-graphite/70 border border-white/[0.06]">
+                  <div class="font-mono text-xs text-slate-400">CODEC SUITE</div>
+                  <div class="font-mono text-xs font-semibold text-iceBlue mt-0.5">aptX Lossless / LDAC</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ACOUSTIC VISUAL DATA & ENGINEERING BENTO GRID -->
+    <section id="acoustics" class="py-20 lg:py-28 border-b border-white/[0.07]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <div class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-amberAccent mb-3">
+              <span class="w-2 h-2 rounded-full bg-amberAccent"></span>
+              <span>ANECHOIC CHAMBER VERIFIED // IEC 60318-4</span>
+            </div>
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-chalk">
+              Acoustic Telemetry &amp; Material Architecture
+            </h2>
+          </div>
+          <p class="text-slate-400 max-w-md text-sm sm:text-base">
+            Every AURA STUDIO ONE unit is individually laser-interferometer tested and shipped with its serialized frequency calibration curve.
+          </p>
+        </div>
+
+        <!-- Bento Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- BENTO CARD 1 (8 Cols): Interactive Frequency Response Curve SVG Chart -->
+          <div class="lg:col-span-8 rounded-3xl machined-card p-6 sm:p-8 flex flex-col justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h3 class="font-display font-bold text-xl text-chalk">Frequency Response Curve</h3>
+                  <span class="px-2 py-0.5 rounded bg-iceBlue/15 text-iceBlue font-mono text-[12.5px]">20Hz — 40kHz HI-RES</span>
+                </div>
+                <p id="eqModeDescription" class="text-xs sm:text-sm text-slate-400 mt-1">
+                  Harman-neutral studio reference target with +/-0.8dB planar driver matching across L/R channels.
+                </p>
+              </div>
+
+              <!-- Interactive DSP Mode Switcher -->
+              <div class="inline-flex p-1 rounded-xl bg-graphite border border-white/10 self-start sm:self-auto" role="tablist" aria-label="Acoustic Tuning Mode">
+                <button type="button" data-eq="flat" class="eq-mode-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-amberAccent text-graphite transition-all">
+                  Studio Flat
+                </button>
+                <button type="button" data-eq="bass" class="eq-mode-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold text-slate-400 hover:text-chalk transition-all">
+                  Spatial Bass
+                </button>
+                <button type="button" data-eq="vocal" class="eq-mode-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold text-slate-400 hover:text-chalk transition-all">
+                  Vocal Clarity
+                </button>
+              </div>
+            </div>
+
+            <!-- SVG Chart Container -->
+            <div class="my-6 relative">
+              <div class="flex flex-wrap items-center justify-between gap-4 mb-3 text-xs font-mono">
+                <div class="flex items-center gap-5">
+                  <span class="inline-flex items-center gap-2 text-chalk">
+                    <span id="legendSwatch" class="w-3 h-1 rounded-full bg-amberAccent"></span>
+                    <span>AURA Planar Lossless (USB-C / LDAC)</span>
+                  </span>
+                  <span class="inline-flex items-center gap-2 text-slate-400">
+                    <span class="w-3 h-0.5 border-t border-dashed border-slate-500"></span>
+                    <span>Standard Dynamic Wireless</span>
+                  </span>
+                </div>
+                <span id="eqPeakReadout" class="text-amberAccent">SUB-20Hz EXTENSION: +1.2dB // 38kHz AIR</span>
+              </div>
+
+              <div class="rounded-2xl bg-graphite/90 border border-white/[0.07] p-3 sm:p-4">
+                <svg viewBox="0 0 680 230" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Interactive Frequency Response Chart">
+                  <defs>
+                    <linearGradient id="freqAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop id="freqAreaStop" offset="0%" stop-color="#F59E0B" stop-opacity="0.28" />
+                      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.0" />
+                    </linearGradient>
+                  </defs>
+
+                  <!-- Horizontal dB Gridlines -->
+                  <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+                    <line x1="48" y1="25" x2="660" y2="25" />
+                    <line x1="48" y1="65" x2="660" y2="65" />
+                    <line x1="48" y1="105" x2="660" y2="105" stroke="rgba(255,255,255,0.14)" />
+                    <line x1="48" y1="145" x2="660" y2="145" />
+                    <line x1="48" y1="185" x2="660" y2="185" />
+                  </g>
+
+                  <!-- Vertical Logarithmic Frequency Gridlines -->
+                  <g stroke="rgba(255,255,255,0.05)" stroke-width="1">
+                    <line x1="48" y1="20" x2="48" y2="190" />
+                    <line x1="135" y1="20" x2="135" y2="190" />
+                    <line x1="225" y1="20" x2="225" y2="190" />
+                    <line x1="340" y1="20" x2="340" y2="190" />
+                    <line x1="455" y1="20" x2="455" y2="190" />
+                    <line x1="565" y1="20" x2="565" y2="190" />
+                    <line x1="660" y1="20" x2="660" y2="190" />
+                  </g>
+
+                  <!-- Y-Axis Labels -->
+                  <g font-family="JetBrains Mono" font-size="9.5" fill="#64748B" text-anchor="end">
+                    <text x="40" y="28">+10dB</text>
+                    <text x="40" y="68">+5dB</text>
+                    <text x="40" y="108" fill="#CBD5E1">0dB</text>
+                    <text x="40" y="148">-5dB</text>
+                    <text x="40" y="188">-10dB</text>
+                  </g>
+
+                  <!-- X-Axis Labels -->
+                  <g font-family="JetBrains Mono" font-size="9.5" fill="#64748B" text-anchor="middle">
+                    <text x="52" y="212">20Hz</text>
+                    <text x="135" y="212">80Hz</text>
+                    <text x="225" y="212">250Hz</text>
+                    <text x="340" y="212">1kHz</text>
+                    <text x="455" y="212">4kHz</text>
+                    <text x="565" y="212">16kHz</text>
+                    <text x="646" y="212" fill="#38BDF8">40kHz</text>
+                  </g>
+
+                  <!-- Standard Consumer Wireless Curve (Muddy mid-bass hump + sharp 14kHz roll-off) -->
+                  <path
+                    d="M48 138 C95 72, 165 62, 225 112 C285 135, 360 118, 455 96 C520 112, 560 165, 660 188"
+                    stroke="#64748B"
+                    stroke-width="2"
+                    stroke-dasharray="5 5"
+                    fill="none"
+                  />
+
+                  <!-- Dynamic Area Under AURA Curve -->
+                  <path
+                    id="auraFreqArea"
+                    d="M48 98 C110 97, 175 102, 245 104 C320 105, 395 103, 465 92 C535 84, 605 94, 660 108 L660 190 L48 190 Z"
+                    fill="url(#freqAreaGrad)"
+                  />
+
+                  <!-- Dynamic AURA Planar Curve -->
+                  <path
+                    id="auraFreqLine"
+                    class="curve-transition"
+                    d="M48 98 C110 97, 175 102, 245 104 C320 105, 395 103, 465 92 C535 84, 605 94, 660 108"
+                    stroke="#F59E0B"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    fill="none"
+                  />
+
+                  <!-- Reference Telemetry Nodes -->
+                  <circle id="nodeSubBass" cx="95" cy="98" r="4.5" fill="#0B0C10" stroke="#F59E0B" stroke-width="2.5" />
+                  <circle id="nodeMidRef" cx="340" cy="104" r="4.5" fill="#0B0C10" stroke="#F59E0B" stroke-width="2.5" />
+                  <circle id="nodeTreble" cx="565" cy="90" r="4.5" fill="#0B0C10" stroke="#38BDF8" stroke-width="2.5" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Bottom Telemetry Callouts -->
+            <div class="grid grid-cols-3 gap-4 pt-2">
+              <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div class="font-mono text-[12.5px] text-slate-400">CHANNEL MATCHING</div>
+                <div class="font-mono text-sm sm:text-base font-bold text-chalk mt-0.5">&plusmn;0.5dB Laser-Paired</div>
+              </div>
+              <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div class="font-mono text-[12.5px] text-slate-400">IMPEDANCE / SENS</div>
+                <div class="font-mono text-sm sm:text-base font-bold text-chalk mt-0.5">32 &Omega; // 108 dB/mW</div>
+              </div>
+              <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div class="font-mono text-[12.5px] text-slate-400">PHASE LINEARITY</div>
+                <div class="font-mono text-sm sm:text-base font-bold text-iceBlue mt-0.5">&lt; 1.8&deg; Deviation</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BENTO CARD 2 (4 Cols): Active Noise Cancellation -48dB Attenuation Bar Matrix -->
+          <div class="lg:col-span-4 rounded-3xl machined-card p-6 sm:p-8 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="px-2.5 py-1 rounded bg-iceBlue/15 text-iceBlue font-mono text-xs font-semibold">8-MIC PHASE ARRAY</span>
+                <button
+                  id="ancToggleBtn"
+                  type="button"
+                  class="px-2.5 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 font-mono text-[12.5px] text-amberAccent transition-colors"
+                >
+                  MODE: MAX -48dB
+                </button>
+              </div>
+
+              <h3 class="font-display font-bold text-xl text-chalk">Hybrid ANC Attenuation</h3>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1.5">
+                Dual-core neural acoustic cancellation samples external pressure 384,000 times per second with zero planar drum-pressure.
+              </p>
+
+              <!-- Big Attenuation Readout -->
+              <div class="my-6 p-4 rounded-2xl bg-graphite border border-white/[0.08] flex items-baseline justify-between">
+                <div>
+                  <div class="font-mono text-xs uppercase tracking-wider text-slate-400">Peak Isolation</div>
+                  <div id="ancPeakValue" class="font-mono text-3xl font-bold text-iceBlue mt-0.5">-48.4 dB</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-mono text-xs uppercase tracking-wider text-slate-400">Cabin Noise Eliminated</div>
+                  <div id="ancPercentValue" class="font-mono text-lg font-bold text-chalk mt-0.5">99.6%</div>
+                </div>
+              </div>
+
+              <!-- Multi-Band Attenuation Bar Matrix -->
+              <div class="space-y-4 font-mono text-xs">
+                <div>
+                  <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Sub-Rumble (40–150Hz)</span>
+                    <span id="ancBand1Label" class="text-iceBlue font-semibold">-48dB</span>
+                  </div>
+                  <div class="h-2.5 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                    <div id="ancBand1Bar" class="h-full bg-gradient-to-r from-iceBlue to-amberAccent rounded-full transition-all duration-500" style="width: 96%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Turbine Drone (150–600Hz)</span>
+                    <span id="ancBand2Label" class="text-iceBlue font-semibold">-44dB</span>
+                  </div>
+                  <div class="h-2.5 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                    <div id="ancBand2Bar" class="h-full bg-gradient-to-r from-iceBlue to-sky-300 rounded-full transition-all duration-500" style="width: 88%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Street Transit (600Hz–2kHz)</span>
+                    <span id="ancBand3Label" class="text-iceBlue font-semibold">-39dB</span>
+                  </div>
+                  <div class="h-2.5 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                    <div id="ancBand3Bar" class="h-full bg-iceBlue/85 rounded-full transition-all duration-500" style="width: 79%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Vocal Chatter (2k–6kHz)</span>
+                    <span id="ancBand4Label" class="text-iceBlue font-semibold">-34dB</span>
+                  </div>
+                  <div class="h-2.5 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                    <div id="ancBand4Bar" class="h-full bg-iceBlue/70 rounded-full transition-all duration-500" style="width: 70%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-[12.5px] font-mono text-slate-400">
+              <span>CLICK MODE BUTTON TO PREVIEW TRANSPARENCY</span>
+              <span class="text-emerald-400">0.0ms ARTIFACT</span>
+            </div>
+          </div>
+
+          <!-- BENTO CARD 3 (5 Cols): 60-Hour Battery & USB-C Lossless DAC Telemetry Card -->
+          <div class="lg:col-span-5 rounded-3xl machined-card p-6 sm:p-8 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="px-2.5 py-1 rounded bg-amberAccent/15 text-amberAccent font-mono text-xs font-semibold">POWER &amp; CONVERSION</span>
+                <span class="font-mono text-xs text-slate-400">1,120mAh SILICON-ANODE</span>
+              </div>
+
+              <h3 class="font-display font-bold text-xl text-chalk">60-Hour Endurance &amp; Direct USB-C DAC</h3>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1.5">
+                Bypass Bluetooth compression completely via single-cable USB-C bit-perfect studio audio while simultaneously trickle-charging.
+              </p>
+
+              <!-- 12-Segment Machined Battery Cell Array -->
+              <div class="mt-6 p-4 rounded-2xl bg-graphite border border-white/[0.08]">
+                <div class="flex items-center justify-between font-mono text-xs mb-2.5">
+                  <span class="text-chalk font-semibold">60 HRS (ANC ON) // 82 HRS (ANC OFF)</span>
+                  <span class="text-amberAccent">5 MIN = 8 HRS</span>
+                </div>
+                <div class="grid grid-cols-12 gap-1.5">
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent"></div>
+                  <div class="h-6 rounded bg-amberAccent/90"></div>
+                  <div class="h-6 rounded bg-amberAccent/80"></div>
+                  <div class="h-6 rounded bg-iceBlue"></div>
+                  <div class="h-6 rounded bg-iceBlue"></div>
+                </div>
+                <div class="flex justify-between font-mono text-xs text-slate-500 mt-2">
+                  <span>0h</span>
+                  <span>30h</span>
+                  <span>60h ANC</span>
+                  <span class="text-iceBlue">82h PURE</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lossless DAC Architecture Telemetry Block -->
+            <div class="mt-5 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.07] flex items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="font-mono text-[12.5px] text-iceBlue uppercase">Bit-Perfect USB-C Path</div>
+                <div class="font-display font-bold text-sm text-chalk">32-Bit / 384kHz PCM &amp; Native DSD256</div>
+                <div class="font-mono text-[12.5px] text-slate-400">Femtosecond Clock // 128dB Dynamic Range</div>
+              </div>
+              <div class="w-14 h-14 rounded-xl bg-graphite border border-iceBlue/30 flex flex-col items-center justify-center shrink-0 font-mono">
+                <span class="text-xs text-slate-400">SABRE</span>
+                <span class="text-xs font-bold text-iceBlue">DAC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- BENTO CARD 4 (7 Cols): CNC Billet Aluminum & Lambskin Materials Breakdown -->
+          <div class="lg:col-span-7 rounded-3xl machined-card p-6 sm:p-8 flex flex-col justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <div>
+                <span class="font-mono text-xs uppercase tracking-wider text-amberAccent">MODULAR INDUSTRIAL CONSTRUCTION</span>
+                <h3 class="font-display font-bold text-xl text-chalk mt-1">Zero Molded Plastic in Structural Load Path</h3>
+              </div>
+              <span class="px-3 py-1 rounded-lg bg-white/[0.05] border border-white/10 font-mono text-xs text-slate-300 self-start">
+                MAGNETIC SWAPPABLE CUSHIONS
+              </span>
+            </div>
+
+            <!-- 4-Part Material Breakdown Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-4 rounded-2xl bg-graphite/80 border border-white/[0.07] flex gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-amberAccent/15 border border-amberAccent/30 flex items-center justify-center shrink-0 text-amberAccent font-mono text-xs font-bold">
+                  01
+                </div>
+                <div>
+                  <h4 class="font-display font-bold text-sm text-chalk">6061-T6 Billet &amp; Ti-6Al-4V</h4>
+                  <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    Cups milled from solid aluminum blocks to eliminate acoustic chamber resonance; Grade-5 titanium yokes tested to 40,000 flex cycles.
+                  </p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-graphite/80 border border-white/[0.07] flex gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-iceBlue/15 border border-iceBlue/30 flex items-center justify-center shrink-0 text-iceBlue font-mono text-xs font-bold">
+                  02
+                </div>
+                <div>
+                  <h4 class="font-display font-bold text-sm text-chalk">1.8-Micron Beryllium Diaphragm</h4>
+                  <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    Ultra-low moving mass planar trace responds 4x faster than dynamic cones for razor-sharp transient attack and spatial imaging.
+                  </p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-graphite/80 border border-white/[0.07] flex gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/15 flex items-center justify-center shrink-0 text-chalk font-mono text-xs font-bold">
+                  03
+                </div>
+                <div>
+                  <h4 class="font-display font-bold text-sm text-chalk">Full-Grain Ethiopian Lambskin</h4>
+                  <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    Dual-density slow-rebound viscoelastic foam wrapped in breathable aniline lambskin; attaches via 8 neodymium alignment pins.
+                  </p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-graphite/80 border border-white/[0.07] flex gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-amberAccent/15 border border-amberAccent/30 flex items-center justify-center shrink-0 text-amberAccent font-mono text-xs font-bold">
+                  04
+                </div>
+                <div>
+                  <h4 class="font-display font-bold text-sm text-chalk">Optical Knurled Rotary Crown</h4>
+                  <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    Zero-contact optical encoder steps gain in precise 0.5dB increments. No capacitive touch misfires in studio or winter conditions.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. FILTERABLE HARDWARE LINEUP GRID -->
+    <section id="lineup" class="py-20 lg:py-28 border-b border-white/[0.07] cad-grid">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+          <div>
+            <div class="font-mono text-xs uppercase tracking-widest text-iceBlue mb-2">MODULAR REFERENCE ECOSYSTEM</div>
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-chalk">
+              Precision Hardware Lineup
+            </h2>
+          </div>
+
+          <!-- Category Filter Buttons -->
+          <div class="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter Hardware By Category">
+            <button type="button" data-category="all" class="lineup-filter-btn px-4 py-2 rounded-xl font-mono text-xs font-semibold bg-chalk text-graphite transition-all">
+              All Hardware (6)
+            </button>
+            <button type="button" data-category="Headphones" class="lineup-filter-btn px-4 py-2 rounded-xl font-mono text-xs font-semibold bg-titanium border border-white/10 text-slate-300 hover:text-chalk transition-all">
+              Headphones (2)
+            </button>
+            <button type="button" data-category="Desktop Audio" class="lineup-filter-btn px-4 py-2 rounded-xl font-mono text-xs font-semibold bg-titanium border border-white/10 text-slate-300 hover:text-chalk transition-all">
+              Desktop Audio (2)
+            </button>
+            <button type="button" data-category="Accessories" class="lineup-filter-btn px-4 py-2 rounded-xl font-mono text-xs font-semibold bg-titanium border border-white/10 text-slate-300 hover:text-chalk transition-all">
+              Accessories (2)
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Products Grid Rendered & Hydrated -->
+        <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated cleanly via JS for instant filtering & cart binding -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TECHNICAL DATASHEET SPECIFICATIONS -->
+    <section id="specs" class="py-20 border-b border-white/[0.07]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-10">
+          <div class="font-mono text-xs uppercase tracking-widest text-amberAccent mb-2">SPECIFICATION MATRIX // STUDIO ONE</div>
+          <h2 class="font-display font-extrabold text-3xl sm:text-4xl tracking-tight text-chalk">Full Engineering Tolerances</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="rounded-2xl machined-card p-6 space-y-4">
+            <h3 class="font-mono text-xs uppercase tracking-widest text-amberAccent border-b border-white/10 pb-3">01 // Acoustic Transducer</h3>
+            <dl class="space-y-3 text-sm">
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Driver Architecture</dt><dd class="font-mono text-chalk text-right">50mm Planar Magnetic</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Diaphragm Coating</dt><dd class="font-mono text-chalk text-right">PVD Beryllium 1.8&mu;m</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Frequency Bandwidth</dt><dd class="font-mono text-iceBlue text-right">10 Hz – 45,000 Hz</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Total Harmonic Dist.</dt><dd class="font-mono text-chalk text-right">&lt; 0.03% @ 1kHz / 100dB</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Magnet Array</dt><dd class="font-mono text-chalk text-right">Dual N55 Halbach Flux</dd></div>
+            </dl>
+          </div>
+
+          <div class="rounded-2xl machined-card p-6 space-y-4">
+            <h3 class="font-mono text-xs uppercase tracking-widest text-iceBlue border-b border-white/10 pb-3">02 // Digital &amp; Wireless</h3>
+            <dl class="space-y-3 text-sm">
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Internal USB-C DAC</dt><dd class="font-mono text-chalk text-right">Dual ESS ES9281AC PRO</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Wired Resolution</dt><dd class="font-mono text-chalk text-right">32-Bit / 384kHz + DSD</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Bluetooth Radio</dt><dd class="font-mono text-chalk text-right">BT 5.4 Multipoint LE</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Hi-Res Codecs</dt><dd class="font-mono text-amberAccent text-right">aptX Lossless, LDAC, AAC</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Analog Balanced In</dt><dd class="font-mono text-chalk text-right">4.4mm + 3.5mm Bypass</dd></div>
+            </dl>
+          </div>
+
+          <div class="rounded-2xl machined-card p-6 space-y-4">
+            <h3 class="font-mono text-xs uppercase tracking-widest text-slate-300 border-b border-white/10 pb-3">03 // Chassis &amp; Package</h3>
+            <dl class="space-y-3 text-sm">
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Structural Materials</dt><dd class="font-mono text-chalk text-right">6061-T6 Al + Ti-6Al-4V</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Total Mass</dt><dd class="font-mono text-chalk text-right">312g (Excl. Cable)</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Battery Longevity</dt><dd class="font-mono text-chalk text-right">60h ANC / 82h Off</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Included Case</dt><dd class="font-mono text-chalk text-right">Ballistic Molded Shell</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-slate-400">Serviceability</dt><dd class="font-mono text-emerald-400 text-right">100% Modular Torx T6</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. VERIFIED AUDIOPHILE REVIEWS & RATING DISTRIBUTION BARS -->
+    <section id="reviews" class="py-20 lg:py-28 border-b border-white/[0.07]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Rating Summary & Visual Distribution Matrix -->
+          <div class="lg:col-span-4 rounded-3xl machined-card p-6 sm:p-8">
+            <div class="font-mono text-xs uppercase tracking-widest text-amberAccent mb-2">VERIFIED SERIALIZED OWNERS</div>
+            <div class="flex items-baseline gap-3">
+              <span class="font-mono font-bold text-5xl text-chalk">4.94</span>
+              <span class="font-mono text-lg text-slate-400">/ 5.0</span>
+            </div>
+
+            <!-- Crisp SVG 5-Star Cluster -->
+            <div class="flex items-center gap-1.5 mt-3 text-amberAccent" aria-label="4.94 out of 5 stars">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span class="ml-2 font-mono text-xs text-slate-400">Based on 1,420 reviews</span>
+            </div>
+
+            <!-- 5-Star to 1-Star Distribution Bars -->
+            <div class="mt-6 space-y-2.5 font-mono text-xs">
+              <div class="flex items-center gap-3">
+                <span class="w-8 text-slate-300">5.0</span>
+                <div class="flex-1 h-2 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                  <div class="h-full bg-amberAccent rounded-full" style="width: 95%"></div>
+                </div>
+                <span class="w-10 text-right text-chalk">95%</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-8 text-slate-300">4.0</span>
+                <div class="flex-1 h-2 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                  <div class="h-full bg-amberAccent/70 rounded-full" style="width: 4%"></div>
+                </div>
+                <span class="w-10 text-right text-slate-400">4%</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-8 text-slate-300">3.0</span>
+                <div class="flex-1 h-2 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                  <div class="h-full bg-slate-500 rounded-full" style="width: 1%"></div>
+                </div>
+                <span class="w-10 text-right text-slate-400">1%</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-8 text-slate-500">2.0</span>
+                <div class="flex-1 h-2 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                  <div class="h-full bg-slate-600 rounded-full" style="width: 0%"></div>
+                </div>
+                <span class="w-10 text-right text-slate-500">0%</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-8 text-slate-500">1.0</span>
+                <div class="flex-1 h-2 rounded-full bg-graphite border border-white/10 overflow-hidden">
+                  <div class="h-full bg-slate-600 rounded-full" style="width: 0%"></div>
+                </div>
+                <span class="w-10 text-right text-slate-500">0%</span>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-5 border-t border-white/10 flex items-center justify-between">
+              <span class="text-xs text-slate-400">Mastering Engineer Approval</span>
+              <span class="font-mono text-sm font-bold text-emerald-400">99.2%</span>
+            </div>
+          </div>
+
+          <!-- 3 Detailed Verified Audiophile Reviews -->
+          <div class="lg:col-span-8 grid grid-cols-1 gap-5">
+            <article class="rounded-2xl machined-card p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div>
+                  <h3 class="font-display font-bold text-base text-chalk">Henrik Lindqvist — Mastering Engineer, Stockholm</h3>
+                  <span class="font-mono text-[12.5px] text-iceBlue">VERIFIED SERIAL #AA-00841 // AURA STUDIO ONE (RAW TITANIUM)</span>
+                </div>
+                <span class="px-2.5 py-1 rounded bg-amberAccent/15 font-mono text-xs font-semibold text-amberAccent">5.0 / 5.0</span>
+              </div>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                "For the first time I can check sub-40Hz low-end phase translation on a flight and plug straight into my MacBook via USB-C at the hotel without carrying an external DAC. The planar transient speed shames wireless headphones costing twice as much."
+              </p>
+            </article>
+
+            <article class="rounded-2xl machined-card p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div>
+                  <h3 class="font-display font-bold text-base text-chalk">Claire Vance — Principal Industrial Designer, Zurich</h3>
+                  <span class="font-mono text-[12.5px] text-iceBlue">VERIFIED SERIAL #AA-01192 // STUDIO DESK BUNDLE</span>
+                </div>
+                <span class="px-2.5 py-1 rounded bg-amberAccent/15 font-mono text-xs font-semibold text-amberAccent">5.0 / 5.0</span>
+              </div>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                "The machining tolerances on the titanium yoke and knurled optical volume crown feel closer to a Leica M body than consumer electronics. Zero creaks, replaceable magnetic lambskin pads, and actual Torx screws instead of glue."
+              </p>
+            </article>
+
+            <article class="rounded-2xl machined-card p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div>
+                  <h3 class="font-display font-bold text-base text-chalk">Kenji Takahashi — Film Score Mixer, Tokyo</h3>
+                  <span class="font-mono text-[12.5px] text-iceBlue">VERIFIED SERIAL #AA-01308 // AURA STUDIO ONE + HELIX 4.4MM</span>
+                </div>
+                <span class="px-2.5 py-1 rounded bg-amberAccent/15 font-mono text-xs font-semibold text-amberAccent">5.0 / 5.0</span>
+              </div>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                "Most ANC circuits destroy midrange timbre when engaged. AURA's Studio Flat DSP profile holds the 1kHz–4kHz vocal pocket dead neutral whether ANC is at -48dB or completely bypassed over the 4.4mm balanced Pentaconn cable."
+              </p>
+            </article>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. STUDIO BUNDLE PRICING & HARDWARE TRADE-IN CTA -->
+    <section id="bundle" class="py-20 lg:py-28 cad-grid border-b border-white/[0.07]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Complete Reference Studio Bundle (7 Cols) -->
+          <div class="lg:col-span-7 rounded-3xl machined-card p-7 sm:p-10 relative overflow-hidden border-amberAccent/30">
+            <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-amberAccent/10 blur-3xl pointer-events-none"></div>
+            
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amberAccent/15 border border-amberAccent/30 font-mono text-xs text-amberAccent font-semibold mb-5">
+              <span>REFERENCE DESK ARCHITECTURE // SAVE $178</span>
+            </div>
+
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-chalk tracking-tight">
+              The Complete Studio One System
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base mt-3 max-w-xl">
+              Pair the flagship planar headphones with our discrete R2R balanced desktop DAC/amplifier and solid billet weighted stand. Calibrated together at the factory.
+            </p>
+
+            <ul class="mt-6 space-y-3 text-sm font-mono text-slate-200">
+              <li class="flex items-center justify-between py-2 border-b border-white/10">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-amberAccent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>AURA STUDIO ONE (Obsidian Black)</span>
+                </span>
+                <span class="text-slate-400">$549</span>
+              </li>
+              <li class="flex items-center justify-between py-2 border-b border-white/10">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-amberAccent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>CORE DAC-AMP ONE (Balanced R2R Desktop)</span>
+                </span>
+                <span class="text-slate-400">$399</span>
+              </li>
+              <li class="flex items-center justify-between py-2 border-b border-white/10">
+                <span class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 text-amberAccent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>CANTILEVER BILLET DESK STAND</span>
+                </span>
+                <span class="text-slate-400">$129</span>
+              </li>
+            </ul>
+
+            <div class="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div>
+                <div class="font-mono text-xs text-slate-400 line-through">SEPARATELY $1,077</div>
+                <div class="flex items-baseline gap-3">
+                  <span class="font-mono font-extrabold text-4xl text-chalk">$899</span>
+                  <span class="font-mono text-xs text-emerald-400">SHIPS IN 24H</span>
+                </div>
+              </div>
+
+              <button
+                id="addBundleBtn"
+                type="button"
+                class="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-xl bg-chalk hover:bg-amberAccent text-graphite font-display font-extrabold text-sm sm:text-base transition-colors"
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Studio Bundle — $899</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hardware Trade-In Credit Estimator (5 Cols) -->
+          <div class="lg:col-span-5 rounded-3xl machined-card p-7 sm:p-10 flex flex-col justify-between">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-iceBlue/15 border border-iceBlue/30 font-mono text-xs text-iceBlue font-semibold mb-5">
+                <span>CIRCULAR ALUMINUM &amp; DRIVER RECLAMATION</span>
+              </div>
+              <h3 class="font-display font-bold text-2xl sm:text-3xl text-chalk">
+                Trade In Legacy Plastic Wireless Headphones
+              </h3>
+              <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+                Send in eligible flagship headphones from Sony, Bose, Apple, Sennheiser, or Focal. Receive an instant credit applied directly in your bag plus prepaid recycling courier labels.
+              </p>
+
+              <div class="mt-6 space-y-3">
+                <label for="tradeDeviceSelect" class="block font-mono text-xs uppercase tracking-wider text-slate-400">Select Trade-In Hardware</label>
+                <select
+                  id="tradeDeviceSelect"
+                  class="w-full rounded-xl bg-graphite border border-white/15 px-4 py-3 font-mono text-xs sm:text-sm text-chalk focus:outline-none focus:border-iceBlue"
+                >
+                  <option value="160">Apple AirPods Max (Lightning / USB-C) — $160 Credit</option>
+                  <option value="120" selected>Sony WH-1000XM5 / Bose QC Ultra — $120 Credit</option>
+                  <option value="185">Sennheiser HD 660S2 / Focal Bathys — $185 Credit</option>
+                  <option value="90">Other Working ANC Over-Ear — $90 Credit</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between gap-4">
+              <div>
+                <div class="font-mono text-[12.5px] text-slate-400">INSTANT CREDIT VALUE</div>
+                <div id="tradeValueDisplay" class="font-mono text-2xl font-bold text-iceBlue">-$120.00</div>
+              </div>
+              <button
+                id="applyTradeBtn"
+                type="button"
+                class="px-5 py-3 rounded-xl bg-iceBlue/15 hover:bg-iceBlue hover:text-graphite border border-iceBlue/40 font-display font-bold text-xs sm:text-sm text-iceBlue transition-all"
+              >
+                Apply Credit to Bag
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- HARDWARE FOOTER -->
+  <footer class="bg-[#07080B] pt-16 pb-12 text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 4 Hardware Guarantees Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-12 border-b border-white/[0.08]">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-titanium border border-white/10 flex items-center justify-center shrink-0 text-amberAccent">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="font-display font-bold text-sm text-chalk">60-Day Studio Trial</div>
+            <p class="text-xs text-slate-400 mt-1">Audition in your own room. Free return courier if not reference-grade.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-titanium border border-white/10 flex items-center justify-center shrink-0 text-iceBlue">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="font-display font-bold text-sm text-chalk">3-Year Machined Warranty</div>
+            <p class="text-xs text-slate-400 mt-1">Covers planar transducers, DAC boards, and titanium structural hinges.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-titanium border border-white/10 flex items-center justify-center shrink-0 text-amberAccent">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div>
+            <div class="font-display font-bold text-sm text-chalk">Right-to-Repair Modular</div>
+            <p class="text-xs text-slate-400 mt-1">Replacement batteries, pads, and USB-C boards stocked for 10 years.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-titanium border border-white/10 flex items-center justify-center shrink-0 text-iceBlue">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div>
+            <div class="font-display font-bold text-sm text-chalk">Serialized Dispatch</div>
+            <p class="text-xs text-slate-400 mt-1">Insured DHL Express worldwide with individual FR calibration certificate.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 py-12 border-b border-white/[0.08]">
+        <div class="md:col-span-5 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <span class="font-display font-extrabold text-lg text-chalk">AURA ACOUSTICS</span>
+            <span class="px-2 py-0.5 rounded bg-white/[0.06] font-mono text-xs text-amberAccent">FW v4.2.8</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
+            Industrial acoustic instruments engineered for mastering rooms, spatial computing, and uncompromising listeners.
+          </p>
+          <form id="footerDispatchForm" class="flex gap-2 max-w-sm pt-1">
+            <input
+              id="footerEmailInput"
+              type="email"
+              required
+              placeholder="engineer@studio.io"
+              class="flex-1 rounded-xl bg-titanium border border-white/15 px-3.5 py-2.5 font-mono text-xs text-chalk placeholder-slate-500 focus:outline-none focus:border-amberAccent"
+            />
+            <button type="submit" class="px-4 py-2.5 rounded-xl bg-chalk hover:bg-amberAccent text-graphite font-display font-bold text-xs transition-colors">
+              Join Lab Notes
+            </button>
+          </form>
+          <p id="footerDispatchMsg" class="hidden font-mono text-xs text-emerald-400">Subscribed to AURA Acoustic Firmware &amp; Batch Dispatches.</p>
+        </div>
+
+        <div class="md:col-span-2 space-y-2.5 text-xs">
+          <div class="font-mono uppercase tracking-wider text-chalk mb-3">Hardware</div>
+          <div><a href="#flagship" class="hover:text-chalk">Studio One</a></div>
+          <div><a href="#lineup" class="hover:text-chalk">IEM Zero</a></div>
+          <div><a href="#lineup" class="hover:text-chalk">Monolith M5</a></div>
+          <div><a href="#lineup" class="hover:text-chalk">Core DAC-Amp</a></div>
+        </div>
+
+        <div class="md:col-span-2 space-y-2.5 text-xs">
+          <div class="font-mono uppercase tracking-wider text-chalk mb-3">Engineering</div>
+          <div><a href="#acoustics" class="hover:text-chalk">Frequency Curves</a></div>
+          <div><a href="#acoustics" class="hover:text-chalk">Beryllium Drivers</a></div>
+          <div><a href="#specs" class="hover:text-chalk">CAD Tolerances</a></div>
+          <div><a href="#bundle" class="hover:text-chalk">Trade-In Program</a></div>
+        </div>
+
+        <div class="md:col-span-3 space-y-2.5 text-xs">
+          <div class="font-mono uppercase tracking-wider text-chalk mb-3">Showrooms</div>
+          <div class="font-mono text-slate-300">Aarhus Acoustic Lab // DK</div>
+          <div class="font-mono text-slate-300">Shibuya Listening Room // JP</div>
+          <div class="font-mono text-slate-300">SoHo Mercer St // NYC</div>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[12.5px] text-slate-500">
+        <span>&copy; 2026 AURA ACOUSTICS CORP. ALL SPECIFICATIONS MEASURED PER IEC 60318-4.</span>
+        <span>PRECISION-MACHINED SOUND // ZERO COMPROMISE</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SLIDE-OVER INTERACTIVE CART DRAWER -->
+  <div id="cartOverlay" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="cartDrawerTitle">
+    <!-- Backdrop -->
+    <div id="cartBackdrop" class="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Drawer Panel -->
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div class="w-screen max-w-md bg-titanium border-l border-white/10 shadow-2xl flex flex-col justify-between">
+        
+        <!-- Drawer Header -->
+        <div class="p-6 border-b border-white/10 flex items-center justify-between">
+          <div>
+            <h2 id="cartDrawerTitle" class="font-display font-extrabold text-lg text-chalk">Hardware Bag</h2>
+            <p id="cartShippingStatus" class="font-mono text-[12.5px] text-emerald-400 mt-0.5">FREE GLOBAL ARMORED COURIER UNLOCKED</p>
+          </div>
+          <button id="closeCartBtn" type="button" class="p-2 rounded-xl bg-white/[0.05] hover:bg-white/10 text-slate-300 hover:text-white transition-colors" aria-label="Close bag">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Cart Items Scroll Area -->
+        <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
+          <!-- Rendered dynamically via JS -->
+        </div>
+
+        <!-- Drawer Footer: Trade-in, Subtotal & Checkout -->
+        <div class="p-6 bg-graphite/90 border-t border-white/10 space-y-4">
+          <!-- Active Trade-In Credit Row (if applied) -->
+          <div id="cartTradeInRow" class="hidden items-center justify-between px-3 py-2 rounded-xl bg-iceBlue/10 border border-iceBlue/30 font-mono text-xs">
+            <span class="text-iceBlue">Trade-In Credit Applied</span>
+            <div class="flex items-center gap-2">
+              <span id="cartTradeInAmount" class="font-bold text-iceBlue">-$120</span>
+              <button id="removeTradeBtn" type="button" class="text-slate-400 hover:text-white" aria-label="Remove trade-in credit">&times;</button>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between text-slate-400">
+              <span>Armored DHL Express</span>
+              <span class="font-mono text-emerald-400">FREE</span>
+            </div>
+            <div class="flex justify-between items-baseline pt-2 border-t border-white/10">
+              <span class="font-display font-bold text-base text-chalk">Estimated Total</span>
+              <span id="cartSubtotalValue" class="font-mono font-extrabold text-2xl text-chalk">$549</span>
+            </div>
+          </div>
+
+          <button
+            id="checkoutBtn"
+            type="button"
+            class="w-full py-4 rounded-xl bg-amberAccent hover:bg-amber-400 text-graphite font-display font-extrabold text-sm tracking-tight transition-all flex items-center justify-center gap-2"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span id="checkoutBtnText">Proceed to Serialized Checkout</span>
+          </button>
+
+          <div id="checkoutConfirmBanner" class="hidden p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-400/40 font-mono text-xs text-emerald-300 text-center">
+            ALLOCATION RESERVED // BATCH 04 SERIAL ASSIGNED. REDIRECTING TO ENCRYPTED PAYMENT...
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- VANILLA JS STOREFRONT ENGINE -->
+  <script>
+    (function () {
+      // 1. Finish Configurations for Hero Flagship Switcher
+      const FINISHES = {
+        obsidian: {
+          id: 'aa-s1-obs',
+          name: 'Obsidian Black',
+          sku: 'SKU: AA-S1-OBS // GRADE-5 TITANIUM',
+          pill: 'FINISH: OBSIDIAN DLC',
+          glow: 'rgba(245, 158, 11, 0.15)',
+          accentHex: '#F59E0B',
+          shell: ['#323746', '#191C26', '#0B0D12'],
+          band: ['#3A4052', '#13161F'],
+          yoke: ['#F59E0B', '#B45309']
+        },
+        titanium: {
+          id: 'aa-s1-raw',
+          name: 'Raw Titanium',
+          sku: 'SKU: AA-S1-RAW // BEAD-BLASTED TI',
+          pill: 'FINISH: RAW GRADE-5 TI',
+          glow: 'rgba(56, 189, 248, 0.16)',
+          accentHex: '#38BDF8',
+          shell: ['#CBD5E1', '#64748B', '#334155'],
+          band: ['#94A3B8', '#334155'],
+          yoke: ['#38BDF8', '#0284C7']
+        },
+        copper: {
+          id: 'aa-s1-cop',
+          name: 'Anodized Copper',
+          sku: 'SKU: AA-S1-COP // ANODIZED CU-TI',
+          pill: 'FINISH: ANODIZED COPPER',
+          glow: 'rgba(217, 119, 6, 0.20)',
+          accentHex: '#FBBF24',
+          shell: ['#92400E', '#451A03', '#1C0D06'],
+          band: ['#78350F', '#271208'],
+          yoke: ['#FBBF24', '#D97706']
+        }
+      };
+
+      let currentFinishKey = 'obsidian';
+
+      // 2. Lineup Catalog (6 Hardware Products)
+      const PRODUCTS = [
+        {
+          id: 'aa-s1-obs',
+          name: 'AURA STUDIO ONE',
+          subtitle: 'Obsidian Black // 50mm Planar Wireless + DAC',
+          category: 'Headphones',
+          sku: 'AA-S1-OBS',
+          price: 549,
+          badge: 'FLAGSHIP',
+          specs: ['50mm Beryllium', '-48dB ANC', '60h USB-C'],
+          svgType: 'headphone'
+        },
+        {
+          id: 'aa-z0-ti',
+          name: 'AURA IEM ZERO',
+          subtitle: 'CNC Machined Titanium Tri-Bore Reference IEMs',
+          category: 'Headphones',
+          sku: 'AA-Z0-TI',
+          price: 329,
+          badge: 'NEW',
+          specs: ['10mm DLC + 2 BA', '0.78mm 2-Pin', '114 dB/mW'],
+          svgType: 'iem'
+        },
+        {
+          id: 'aa-m5-act',
+          name: 'MONOLITH M5 PAIR',
+          subtitle: 'Bi-Amplified Nearfield Studio Reference Monitors',
+          category: 'Desktop Audio',
+          sku: 'AA-M5-ACT',
+          price: 1290,
+          badge: 'REFERENCE',
+          specs: ['AMT Ribbon', '300W Class-D', '38Hz–40kHz'],
+          svgType: 'monitor'
+        },
+        {
+          id: 'aa-dac-01',
+          name: 'CORE DAC-AMP ONE',
+          subtitle: 'Discrete 24-Bit R2R Balanced Desktop Preamp',
+          category: 'Desktop Audio',
+          sku: 'AA-DAC-01',
+          price: 399,
+          badge: 'CLASS-A',
+          specs: ['4.2W @ 32Ω', '4.4mm Pentaconn', 'R2R Ladder'],
+          svgType: 'dac'
+        },
+        {
+          id: 'aa-st-al',
+          name: 'CANTILEVER STAND',
+          subtitle: 'Solid Billet Aluminum Weighted Headphone Stand',
+          category: 'Accessories',
+          sku: 'AA-ST-AL',
+          price: 129,
+          badge: 'CNC BILLET',
+          specs: ['1.1kg Base', 'Silicone Saddle', 'Cable Channel'],
+          svgType: 'stand'
+        },
+        {
+          id: 'aa-cb-44',
+          name: 'HELIX 4.4MM CABLE',
+          subtitle: '8-Core OCC Monocrystalline Balanced Studio Cable',
+          category: 'Accessories',
+          sku: 'AA-CB-44',
+          price: 149,
+          badge: 'LOSSLESS',
+          specs: ['4.4mm Balanced', 'OCC Silver-Cu', '1.8m Braided'],
+          svgType: 'cable'
+        }
+      ];
+
+      // Custom Architectural SVG Thumbnails per Product Type
+      function getProductSvg(type) {
+        switch (type) {
+          case 'headphone':
+            return `<svg viewBox="0 0 200 130" class="w-full h-36" fill="none">
+              <circle cx="100" cy="68" r="52" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3"/>
+              <path d="M62 72 C62 24, 138 24, 138 72" stroke="#94A3B8" stroke-width="8" stroke-linecap="round"/>
+              <rect x="50" y="64" width="22" height="42" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.8"/>
+              <rect x="128" y="64" width="22" height="42" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.8"/>
+              <line x1="61" y1="73" x2="61" y2="97" stroke="#F59E0B" stroke-width="2"/>
+              <line x1="139" y1="73" x2="139" y2="97" stroke="#F59E0B" stroke-width="2"/>
+            </svg>`;
+          case 'iem':
+            return `<svg viewBox="0 0 200 130" class="w-full h-36" fill="none">
+              <polygon points="55,58 88,42 96,76 64,92" fill="#1E293B" stroke="#38BDF8" stroke-width="1.8"/>
+              <circle cx="76" cy="67" r="8" stroke="#F59E0B" stroke-width="1.6"/>
+              <polygon points="145,58 112,42 104,76 136,92" fill="#1E293B" stroke="#38BDF8" stroke-width="1.8"/>
+              <circle cx="124" cy="67" r="8" stroke="#F59E0B" stroke-width="1.6"/>
+              <path d="M72 46 C72 22, 42 28, 44 62" stroke="#64748B" stroke-width="2" stroke-dasharray="2 2"/>
+              <path d="M128 46 C128 22, 158 28, 156 62" stroke="#64748B" stroke-width="2" stroke-dasharray="2 2"/>
+            </svg>`;
+          case 'monitor':
+            return `<svg viewBox="0 0 200 130" class="w-full h-36" fill="none">
+              <rect x="44" y="22" width="48" height="86" rx="8" fill="#161923" stroke="rgba(255,255,255,0.22)" stroke-width="1.6"/>
+              <rect x="60" y="32" width="16" height="12" rx="2" stroke="#38BDF8" stroke-width="1.5"/>
+              <circle cx="68" cy="74" r="16" stroke="#F59E0B" stroke-width="1.8"/>
+              <circle cx="68" cy="74" r="5" fill="#F59E0B"/>
+              <rect x="108" y="22" width="48" height="86" rx="8" fill="#161923" stroke="rgba(255,255,255,0.22)" stroke-width="1.6"/>
+              <rect x="124" y="32" width="16" height="12" rx="2" stroke="#38BDF8" stroke-width="1.5"/>
+              <circle cx="132" cy="74" r="16" stroke="#F59E0B" stroke-width="1.8"/>
+              <circle cx="132" cy="74" r="5" fill="#F59E0B"/>
+            </svg>`;
+          case 'dac':
+            return `<svg viewBox="0 0 200 130" class="w-full h-36" fill="none">
+              <rect x="30" y="42" width="140" height="50" rx="8" fill="#161923" stroke="rgba(255,255,255,0.24)" stroke-width="1.6"/>
+              <rect x="42" y="54" width="54" height="26" rx="4" fill="#0B0C10" stroke="#38BDF8" stroke-width="1.2"/>
+              <text x="69" y="70" text-anchor="middle" fill="#38BDF8" font-family="JetBrains Mono" font-size="9">384kHz</text>
+              <circle cx="116" cy="67" r="6" stroke="#94A3B8" stroke-width="1.6"/>
+              <circle cx="146" cy="67" r="14" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/>
+              <line x1="146" y1="67" x2="154" y2="59" stroke="#F59E0B" stroke-width="2"/>
+            </svg>`;
+          case 'stand':
+            return `<svg viewBox="0 0 200 130" class="w-full h-36" fill="none">
+              <rect x="64" y="100" width="72" height="10" rx="4" fill="#334155" stroke="rgba(255,255,255,0.25)"/>
+              <path d="M100 100 L100 28 L128 28" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M84 26 Q104 20 128 26" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+            </svg>`;
+          default:
+            return `<svg viewBox="0 0 200 130" class="w-full h-36" fill="none">
+              <path d="M44 82 C44 38, 156 38, 156 82" stroke="#F59E0B" stroke-width="3.5" stroke-dasharray="6 3" fill="none"/>
+              <path d="M54 88 C54 48, 146 48, 146 88" stroke="#38BDF8" stroke-width="2" fill="none"/>
+              <rect x="36" y="78" width="16" height="26" rx="3" fill="#334155" stroke="#F8FAFC" stroke-width="1.4"/>
+              <rect x="148" y="78" width="16" height="26" rx="3" fill="#334155" stroke="#F8FAFC" stroke-width="1.4"/>
+            </svg>`;
+        }
+      }
+
+      // 3. Cart State
+      let cart = [
+        {
+          id: 'aa-s1-obs',
+          name: 'AURA STUDIO ONE — Obsidian Black',
+          sku: 'AA-S1-OBS',
+          price: 549,
+          qty: 1
+        }
+      ];
+      let tradeInCredit = 0;
+
+      // Render Product Lineup Grid
+      const productGrid = document.getElementById('productGrid');
+      function renderProducts(categoryFilter = 'all') {
+        const filtered = categoryFilter === 'all'
+          ? PRODUCTS
+          : PRODUCTS.filter(p => p.category === categoryFilter);
+
+        productGrid.innerHTML = filtered.map(p => `
+          <article class="rounded-3xl machined-card p-6 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="font-mono text-[12.5px] text-slate-400">SKU: ${p.sku}</span>
+                <span class="px-2.5 py-0.5 rounded bg-white/[0.06] border border-white/10 font-mono text-xs font-semibold text-amberAccent">${p.badge}</span>
+              </div>
+
+              <div class="rounded-2xl bg-graphite/80 border border-white/[0.06] p-3 mb-5 flex items-center justify-center">
+                ${getProductSvg(p.svgType)}
+              </div>
+
+              <div class="font-mono text-xs uppercase tracking-wider text-iceBlue">${p.category}</div>
+              <h3 class="font-display font-bold text-lg text-chalk mt-0.5">${p.name}</h3>
+              <p class="text-xs text-slate-400 mt-1">${p.subtitle}</p>
+
+              <div class="flex flex-wrap gap-1.5 mt-4">
+                ${p.specs.map(s => `<span class="px-2 py-1 rounded-md bg-white/[0.04] font-mono text-xs text-slate-300">${s}</span>`).join('')}
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+              <span class="font-mono font-bold text-xl text-chalk">$${p.price.toLocaleString()}</span>
+              <button
+                type="button"
+                data-add-id="${p.id}"
+                class="add-product-btn inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-amberAccent hover:text-graphite border border-white/10 font-display font-bold text-xs text-chalk transition-all"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add to Cart</span>
+              </button>
+            </div>
+          </article>
+        `).join('');
+
+        // Bind Add-to-Cart buttons
+        document.querySelectorAll('.add-product-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const prod = PRODUCTS.find(item => item.id === btn.dataset.addId);
+            if (!prod) return;
+            addItemToCart({
+              id: prod.id,
+              name: prod.name,
+              sku: prod.sku,
+              price: prod.price
+            });
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<span>Added</span>`;
+            btn.classList.add('bg-amberAccent', 'text-graphite');
+            setTimeout(() => {
+              btn.innerHTML = originalHTML;
+              btn.classList.remove('bg-amberAccent', 'text-graphite');
+            }, 900);
+          });
+        });
+      }
+
+      // Filter Buttons
+      document.querySelectorAll('.lineup-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.lineup-filter-btn').forEach(b => {
+            b.className = 'lineup-filter-btn px-4 py-2 rounded-xl font-mono text-xs font-semibold bg-titanium border border-white/10 text-slate-300 hover:text-chalk transition-all';
+          });
+          btn.className = 'lineup-filter-btn px-4 py-2 rounded-xl font-mono text-xs font-semibold bg-chalk text-graphite transition-all';
+          renderProducts(btn.dataset.category);
+        });
+      });
+
+      // Cart Functions
+      const cartOverlay = document.getElementById('cartOverlay');
+      const cartItemsContainer = document.getElementById('cartItemsContainer');
+      const navCartBadge = document.getElementById('navCartBadge');
+      const cartSubtotalValue = document.getElementById('cartSubtotalValue');
+      const cartTradeInRow = document.getElementById('cartTradeInRow');
+      const cartTradeInAmount = document.getElementById('cartTradeInAmount');
+      const checkoutConfirmBanner = document.getElementById('checkoutConfirmBanner');
+
+      function openCart() {
+        checkoutConfirmBanner.classList.add('hidden');
+        cartOverlay.classList.remove('hidden');
+      }
+
+      function closeCart() {
+        cartOverlay.classList.add('hidden');
+      }
+
+      function addItemToCart(item) {
+        const existing = cart.find(c => c.id === item.id);
+        if (existing) {
+          existing.qty += 1;
+        } else {
+          cart.push({ ...item, qty: 1 });
+        }
+        updateCartUI();
+        openCart();
+      }
+
+      function updateCartUI() {
+        const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+        navCartBadge.textContent = totalQty;
+
+        const rawSubtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        const finalTotal = Math.max(0, rawSubtotal - tradeInCredit);
+        cartSubtotalValue.textContent = '$' + finalTotal.toLocaleString();
+
+        if (tradeInCredit > 0 && cart.length > 0) {
+          cartTradeInRow.classList.remove('hidden');
+          cartTradeInRow.classList.add('flex');
+          cartTradeInAmount.textContent = '-$' + tradeInCredit;
+        } else {
+          cartTradeInRow.classList.add('hidden');
+          cartTradeInRow.classList.remove('flex');
+        }
+
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center text-center py-14">
+              <div class="w-12 h-12 rounded-2xl bg-graphite border border-white/10 flex items-center justify-center text-slate-500 mb-3">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg>
+              </div>
+              <p class="font-display font-bold text-chalk">Your Hardware Bag is Empty</p>
+              <p class="text-xs text-slate-400 mt-1 max-w-xs">Select a precision-machined AURA instrument from the lineup to reserve Batch 04 allocation.</p>
+            </div>
+          `;
+          return;
+        }
+
+        cartItemsContainer.innerHTML = cart.map(item => `
+          <div class="p-4 rounded-2xl bg-graphite border border-white/10 flex items-center justify-between gap-4">
+            <div class="min-w-0">
+              <div class="font-mono text-xs text-slate-400">${item.sku}</div>
+              <div class="font-display font-bold text-sm text-chalk truncate">${item.name}</div>
+              <div class="font-mono text-xs text-amberAccent mt-1">$${(item.price * item.qty).toLocaleString()}</div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="inline-flex items-center rounded-lg bg-titanium border border-white/10 font-mono text-xs">
+                <button type="button" data-dec="${item.id}" class="px-2.5 py-1 text-slate-300 hover:text-white" aria-label="Decrease quantity">-</button>
+                <span class="px-2 text-chalk">${item.qty}</span>
+                <button type="button" data-inc="${item.id}" class="px-2.5 py-1 text-slate-300 hover:text-white" aria-label="Increase quantity">+</button>
+              </div>
+              <button type="button" data-rem="${item.id}" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 transition-colors" aria-label="Remove item">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        cartItemsContainer.querySelectorAll('[data-inc]').forEach(b => {
+          b.addEventListener('click', () => {
+            const target = cart.find(c => c.id === b.dataset.inc);
+            if (target) target.qty += 1;
+            updateCartUI();
+          });
+        });
+
+        cartItemsContainer.querySelectorAll('[data-dec]').forEach(b => {
+          b.addEventListener('click', () => {
+            const target = cart.find(c => c.id === b.dataset.dec);
+            if (!target) return;
+            if (target.qty > 1) {
+              target.qty -= 1;
+            } else {
+              cart = cart.filter(c => c.id !== target.id);
+            }
+            updateCartUI();
+          });
+        });
+
+        cartItemsContainer.querySelectorAll('[data-rem]').forEach(b => {
+          b.addEventListener('click', () => {
+            cart = cart.filter(c => c.id !== b.dataset.rem);
+            updateCartUI();
+          });
+        });
+      }
+
+      document.getElementById('openCartBtn').addEventListener('click', openCart);
+      document.getElementById('closeCartBtn').addEventListener('click', closeCart);
+      document.getElementById('cartBackdrop').addEventListener('click', closeCart);
+
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        if (cart.length === 0) return;
+        checkoutConfirmBanner.classList.remove('hidden');
+      });
+
+      // 4. Hero Colorway Finish Switcher Logic
+      document.querySelectorAll('.finish-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.finish;
+          const cfg = FINISHES[key];
+          if (!cfg) return;
+          currentFinishKey = key;
+
+          document.querySelectorAll('.finish-btn').forEach(b => {
+            b.className = 'finish-btn group flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] text-left transition-all';
+          });
+          btn.className = 'finish-btn group flex items-center gap-3 p-3 rounded-xl border border-amberAccent bg-white/[0.06] text-left transition-all';
+
+          document.getElementById('selectedFinishName').textContent = cfg.name;
+          document.getElementById('heroSkuTag').textContent = cfg.sku;
+          document.getElementById('svgFinishPill').textContent = cfg.pill;
+          document.getElementById('heroAmbient').style.setProperty('--hero-glow', cfg.glow);
+
+          // Update SVG Hardware Gradients Dynamically
+          document.getElementById('shellStop1').setAttribute('stop-color', cfg.shell[0]);
+          document.getElementById('shellStop2').setAttribute('stop-color', cfg.shell[1]);
+          document.getElementById('shellStop3').setAttribute('stop-color', cfg.shell[2]);
+          document.getElementById('bandStop1').setAttribute('stop-color', cfg.band[0]);
+          document.getElementById('bandStop2').setAttribute('stop-color', cfg.band[1]);
+          document.getElementById('yokeStop1').setAttribute('stop-color', cfg.yoke[0]);
+          document.getElementById('yokeStop2').setAttribute('stop-color', cfg.yoke[1]);
+          document.getElementById('glowStop1').setAttribute('stop-color', cfg.accentHex);
+          document.getElementById('leftTrimRing').setAttribute('stroke', cfg.accentHex);
+          document.getElementById('rightTrimRing').setAttribute('stroke', cfg.accentHex);
+          document.getElementById('headbandAccentArc').setAttribute('stroke', cfg.accentHex);
+          document.getElementById('centerCoreRing').setAttribute('stroke', cfg.accentHex);
+        });
+      });
+
+      // Hero Add to Bag Button (adds currently selected finish!)
+      document.getElementById('heroAddToBagBtn').addEventListener('click', () => {
+        const cfg = FINISHES[currentFinishKey];
+        addItemToCart({
+          id: cfg.id,
+          name: `AURA STUDIO ONE — ${cfg.name}`,
+          sku: cfg.sku.split(' ')[1],
+          price: 549
+        });
+      });
+
+      // 5. Interactive Frequency Response Curve Switcher
+      const EQ_PROFILES = {
+        flat: {
+          line: 'M48 98 C110 97, 175 102, 245 104 C320 105, 395 103, 465 92 C535 84, 605 94, 660 108',
+          area: 'M48 98 C110 97, 175 102, 245 104 C320 105, 395 103, 465 92 C535 84, 605 94, 660 108 L660 190 L48 190 Z',
+          color: '#F59E0B',
+          subY: 98,
+          midY: 104,
+          trebY: 90,
+          desc: 'Harman-neutral studio reference target with +/-0.8dB planar driver matching across L/R channels.',
+          readout: 'SUB-20Hz EXTENSION: +1.2dB // 38kHz AIR'
+        },
+        bass: {
+          line: 'M48 58 C110 56, 175 78, 245 102 C320 106, 395 102, 465 88 C535 80, 605 90, 660 104',
+          area: 'M48 58 C110 56, 175 78, 245 102 C320 106, 395 102, 465 88 C535 80, 605 90, 660 104 L660 190 L48 190 Z',
+          color: '#38BDF8',
+          subY: 60,
+          midY: 104,
+          trebY: 86,
+          desc: 'Isobaric low-shelf boost (+5.5dB below 90Hz) engineered for tactile sub-bass impact without midrange bleed.',
+          readout: 'SUB-BASS SHELF: +5.5dB @ 35Hz // ZERO MUD'
+        },
+        vocal: {
+          line: 'M48 106 C110 105, 175 106, 245 96 C320 78, 395 74, 465 78 C535 82, 605 92, 660 106',
+          area: 'M48 106 C110 105, 175 106, 245 96 C320 78, 395 74, 465 78 C535 82, 605 92, 660 106 L660 190 L48 190 Z',
+          color: '#FBBF24',
+          subY: 105,
+          midY: 79,
+          trebY: 86,
+          desc: 'Forward 1.5kHz–4kHz presence contour designed for acoustic vocal monitoring, dialogue editing, and string articulation.',
+          readout: 'PRESENCE GAIN: +3.4dB @ 2.8kHz // ULTRA CLEAR'
+        }
+      };
+
+      document.querySelectorAll('.eq-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const prof = EQ_PROFILES[btn.dataset.eq];
+          if (!prof) return;
+
+          document.querySelectorAll('.eq-mode-btn').forEach(b => {
+            b.className = 'eq-mode-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold text-slate-400 hover:text-chalk transition-all';
+          });
+          btn.className = 'eq-mode-btn px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-amberAccent text-graphite transition-all';
+
+          document.getElementById('auraFreqLine').setAttribute('d', prof.line);
+          document.getElementById('auraFreqLine').setAttribute('stroke', prof.color);
+          document.getElementById('auraFreqArea').setAttribute('d', prof.area);
+          document.getElementById('freqAreaStop').setAttribute('stop-color', prof.color);
+          document.getElementById('nodeSubBass').setAttribute('cy', prof.subY);
+          document.getElementById('nodeMidRef').setAttribute('cy', prof.midY);
+          document.getElementById('nodeTreble').setAttribute('cy', prof.trebY);
+          document.getElementById('eqModeDescription').textContent = prof.desc;
+          document.getElementById('eqPeakReadout').textContent = prof.readout;
+        });
+      });
+
+      // 6. Interactive ANC Attenuation Toggle (Max -48dB vs Studio Transparency)
+      let ancMaxActive = true;
+      document.getElementById('ancToggleBtn').addEventListener('click', function () {
+        ancMaxActive = !ancMaxActive;
+        if (ancMaxActive) {
+          this.textContent = 'MODE: MAX -48dB';
+          document.getElementById('ancPeakValue').textContent = '-48.4 dB';
+          document.getElementById('ancPercentValue').textContent = '99.6%';
+          document.getElementById('ancBand1Label').textContent = '-48dB';
+          document.getElementById('ancBand1Bar').style.width = '96%';
+          document.getElementById('ancBand2Label').textContent = '-44dB';
+          document.getElementById('ancBand2Bar').style.width = '88%';
+          document.getElementById('ancBand3Label').textContent = '-39dB';
+          document.getElementById('ancBand3Bar').style.width = '79%';
+          document.getElementById('ancBand4Label').textContent = '-34dB';
+          document.getElementById('ancBand4Bar').style.width = '70%';
+        } else {
+          this.textContent = 'MODE: TRANSPARENCY';
+          document.getElementById('ancPeakValue').textContent = '0.0 dB';
+          document.getElementById('ancPercentValue').textContent = 'NATURAL PASS';
+          document.getElementById('ancBand1Label').textContent = '-2dB';
+          document.getElementById('ancBand1Bar').style.width = '10%';
+          document.getElementById('ancBand2Label').textContent = '0dB';
+          document.getElementById('ancBand2Bar').style.width = '6%';
+          document.getElementById('ancBand3Label').textContent = '0dB';
+          document.getElementById('ancBand3Bar').style.width = '6%';
+          document.getElementById('ancBand4Label').textContent = '0dB';
+          document.getElementById('ancBand4Bar').style.width = '6%';
+        }
+      });
+
+      // 7. Studio Bundle & Trade-In Program Actions
+      document.getElementById('addBundleBtn').addEventListener('click', () => {
+        addItemToCart({
+          id: 'aa-studio-bundle',
+          name: 'COMPLETE STUDIO ONE SYSTEM (3-Piece Bundle)',
+          sku: 'AA-BND-PRO',
+          price: 899
+        });
+      });
+
+      const tradeDeviceSelect = document.getElementById('tradeDeviceSelect');
+      const tradeValueDisplay = document.getElementById('tradeValueDisplay');
+      tradeDeviceSelect.addEventListener('change', () => {
+        tradeValueDisplay.textContent = '-$' + tradeDeviceSelect.value + '.00';
+      });
+
+      document.getElementById('applyTradeBtn').addEventListener('click', () => {
+        tradeInCredit = parseInt(tradeDeviceSelect.value, 10) || 120;
+        updateCartUI();
+        openCart();
+      });
+
+      document.getElementById('removeTradeBtn').addEventListener('click', () => {
+        tradeInCredit = 0;
+        updateCartUI();
+      });
+
+      // 8. Mobile Menu & Footer Dispatch Form
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+      });
+
+      document.getElementById('footerDispatchForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('footerEmailInput').value = '';
+        document.getElementById('footerDispatchMsg').classList.remove('hidden');
+      });
+
+      // Initialize
+      renderProducts('all');
+      updateCartUI();
+    })();
+  </script>
+</body>
+</html>
