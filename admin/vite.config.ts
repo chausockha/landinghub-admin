@@ -78,6 +78,14 @@ function templatesStaticGuardPlugin(): Plugin {
 </html>`)
       })
     },
+    closeBundle() {
+      const outTemplatesDir = path.resolve(
+        new URL('./dist/templates', import.meta.url).pathname,
+      )
+      if (fs.existsSync(templatesRoot)) {
+        fs.cpSync(templatesRoot, outTemplatesDir, { recursive: true })
+      }
+    },
   }
 }
 
