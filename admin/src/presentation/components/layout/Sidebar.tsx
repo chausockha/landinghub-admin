@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   LayoutTemplate,
   Waypoints,
+  Gamepad2,
   Settings,
   Layers,
   Cloud,
@@ -25,10 +26,17 @@ import { useThemeTokens } from '../../theme/ThemeProvider.tsx';
 import { useSidebar } from './SidebarContext.tsx';
 import { cn } from '../../../shared/utils/cn.ts';
 
-const navItems = [
+const navItems: Array<{
+  to: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  end?: boolean;
+  badge?: string;
+}> = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { to: '/templates', icon: LayoutTemplate, label: 'Kho Templates' },
   { to: '/routes', icon: Waypoints, label: 'Routes & Flow' },
+  { to: '/entertainment', icon: Gamepad2, label: 'Góc Giải Trí', badge: '4' },
   { to: '/settings', icon: Settings, label: 'Cài đặt & Tokens' },
 ];
 
@@ -174,8 +182,8 @@ export function Sidebar() {
           </div>
 
           <div className="flex flex-col gap-1">
-            {navItems.map(({ to, icon: Icon, label, end }) => {
-              const badgeVal = to === '/templates' ? stats?.total : undefined;
+            {navItems.map(({ to, icon: Icon, label, end, badge }) => {
+              const badgeVal = to === '/templates' ? stats?.total : badge;
               return (
                 <NavLink
                   key={to}

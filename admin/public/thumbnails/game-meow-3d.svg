@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" fill="none">
+  <defs>
+    <linearGradient id="roomBg" x1="0" y1="0" x2="800" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF1F2"/>
+      <stop offset="52%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#FDE68A"/>
+    </linearGradient>
+    <radialGradient id="rugGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="75%" stop-color="#FCE7F3"/>
+      <stop offset="100%" stop-color="#F9A8D4"/>
+    </radialGradient>
+    <linearGradient id="catFur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cozy Pastel Sunlight Room -->
+  <rect width="800" height="450" fill="url(#roomBg)"/>
+
+  <!-- Soft Sunlight Window Rays -->
+  <polygon points="80,0 260,0 410,450 180,450" fill="#FFFFFF" opacity="0.38"/>
+
+  <!-- Cute Pink Paw Rug -->
+  <ellipse cx="400" cy="335" rx="235" ry="76" fill="url(#rugGrad)" stroke="#F472B6" stroke-width="4" stroke-dasharray="14 10"/>
+
+  <!-- Floating Hearts -->
+  <g fill="#F43F5E" opacity="0.85">
+    <path d="M265 125 C265 113 248 113 248 125 C248 113 231 113 231 125 C231 140 248 150 248 150 C248 150 265 140 265 125 Z"/>
+    <path d="M565 105 C565 96 552 96 552 105 C552 96 539 96 539 105 C539 116 552 124 552 124 C552 124 565 116 565 105 Z" opacity="0.7"/>
+  </g>
+
+  <!-- Cute 3D Ginger Cat -->
+  <g transform="translate(400, 248)">
+    <!-- Shadow -->
+    <ellipse cx="0" cy="82" rx="95" ry="24" fill="#9A3412" opacity="0.18"/>
+    <!-- Tail -->
+    <path d="M62 52 Q128 38 118 -14" stroke="#EA580C" stroke-width="22" stroke-linecap="round" fill="none"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="36" rx="68" ry="52" fill="url(#catFur)"/>
+    <ellipse cx="0" cy="44" rx="40" ry="36" fill="#FFF7ED"/>
+    <!-- Paws -->
+    <ellipse cx="-32" cy="78" rx="20" ry="13" fill="#FFF7ED"/>
+    <ellipse cx="32" cy="78" rx="20" ry="13" fill="#FFF7ED"/>
+    <!-- Collar & Gold Bell -->
+    <rect x="-46" y="-8" width="92" height="14" rx="7" fill="#EC4899"/>
+    <circle cx="0" cy="4" r="11" fill="#FACC15" stroke="#CA8A04" stroke-width="2"/>
+
+    <!-- Ears -->
+    <polygon points="-62,-44 -48,-108 -12,-66" fill="#EA580C"/>
+    <polygon points="-54,-50 -45,-94 -20,-64" fill="#FDA4AF"/>
+    <polygon points="62,-44 48,-108 12,-66" fill="#EA580C"/>
+    <polygon points="54,-50 45,-94 20,-64" fill="#FDA4AF"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="-38" rx="74" ry="62" fill="url(#catFur)"/>
+    <!-- Forehead Stripes -->
+    <rect x="-6" y="-92" width="12" height="22" rx="6" fill="#C2410C"/>
+    <rect x="-24" y="-86" width="10" height="18" rx="5" fill="#C2410C"/>
+    <rect x="14" y="-86" width="10" height="18" rx="5" fill="#C2410C"/>
+
+    <!-- Big Sparkling Eyes -->
+    <circle cx="-28" cy="-40" r="14" fill="#1E293B"/>
+    <circle cx="-32" cy="-45" r="5" fill="#FFFFFF"/>
+    <circle cx="28" cy="-40" r="14" fill="#1E293B"/>
+    <circle cx="24" cy="-45" r="5" fill="#FFFFFF"/>
+
+    <!-- Rosy Cheeks & Cute Mouth -->
+    <ellipse cx="-46" cy="-24" rx="12" ry="7" fill="#FB7185" opacity="0.65"/>
+    <ellipse cx="46" cy="-24" rx="12" ry="7" fill="#FB7185" opacity="0.65"/>
+    <polygon points="-7,-28 7,-28 0,-20" fill="#F43F5E"/>
+    <path d="M-14 -14 Q-7 -6 0 -16 Q7 -6 14 -14" stroke="#7C2D12" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+
+    <!-- Golden Crown Accessory -->
+    <polygon points="-24,-96 -18,-122 -6,-106 0,-126 6,-106 18,-122 24,-96" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+  </g>
+
+  <!-- Pink Yarn Ball -->
+  <g transform="translate(228, 338)">
+    <circle cx="0" cy="18" r="28" fill="#831843" opacity="0.14"/>
+    <circle cx="0" cy="0" r="30" fill="#EC4899"/>
+    <path d="M-22 -12 Q0 -28 22 -8 M-26 6 Q0 -12 26 8 M-16 22 Q6 6 20 22" stroke="#FBCFE8" stroke-width="3.5" fill="none"/>
+  </g>
+
+  <!-- Glowing Red Laser Pointer Dot -->
+  <g transform="translate(566, 336)">
+    <circle cx="0" cy="0" r="22" fill="#EF4444" opacity="0.28"/>
+    <circle cx="0" cy="0" r="9" fill="#EF4444"/>
+    <circle cx="0" cy="0" r="4" fill="#FFFFFF"/>
+  </g>
+</svg>

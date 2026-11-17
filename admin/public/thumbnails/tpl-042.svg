@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="invHoriz42" width="8" height="3.5" patternUnits="userSpaceOnUse">
+      <rect width="8" height="2" fill="#CFD2DE"/>
+      <rect y="2" width="8" height="1.5" fill="#FFFFFF"/>
+    </pattern>
+    <pattern id="invDiag42" width="6" height="6" patternTransform="rotate(40 0 0)" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#E6E7F2"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#9D9FBE" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+  <!-- Outer Soft SaaS Canvas -->
+  <rect width="800" height="450" fill="#F4F5F9"/>
+
+  <!-- Left Airy White Sidebar -->
+  <rect x="0" y="0" width="136" height="450" fill="#FAFBFE"/>
+  <line x1="136" y1="0" x2="136" y2="450" stroke="#ECEEF5"/>
+
+  <!-- Isometric Cube Mark (Badge-safe top-left) -->
+  <polygon points="28,16 38,22 28,28 18,22" fill="#9E94FF"/>
+  <polygon points="18,22 28,28 28,39 18,33" fill="#8176FA"/>
+  <polygon points="38,22 28,28 28,39 38,33" fill="#675AF0"/>
+
+  <!-- Sidebar Nav Items -->
+  <rect x="14" y="108" width="108" height="24" rx="7" fill="#FFFFFF" stroke="#E6E8F0"/>
+  <text x="32" y="123" fill="#181D27" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Dashboard</text>
+  <text x="32" y="150" fill="#667085" font-family="Inter, sans-serif" font-size="8">Inventory</text>
+  <text x="32" y="174" fill="#667085" font-family="Inter, sans-serif" font-size="8">Warehouses</text>
+  <text x="32" y="198" fill="#667085" font-family="Inter, sans-serif" font-size="8">Suppliers</text>
+  <text x="32" y="222" fill="#667085" font-family="Inter, sans-serif" font-size="8">Purchase Orders</text>
+  <text x="32" y="246" fill="#667085" font-family="Inter, sans-serif" font-size="8">Shipments</text>
+  <text x="32" y="270" fill="#667085" font-family="Inter, sans-serif" font-size="8">Cash Flow</text>
+
+  <!-- Bottom User Pill -->
+  <rect x="12" y="402" width="112" height="34" rx="10" fill="#FFFFFF" stroke="#E6E8F0"/>
+  <circle cx="28" cy="419" r="9" fill="#CBD5E1"/>
+  <text x="43" y="417" fill="#181D27" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Rakib Kowshar</text>
+  <text x="43" y="427" fill="#98A2B3" font-family="Inter, sans-serif" font-size="6.5">Admin</text>
+
+  <!-- Top Right Search & Avatar -->
+  <rect x="546" y="16" width="164" height="26" rx="13" fill="#FFFFFF" stroke="#E6E8F0"/>
+  <text x="566" y="32" fill="#98A2B3" font-family="Inter, sans-serif" font-size="8">Search Products / SKU...</text>
+  <circle cx="732" cy="29" r="12" fill="#FFFFFF" stroke="#E6E8F0"/>
+  <circle cx="739" cy="20" r="5" fill="#EF4444"/>
+  <circle cx="766" cy="29" r="12" fill="#D97757"/>
+
+  <!-- Row 1: 4 Clean SaaS KPI Cards (y >= 104 so 100% clear of top-left card badges) -->
+  <rect x="154" y="102" width="148" height="68" rx="12" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="168" y="121" fill="#667085" font-family="Inter, sans-serif" font-size="8">Total Products</text>
+  <rect x="256" y="111" width="34" height="13" rx="6.5" fill="#E8F8F0"/>
+  <text x="273" y="120" text-anchor="middle" fill="#2DA462" font-family="Inter, sans-serif" font-size="7" font-weight="700">+8.4%</text>
+  <text x="168" y="152" fill="#141B34" font-family="Inter, sans-serif" font-size="17" font-weight="800">13,284</text>
+
+  <rect x="312" y="102" width="148" height="68" rx="12" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="326" y="121" fill="#667085" font-family="Inter, sans-serif" font-size="8">In Stock</text>
+  <rect x="414" y="111" width="34" height="13" rx="6.5" fill="#E8F8F0"/>
+  <text x="431" y="120" text-anchor="middle" fill="#2DA462" font-family="Inter, sans-serif" font-size="7" font-weight="700">+3.2%</text>
+  <text x="326" y="152" fill="#141B34" font-family="Inter, sans-serif" font-size="17" font-weight="800">1,102</text>
+
+  <rect x="470" y="102" width="148" height="68" rx="12" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="484" y="121" fill="#667085" font-family="Inter, sans-serif" font-size="8">Low Stock</text>
+  <rect x="572" y="111" width="34" height="13" rx="6.5" fill="#FDECEC"/>
+  <text x="589" y="120" text-anchor="middle" fill="#E5534B" font-family="Inter, sans-serif" font-size="7" font-weight="700">-2.8%</text>
+  <text x="484" y="152" fill="#141B34" font-family="Inter, sans-serif" font-size="17" font-weight="800">2,496</text>
+
+  <rect x="628" y="102" width="152" height="68" rx="12" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="642" y="121" fill="#667085" font-family="Inter, sans-serif" font-size="8">Out of Stock</text>
+  <rect x="734" y="111" width="34" height="13" rx="6.5" fill="#FDECEC"/>
+  <text x="751" y="120" text-anchor="middle" fill="#E5534B" font-family="Inter, sans-serif" font-size="7" font-weight="700">-1.6%</text>
+  <text x="642" y="152" fill="#141B34" font-family="Inter, sans-serif" font-size="17" font-weight="800">345</text>
+
+  <!-- Row 2: Cash Flow Striped Chart + Inventory Alerts Donut -->
+  <rect x="154" y="180" width="410" height="154" rx="14" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="170" y="201" fill="#181D27" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Cash Flow</text>
+  <circle cx="420" cy="197" r="3" fill="#FA897B"/><text x="427" y="200" fill="#667085" font-family="Inter, sans-serif" font-size="7.5">Expenses</text>
+  <circle cx="476" cy="197" r="3" fill="#8B7FF9"/><text x="483" y="200" fill="#667085" font-family="Inter, sans-serif" font-size="7.5">Income</text>
+
+  <!-- 12 Monthly Bars (Jul highlighted in Violet + Coral!) -->
+  <g transform="translate(172, 218)">
+    <rect x="0"   y="36" width="18" height="58" fill="url(#invHoriz42)"/>
+    <rect x="31"  y="52" width="18" height="42" fill="url(#invHoriz42)"/>
+    <rect x="62"  y="24" width="18" height="70" fill="url(#invHoriz42)"/>
+    <rect x="93"  y="48" width="18" height="46" fill="url(#invHoriz42)"/>
+    <rect x="124" y="12" width="18" height="82" fill="url(#invHoriz42)"/>
+    <rect x="155" y="66" width="18" height="28" fill="url(#invHoriz42)"/>
+    <!-- Active Jul Column -->
+    <rect x="186" y="4"  width="18" height="26" fill="#FCC5BE"/>
+    <line x1="186" y1="5" x2="204" y2="5" stroke="#F9796B" stroke-width="2"/>
+    <rect x="186" y="30" width="18" height="64" fill="#B4ADFF"/>
+    <line x1="186" y1="31" x2="204" y2="31" stroke="#7C6FF9" stroke-width="2"/>
+    <!-- Tooltip next to Jul -->
+    <rect x="210" y="6" width="84" height="34" rx="6" fill="#F6F7FB" stroke="#E5E7F0"/>
+    <circle cx="218" cy="17" r="2.5" fill="#7C6FF9"/>
+    <text x="224" y="20" fill="#181D27" font-family="Inter, sans-serif" font-size="7" font-weight="700">$24,400</text>
+    <circle cx="218" cy="30" r="2.5" fill="#FA897B"/>
+    <text x="224" y="33" fill="#181D27" font-family="Inter, sans-serif" font-size="7" font-weight="700">$3,467</text>
+
+    <rect x="217" y="44" width="18" height="50" fill="url(#invHoriz42)"/>
+    <rect x="248" y="56" width="18" height="38" fill="url(#invHoriz42)"/>
+    <rect x="279" y="60" width="18" height="34" fill="url(#invHoriz42)"/>
+    <rect x="310" y="48" width="18" height="46" fill="url(#invHoriz42)"/>
+    <rect x="341" y="50" width="18" height="44" fill="url(#invHoriz42)"/>
+  </g>
+
+  <!-- Right Card: Inventory Alerts Donut -->
+  <rect x="574" y="180" width="206" height="154" rx="14" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="590" y="201" fill="#181D27" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Inventory Alerts</text>
+  <circle cx="677" cy="252" r="34" fill="none" stroke="#63C787" stroke-width="15" stroke-dasharray="154 214"/>
+  <circle cx="677" cy="252" r="34" fill="none" stroke="#FA897B" stroke-width="15" stroke-dasharray="40 214" stroke-dashoffset="-156"/>
+  <circle cx="677" cy="252" r="34" fill="none" stroke="url(#invDiag42)" stroke-width="15" stroke-dasharray="17 214" stroke-dashoffset="-197"/>
+  <text x="614" y="322" text-anchor="middle" fill="#181D27" font-family="Inter, sans-serif" font-size="9" font-weight="800">2880</text>
+  <text x="677" y="322" text-anchor="middle" fill="#181D27" font-family="Inter, sans-serif" font-size="9" font-weight="800">510</text>
+  <text x="740" y="322" text-anchor="middle" fill="#181D27" font-family="Inter, sans-serif" font-size="9" font-weight="800">374</text>
+
+  <!-- Row 3: Product Inventory Clean Table -->
+  <rect x="154" y="344" width="626" height="94" rx="14" fill="#FFFFFF" stroke="#ECEEF6"/>
+  <text x="170" y="365" fill="#181D27" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Product Inventory</text>
+  <line x1="154" y1="376" x2="780" y2="376" stroke="#F0F1F6"/>
+
+  <rect x="170" y="385" width="16" height="16" rx="4" fill="#F3F4F6"/>
+  <text x="194" y="396" fill="#181D27" font-family="Inter, sans-serif" font-size="8.5" font-weight="600">Wireless Headphones</text>
+  <text x="360" y="396" fill="#667085" font-family="Inter, sans-serif" font-size="8">HP-401</text>
+  <text x="450" y="396" fill="#667085" font-family="Inter, sans-serif" font-size="8">Warehouse A</text>
+  <text x="560" y="396" fill="#181D27" font-family="Inter, sans-serif" font-size="8" font-weight="600">1245</text>
+  <rect x="630" y="386" width="52" height="15" rx="4" fill="#FFF6E5"/>
+  <text x="656" y="396" text-anchor="middle" fill="#DF9A28" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Low Stock</text>
+
+  <line x1="154" y1="408" x2="780" y2="408" stroke="#F0F1F6"/>
+  <rect x="170" y="415" width="16" height="16" rx="4" fill="#F3F4F6"/>
+  <text x="194" y="426" fill="#181D27" font-family="Inter, sans-serif" font-size="8.5" font-weight="600">Women’s Pleated Dress</text>
+  <text x="360" y="426" fill="#667085" font-family="Inter, sans-serif" font-size="8">HB-552</text>
+  <text x="450" y="426" fill="#667085" font-family="Inter, sans-serif" font-size="8">Warehouse B</text>
+  <text x="560" y="426" fill="#181D27" font-family="Inter, sans-serif" font-size="8" font-weight="600">346</text>
+  <rect x="630" y="416" width="52" height="15" rx="4" fill="#EAF9F0"/>
+  <text x="656" y="426" text-anchor="middle" fill="#34A866" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">In Stock</text>
+</svg>

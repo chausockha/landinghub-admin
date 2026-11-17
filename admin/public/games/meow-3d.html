@@ -1,0 +1,3262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meow 3D - Thế Giới Nuôi Mèo Cưng</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
+            background: #fdf2f8;
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .pastel-glass {
+            background: rgba(255, 252, 249, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.94);
+            box-shadow: 0 8px 26px rgba(180, 130, 110, 0.16), inset 0 2px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        .game-btn {
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.11), 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .game-btn:active {
+            transform: translateY(2px) scale(0.96);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        .game-btn.active-mode {
+            animation: pulseGlow 1.4s infinite;
+            border-color: #ef4444 !important;
+            background: linear-gradient(135deg, #fee2e2, #fecaca) !important;
+            color: #b91c1c !important;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45), 0 4px 0 rgba(185, 28, 28, 0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0), 0 4px 0 rgba(185, 28, 28, 0.2); }
+        }
+
+        #cat-speech {
+            position: fixed;
+            pointer-events: none;
+            z-index: 15;
+            transform: translate(-50%, -100%);
+            transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #cat-speech::after {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px 7px 0;
+            border-style: solid;
+            border-color: #ffffff transparent transparent;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-amber-950">
+
+    <!-- Khung vẽ 3D Three.js -->
+    <div id="canvas-container"></div>
+
+    <!-- Bong bóng lời thoại nổi trên đầu mèo -->
+    <div id="cat-speech" class="opacity-0 scale-90 bg-white px-3.5 py-1.5 rounded-2xl shadow-lg border-2 border-pink-200 text-xs sm:text-sm font-extrabold text-pink-600 whitespace-nowrap">
+        Meow~ 💕
+    </div>
+
+    <!-- GIAO DIỆN NGƯỜI DÙNG (HUD OVERLAY) -->
+    <div id="ui-layer" class="fixed inset-0 pointer-events-none z-10 flex flex-col justify-between p-2.5 sm:p-3.5">
+
+        <!-- PHẦN TRÊN: Hồ sơ mèo + Chỉ số + Xu Cá Vàng + Chụp ảnh Polaroid -->
+        <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-2">
+
+            <!-- Khối Trái: Hồ sơ Mèo + Cân nặng + 4 Thanh chỉ số -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pointer-events-auto max-w-full">
+                <div id="profile-card" class="pastel-glass rounded-3xl px-3.5 py-2 flex items-center gap-3 shrink-0">
+                    <div id="cat-avatar-badge" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-amber-300 to-orange-400 flex items-center justify-center text-2xl shadow-inner border-2 border-white shrink-0">
+                        🐱
+                    </div>
+                    <div class="min-w-[160px]">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span id="cat-name-display" class="font-black text-base text-amber-950 tracking-tight truncate max-w-[100px]">Mochi</span>
+                            <button id="btn-rename" title="Đổi tên & Quản lý lưu trữ" class="w-5 h-5 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-700 flex items-center justify-center text-[11px] transition">
+                                ✏️
+                            </button>
+                            <span id="level-badge" class="px-2 py-0.5 text-[10px] font-black rounded-full bg-pink-500 text-white shadow-sm">
+                                Cấp 1 • Mèo Con
+                            </span>
+                            <span id="weight-badge" class="px-2 py-0.5 text-[10px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                                ⚖️ 2.2 kg
+                            </span>
+                        </div>
+                        <!-- Thanh EXP -->
+                        <div class="mt-1 flex items-center gap-1.5">
+                            <span class="text-[11px]">💗</span>
+                            <div class="w-full h-2 bg-pink-100 rounded-full overflow-hidden border border-pink-200">
+                                <div id="exp-bar" class="h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full transition-all duration-300" style="width: 20%;"></div>
+                            </div>
+                            <span id="exp-text" class="text-[10px] font-bold text-pink-600 shrink-0">20/100</span>
+                        </div>
+                        <div id="cat-mood-text" class="text-[11px] font-bold text-amber-700/95 mt-0.5 truncate">
+                            ✨ Đang vẫy đuôi vui vẻ
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Thanh Chỉ Số -->
+                <div class="pastel-glass rounded-3xl px-3 py-2 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 flex-1">
+                    <div class="min-w-[82px]">
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-amber-900">
+                            <span>🍖 Độ no</span>
+                            <span id="val-hunger">85%</span>
+                        </div>
+                        <div class="h-2 bg-amber-100/90 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-hunger" class="h-full bg-gradient-to-r from-orange-400 to-amber-500 rounded-full transition-all duration-300" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                    <div class="min-w-[82px]">
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-amber-900">
+                            <span>💖 Vui vẻ</span>
+                            <span id="val-happy">88%</span>
+                        </div>
+                        <div class="h-2 bg-pink-100/90 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-happy" class="h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full transition-all duration-300" style="width: 88%;"></div>
+                        </div>
+                    </div>
+                    <div class="min-w-[82px]">
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-amber-900">
+                            <span>⚡ Năng lượng</span>
+                            <span id="val-energy">90%</span>
+                        </div>
+                        <div class="h-2 bg-sky-100/90 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-energy" class="h-full bg-gradient-to-r from-sky-400 to-indigo-400 rounded-full transition-all duration-300" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                    <div class="min-w-[82px]">
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-amber-900">
+                            <span>🫧 Sạch sẽ</span>
+                            <span id="val-hygiene">92%</span>
+                        </div>
+                        <div class="h-2 bg-emerald-100/90 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-hygiene" class="h-full bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full transition-all duration-300" style="width: 92%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khối Phải: Xu Cá Vàng + Chụp Polaroid + Tiện ích -->
+            <div class="flex items-center justify-between sm:justify-end gap-1.5 pointer-events-auto flex-wrap">
+                <div class="pastel-glass rounded-full px-3.5 py-1.5 flex items-center gap-1.5 shadow-sm border-amber-300">
+                    <span class="text-base">🪙</span>
+                    <span id="coin-display" class="font-black text-sm sm:text-base text-amber-700">120</span>
+                    <span class="text-[11px] font-extrabold text-amber-600/90">Xu Cá Vàng</span>
+                </div>
+
+                <button id="btn-polaroid" title="Chụp ảnh khung Polaroid lưu về máy" class="game-btn pastel-glass px-3 h-10 rounded-full flex items-center gap-1 text-xs font-black text-pink-700">
+                    <span class="text-base">📸</span>
+                    <span class="hidden sm:inline">Polaroid</span>
+                </button>
+
+                <button id="btn-daynight" title="Đổi ánh sáng Ngày / Đêm" class="game-btn pastel-glass w-10 h-10 rounded-full flex items-center justify-center text-lg">
+                    ☀️
+                </button>
+                <button id="btn-sound" title="Bật / Tắt âm thanh" class="game-btn pastel-glass w-10 h-10 rounded-full flex items-center justify-center text-lg">
+                    🔊
+                </button>
+                <button id="btn-reset-cam" title="Đặt lại góc nhìn 3D" class="game-btn pastel-glass w-10 h-10 rounded-full flex items-center justify-center text-base">
+                    🎥
+                </button>
+            </div>
+        </div>
+
+        <!-- BANNER MINI-GAME 30s HOẶC CẢNH BÁO CHĂM SÓC Ở GIỮA TRÊN -->
+        <div class="flex flex-col items-center gap-1.5 pointer-events-none my-auto pt-1">
+            <div id="minigame-banner" class="hidden pointer-events-auto pastel-glass px-4 py-1.5 rounded-full border-2 border-amber-400 items-center gap-3 shadow-md">
+                <span id="minigame-title" class="text-xs sm:text-sm font-black text-rose-600">🐭 Săn Chuột Dây Cót!</span>
+                <span id="minigame-timer" class="px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-xs font-black">30s</span>
+                <span id="minigame-score" class="text-xs font-black text-amber-900">Đã bắt: 0</span>
+                <button id="btn-stop-minigame" class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[11px] font-black hover:bg-rose-200">Dừng</button>
+            </div>
+
+            <div id="alert-pills" class="flex flex-wrap justify-center gap-1.5 pointer-events-auto">
+                <button id="pill-litter-alert" class="hidden game-btn px-3 py-1 rounded-full bg-amber-100 border-2 border-amber-500 text-amber-950 text-xs font-black items-center gap-1">
+                    💩 Khay cát đầy mùi! Bấm dọn ngay (+8 Xu)
+                </button>
+                <button id="pill-hairball-alert" class="hidden game-btn px-3 py-1 rounded-full bg-emerald-100 border-2 border-emerald-500 text-emerald-950 text-xs font-black items-center gap-1">
+                    🌿 Mèo khạc búi lông! Cho ăn Cỏ Mèo / Chải lông
+                </button>
+            </div>
+
+            <div id="hint-banner" class="pastel-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-amber-800/90 shadow-sm text-center">
+                🪙 Nhặt Xu Cá Vàng mèo thả trên sàn • 🛋️ Mua Cat Tree, Bể Cá, Robot Hút Bụi & Nhận Nuôi Mèo Bạn!
+            </div>
+        </div>
+
+        <!-- PHẦN DƯỚI: NGĂN KÉO ĐA NĂNG (THỨC ĂN / VỆ SINH / KỸ NĂNG / CỬA HÀNG) + DOCK CHÍNH -->
+        <div class="flex flex-col items-center gap-2 w-full">
+
+            <!-- 1. NGĂN KÉO THỰC ĐƠN THỨC ĂN & CỎ MÈO -->
+            <div id="panel-food" class="hidden pointer-events-auto pastel-glass rounded-3xl p-3.5 w-full max-w-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-black text-sm sm:text-base text-amber-950">🍽️ Thực Đơn Dinh Dưỡng & Cỏ Mèo</h3>
+                    <button data-close-panel class="w-7 h-7 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-black text-xs">✕</button>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button data-food="kibble" class="food-item-btn game-btn rounded-2xl p-2.5 bg-white/90 border-2 border-amber-200 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🥣</span>
+                        <span class="text-xs font-black text-amber-950">Hạt Khô</span>
+                        <span class="text-[10px] font-bold text-slate-500">+18 No • Ít béo</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">Miễn phí</span>
+                    </button>
+                    <button data-food="salmon" class="food-item-btn game-btn rounded-2xl p-2.5 bg-orange-50 border-2 border-orange-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🍣</span>
+                        <span class="text-xs font-black text-amber-950">Cá Hồi Tươi</span>
+                        <span class="text-[10px] font-bold text-orange-700">+38 No • +0.15kg</span>
+                        <span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-black">🪙 15 Xu</span>
+                    </button>
+                    <button data-food="churu" class="food-item-btn game-btn rounded-2xl p-2.5 bg-pink-50 border-2 border-pink-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🍡</span>
+                        <span class="text-xs font-black text-amber-950">Súp Churu</span>
+                        <span class="text-[10px] font-bold text-pink-700">+28 Vui • Dễ mập!</span>
+                        <span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-black">🪙 25 Xu</span>
+                    </button>
+                    <button data-food="catnip" class="food-item-btn game-btn rounded-2xl p-2.5 bg-emerald-50 border-2 border-emerald-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🌱</span>
+                        <span class="text-xs font-black text-amber-950">Cỏ Mèo</span>
+                        <span class="text-[10px] font-bold text-emerald-700">Tiêu búi lông & mỡ</span>
+                        <span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-black">🪙 12 Xu</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. NGĂN KÉO DỌN VỆ SINH, CHẢI LÔNG & TẮM -->
+            <div id="panel-care" class="hidden pointer-events-auto pastel-glass rounded-3xl p-3.5 w-full max-w-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-black text-sm sm:text-base text-amber-950">🧹 Chăm Sóc Thực Tế & Khay Cát</h3>
+                    <button data-close-panel class="w-7 h-7 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-black text-xs">✕</button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button id="btn-scoop-litter" class="game-btn rounded-2xl p-2.5 bg-amber-50 border-2 border-amber-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🪣</span>
+                        <span class="text-xs font-black text-amber-950">Xúc Khay Cát</span>
+                        <span id="litter-status-sub" class="text-[10px] font-bold text-amber-700">Sạch sẽ</span>
+                    </button>
+                    <button id="btn-brush-fur" class="game-btn rounded-2xl p-2.5 bg-pink-50 border-2 border-pink-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🪮</span>
+                        <span class="text-xs font-black text-amber-950">Chải Lông</span>
+                        <span class="text-[10px] font-bold text-pink-700">Ngừa búi lông</span>
+                    </button>
+                    <button id="btn-bath-soap" class="game-btn rounded-2xl p-2.5 bg-sky-50 border-2 border-sky-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🫧</span>
+                        <span class="text-xs font-black text-amber-950">Tắm Xà Phòng</span>
+                        <span class="text-[10px] font-bold text-sky-700">100% Thơm tho</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. NGĂN KÉO DẠY KỸ NĂNG BIỂU DIỄN 3D -->
+            <div id="panel-tricks" class="hidden pointer-events-auto pastel-glass rounded-3xl p-3.5 w-full max-w-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-black text-sm sm:text-base text-amber-950">🎓 Huấn Luyện Kỹ Năng Mèo Cưng</h3>
+                    <button data-close-panel class="w-7 h-7 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-black text-xs">✕</button>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button data-trick="sit" class="trick-btn game-btn rounded-2xl p-2.5 bg-white/90 border-2 border-amber-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🐾</span>
+                        <span class="text-xs font-black text-amber-950">Ngồi Ngoan</span>
+                        <span class="text-[10px] font-bold text-emerald-700">Mở từ Cấp 1 • +4 Xu</span>
+                    </button>
+                    <button data-trick="paw" class="trick-btn game-btn rounded-2xl p-2.5 bg-white/90 border-2 border-amber-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🤝</span>
+                        <span class="text-xs font-black text-amber-950">Bắt Tay</span>
+                        <span id="req-paw" class="text-[10px] font-bold text-amber-700">Cần Cấp 2 (Mèo Choai)</span>
+                    </button>
+                    <button data-trick="beg" class="trick-btn game-btn rounded-2xl p-2.5 bg-white/90 border-2 border-amber-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🙏</span>
+                        <span class="text-xs font-black text-amber-950">Đứng Xin Ăn</span>
+                        <span id="req-beg" class="text-[10px] font-bold text-amber-700">Cần Cấp 3</span>
+                    </button>
+                    <button data-trick="backflip" class="trick-btn game-btn rounded-2xl p-2.5 bg-white/90 border-2 border-amber-300 flex flex-col items-center gap-1">
+                        <span class="text-2xl">🤸</span>
+                        <span class="text-xs font-black text-amber-950">Lộn Nhào 3D</span>
+                        <span id="req-backflip" class="text-[10px] font-bold text-amber-700">Cần Cấp 4</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. CỬA HÀNG NỘI THẤT, TỦ ĐỒ PHỤ KIỆN & NHẬN NUÔI MÈO BẠN -->
+            <div id="panel-shop" class="hidden pointer-events-auto pastel-glass rounded-3xl p-3.5 w-full max-w-2xl max-h-[60vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-2.5">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button data-shop-tab="furniture" class="shop-tab-btn px-3 py-1 rounded-full text-xs font-black bg-amber-500 text-white">🛋️ Nội Thất Phòng</button>
+                        <button data-shop-tab="wardrobe" class="shop-tab-btn px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900">🎨 Phụ Kiện & Lông</button>
+                        <button data-shop-tab="buddy" class="shop-tab-btn px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900">🐱🐱 Mèo Bạn</button>
+                    </div>
+                    <button data-close-panel class="w-7 h-7 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-black text-xs shrink-0">✕</button>
+                </div>
+
+                <!-- Tab Nội Thất -->
+                <div id="shop-tab-furniture" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div class="rounded-2xl bg-white/85 border-2 border-amber-200 p-3 flex flex-col justify-between gap-2">
+                        <div>
+                            <div class="text-2xl mb-1">🏰</div>
+                            <div class="text-xs font-black text-amber-950">Cat Tree 3 Tầng</div>
+                            <p class="text-[11px] font-semibold text-amber-800/80 leading-snug mt-0.5">Tháp leo nhiều tầng để mèo phóng lên đỉnh ngồi ngắm toàn phòng & giảm béo.</p>
+                        </div>
+                        <button id="buy-cattree" class="game-btn w-full py-1.5 rounded-xl bg-amber-400 text-amber-950 font-black text-xs">🪙 Mua (95 Xu)</button>
+                    </div>
+
+                    <div class="rounded-2xl bg-white/85 border-2 border-sky-200 p-3 flex flex-col justify-between gap-2">
+                        <div>
+                            <div class="text-2xl mb-1">🐠</div>
+                            <div class="text-xs font-black text-amber-950">Bể Cá Cảnh Phát Sáng</div>
+                            <p class="text-[11px] font-semibold text-amber-800/80 leading-snug mt-0.5">Đàn cá vàng bơi tung tăng sủi bọt khí khiến mèo thích thú ra ngồi rình.</p>
+                        </div>
+                        <button id="buy-aquarium" class="game-btn w-full py-1.5 rounded-xl bg-amber-400 text-amber-950 font-black text-xs">🪙 Mua (110 Xu)</button>
+                    </div>
+
+                    <div class="rounded-2xl bg-white/85 border-2 border-indigo-200 p-3 flex flex-col justify-between gap-2">
+                        <div>
+                            <div class="text-2xl mb-1">🤖</div>
+                            <div class="text-xs font-black text-amber-950">Robot Hút Bụi Tự Hành</div>
+                            <p class="text-[11px] font-semibold text-amber-800/80 leading-snug mt-0.5">Tự chạy quanh sàn giữ phòng sạch, bấm vào Robot để cho mèo ngồi cưỡi!</p>
+                        </div>
+                        <button id="buy-roomba" class="game-btn w-full py-1.5 rounded-xl bg-amber-400 text-amber-950 font-black text-xs">🪙 Mua (140 Xu)</button>
+                    </div>
+                </div>
+
+                <!-- Tab Phụ kiện & Màu Lông -->
+                <div id="shop-tab-wardrobe" class="hidden space-y-2.5">
+                    <div>
+                        <div class="text-[11px] font-extrabold text-amber-700 mb-1">🐾 Đổi Giống / Màu Lông Mèo Chính:</div>
+                        <div id="coat-options" class="grid grid-cols-5 gap-1.5">
+                            <button data-coat="ginger" class="coat-btn game-btn rounded-xl p-1.5 bg-orange-100 border-2 border-orange-400 flex flex-col items-center gap-0.5">
+                                <span class="w-5 h-5 rounded-full bg-gradient-to-br from-orange-300 to-amber-600 border border-white"></span>
+                                <span class="text-[10px] font-extrabold">Mèo Cam</span>
+                            </button>
+                            <button data-coat="white" class="coat-btn game-btn rounded-xl p-1.5 bg-white/80 border-2 border-transparent flex flex-col items-center gap-0.5">
+                                <span class="w-5 h-5 rounded-full bg-gradient-to-br from-white to-slate-200 border border-slate-300"></span>
+                                <span class="text-[10px] font-extrabold">Mèo Trắng</span>
+                            </button>
+                            <button data-coat="tuxedo" class="coat-btn game-btn rounded-xl p-1.5 bg-white/80 border-2 border-transparent flex flex-col items-center gap-0.5">
+                                <span class="w-5 h-5 rounded-full bg-gradient-to-br from-zinc-800 to-white border border-white"></span>
+                                <span class="text-[10px] font-extrabold">Tuxedo</span>
+                            </button>
+                            <button data-coat="british" class="coat-btn game-btn rounded-xl p-1.5 bg-white/80 border-2 border-transparent flex flex-col items-center gap-0.5">
+                                <span class="w-5 h-5 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 border border-white"></span>
+                                <span class="text-[10px] font-extrabold">Xám Anh</span>
+                            </button>
+                            <button data-coat="calico" class="coat-btn game-btn rounded-xl p-1.5 bg-white/80 border-2 border-transparent flex flex-col items-center gap-0.5">
+                                <span class="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 via-stone-800 to-amber-50 border border-white"></span>
+                                <span class="text-[10px] font-extrabold">Tam Thể</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-extrabold text-amber-700 mb-1">🎀 Phụ Kiện Mở Khóa Bằng Xu Cá:</div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                            <button data-acc="none" class="acc-btn game-btn rounded-xl py-2 px-2 bg-pink-100 border-2 border-pink-400 text-xs font-black">🚫 Tháo ra</button>
+                            <button data-acc="bow" data-cost="40" class="acc-btn game-btn rounded-xl py-2 px-2 bg-white/85 border-2 border-amber-200 text-xs font-black">🎀 Nơ Hồng <span id="price-acc-bow" class="text-amber-700">(40🪙)</span></button>
+                            <button data-acc="glasses" data-cost="65" class="acc-btn game-btn rounded-xl py-2 px-2 bg-white/85 border-2 border-amber-200 text-xs font-black">🕶️ Kính Ngầu <span id="price-acc-glasses" class="text-amber-700">(65🪙)</span></button>
+                            <button data-acc="crown" data-cost="120" class="acc-btn game-btn rounded-xl py-2 px-2 bg-white/85 border-2 border-amber-200 text-xs font-black">👑 Vương Miện <span id="price-acc-crown" class="text-amber-700">(120🪙)</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Nhận Nuôi Mèo Bạn -->
+                <div id="shop-tab-buddy" class="hidden">
+                    <div class="rounded-2xl bg-gradient-to-r from-pink-50 to-amber-50 border-2 border-pink-200 p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="text-sm font-black text-amber-950 flex items-center gap-1.5">
+                                <span>🐱💕🐱</span>
+                                <span id="buddy-title-status">Nhận Nuôi Bé Mèo Bạn Thứ 2</span>
+                            </div>
+                            <p class="text-xs font-semibold text-amber-800/85">
+                                Hai bé sẽ tự rượt đuổi nhau quanh thảm, liếm lông làm lành thả tim và nằm cuộn tròn ngủ chung ổ cực đáng yêu!
+                            </p>
+                            <div class="flex items-center gap-1.5 pt-1">
+                                <span class="text-[11px] font-extrabold text-amber-800">Màu lông Mèo Bạn:</span>
+                                <select id="buddy-coat-select" class="rounded-xl border border-amber-300 bg-white px-2 py-1 text-xs font-bold text-amber-950">
+                                    <option value="white">Mèo Trắng Tuyết</option>
+                                    <option value="tuxedo">Mèo Tuxedo</option>
+                                    <option value="british">Mèo Xám Anh</option>
+                                    <option value="calico">Mèo Tam Thể</option>
+                                    <option value="ginger">Mèo Cam</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="btn-adopt-buddy" class="game-btn shrink-0 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black text-xs">
+                            🪙 Nhận Nuôi (160 Xu)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THANH DOCK HÀNH ĐỘNG CHÍNH -->
+            <div class="pointer-events-auto w-full max-w-4xl pastel-glass rounded-3xl p-2">
+                <div class="flex items-center justify-start md:justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar px-0.5 py-0.5">
+                    <button id="dock-food" class="game-btn shrink-0 bg-gradient-to-b from-amber-50 to-orange-100 border-2 border-orange-200 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span class="text-xl leading-none">🍽️</span>
+                        <span class="text-[11px] font-extrabold text-amber-950 mt-1">Thức Ăn</span>
+                    </button>
+
+                    <button id="dock-care" class="relative game-btn shrink-0 bg-gradient-to-b from-cyan-50 to-sky-100 border-2 border-sky-200 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span id="care-badge-dot" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black items-center justify-center">!</span>
+                        <span class="text-xl leading-none">🧹</span>
+                        <span class="text-[11px] font-extrabold text-sky-950 mt-1">Vệ Sinh</span>
+                    </button>
+
+                    <button id="act-laser" class="game-btn shrink-0 bg-gradient-to-b from-rose-50 to-red-100 border-2 border-red-200 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span class="text-xl leading-none">🔴</span>
+                        <span id="label-laser" class="text-[11px] font-extrabold text-rose-950 mt-1">Đèn Laser</span>
+                    </button>
+
+                    <button id="act-yarn" class="game-btn shrink-0 bg-gradient-to-b from-pink-50 to-fuchsia-100 border-2 border-pink-200 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span class="text-xl leading-none">🧶</span>
+                        <span class="text-[11px] font-extrabold text-fuchsia-950 mt-1">Bóng Len</span>
+                    </button>
+
+                    <button id="act-minigame" class="game-btn shrink-0 bg-gradient-to-b from-yellow-50 to-amber-100 border-2 border-amber-300 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span id="icon-minigame" class="text-xl leading-none">🐭</span>
+                        <span id="label-minigame" class="text-[11px] font-extrabold text-amber-950 mt-1">Bắt Chuột</span>
+                    </button>
+
+                    <button id="dock-tricks" class="game-btn shrink-0 bg-gradient-to-b from-purple-50 to-violet-100 border-2 border-purple-200 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span class="text-xl leading-none">🎓</span>
+                        <span class="text-[11px] font-extrabold text-purple-950 mt-1">Kỹ Năng</span>
+                    </button>
+
+                    <button id="dock-shop" class="game-btn shrink-0 bg-gradient-to-b from-emerald-50 to-teal-100 border-2 border-teal-300 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span class="text-xl leading-none">🛋️</span>
+                        <span class="text-[11px] font-extrabold text-teal-950 mt-1">Cửa Hàng</span>
+                    </button>
+
+                    <button id="act-sleep" class="game-btn shrink-0 bg-gradient-to-b from-indigo-50 to-violet-100 border-2 border-indigo-200 rounded-2xl px-2.5 py-1.5 flex flex-col items-center min-w-[70px] sm:min-w-[82px]">
+                        <span id="icon-sleep" class="text-xl leading-none">💤</span>
+                        <span id="label-sleep" class="text-[11px] font-extrabold text-indigo-950 mt-1">Đi Ngủ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỔI TÊN & QUẢN LÝ FILE LƯU -->
+    <div id="rename-modal" class="fixed inset-0 z-30 hidden items-center justify-center bg-black/45 backdrop-blur-sm p-4">
+        <div class="pastel-glass rounded-3xl p-5 w-full max-w-xs shadow-2xl border-2 border-white">
+            <h3 class="text-lg font-black text-amber-950 flex items-center gap-2 mb-1">
+                🐱 Hồ Sơ Mèo Cưng
+            </h3>
+            <p class="text-xs font-semibold text-amber-800/80 mb-3">Tiến trình được tự động lưu vào trình duyệt!</p>
+            <input id="rename-input" type="text" maxlength="16" placeholder="Nhập tên mèo..."
+                class="w-full px-3.5 py-2 rounded-2xl border-2 border-amber-300 bg-white font-bold text-amber-950 focus:outline-none focus:border-pink-400 mb-3">
+            <div class="flex items-center justify-between gap-2">
+                <button id="btn-reset-save" class="px-2.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-extrabold text-[11px]">
+                    Chơi lại từ đầu
+                </button>
+                <div class="flex gap-1.5">
+                    <button id="rename-cancel" class="game-btn px-3 py-2 rounded-xl bg-slate-100 text-slate-700 font-extrabold text-xs">Hủy</button>
+                    <button id="rename-save" class="game-btn px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-extrabold text-xs">Lưu 💕</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL XEM & TẢI ẢNH POLAROID -->
+    <div id="polaroid-modal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl p-4 shadow-2xl max-w-sm w-full flex flex-col items-center gap-3 transform -rotate-1">
+            <img id="polaroid-preview-img" src="" alt="Polaroid Mèo Cưng" class="w-full rounded-lg border border-slate-200 shadow-inner" />
+            <div class="flex items-center justify-between w-full gap-2">
+                <button id="polaroid-close" class="game-btn flex-1 py-2 rounded-xl bg-slate-100 text-slate-700 font-black text-xs">Đóng</button>
+                <a id="polaroid-download" download="meow-3d-polaroid.png" class="game-btn flex-1 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black text-xs text-center">
+                    ⬇️ Lưu Ảnh Về Máy
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST THÔNG BÁO -->
+    <div id="toast-msg" class="fixed top-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none opacity-0 transition-all duration-300 bg-amber-950/90 text-white px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold shadow-lg text-center">
+        Thông báo
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. HỆ THỐNG ÂM THANH WEB AUDIO API (TIẾNG MÈO, XU RƠI, CÀO CÁT, KHẠC LÔNG, CHỤP ẢNH)
+        ========================================================================= */
+        class CatSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+                this.lastPurrTime = 0;
+                this.mouthEnergy = 0;
+            }
+
+            unlock() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            }
+
+            toggle() {
+                this.unlock();
+                this.enabled = !this.enabled;
+                return this.enabled;
+            }
+
+            playMeow(style = 'normal') {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const randPitch = 0.92 + Math.random() * 0.18;
+
+                let duration = 0.55, fStart = 490 * randPitch, fPeak = 740 * randPitch, fEnd = 430 * randPitch, peakRatio = 0.28;
+                if (style === 'short') {
+                    duration = 0.24; fStart = 560 * randPitch; fPeak = 860 * randPitch; fEnd = 620 * randPitch; peakRatio = 0.38;
+                } else if (style === 'hungry') {
+                    duration = 0.92; fStart = 520 * randPitch; fPeak = 690 * randPitch; fEnd = 360 * randPitch; peakRatio = 0.22;
+                } else if (style === 'happy') {
+                    duration = 0.46; fStart = 540 * randPitch; fPeak = 890 * randPitch; fEnd = 570 * randPitch; peakRatio = 0.35;
+                }
+
+                const oscSaw = this.ctx.createOscillator();
+                const oscTri = this.ctx.createOscillator();
+                oscSaw.type = 'sawtooth';
+                oscTri.type = 'triangle';
+
+                [oscSaw, oscTri].forEach(osc => {
+                    osc.frequency.setValueAtTime(fStart, now);
+                    osc.frequency.exponentialRampToValueAtTime(fPeak, now + duration * peakRatio);
+                    osc.frequency.exponentialRampToValueAtTime(fEnd, now + duration);
+                });
+
+                const formant1 = this.ctx.createBiquadFilter();
+                formant1.type = 'bandpass';
+                formant1.Q.value = 4.2;
+                formant1.frequency.setValueAtTime(400, now);
+                formant1.frequency.exponentialRampToValueAtTime(1080, now + duration * 0.32);
+                formant1.frequency.exponentialRampToValueAtTime(460, now + duration);
+
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.0001, now);
+                env.gain.linearRampToValueAtTime(0.26, now + duration * 0.12);
+                env.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                oscSaw.connect(formant1);
+                oscTri.connect(formant1);
+                formant1.connect(env);
+                env.connect(this.ctx.destination);
+
+                oscSaw.start(now);
+                oscTri.start(now);
+                oscSaw.stop(now + duration + 0.03);
+                oscTri.stop(now + duration + 0.03);
+                this.triggerMouthAnim(duration);
+            }
+
+            triggerMouthAnim(duration) {
+                this.mouthEnergy = 1.0;
+                const start = performance.now();
+                const durMs = duration * 1000;
+                const tick = () => {
+                    const elapsed = performance.now() - start;
+                    if (elapsed < durMs) {
+                        this.mouthEnergy = Math.sin((elapsed / durMs) * Math.PI);
+                        requestAnimationFrame(tick);
+                    } else {
+                        this.mouthEnergy = 0;
+                    }
+                };
+                requestAnimationFrame(tick);
+            }
+
+            playPurr() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                if (now - this.lastPurrTime < 0.42) return;
+                this.lastPurrTime = now;
+
+                const dur = 0.52;
+                const bufferSize = Math.floor(this.ctx.sampleRate * dur);
+                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / this.ctx.sampleRate;
+                    const rattle = 0.5 + 0.5 * Math.sin(2 * Math.PI * 25.5 * t);
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(rattle, 2.2);
+                }
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = noiseBuffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 165;
+
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.001, now);
+                env.gain.linearRampToValueAtTime(0.24, now + 0.14);
+                env.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+                noise.connect(filter);
+                filter.connect(env);
+                env.connect(this.ctx.destination);
+                noise.start(now);
+                noise.stop(now + dur);
+            }
+
+            playNomNom() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(220 + Math.random() * 45, now);
+                osc.frequency.exponentialRampToValueAtTime(95, now + 0.11);
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.16, now);
+                env.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                osc.connect(env);
+                env.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.13);
+                this.triggerMouthAnim(0.14);
+            }
+
+            // Tiếng Xu Cá Vàng leng keng
+            playCoin() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                [987.77, 1318.51].forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.065);
+                    const env = this.ctx.createGain();
+                    env.gain.setValueAtTime(0.15, now + i * 0.065);
+                    env.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.065 + 0.24);
+                    osc.connect(env);
+                    env.connect(this.ctx.destination);
+                    osc.start(now + i * 0.065);
+                    osc.stop(now + i * 0.065 + 0.25);
+                });
+            }
+
+            // Tiếng mèo bới cát sột soạt / xúc cát
+            playSandScratch() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const len = Math.floor(this.ctx.sampleRate * 0.26);
+                const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < len; i++) {
+                    d[i] = (Math.random() * 2 - 1) * Math.sin((i / len) * Math.PI);
+                }
+                const src = this.ctx.createBufferSource();
+                src.buffer = buf;
+                const bp = this.ctx.createBiquadFilter();
+                bp.type = 'bandpass';
+                bp.frequency.value = 1850;
+                const g = this.ctx.createGain();
+                g.gain.value = 0.14;
+                src.connect(bp);
+                bp.connect(g);
+                g.connect(this.ctx.destination);
+                src.start(now);
+            }
+
+            // Tiếng khạc nhẹ búi lông
+            playHairballHack() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(260, now);
+                osc.frequency.linearRampToValueAtTime(140, now + 0.18);
+                const g = this.ctx.createGain();
+                g.gain.setValueAtTime(0.12, now);
+                g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.connect(g);
+                g.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.22);
+                this.triggerMouthAnim(0.22);
+            }
+
+            playBubblePop() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                osc.type = 'sine';
+                const base = 480 + Math.random() * 380;
+                osc.frequency.setValueAtTime(base, now);
+                osc.frequency.exponentialRampToValueAtTime(base * 2.1, now + 0.09);
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.13, now);
+                env.gain.exponentialRampToValueAtTime(0.001, now + 0.095);
+                osc.connect(env);
+                env.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+
+            playBell() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                [2750, 4180].forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+                    const env = this.ctx.createGain();
+                    env.gain.setValueAtTime(idx === 0 ? 0.045 : 0.025, now);
+                    env.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+                    osc.connect(env);
+                    env.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.19);
+                });
+            }
+
+            playShutter() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const len = Math.floor(this.ctx.sampleRate * 0.08);
+                const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.25));
+                const src = this.ctx.createBufferSource();
+                src.buffer = buf;
+                const g = this.ctx.createGain();
+                g.gain.value = 0.25;
+                src.connect(g);
+                g.connect(this.ctx.destination);
+                src.start(now);
+            }
+
+            playChime() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.5].forEach((n, i) => {
+                    const osc = this.ctx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(n, now + i * 0.075);
+                    const env = this.ctx.createGain();
+                    env.gain.setValueAtTime(0.13, now + i * 0.075);
+                    env.gain.exponentialRampToValueAtTime(0.001, now + i * 0.075 + 0.28);
+                    osc.connect(env);
+                    env.connect(this.ctx.destination);
+                    osc.start(now + i * 0.075);
+                    osc.stop(now + i * 0.075 + 0.3);
+                });
+            }
+        }
+
+        const soundFX = new CatSoundEngine();
+
+        /* =========================================================================
+           2. PROCEDURAL TEXTURES (SÀN GỖ, THẢM, 5 BỘ LÔNG, HẠT SPRITE)
+        ========================================================================= */
+        function createWoodFloorTexture() {
+            const c = document.createElement('canvas');
+            c.width = 512; c.height = 512;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#e7bfa0';
+            ctx.fillRect(0, 0, 512, 512);
+            const planks = 8, ph = 512 / planks;
+            for (let row = 0; row < planks; row++) {
+                const y = row * ph, offset = (row % 2) * 128;
+                for (let col = -1; col < 4; col++) {
+                    const x = col * 256 + offset;
+                    const shade = (row * 3 + col) % 3;
+                    ctx.fillStyle = shade === 0 ? '#e6bc98' : shade === 1 ? '#dfb18b' : '#ecc6a6';
+                    ctx.fillRect(x + 2, y + 2, 252, ph - 4);
+                }
+                ctx.fillStyle = '#c89670';
+                ctx.fillRect(0, y, 512, 2);
+            }
+            const tex = new THREE.CanvasTexture(c);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(3, 3);
+            return tex;
+        }
+
+        function createRugTexture() {
+            const c = document.createElement('canvas');
+            c.width = 512; c.height = 512;
+            const ctx = c.getContext('2d');
+            const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 256);
+            grad.addColorStop(0, '#fff5f7');
+            grad.addColorStop(0.75, '#fce7f3');
+            grad.addColorStop(1, '#f9a8d4');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+            ctx.strokeStyle = '#f472b6';
+            ctx.lineWidth = 10;
+            ctx.setLineDash([18, 12]);
+            ctx.beginPath();
+            ctx.arc(256, 256, 215, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(244, 114, 182, 0.26)';
+            ctx.beginPath();
+            ctx.ellipse(256, 282, 52, 42, 0, 0, Math.PI * 2);
+            ctx.fill();
+            [[-48, 224], [-17, 202], [17, 202], [48, 224]].forEach(([dx, ty]) => {
+                ctx.beginPath();
+                ctx.ellipse(256 + dx, ty, 18, 24, dx * 0.006, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            return new THREE.CanvasTexture(c);
+        }
+
+        function createCoatTexture(coatType) {
+            const c = document.createElement('canvas');
+            c.width = 256; c.height = 256;
+            const ctx = c.getContext('2d');
+            if (coatType === 'ginger') {
+                ctx.fillStyle = '#f79d42'; ctx.fillRect(0, 0, 256, 256);
+                ctx.fillStyle = '#d97318';
+                for (let i = 0; i < 7; i++) {
+                    ctx.beginPath(); ctx.ellipse(128, 30 + i * 34, 95, 8, 0, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.fillStyle = '#fff3df';
+                ctx.beginPath(); ctx.ellipse(128, 135, 42, 95, 0, 0, Math.PI * 2); ctx.fill();
+            } else if (coatType === 'white') {
+                ctx.fillStyle = '#fffdfa'; ctx.fillRect(0, 0, 256, 256);
+            } else if (coatType === 'tuxedo') {
+                ctx.fillStyle = '#272730'; ctx.fillRect(0, 0, 256, 256);
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.ellipse(128, 128, 48, 92, 0, 0, Math.PI * 2); ctx.fill();
+            } else if (coatType === 'british') {
+                ctx.fillStyle = '#8b9bb0'; ctx.fillRect(0, 0, 256, 256);
+                ctx.fillStyle = '#9eadc2';
+                ctx.beginPath(); ctx.ellipse(128, 130, 44, 88, 0, 0, Math.PI * 2); ctx.fill();
+            } else if (coatType === 'calico') {
+                ctx.fillStyle = '#fffbf4'; ctx.fillRect(0, 0, 256, 256);
+                [
+                    { x: 55, y: 65, r: 44, col: '#f08a2b' },
+                    { x: 200, y: 80, r: 48, col: '#342924' },
+                    { x: 75, y: 185, r: 42, col: '#342924' },
+                    { x: 190, y: 190, r: 46, col: '#f08a2b' }
+                ].forEach(s => {
+                    ctx.fillStyle = s.col;
+                    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+                });
+            }
+            return new THREE.CanvasTexture(c);
+        }
+
+        function createSpriteTexture(symbol, color = '#ff4d88') {
+            const c = document.createElement('canvas');
+            c.width = 128; c.height = 128;
+            const ctx = c.getContext('2d');
+            ctx.font = '900 72px Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = '#ffffff';
+            ctx.strokeText(symbol, 64, 68);
+            ctx.fillStyle = color;
+            ctx.fillText(symbol, 64, 68);
+            return new THREE.CanvasTexture(c);
+        }
+
+        /* =========================================================================
+           3. DỮ LIỆU GAME, LƯU TRỮ LOCALSTORAGE & HẰNG SỐ VỊ TRÍ
+        ========================================================================= */
+        const SAVE_KEY = 'landinghub_meow3d_save_v2';
+        const BED_POS = new THREE.Vector3(-2.35, 0, -1.75);
+        const BOWL_POS = new THREE.Vector3(2.35, 0, -1.65);
+        const BOWL_EAT_POS = new THREE.Vector3(1.72, 0, -1.35);
+        const SCRATCH_POS = new THREE.Vector3(-2.55, 0, 1.65);
+        const LITTER_POS = new THREE.Vector3(2.68, 0, 2.15);
+        const AQUARIUM_POS = new THREE.Vector3(2.55, 0, -3.35);
+
+        const COAT_PRESETS = {
+            ginger: { name: 'Mèo Cam', headColor: 0xf79d42, pawColor: 0xfff3df, tailColor: 0xf08c2e, irisColor: 0x2ea043, badgeBg: 'from-amber-300 to-orange-400' },
+            white: { name: 'Mèo Trắng', headColor: 0xfffdfa, pawColor: 0xffffff, tailColor: 0xfffdfa, irisColor: 0x38bdf8, badgeBg: 'from-slate-100 to-sky-200' },
+            tuxedo: { name: 'Mèo Tuxedo', headColor: 0x272730, pawColor: 0xffffff, tailColor: 0x22222a, irisColor: 0xfbbf24, badgeBg: 'from-zinc-700 to-zinc-900' },
+            british: { name: 'Mèo Xám Anh', headColor: 0x8b9bb0, pawColor: 0x9aaac0, tailColor: 0x7d8da3, irisColor: 0xf59e0b, badgeBg: 'from-slate-400 to-slate-500' },
+            calico: { name: 'Mèo Tam Thể', headColor: 0xfffbf4, pawColor: 0xfffbf4, tailColor: 0x342924, irisColor: 0x10b981, badgeBg: 'from-amber-200 to-orange-300' }
+        };
+
+        const FOOD_MENU = {
+            kibble: { name: 'Hạt Khô', cost: 0, hunger: 18, happy: 5, weightDelta: 0.03, hairballDelta: 3, exp: 6 },
+            salmon: { name: 'Cá Hồi Tươi', cost: 15, hunger: 38, happy: 15, weightDelta: 0.14, hairballDelta: 6, exp: 16 },
+            churu:  { name: 'Súp Churu', cost: 25, hunger: 22, happy: 28, weightDelta: 0.22, hairballDelta: 8, exp: 24 },
+            catnip: { name: 'Cỏ Mèo', cost: 12, hunger: 6, happy: 22, weightDelta: -0.18, hairballDelta: -100, exp: 14, curesHairball: true }
+        };
+
+        const game = {
+            catName: 'Mochi',
+            level: 1,
+            exp: 20,
+            expNext: 100,
+            coins: 120,
+            weightKg: 2.2,
+            weightTierReached: 0, // Mở thưởng mốc cân nặng: 2.8kg, 3.6kg, 4.5kg
+            coat: 'ginger',
+            accessory: 'none',
+            unlockedAcc: ['none'],
+            furniture: {
+                catTree: false,
+                aquarium: false,
+                roomba: false
+            },
+            buddy: {
+                adopted: false,
+                coat: 'white'
+            },
+
+            stats: {
+                hunger: 85,
+                happy: 88,
+                energy: 90,
+                hygiene: 92
+            },
+
+            // Chăm sóc thực tế: Tiêu hóa -> Đi vệ sinh khay cát, Búi lông
+            digestion: 25,
+            litterClumps: 0,
+            stinkTimer: 0,
+            hairballRisk: 15,
+            hasHairball: false,
+
+            // Trạng thái AI: IDLE, WANDER, LASER, CHASE_YARN, EATING, BATHING, SLEEPING,
+            // USE_LITTER, TRICK, CLIMB_TREE, WATCH_FISH, RIDE_ROOMBA, MINI_HUNT
+            state: 'IDLE',
+            stateTimer: 0,
+            subPhase: 0,
+            activeTrick: null,
+            pendingFoodKey: 'kibble',
+
+            pos: new THREE.Vector3(0, 0, 0.2),
+            elevY: 0,
+            angle: 0,
+            targetPos: new THREE.Vector3(0, 0, 0.2),
+            walkCycle: 0,
+            currentSpeed: 0,
+
+            blinkTimer: 2.5,
+            isBlinking: false,
+            earTwitchTimer: 3.0,
+            earTwitchAmount: 0,
+            pettingTimer: 0,
+            jumpY: 0,
+            jumpVel: 0,
+            flipAngle: 0,
+            hungryMeowCooldown: 8,
+            eatChewTimer: 0,
+            bubbleSpawnTimer: 0,
+            zzzTimer: 0,
+            passiveCoinTimer: 16
+        };
+
+        function saveGameState() {
+            try {
+                const payload = {
+                    catName: game.catName,
+                    level: game.level,
+                    exp: game.exp,
+                    expNext: game.expNext,
+                    coins: game.coins,
+                    weightKg: Number(game.weightKg.toFixed(2)),
+                    weightTierReached: game.weightTierReached,
+                    coat: game.coat,
+                    accessory: game.accessory,
+                    unlockedAcc: game.unlockedAcc,
+                    furniture: game.furniture,
+                    buddy: game.buddy,
+                    stats: game.stats,
+                    litterClumps: game.litterClumps,
+                    hasHairball: game.hasHairball
+                };
+                localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+            } catch (e) {}
+        }
+
+        function loadGameState() {
+            try {
+                const raw = localStorage.getItem(SAVE_KEY);
+                if (!raw) return;
+                const d = JSON.parse(raw);
+                if (d.catName) game.catName = d.catName;
+                if (typeof d.level === 'number') game.level = d.level;
+                if (typeof d.exp === 'number') game.exp = d.exp;
+                if (typeof d.expNext === 'number') game.expNext = d.expNext;
+                if (typeof d.coins === 'number') game.coins = d.coins;
+                if (typeof d.weightKg === 'number') game.weightKg = d.weightKg;
+                if (typeof d.weightTierReached === 'number') game.weightTierReached = d.weightTierReached;
+                if (d.coat && COAT_PRESETS[d.coat]) game.coat = d.coat;
+                if (d.accessory) game.accessory = d.accessory;
+                if (Array.isArray(d.unlockedAcc)) game.unlockedAcc = d.unlockedAcc;
+                if (d.furniture) Object.assign(game.furniture, d.furniture);
+                if (d.buddy) Object.assign(game.buddy, d.buddy);
+                if (d.stats) Object.assign(game.stats, d.stats);
+                if (typeof d.litterClumps === 'number') game.litterClumps = d.litterClumps;
+                if (typeof d.hasHairball === 'boolean') game.hasHairball = d.hasHairball;
+            } catch (e) {}
+        }
+
+        /* =========================================================================
+           4. DỰNG CẢNH 3D, KHAY CÁT, NỘI THẤT MỞ KHÓA, XU CÁ VÀNG & MINI-GAME
+        ========================================================================= */
+        let scene, camera, renderer;
+        let ambientLight, mainDirLight, warmPointLight;
+        let backWallGroup, leftWallGroup, windowSkyMat, sunMoonMesh, windowBeamMesh;
+        let isNightMode = false;
+
+        let bedGroup, bowlFoodGroup, miniScratchGroup, danglingToyPivot, yarnBallGroup;
+        let litterBoxGroup, litterClumpMeshes = [], scoopMesh;
+        let catTreeTowerGroup, aquariumGroup, aquariumFish = [], roombaGroup;
+        let roombaState = { pos: new THREE.Vector3(1.2, 0, 1.1), angle: 0.9, riding: false };
+
+        let laserGroup, isLaserMode = false;
+        const laserTarget = new THREE.Vector3(0, 0.02, 0.8);
+        const yarnState = { pos: new THREE.Vector3(1.3, 0.24, 1.1), vel: new THREE.Vector3(0, 0, 0), radius: 0.24, bouncesLeft: 0 };
+
+        let catRig = null;
+        let buddyRig = null;
+        const buddyAI = {
+            pos: new THREE.Vector3(-0.9, 0, 0.6),
+            angle: 0.5,
+            targetPos: new THREE.Vector3(-0.9, 0, 0.6),
+            mode: 'PLAY', // PLAY, GROOM, SLEEP
+            timer: 3,
+            walkCycle: 0,
+            speed: 0
+        };
+
+        const coinDrops = [];     // Xu Cá Vàng 3D rơi trên sàn
+        const huntTargets = [];   // Chuột dây cót / Đom đóm trong mini-game 30s
+        const minigame = { active: false, timeLeft: 0, score: 0, isNightFirefly: false };
+
+        const particles = [];
+        let heartTex, zzzTex, starTex, stinkTex;
+
+        const camOrbit = {
+            theta: 0.42, phi: 1.08, radius: 6.6,
+            targetTheta: 0.42, targetPhi: 1.08, targetRadius: 6.6,
+            lookAt: new THREE.Vector3(0, 0.65, 0),
+            isDragging: false, isPettingDrag: false, lastX: 0, lastY: 0, pinchDist: 0
+        };
+
+        const raycaster = new THREE.Raycaster();
+        const pointerNDC = new THREE.Vector2(0, 0);
+        const lookCursor3D = new THREE.Vector3(0, 1.1, 3.5);
+        let speechTimer = 0;
+
+        const sharedCoatMaterials = {};
+
+        function initSharedCoatMaterials() {
+            Object.keys(COAT_PRESETS).forEach(key => {
+                sharedCoatMaterials[key] = {
+                    torsoMat: new THREE.MeshStandardMaterial({ map: createCoatTexture(key), roughness: 0.82 }),
+                    headMat: new THREE.MeshStandardMaterial({ color: COAT_PRESETS[key].headColor, roughness: 0.82 }),
+                    pawMat: new THREE.MeshStandardMaterial({ color: COAT_PRESETS[key].pawColor, roughness: 0.85 }),
+                    tailMat: new THREE.MeshStandardMaterial({ color: COAT_PRESETS[key].tailColor, roughness: 0.82 })
+                };
+            });
+        }
+
+        function initThreeScene() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xfff1f5);
+            scene.fog = new THREE.Fog(0xfff1f5, 14, 28);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60);
+            if (window.innerWidth < 640) camOrbit.radius = camOrbit.targetRadius = 7.8;
+
+            // preserveDrawingBuffer giúp chụp ảnh Polaroid mượt mà mọi trình duyệt
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            heartTex = createSpriteTexture('❤', '#ff477e');
+            zzzTex = createSpriteTexture('Zzz', '#818cf8');
+            starTex = createSpriteTexture('✦', '#fbbf24');
+            stinkTex = createSpriteTexture('☁', '#65a30d');
+
+            initSharedCoatMaterials();
+            setupLights();
+            buildCozyRoom();
+            buildLitterBox3D();
+            buildUnlockableFurniture3D();
+
+            catRig = createArticulatedCatRig(game.coat, 1.0);
+            catRig.root.position.copy(game.pos);
+            scene.add(catRig.root);
+            applyCatCoat(game.coat, false);
+            applyCatAccessory(game.accessory, false);
+
+            if (game.buddy.adopted) {
+                spawnBuddyCat3D(false);
+            }
+
+            syncFurnitureVisibility();
+            syncLitterVisuals();
+            buildLaserAndYarn();
+            setupInteractionEvents();
+
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function setupLights() {
+            ambientLight = new THREE.HemisphereLight(0xfff8f0, 0xf3d8c7, 0.78);
+            scene.add(ambientLight);
+
+            mainDirLight = new THREE.DirectionalLight(0xfff5e4, 0.85);
+            mainDirLight.position.set(4.5, 8.5, 5.5);
+            mainDirLight.castShadow = true;
+            mainDirLight.shadow.mapSize.set(1024, 1024);
+            const d = 5.5;
+            mainDirLight.shadow.camera.left = -d;
+            mainDirLight.shadow.camera.right = d;
+            mainDirLight.shadow.camera.top = d;
+            mainDirLight.shadow.camera.bottom = -d;
+            mainDirLight.shadow.bias = -0.0008;
+            scene.add(mainDirLight);
+
+            warmPointLight = new THREE.PointLight(0xffb36b, 0.35, 10);
+            warmPointLight.position.set(-2.2, 2.5, -1.8);
+            scene.add(warmPointLight);
+        }
+
+        function buildCozyRoom() {
+            const floorMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(8.6, 0.35, 8.6),
+                new THREE.MeshStandardMaterial({ map: createWoodFloorTexture(), roughness: 0.75 })
+            );
+            floorMesh.position.y = -0.175;
+            floorMesh.receiveShadow = true;
+            scene.add(floorMesh);
+
+            const rugTex = createRugTexture();
+            const rugMesh = new THREE.Mesh(
+                new THREE.CylinderGeometry(2.15, 2.18, 0.03, 48),
+                new THREE.MeshStandardMaterial({ map: rugTex, roughness: 0.92 })
+            );
+            rugMesh.position.set(0, 0.015, 0.15);
+            rugMesh.receiveShadow = true;
+            scene.add(rugMesh);
+
+            backWallGroup = new THREE.Group();
+            const backWall = new THREE.Mesh(
+                new THREE.BoxGeometry(8.6, 4.4, 0.24),
+                new THREE.MeshStandardMaterial({ color: 0xffeef2, roughness: 0.9 })
+            );
+            backWall.position.set(0, 2.2, -4.18);
+            backWall.receiveShadow = true;
+            backWallGroup.add(backWall);
+
+            // Cửa sổ Ngày / Đêm
+            const winGroup = new THREE.Group();
+            winGroup.position.set(0.1, 2.35, -4.02);
+            windowSkyMat = new THREE.MeshBasicMaterial({ color: 0x87dcff });
+            const skyPane = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.7), windowSkyMat);
+            skyPane.name = 'interactive_window';
+            winGroup.add(skyPane);
+
+            sunMoonMesh = new THREE.Mesh(new THREE.CircleGeometry(0.26, 24), new THREE.MeshBasicMaterial({ color: 0xfff08a }));
+            sunMoonMesh.position.set(0.52, 0.4, 0.01);
+            winGroup.add(sunMoonMesh);
+
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+            const topBar = new THREE.Mesh(new THREE.BoxGeometry(2.45, 0.14, 0.14), frameMat); topBar.position.y = 0.88;
+            const botBar = new THREE.Mesh(new THREE.BoxGeometry(2.55, 0.16, 0.22), frameMat); botBar.position.y = -0.88;
+            const leftBar = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.8, 0.14), frameMat); leftBar.position.x = -1.14;
+            const rightBar = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.8, 0.14), frameMat); rightBar.position.x = 1.14;
+            winGroup.add(topBar, botBar, leftBar, rightBar);
+            backWallGroup.add(winGroup);
+
+            windowBeamMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(2.2, 2.6),
+                new THREE.MeshBasicMaterial({ color: 0xfff7cc, transparent: true, opacity: 0.18, depthWrite: false })
+            );
+            windowBeamMesh.rotation.x = -Math.PI / 2;
+            windowBeamMesh.position.set(0.1, 0.032, -2.2);
+            scene.add(windowBeamMesh);
+            scene.add(backWallGroup);
+
+            leftWallGroup = new THREE.Group();
+            const leftWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.24, 4.4, 8.6),
+                new THREE.MeshStandardMaterial({ color: 0xfff5e9, roughness: 0.9 })
+            );
+            leftWall.position.set(-4.18, 2.2, 0);
+            leftWall.receiveShadow = true;
+            leftWallGroup.add(leftWall);
+            scene.add(leftWallGroup);
+
+            // Ổ nệm ngủ rộng rãi cho cả 2 bé mèo
+            bedGroup = new THREE.Group();
+            bedGroup.position.copy(BED_POS);
+            const bedRim = new THREE.Mesh(
+                new THREE.TorusGeometry(0.88, 0.26, 18, 36),
+                new THREE.MeshStandardMaterial({ color: 0xff9ebb, roughness: 0.88 })
+            );
+            bedRim.rotation.x = Math.PI / 2;
+            bedRim.position.y = 0.24;
+            bedRim.castShadow = true;
+            bedRim.name = 'interactive_bed';
+            const cushion = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.82, 0.84, 0.22, 32),
+                new THREE.MeshStandardMaterial({ color: 0xfff0f5, roughness: 0.92 })
+            );
+            cushion.position.y = 0.12;
+            cushion.name = 'interactive_bed';
+            bedGroup.add(bedRim, cushion);
+            scene.add(bedGroup);
+
+            // Trạm bát ăn & nước
+            const stationGroup = new THREE.Group();
+            stationGroup.position.copy(BOWL_POS);
+            const matTray = new THREE.Mesh(
+                new THREE.BoxGeometry(1.45, 0.04, 0.78),
+                new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.8 })
+            );
+            matTray.position.y = 0.02;
+            stationGroup.add(matTray);
+
+            const foodBowlOuter = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.28, 0.34, 0.18, 24),
+                new THREE.MeshStandardMaterial({ color: 0xfb7185, roughness: 0.35 })
+            );
+            foodBowlOuter.position.set(-0.34, 0.11, 0);
+            foodBowlOuter.name = 'interactive_bowl';
+            stationGroup.add(foodBowlOuter);
+
+            bowlFoodGroup = new THREE.Group();
+            bowlFoodGroup.position.set(-0.34, 0.2, 0);
+            const pateMound = new THREE.Mesh(
+                new THREE.SphereGeometry(0.2, 14, 10),
+                new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 })
+            );
+            pateMound.scale.set(1, 0.42, 1);
+            bowlFoodGroup.add(pateMound);
+            bowlFoodGroup.scale.setScalar(0.35);
+            stationGroup.add(bowlFoodGroup);
+
+            const waterBowl = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.26, 0.32, 0.17, 24),
+                new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.35 })
+            );
+            waterBowl.position.set(0.34, 0.105, 0);
+            stationGroup.add(waterBowl);
+            scene.add(stationGroup);
+
+            // Trụ cào móng cơ bản (khi chưa nâng cấp lên Cat Tree 3 tầng)
+            miniScratchGroup = new THREE.Group();
+            miniScratchGroup.position.copy(SCRATCH_POS);
+            const postBase = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.7, 0.12, 24), new THREE.MeshStandardMaterial({ color: 0xfde047 }));
+            postBase.position.y = 0.06;
+            const sisal = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.4, 18), new THREE.MeshStandardMaterial({ color: 0xd6b17e, roughness: 0.95 }));
+            sisal.position.y = 0.76;
+            sisal.name = 'interactive_scratch';
+            const topPad = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.43, 0.12, 24), new THREE.MeshStandardMaterial({ color: 0xf9a8d4 }));
+            topPad.position.y = 1.5;
+
+            danglingToyPivot = new THREE.Group();
+            danglingToyPivot.position.set(0.35, 1.45, 0);
+            const pomPom = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), new THREE.MeshStandardMaterial({ color: 0xf43f5e }));
+            pomPom.position.y = -0.38;
+            pomPom.name = 'interactive_scratch';
+            const strMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.38, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+            strMesh.position.y = -0.19;
+            danglingToyPivot.add(strMesh, pomPom);
+            miniScratchGroup.add(postBase, sisal, topPad, danglingToyPivot);
+            scene.add(miniScratchGroup);
+        }
+
+        /* --- Khay Cát Vệ Sinh Thực Tế & Xẻng Dọn --- */
+        function buildLitterBox3D() {
+            litterBoxGroup = new THREE.Group();
+            litterBoxGroup.position.copy(LITTER_POS);
+
+            const trayMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.45 });
+            const trayOuter = new THREE.Mesh(new THREE.BoxGeometry(1.18, 0.28, 0.92), trayMat);
+            trayOuter.position.y = 0.14;
+            trayOuter.castShadow = true;
+            trayOuter.name = 'interactive_litter';
+            litterBoxGroup.add(trayOuter);
+
+            const sandMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(1.04, 0.08, 0.78),
+                new THREE.MeshStandardMaterial({ color: 0xe7d3b0, roughness: 0.96 })
+            );
+            sandMesh.position.y = 0.25;
+            sandMesh.name = 'interactive_litter';
+            litterBoxGroup.add(sandMesh);
+
+            // Xẻng xúc cát hồng dựng bên cạnh
+            scoopMesh = new THREE.Group();
+            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.32, 8), new THREE.MeshStandardMaterial({ color: 0xf472b6 }));
+            handle.position.y = 0.28;
+            const blade = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.04), new THREE.MeshStandardMaterial({ color: 0xf472b6 }));
+            blade.position.y = 0.09;
+            scoopMesh.add(handle, blade);
+            scoopMesh.position.set(0.68, 0.04, 0);
+            scoopMesh.rotation.z = -0.22;
+            litterBoxGroup.add(scoopMesh);
+
+            // 3 mẫu cục bẩn (ẩn khi sạch)
+            const clumpMat = new THREE.MeshStandardMaterial({ color: 0x6b4423, roughness: 0.95 });
+            [[-0.22, 0.3, -0.1], [0.18, 0.3, 0.12], [-0.02, 0.3, 0.18]].forEach(([x, y, z]) => {
+                const c = new THREE.Mesh(new THREE.DodecahedronGeometry(0.075, 0), clumpMat);
+                c.position.set(x, y, z);
+                c.visible = false;
+                c.name = 'interactive_litter';
+                litterBoxGroup.add(c);
+                litterClumpMeshes.push(c);
+            });
+
+            scene.add(litterBoxGroup);
+        }
+
+        function syncLitterVisuals() {
+            litterClumpMeshes.forEach((m, idx) => {
+                m.visible = idx < game.litterClumps;
+            });
+        }
+
+        /* --- 3 Món Nội Thất Mở Khóa (Cat Tree 3 tầng, Bể Cá Cảnh, Robot Hút Bụi) --- */
+        function buildUnlockableFurniture3D() {
+            // 1. Cat Tree 3 Tầng Cao Cấp
+            catTreeTowerGroup = new THREE.Group();
+            catTreeTowerGroup.position.copy(SCRATCH_POS);
+            const plushPink = new THREE.MeshStandardMaterial({ color: 0xf9a8d4, roughness: 0.88 });
+            const plushCream = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.88 });
+            const sisalMat = new THREE.MeshStandardMaterial({ color: 0xd4a373, roughness: 0.95 });
+
+            const base = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.14, 1.35), plushCream);
+            base.position.y = 0.07;
+            base.castShadow = true;
+            catTreeTowerGroup.add(base);
+
+            const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.95, 16), sisalMat);
+            p1.position.set(-0.32, 0.55, -0.2);
+            const tier1 = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.12, 24), plushPink);
+            tier1.position.set(-0.32, 1.02, -0.2);
+            tier1.name = 'interactive_cattree';
+
+            const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 1.65, 16), sisalMat);
+            p2.position.set(0.32, 0.9, 0.2);
+            const house = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.52, 20), plushCream);
+            house.position.set(0.32, 1.72, 0.2);
+            house.name = 'interactive_cattree';
+
+            const p3 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.28, 16), sisalMat);
+            p3.position.set(0, 1.2, -0.05);
+            const topBed = new THREE.Mesh(new THREE.CylinderGeometry(0.54, 0.5, 0.16, 24), plushPink);
+            topBed.position.set(0, 2.34, -0.05);
+            topBed.castShadow = true;
+            topBed.name = 'interactive_cattree';
+
+            catTreeTowerGroup.add(p1, tier1, p2, house, p3, topBed);
+            catTreeTowerGroup.visible = false;
+            scene.add(catTreeTowerGroup);
+
+            // 2. Bể Cá Cảnh Phát Sáng
+            aquariumGroup = new THREE.Group();
+            aquariumGroup.position.copy(AQUARIUM_POS);
+            const stand = new THREE.Mesh(
+                new THREE.BoxGeometry(1.42, 0.92, 0.68),
+                new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.75 })
+            );
+            stand.position.y = 0.46;
+            stand.castShadow = true;
+            aquariumGroup.add(stand);
+
+            const waterBox = new THREE.Mesh(
+                new THREE.BoxGeometry(1.32, 0.72, 0.56),
+                new THREE.MeshPhongMaterial({ color: 0x0ea5e9, emissive: 0x0369a1, transparent: true, opacity: 0.52, shininess: 120 })
+            );
+            waterBox.position.y = 1.28;
+            waterBox.name = 'interactive_aquarium';
+            aquariumGroup.add(waterBox);
+
+            // 3 chú cá nhỏ bơi trong bể
+            const fishColors = [0xf97316, 0xfacc15, 0xf43f5e];
+            for (let i = 0; i < 3; i++) {
+                const fg = new THREE.Group();
+                const fb = new THREE.Mesh(new THREE.SphereGeometry(0.065, 10, 8), new THREE.MeshBasicMaterial({ color: fishColors[i] }));
+                fb.scale.set(1.5, 0.85, 0.6);
+                const ft = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.08, 4), new THREE.MeshBasicMaterial({ color: fishColors[i] }));
+                ft.rotation.z = Math.PI / 2;
+                ft.position.x = -0.1;
+                fg.add(fb, ft);
+                fg.position.set((i - 1) * 0.3, 1.25 + (i % 2) * 0.12, 0);
+                aquariumGroup.add(fg);
+                aquariumFish.push({ group: fg, dir: i % 2 === 0 ? 1 : -1, speed: 0.45 + i * 0.12, baseY: 1.22 + i * 0.08 });
+            }
+            aquariumGroup.visible = false;
+            scene.add(aquariumGroup);
+
+            // 3. Robot Hút Bụi Tự Hành
+            roombaGroup = new THREE.Group();
+            const disc = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.46, 0.48, 0.12, 28),
+                new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.5 })
+            );
+            disc.position.y = 0.07;
+            disc.castShadow = true;
+            disc.name = 'interactive_roomba';
+
+            const ring = new THREE.Mesh(
+                new THREE.TorusGeometry(0.32, 0.022, 8, 24),
+                new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+            );
+            ring.rotation.x = Math.PI / 2;
+            ring.position.y = 0.135;
+            roombaGroup.add(disc, ring);
+            roombaGroup.position.copy(roombaState.pos);
+            roombaGroup.visible = false;
+            scene.add(roombaGroup);
+        }
+
+        function syncFurnitureVisibility() {
+            miniScratchGroup.visible = !game.furniture.catTree;
+            catTreeTowerGroup.visible = game.furniture.catTree;
+            aquariumGroup.visible = game.furniture.aquarium;
+            roombaGroup.visible = game.furniture.roomba;
+        }
+
+        /* =========================================================================
+           5. FACTORY DỰNG CHÚ MÈO 3D (DÙNG CHUNG CHO MÈO CHÍNH & MÈO BẠN)
+        ========================================================================= */
+        function createArticulatedCatRig(coatKey, baseScale = 1.0) {
+            const mats = sharedCoatMaterials[coatKey] || sharedCoatMaterials.ginger;
+            const preset = COAT_PRESETS[coatKey] || COAT_PRESETS.ginger;
+            const pinkMat = new THREE.MeshStandardMaterial({ color: 0xff8fab, roughness: 0.6 });
+            const collarMat = new THREE.MeshStandardMaterial({ color: baseScale === 1 ? 0xef4444 : 0xec4899, roughness: 0.45 });
+            const goldMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.65, roughness: 0.25 });
+            const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e1b24, roughness: 0.2 });
+
+            const rig = {
+                root: new THREE.Group(),
+                bodyPivot: new THREE.Group(),
+                torso: null,
+                headPivot: new THREE.Group(),
+                earL: null, earR: null,
+                eyeLOpen: null, eyeROpen: null,
+                eyeLHappy: null, eyeRHappy: null,
+                irisL: null, irisR: null,
+                irisDiskL: null, irisDiskR: null,
+                eyelidL: null, eyelidR: null,
+                blushL: null, blushR: null,
+                mouthOpen: null,
+                bellPivot: new THREE.Group(),
+                legs: [],
+                tailSegments: [],
+                accBow: null, accCrown: null, accGlasses: null,
+                hitMeshes: []
+            };
+
+            rig.root.scale.setScalar(baseScale);
+            rig.bodyPivot.position.y = 0.48;
+            rig.root.add(rig.bodyPivot);
+
+            rig.torso = new THREE.Mesh(new THREE.SphereGeometry(0.42, 26, 22), mats.torsoMat);
+            rig.torso.scale.set(0.92, 0.86, 1.32);
+            rig.torso.castShadow = true;
+            rig.bodyPivot.add(rig.torso);
+            rig.hitMeshes.push(rig.torso);
+
+            const collar = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.042, 10, 24), collarMat);
+            collar.position.set(0, 0.14, 0.41);
+            collar.rotation.x = Math.PI * 0.36;
+            rig.bodyPivot.add(collar);
+
+            rig.bellPivot.position.set(0, -0.05, 0.56);
+            rig.bellPivot.add(new THREE.Mesh(new THREE.SphereGeometry(0.072, 14, 14), goldMat));
+            rig.bodyPivot.add(rig.bellPivot);
+
+            rig.headPivot.position.set(0, 0.34, 0.46);
+            rig.bodyPivot.add(rig.headPivot);
+
+            const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.41, 26, 22), mats.headMat);
+            headMesh.scale.set(1.12, 0.96, 0.98);
+            headMesh.castShadow = true;
+            headMesh.name = 'cat_head';
+            rig.headPivot.add(headMesh);
+            rig.hitMeshes.push(headMesh);
+
+            [-1, 1].forEach(side => {
+                const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 12), mats.pawMat);
+                cheek.position.set(side * 0.14, -0.1, 0.3);
+                cheek.scale.set(1.1, 0.82, 0.75);
+                rig.headPivot.add(cheek);
+            });
+
+            const blushMat = new THREE.MeshBasicMaterial({ color: 0xff7096, transparent: true, opacity: 0.38 });
+            rig.blushL = new THREE.Mesh(new THREE.CircleGeometry(0.068, 14), blushMat);
+            rig.blushL.position.set(-0.27, -0.06, 0.365);
+            rig.blushL.rotation.y = -0.38;
+            rig.blushR = new THREE.Mesh(new THREE.CircleGeometry(0.068, 14), blushMat);
+            rig.blushR.position.set(0.27, -0.06, 0.365);
+            rig.blushR.rotation.y = 0.38;
+            rig.headPivot.add(rig.blushL, rig.blushR);
+
+            function makeEar(side) {
+                const eg = new THREE.Group();
+                eg.position.set(side * 0.27, 0.31, 0.02);
+                eg.rotation.set(0.12, 0, -side * 0.34);
+                const outer = new THREE.Mesh(new THREE.ConeGeometry(0.165, 0.32, 14), mats.headMat);
+                outer.position.y = 0.12; outer.scale.set(1, 1, 0.58);
+                const inner = new THREE.Mesh(new THREE.ConeGeometry(0.105, 0.22, 12), pinkMat);
+                inner.position.set(0, 0.11, 0.048); inner.scale.set(1, 1, 0.35);
+                eg.add(outer, inner);
+                rig.hitMeshes.push(outer);
+                return eg;
+            }
+            rig.earL = makeEar(-1);
+            rig.earR = makeEar(1);
+            rig.headPivot.add(rig.earL, rig.earR);
+
+            const irisMat = new THREE.MeshBasicMaterial({ color: preset.irisColor });
+            const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0x111118 });
+
+            function makeEye(side) {
+                const holder = new THREE.Group();
+                holder.position.set(side * 0.175, 0.055, 0.355);
+                holder.rotation.y = side * 0.22;
+                const openGroup = new THREE.Group();
+                const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.095, 16, 14), pupilMat);
+                sclera.scale.set(1, 1.08, 0.45);
+                openGroup.add(sclera);
+
+                const irisGroup = new THREE.Group();
+                const irisDisk = new THREE.Mesh(new THREE.CircleGeometry(0.082, 18), irisMat.clone());
+                irisDisk.position.z = 0.043;
+                const pupilDisk = new THREE.Mesh(new THREE.CircleGeometry(0.056, 18), pupilMat);
+                pupilDisk.position.z = 0.045;
+                const shine = new THREE.Mesh(new THREE.CircleGeometry(0.024, 10), whiteMat);
+                shine.position.set(-0.025, 0.028, 0.048);
+                irisGroup.add(irisDisk, pupilDisk, shine);
+                openGroup.add(irisGroup);
+
+                const eyelid = new THREE.Mesh(new THREE.SphereGeometry(0.099, 14, 10), mats.headMat);
+                eyelid.scale.set(1.04, 0.01, 0.5);
+                eyelid.position.y = 0.09;
+                eyelid.visible = false;
+                openGroup.add(eyelid);
+
+                const happyArc = new THREE.Mesh(new THREE.TorusGeometry(0.068, 0.016, 8, 16, Math.PI * 0.85), darkMat);
+                happyArc.position.set(0, -0.01, 0.04);
+                happyArc.rotation.z = Math.PI * 0.075;
+                happyArc.visible = false;
+
+                holder.add(openGroup, happyArc);
+                return { holder, openGroup, happyArc, irisGroup, eyelid, irisDisk };
+            }
+
+            const eL = makeEye(-1), eR = makeEye(1);
+            rig.headPivot.add(eL.holder, eR.holder);
+            rig.eyeLOpen = eL.openGroup; rig.eyeROpen = eR.openGroup;
+            rig.eyeLHappy = eL.happyArc; rig.eyeRHappy = eR.happyArc;
+            rig.irisL = eL.irisGroup; rig.irisR = eR.irisGroup;
+            rig.eyelidL = eL.eyelid; rig.eyelidR = eR.eyelid;
+            rig.irisDiskL = eL.irisDisk; rig.irisDiskR = eR.irisDisk;
+
+            const nose = new THREE.Mesh(new THREE.ConeGeometry(0.042, 0.045, 3), pinkMat);
+            nose.rotation.set(Math.PI * 0.15, 0, Math.PI);
+            nose.position.set(0, -0.035, 0.415);
+            rig.headPivot.add(nose);
+
+            [-1, 1].forEach(side => {
+                const lip = new THREE.Mesh(new THREE.TorusGeometry(0.036, 0.009, 8, 12, Math.PI * 0.9), darkMat);
+                lip.position.set(side * 0.035, -0.068, 0.4);
+                lip.rotation.z = Math.PI * 1.05;
+                rig.headPivot.add(lip);
+            });
+
+            rig.mouthOpen = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 10), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
+            rig.mouthOpen.position.set(0, -0.095, 0.388);
+            rig.mouthOpen.scale.set(0.95, 0.01, 0.4);
+            rig.mouthOpen.visible = false;
+            rig.headPivot.add(rig.mouthOpen);
+
+            // Phụ kiện gắn trên đầu
+            rig.accBow = new THREE.Group();
+            rig.accBow.position.set(-0.22, 0.32, 0.14);
+            rig.accBow.rotation.z = 0.28;
+            const bowMat = new THREE.MeshStandardMaterial({ color: 0xff4d8d, roughness: 0.4 });
+            const bwL = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.14, 10), bowMat); bwL.rotation.z = -Math.PI / 2; bwL.position.x = -0.075;
+            const bwR = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.14, 10), bowMat); bwR.rotation.z = Math.PI / 2; bwR.position.x = 0.075;
+            rig.accBow.add(new THREE.Mesh(new THREE.SphereGeometry(0.048, 10, 10), bowMat), bwL, bwR);
+            rig.accBow.visible = false;
+            rig.headPivot.add(rig.accBow);
+
+            rig.accCrown = new THREE.Group();
+            rig.accCrown.position.set(0, 0.41, 0.05);
+            rig.accCrown.add(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.13, 0.1, 14), goldMat));
+            for (let i = 0; i < 5; i++) {
+                const a = (i / 5) * Math.PI * 2;
+                const sp = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.1, 8), goldMat);
+                sp.position.set(Math.cos(a) * 0.125, 0.09, Math.sin(a) * 0.125);
+                rig.accCrown.add(sp);
+            }
+            rig.accCrown.visible = false;
+            rig.headPivot.add(rig.accCrown);
+
+            rig.accGlasses = new THREE.Group();
+            rig.accGlasses.position.set(0, 0.065, 0.415);
+            const gMat = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.6, roughness: 0.2 });
+            [-1, 1].forEach(s => {
+                const lens = new THREE.Mesh(new THREE.CircleGeometry(0.115, 18), gMat);
+                lens.position.set(s * 0.175, 0, 0.005);
+                lens.rotation.y = s * 0.16;
+                rig.accGlasses.add(lens);
+            });
+            rig.accGlasses.add(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.022, 0.022), gMat));
+            rig.accGlasses.visible = false;
+            rig.headPivot.add(rig.accGlasses);
+
+            // 4 chân khớp nối
+            [
+                { x: -0.22, y: -0.14, z: 0.34 },
+                { x: 0.22, y: -0.14, z: 0.34 },
+                { x: -0.23, y: -0.14, z: -0.34 },
+                { x: 0.23, y: -0.14, z: -0.34 }
+            ].forEach(lp => {
+                const legPivot = new THREE.Group();
+                legPivot.position.set(lp.x, lp.y, lp.z);
+                const limb = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.082, 0.3, 12), mats.headMat);
+                limb.position.y = -0.15;
+                limb.castShadow = true;
+                const paw = new THREE.Mesh(new THREE.SphereGeometry(0.098, 12, 10), mats.pawMat);
+                paw.position.set(0, -0.29, 0.025);
+                paw.scale.set(1.0, 0.72, 1.22);
+                legPivot.add(limb, paw);
+                rig.bodyPivot.add(legPivot);
+                rig.legs.push({ pivot: legPivot, limb, paw });
+                rig.hitMeshes.push(limb);
+            });
+
+            // Đuôi 5 đốt
+            let parentTail = rig.bodyPivot;
+            for (let i = 0; i < 5; i++) {
+                const segPivot = new THREE.Group();
+                if (i === 0) {
+                    segPivot.position.set(0, 0.08, -0.52);
+                    segPivot.rotation.x = 0.65;
+                } else {
+                    segPivot.position.set(0, 0.17, 0);
+                    segPivot.rotation.x = 0.22;
+                }
+                const segMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.066 - i * 0.006, 0.072 - i * 0.006, 0.2, 10), mats.tailMat);
+                segMesh.position.y = 0.09;
+                segPivot.add(segMesh);
+                parentTail.add(segPivot);
+                rig.tailSegments.push({ pivot: segPivot, mesh: segMesh });
+                parentTail = segPivot;
+            }
+
+            return rig;
+        }
+
+        function spawnBuddyCat3D(announce = true) {
+            if (buddyRig) {
+                scene.remove(buddyRig.root);
+            }
+            buddyRig = createArticulatedCatRig(game.buddy.coat, 0.88);
+            buddyRig.accBow.visible = true; // Bé mèo bạn đeo nơ xinh
+            buddyRig.root.position.copy(buddyAI.pos);
+            scene.add(buddyRig.root);
+            if (announce) {
+                soundFX.playChime();
+                soundFX.playMeow('happy');
+                showSpeech('Áaa có bạn mới chơi chung rồi!! 🐱💕🐱', 3.0);
+                showToast('🎉 Đã đón bé Mèo Bạn về nhà! Hai bé sẽ tự chơi và ngủ chung ổ!');
+            }
+        }
+
+        function buildLaserAndYarn() {
+            laserGroup = new THREE.Group();
+            laserGroup.visible = false;
+            const dot = new THREE.Mesh(new THREE.CircleGeometry(0.07, 16), new THREE.MeshBasicMaterial({ color: 0xff1133 }));
+            dot.rotation.x = -Math.PI / 2; dot.position.y = 0.035;
+            const beamGeo = new THREE.CylinderGeometry(0.008, 0.018, 4.5, 8);
+            beamGeo.translate(0, 2.25, 0);
+            const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: 0xff2244, transparent: true, opacity: 0.22 }));
+            laserGroup.add(dot, beam);
+            scene.add(laserGroup);
+
+            yarnBallGroup = new THREE.Group();
+            yarnBallGroup.position.copy(yarnState.pos);
+            const core = new THREE.Mesh(new THREE.SphereGeometry(0.22, 18, 16), new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.85 }));
+            core.castShadow = true;
+            core.name = 'interactive_yarn';
+            yarnBallGroup.add(core);
+            scene.add(yarnBallGroup);
+        }
+
+        /* =========================================================================
+           6. HỆ THỐNG XU CÁ VÀNG RƠI TRÊN SÀN, HẠT HIỆU ỨNG & MINI-GAME 30s
+        ========================================================================= */
+        function spawnGoldCoinOnFloor(originPos, value = 6) {
+            if (coinDrops.length >= 12) return;
+            const group = new THREE.Group();
+            const coinMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.72, roughness: 0.22, emissive: 0x78350f, emissiveIntensity: 0.25 });
+            const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.045, 20), coinMat);
+            disc.rotation.z = Math.PI / 2;
+            disc.name = 'interactive_coin';
+            group.add(disc);
+
+            const ang = Math.random() * Math.PI * 2;
+            const dist = 0.55 + Math.random() * 0.65;
+            group.position.set(
+                THREE.MathUtils.clamp(originPos.x + Math.cos(ang) * dist, -2.9, 2.9),
+                0.24,
+                THREE.MathUtils.clamp(originPos.z + Math.sin(ang) * dist, -2.8, 2.8)
+            );
+            scene.add(group);
+            soundFX.playCoin();
+
+            coinDrops.push({
+                group,
+                value,
+                age: 0,
+                vy: 2.2
+            });
+        }
+
+        function collectCoinDrop(index) {
+            const c = coinDrops[index];
+            if (!c) return;
+            game.coins += c.value;
+            soundFX.playCoin();
+            spawnFloatingSprite('star', c.group.position.clone().add(new THREE.Vector3(0, 0.3, 0)));
+            scene.remove(c.group);
+            coinDrops.splice(index, 1);
+            updateHUD();
+        }
+
+        function startMouseHuntMinigame() {
+            soundFX.unlock();
+            if (minigame.active) return;
+            if (isLaserMode) toggleLaserMode(false);
+            wakeUpIfSleeping(false);
+            roombaState.riding = false;
+
+            minigame.active = true;
+            minigame.timeLeft = 30;
+            minigame.score = 0;
+            minigame.isNightFirefly = isNightMode;
+
+            // Xóa mục tiêu cũ nếu còn
+            clearHuntTargets();
+            for (let i = 0; i < 3; i++) {
+                spawnHuntTarget();
+            }
+
+            game.state = 'MINI_HUNT';
+            const banner = document.getElementById('minigame-banner');
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+            document.getElementById('minigame-title').textContent =
+                minigame.isNightFirefly ? '✨ Vồ Đom Đóm Đêm!' : '🐭 Bắt Chuột Dây Cót!';
+            document.getElementById('hint-banner').textContent =
+                '🎯 Chạm vào Chuột / Đom Đóm (hoặc mặt sàn gần đó) để điều khiển mèo phóng tới vồ kiếm Xu Cá Vàng!';
+            soundFX.playMeow('short');
+            showSpeech(minigame.isNightFirefly ? 'Đom đóm sáng quá! Vồ thôi! ✨' : 'Chuột dây cót kìa! Gừ! 🐭', 2.2);
+        }
+
+        function spawnHuntTarget() {
+            const g = new THREE.Group();
+            if (minigame.isNightFirefly) {
+                const glow = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.13, 12, 12),
+                    new THREE.MeshBasicMaterial({ color: 0xfef08a })
+                );
+                glow.name = 'interactive_prey';
+                g.add(glow);
+                g.position.set((Math.random() - 0.5) * 5.2, 0.55, (Math.random() - 0.5) * 5.0);
+            } else {
+                // Chuột dây cót xám có tai hồng & khóa vặn cót vàng trên lưng
+                const body = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.16, 14, 12),
+                    new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.6 })
+                );
+                body.scale.set(0.85, 0.75, 1.45);
+                body.position.y = 0.12;
+                body.name = 'interactive_prey';
+                const keyWind = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.06, 0.015, 6, 12),
+                    new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.7 })
+                );
+                keyWind.position.set(0, 0.24, -0.04);
+                g.add(body, keyWind);
+                g.position.set((Math.random() - 0.5) * 5.2, 0, (Math.random() - 0.5) * 5.0);
+            }
+            scene.add(g);
+            huntTargets.push({
+                group: g,
+                angle: Math.random() * Math.PI * 2,
+                speed: 2.3 + Math.random() * 1.1,
+                turnTimer: 0.8
+            });
+        }
+
+        function clearHuntTargets() {
+            while (huntTargets.length > 0) {
+                const t = huntTargets.pop();
+                scene.remove(t.group);
+            }
+        }
+
+        function stopMouseHuntMinigame(completed = false) {
+            if (!minigame.active) return;
+            minigame.active = false;
+            clearHuntTargets();
+            if (game.state === 'MINI_HUNT') game.state = 'IDLE';
+
+            const banner = document.getElementById('minigame-banner');
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+            document.getElementById('hint-banner').textContent =
+                '🪙 Nhặt Xu Cá Vàng mèo thả trên sàn • 🛋️ Mua Cat Tree, Bể Cá, Robot Hút Bụi & Nhận Nuôi Mèo Bạn!';
+
+            if (completed || minigame.score > 0) {
+                const bonus = minigame.score * 6 + (completed ? 10 : 0);
+                game.coins += bonus;
+                // Vận động săn mồi giúp mèo tiêu mỡ giảm béo rất hiệu quả!
+                game.weightKg = Math.max(1.8, game.weightKg - minigame.score * 0.04);
+                soundFX.playChime();
+                showToast(`🏆 Kết thúc săn mồi! Bắt được ${minigame.score} mục tiêu • Thưởng +${bonus} Xu Cá Vàng!`);
+                showSpeech(`Đã quá sen ơi! +${bonus} Xu Cá! 🪙💕`, 2.6);
+                saveGameState();
+                updateHUD();
+            }
+        }
+
+        function spawnFloatingSprite(type, worldPos) {
+            const tex = type === 'heart' ? heartTex : type === 'zzz' ? zzzTex : type === 'stink' ? stinkTex : starTex;
+            const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 1 });
+            const sprite = new THREE.Sprite(mat);
+            sprite.position.copy(worldPos);
+            sprite.position.x += (Math.random() - 0.5) * 0.4;
+            sprite.position.z += (Math.random() - 0.5) * 0.4;
+            sprite.scale.setScalar(0.05);
+            scene.add(sprite);
+            particles.push({
+                kind: 'sprite', mesh: sprite, life: 0,
+                maxLife: type === 'zzz' ? 1.8 : 1.3,
+                baseScale: type === 'stink' ? 0.32 : 0.38,
+                vy: type === 'zzz' || type === 'stink' ? 0.52 : 0.92,
+                swaySeed: Math.random() * Math.PI * 2
+            });
+        }
+
+        function spawnSoapBubble(centerPos) {
+            const r = 0.06 + Math.random() * 0.1;
+            const col = new THREE.Color().setHSL(0.5 + Math.random() * 0.35, 0.85, 0.82);
+            const bubble = new THREE.Mesh(
+                new THREE.SphereGeometry(r, 10, 10),
+                new THREE.MeshStandardMaterial({ color: col, transparent: true, opacity: 0.62, roughness: 0.1 })
+            );
+            const ang = Math.random() * Math.PI * 2, dist = 0.25 + Math.random() * 0.5;
+            bubble.position.set(centerPos.x + Math.cos(ang) * dist, centerPos.y + 0.3 + Math.random() * 0.5, centerPos.z + Math.sin(ang) * dist);
+            scene.add(bubble);
+            particles.push({ kind: 'bubble', mesh: bubble, life: 0, maxLife: 1.2, vy: 0.55, ang });
+        }
+
+        function updateParticlesAndCoins(dt, elapsed) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.life += dt;
+                const t = p.life / p.maxLife;
+                if (t >= 1) {
+                    scene.remove(p.mesh);
+                    particles.splice(i, 1);
+                    continue;
+                }
+                if (p.kind === 'sprite') {
+                    p.mesh.position.y += p.vy * dt;
+                    p.mesh.position.x += Math.sin(p.life * 4 + p.swaySeed) * 0.22 * dt;
+                    const s = t < 0.2 ? (t / 0.2) * p.baseScale : p.baseScale * (1 - (t - 0.2) * 0.3);
+                    p.mesh.scale.setScalar(Math.max(0.01, s));
+                    p.mesh.material.opacity = t > 0.65 ? 1 - (t - 0.65) / 0.35 : 1;
+                } else if (p.kind === 'bubble') {
+                    p.mesh.position.y += p.vy * dt;
+                    p.mesh.material.opacity = 0.62 * (1 - t);
+                }
+            }
+
+            // Xu Cá Vàng xoay lấp lánh trên sàn & tự hút nhẹ sau 8 giây
+            for (let i = coinDrops.length - 1; i >= 0; i--) {
+                const c = coinDrops[i];
+                c.age += dt;
+                if (c.group.position.y > 0.22 || c.vy > 0) {
+                    c.vy -= 9.5 * dt;
+                    c.group.position.y = Math.max(0.22, c.group.position.y + c.vy * dt);
+                } else {
+                    c.group.position.y = 0.22 + Math.sin(elapsed * 4 + i) * 0.04;
+                }
+                c.group.rotation.y += dt * 3.2;
+                if (c.age > 9.0) {
+                    collectCoinDrop(i);
+                }
+            }
+        }
+
+        /* =========================================================================
+           7. HÀNH ĐỘNG CHĂM SÓC, MUA ĐỒ, DỌN KHAY CÁT, DẠY KỸ NĂNG & CHỤP POLAROID
+        ========================================================================= */
+        function getGrowthTitle() {
+            if (game.level >= 5) return 'Hoàng Thượng';
+            if (game.level >= 3) return 'Mèo Trưởng Thành';
+            if (game.level >= 2) return 'Mèo Choai';
+            return 'Mèo Con';
+        }
+
+        function addAffection(expGain, coinDropChance = 0.25) {
+            game.exp += expGain;
+            if (Math.random() < coinDropChance) {
+                spawnGoldCoinOnFloor(game.pos, 5 + game.level);
+            }
+
+            if (game.exp >= game.expNext) {
+                game.exp -= game.expNext;
+                game.level += 1;
+                game.expNext = Math.round(game.expNext * 1.25);
+                soundFX.playChime();
+                spawnGoldCoinOnFloor(game.pos, 15);
+                spawnGoldCoinOnFloor(game.pos, 15);
+                showToast(`🎉 Đạt Cấp ${game.level} (${getGrowthTitle()})! Mèo rơi thưởng 30 Xu Cá Vàng!`);
+                showSpeech(`Em lớn thành ${getGrowthTitle()} rồi nè! 💕`, 2.8);
+                saveGameState();
+            }
+            updateHUD();
+        }
+
+        function checkWeightMilestones() {
+            const milestones = [
+                { kg: 2.8, tier: 1, reward: 25, label: '2.8kg Mũm Mĩm Đáng Yêu' },
+                { kg: 3.6, tier: 2, reward: 40, label: '3.6kg Mèo Tròn Khỏe Mạnh' },
+                { kg: 4.5, tier: 3, reward: 60, label: '4.5kg Cục Bông Siêu To' }
+            ];
+            milestones.forEach(m => {
+                if (game.weightKg >= m.kg && game.weightTierReached < m.tier) {
+                    game.weightTierReached = m.tier;
+                    spawnGoldCoinOnFloor(game.pos, m.reward);
+                    soundFX.playChime();
+                    showToast(`⚖️ Cột mốc cân nặng mới: ${m.label}! Thưởng +${m.reward} Xu Cá Vàng!`);
+                }
+            });
+        }
+
+        function feedCatWithItem(foodKey) {
+            soundFX.unlock();
+            const item = FOOD_MENU[foodKey];
+            if (!item) return;
+
+            if (game.coins < item.cost) {
+                showToast(`🪙 Chưa đủ Xu Cá Vàng (cần ${item.cost} Xu)! Hãy vuốt ve, dọn cát hoặc chơi Bắt Chuột nhé!`);
+                return;
+            }
+
+            game.coins -= item.cost;
+            game.pendingFoodKey = foodKey;
+            closeAllPanels();
+
+            if (isLaserMode) toggleLaserMode(false);
+            wakeUpIfSleeping(false);
+            roombaState.riding = false;
+
+            bowlFoodGroup.scale.setScalar(1.08);
+            game.state = 'EATING';
+            game.subPhase = 0;
+            game.stateTimer = 2.8;
+            soundFX.playMeow('happy');
+            showSpeech(`Áaa ${item.name} ngon tuyệt! 😋`, 2.0);
+            updateHUD();
+        }
+
+        function scoopLitterBox() {
+            soundFX.unlock();
+            closeAllPanels();
+            if (game.litterClumps <= 0) {
+                showToast('✨ Khay cát hiện đang thơm sạch tinh tươm!');
+                return;
+            }
+            const cleaned = game.litterClumps;
+            game.litterClumps = 0;
+            game.stinkTimer = 0;
+            syncLitterVisuals();
+
+            // Hiệu ứng vung xẻng dọn sạch
+            scoopMesh.rotation.z = 0.45;
+            setTimeout(() => { scoopMesh.rotation.z = -0.22; }, 350);
+
+            soundFX.playSandScratch();
+            soundFX.playCoin();
+            const reward = 6 + cleaned * 3;
+            game.coins += reward;
+            game.stats.hygiene = Math.min(100, game.stats.hygiene + 16);
+            game.stats.happy = Math.min(100, game.stats.happy + 10);
+            spawnFloatingSprite('star', new THREE.Vector3(LITTER_POS.x, 0.85, LITTER_POS.z));
+            showToast(`🪣 Đã dọn sạch khay cát! Phòng hết mùi hôi • Thưởng +${reward} Xu Cá Vàng!`);
+            showSpeech('Khay cát sạch thơm quá, yêu sen! 💕', 2.2);
+            saveGameState();
+            updateHUD();
+        }
+
+        function brushCatFur() {
+            soundFX.unlock();
+            closeAllPanels();
+            wakeUpIfSleeping(false);
+            soundFX.playPurr();
+            game.hairballRisk = 0;
+            if (game.hasHairball) {
+                game.hasHairball = false;
+                showToast('🪮 Đã chải sạch lông rụng & giúp mèo hết nghẹn búi lông!');
+            } else {
+                showToast('🪮 Đã chải chuốt bộ lông mượt mà óng ả!');
+            }
+            game.stats.hygiene = Math.min(100, game.stats.hygiene + 18);
+            game.stats.happy = Math.min(100, game.stats.happy + 12);
+            spawnFloatingSprite('heart', new THREE.Vector3(game.pos.x, 1.15, game.pos.z));
+            addAffection(8, 0.5);
+            saveGameState();
+        }
+
+        function performTrick(trickId) {
+            soundFX.unlock();
+            const reqLevels = { sit: 1, paw: 2, beg: 3, backflip: 4 };
+            const needLv = reqLevels[trickId] || 1;
+            if (game.level < needLv) {
+                showToast(`🎓 Kỹ năng này mở khóa ở Cấp ${needLv} (hiện tại Cấp ${game.level})!`);
+                return;
+            }
+            if (game.hasHairball) {
+                showToast('🌿 Mèo đang vướng búi lông, hãy cho ăn Cỏ Mèo hoặc Chải Lông trước nhé!');
+                return;
+            }
+
+            closeAllPanels();
+            if (isLaserMode) toggleLaserMode(false);
+            wakeUpIfSleeping(false);
+            roombaState.riding = false;
+
+            game.state = 'TRICK';
+            game.activeTrick = trickId;
+            game.stateTimer = trickId === 'backflip' ? 1.35 : 2.5;
+            game.flipAngle = 0;
+
+            // Quay mặt về phía camera biểu diễn
+            game.angle = Math.atan2(camera.position.x - game.pos.x, camera.position.z - game.pos.z);
+
+            if (trickId === 'backflip') {
+                game.jumpVel = 4.6;
+                soundFX.playMeow('happy');
+                soundFX.playBell();
+                showSpeech('Xem tuyệt chiêu Lộn Nhào 360° nè!! 🤸✨', 2.2);
+            } else if (trickId === 'beg') {
+                soundFX.playMeow('happy');
+                showSpeech('Đứng 2 chân ngoan chưa, thưởng cá đi sen! 🙏💕', 2.4);
+            } else if (trickId === 'paw') {
+                soundFX.playMeow('short');
+                showSpeech('Bắt tay cái nào người anh em! 🤝🐾', 2.2);
+            } else {
+                soundFX.playMeow('normal');
+                showSpeech('Em ngồi ngoan tăm tắp nè! 🐾', 2.2);
+            }
+
+            const rewardCoins = trickId === 'backflip' ? 12 : trickId === 'beg' ? 8 : 5;
+            spawnGoldCoinOnFloor(game.pos, rewardCoins);
+            game.weightKg = Math.max(1.8, game.weightKg - 0.03);
+            addAffection(10, 0);
+        }
+
+        /* --- Chụp ảnh khung Polaroid lưu về máy --- */
+        function capturePolaroidSnapshot() {
+            soundFX.playShutter();
+            renderer.render(scene, camera);
+
+            const srcCanvas = renderer.domElement;
+            const out = document.createElement('canvas');
+            const w = 720, h = 840;
+            out.width = w;
+            out.height = h;
+            const ctx = out.getContext('2d');
+
+            // Khung giấy ảnh Polaroid trắng kem
+            ctx.fillStyle = '#fffdf9';
+            ctx.fillRect(0, 0, w, h);
+
+            // Cắt khung vuông trung tâm từ WebGL canvas
+            const minSide = Math.min(srcCanvas.width, srcCanvas.height);
+            const sx = (srcCanvas.width - minSide) / 2;
+            const sy = (srcCanvas.height - minSide) / 2;
+            ctx.drawImage(srcCanvas, sx, sy, minSide, minSide, 44, 44, w - 88, w - 88);
+
+            // Viền mỏng quanh ảnh
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(44, 44, w - 88, w - 88);
+
+            // Chữ kỷ niệm bên dưới khung Polaroid
+            ctx.fillStyle = '#451a03';
+            ctx.font = '900 30px Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            const buddyText = game.buddy.adopted ? ' & Mèo Bạn' : '';
+            ctx.fillText(`🐾 ${game.catName}${buddyText} • ${game.weightKg.toFixed(1)}kg (Cấp ${game.level})`, w / 2, 742);
+
+            ctx.fillStyle = '#9a3412';
+            ctx.font = '700 20px Nunito, sans-serif';
+            const dateStr = new Date().toLocaleDateString('vi-VN');
+            ctx.fillText(`Meow 3D Studio • ${dateStr}`, w / 2, 785);
+
+            const dataUrl = out.toDataURL('image/png');
+            document.getElementById('polaroid-preview-img').src = dataUrl;
+            document.getElementById('polaroid-download').href = dataUrl;
+            document.getElementById('polaroid-modal').classList.remove('hidden');
+            document.getElementById('polaroid-modal').classList.add('flex');
+        }
+
+        /* =========================================================================
+           8. CÁC HÀM CHUYỂN ĐỘNG, TƯƠNG TÁC ĐỒ VẬT & AI MÈO BẠN
+        ========================================================================= */
+        function applyCatCoat(coatKey, notify = true) {
+            if (!COAT_PRESETS[coatKey]) return;
+            game.coat = coatKey;
+            const mats = sharedCoatMaterials[coatKey];
+            const preset = COAT_PRESETS[coatKey];
+
+            catRig.torso.material = mats.torsoMat;
+            catRig.headPivot.children.forEach(ch => { if (ch.name === 'cat_head') ch.material = mats.headMat; });
+            catRig.earL.children[0].material = mats.headMat;
+            catRig.earR.children[0].material = mats.headMat;
+            catRig.eyelidL.material = mats.headMat;
+            catRig.eyelidR.material = mats.headMat;
+            catRig.irisDiskL.material.color.setHex(preset.irisColor);
+            catRig.irisDiskR.material.color.setHex(preset.irisColor);
+            catRig.legs.forEach(l => { l.limb.material = mats.headMat; l.paw.material = mats.pawMat; });
+            catRig.tailSegments.forEach(seg => { seg.mesh.material = mats.tailMat; });
+
+            const badge = document.getElementById('cat-avatar-badge');
+            badge.className = `w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br ${preset.badgeBg} flex items-center justify-center text-2xl shadow-inner border-2 border-white shrink-0`;
+
+            if (notify) {
+                soundFX.playMeow('happy');
+                saveGameState();
+                showToast(`🎨 Đã đổi sang màu lông ${preset.name}!`);
+            }
+        }
+
+        function applyCatAccessory(accKey, notify = true) {
+            game.accessory = accKey;
+            catRig.accBow.visible = accKey === 'bow';
+            catRig.accCrown.visible = accKey === 'crown';
+            catRig.accGlasses.visible = accKey === 'glasses';
+            if (notify) {
+                soundFX.playBell();
+                saveGameState();
+            }
+        }
+
+        function toggleLaserMode(forceState) {
+            soundFX.unlock();
+            isLaserMode = typeof forceState === 'boolean' ? forceState : !isLaserMode;
+            const btn = document.getElementById('act-laser');
+            const label = document.getElementById('label-laser');
+            if (isLaserMode) {
+                if (minigame.active) stopMouseHuntMinigame(false);
+                wakeUpIfSleeping(false);
+                roombaState.riding = false;
+                laserGroup.visible = true;
+                game.state = 'LASER';
+                btn.classList.add('active-mode');
+                label.textContent = 'Tắt Laser';
+                soundFX.playMeow('short');
+            } else {
+                laserGroup.visible = false;
+                if (game.state === 'LASER') game.state = 'IDLE';
+                btn.classList.remove('active-mode');
+                label.textContent = 'Đèn Laser';
+            }
+            updateSleepButtonUI();
+        }
+
+        function throwYarnBall() {
+            soundFX.unlock();
+            if (isLaserMode) toggleLaserMode(false);
+            wakeUpIfSleeping(false);
+            roombaState.riding = false;
+            yarnState.pos.set(0, 1.3, 0);
+            yarnState.vel.set((Math.random() - 0.5) * 6.2, 2.8, (Math.random() - 0.5) * 6.2);
+            yarnState.bouncesLeft = 3;
+            game.state = 'CHASE_YARN';
+            soundFX.playMeow('short');
+            showSpeech('Bóng len kìa! Vồ lấy! 🧶', 1.8);
+            updateSleepButtonUI();
+        }
+
+        function triggerBathCat() {
+            soundFX.unlock();
+            closeAllPanels();
+            if (isLaserMode) toggleLaserMode(false);
+            wakeUpIfSleeping(false);
+            roombaState.riding = false;
+            game.state = 'BATHING';
+            game.subPhase = 0;
+            game.stateTimer = 2.4;
+            soundFX.playBubblePop();
+            showSpeech('Tắm bong bóng thơm phức~ 🫧', 2.0);
+        }
+
+        function toggleSleepCat() {
+            soundFX.unlock();
+            if (isLaserMode) toggleLaserMode(false);
+            roombaState.riding = false;
+            if (game.state === 'SLEEPING') {
+                wakeUpIfSleeping(true);
+            } else {
+                game.state = 'SLEEPING';
+                game.subPhase = 0;
+                game.elevY = 0;
+                soundFX.playMeow('normal');
+                showSpeech(game.buddy.adopted ? 'Về ổ ngủ chung nào bạn ơi~ 💤' : 'Buồn ngủ quá~ Về ổ thôi 💤', 2.0);
+                updateSleepButtonUI();
+            }
+        }
+
+        function wakeUpIfSleeping(playSound = true) {
+            if (game.state === 'SLEEPING') {
+                game.state = 'IDLE';
+                game.elevY = 0;
+                if (playSound) soundFX.playMeow('happy');
+                updateSleepButtonUI();
+            }
+        }
+
+        function updateSleepButtonUI() {
+            document.getElementById('icon-sleep').textContent = game.state === 'SLEEPING' ? '☀️' : '💤';
+            document.getElementById('label-sleep').textContent = game.state === 'SLEEPING' ? 'Đánh Thức' : 'Đi Ngủ';
+        }
+
+        function toggleDayNight() {
+            isNightMode = !isNightMode;
+            document.getElementById('btn-daynight').textContent = isNightMode ? '🌙' : '☀️';
+            document.getElementById('icon-minigame').textContent = isNightMode ? '✨' : '🐭';
+            document.getElementById('label-minigame').textContent = isNightMode ? 'Đom Đóm' : 'Bắt Chuột';
+
+            if (isNightMode) {
+                scene.background.setHex(0x1e1b38); scene.fog.color.setHex(0x1e1b38);
+                ambientLight.color.setHex(0x818cf8); ambientLight.intensity = 0.45;
+                mainDirLight.intensity = 0.42; warmPointLight.intensity = 0.85;
+                windowSkyMat.color.setHex(0x17153b);
+            } else {
+                scene.background.setHex(0xfff1f5); scene.fog.color.setHex(0xfff1f5);
+                ambientLight.color.setHex(0xfff8f0); ambientLight.intensity = 0.78;
+                mainDirLight.intensity = 0.85; warmPointLight.intensity = 0.35;
+                windowSkyMat.color.setHex(0x87dcff);
+            }
+        }
+
+        function moveEntityTowards(posVec, currentAng, targetX, targetZ, maxSpd, dt, stopDist = 0.2) {
+            const dx = targetX - posVec.x, dz = targetZ - posVec.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist > stopDist) {
+                const desired = Math.atan2(dx, dz);
+                let diff = desired - currentAng;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                const nextAng = currentAng + diff * Math.min(1, dt * 10);
+                const spd = Math.min(maxSpd, dist * 3.8 + 0.55);
+                posVec.x = THREE.MathUtils.clamp(posVec.x + (dx / dist) * spd * dt, -3.1, 3.1);
+                posVec.z = THREE.MathUtils.clamp(posVec.z + (dz / dist) * spd * dt, -3.0, 3.1);
+                return { arrived: false, angle: nextAng, speed: spd };
+            }
+            return { arrived: true, angle: currentAng, speed: 0 };
+        }
+
+        function updateMainCatAndRoom(dt, elapsed) {
+            // Hệ số tốc độ theo cân nặng: Mèo mập > 4.2kg sẽ chạy lạch bạch chậm hơn!
+            const chonkRatio = THREE.MathUtils.clamp((game.weightKg - 2.2) / 2.6, -0.15, 0.65);
+            const speedFactor = (game.weightKg > 4.2 ? 0.72 : 1.0) * (game.hasHairball ? 0.75 : 1.0);
+
+            // 1. Cập nhật Bể cá & Robot hút bụi
+            if (game.furniture.aquarium) {
+                aquariumFish.forEach((f, idx) => {
+                    f.group.position.x += f.dir * f.speed * dt;
+                    f.group.position.y = f.baseY + Math.sin(elapsed * 3 + idx) * 0.04;
+                    if (Math.abs(f.group.position.x) > 0.46) {
+                        f.dir *= -1;
+                        f.group.scale.x = f.dir;
+                    }
+                });
+            }
+
+            if (game.furniture.roomba) {
+                roombaState.pos.x += Math.sin(roombaState.angle) * 1.15 * dt;
+                roombaState.pos.z += Math.cos(roombaState.angle) * 1.15 * dt;
+                if (Math.abs(roombaState.pos.x) > 2.85 || Math.abs(roombaState.pos.z) > 2.85) {
+                    roombaState.angle += 2.1 + Math.random() * 0.8;
+                    roombaState.pos.x = THREE.MathUtils.clamp(roombaState.pos.x, -2.85, 2.85);
+                    roombaState.pos.z = THREE.MathUtils.clamp(roombaState.pos.z, -2.85, 2.85);
+                }
+                roombaGroup.position.copy(roombaState.pos);
+                // Robot hút bụi giúp duy trì vệ sinh sàn
+                game.stats.hygiene = Math.min(100, game.stats.hygiene + dt * 0.18);
+            }
+
+            // 2. Cập nhật chỉ số sinh tồn, Khay cát bốc mùi & Mèo thả Xu khi vui
+            if (game.state === 'SLEEPING' && game.subPhase === 1) {
+                game.stats.energy = Math.min(100, game.stats.energy + dt * 6.5);
+                game.stats.hunger = Math.max(0, game.stats.hunger - dt * 0.3);
+            } else {
+                game.stats.hunger = Math.max(0, game.stats.hunger - dt * 0.45);
+                game.stats.happy = Math.max(0, game.stats.happy - dt * 0.35);
+                game.stats.energy = Math.max(0, game.stats.energy - dt * 0.38);
+                game.stats.hygiene = Math.max(0, game.stats.hygiene - dt * 0.28);
+            }
+
+            // Phạt mùi hôi nếu khay cát có chất thải chưa dọn
+            if (game.litterClumps > 0) {
+                game.stinkTimer += dt;
+                if (game.stinkTimer > 2.4) {
+                    game.stinkTimer = 0;
+                    spawnFloatingSprite('stink', new THREE.Vector3(LITTER_POS.x, 0.55, LITTER_POS.z));
+                }
+                game.stats.hygiene = Math.max(0, game.stats.hygiene - dt * 0.45 * game.litterClumps);
+                game.stats.happy = Math.max(0, game.stats.happy - dt * 0.32 * game.litterClumps);
+            }
+
+            // Mèo vui vẻ tự thả Xu Cá Vàng định kỳ
+            if (game.stats.happy >= 75 && !minigame.active) {
+                game.passiveCoinTimer -= dt;
+                if (game.passiveCoinTimer <= 0) {
+                    game.passiveCoinTimer = 20 + Math.random() * 10;
+                    spawnGoldCoinOnFloor(game.pos, 5 + Math.floor(game.level * 1.5));
+                    showSpeech('Tặng sen Xu Cá Vàng nè! 🪙💕', 1.8);
+                }
+            }
+
+            // Chuyển hóa thức ăn -> Đi khay cát bới cát
+            if (game.digestion >= 100 && (game.state === 'IDLE' || game.state === 'WANDER') && game.litterClumps < 3) {
+                game.digestion = 0;
+                game.state = 'USE_LITTER';
+                game.subPhase = 0;
+                game.stateTimer = 2.6;
+                showSpeech('Bụng râm ran... Ra thau cát chút nha! 🐾', 2.0);
+            }
+
+            // Nguy cơ khạc búi lông nếu tích tụ cao
+            if (game.hairballRisk >= 100 && !game.hasHairball && game.state === 'IDLE') {
+                game.hairballRisk = 40;
+                game.hasHairball = true;
+                soundFX.playHairballHack();
+                game.jumpVel = 1.2;
+                showSpeech('Khụ khụ... Em vướng búi lông rồi! 🌿🥺', 3.0);
+                showToast('🌿 Mèo bị khạc búi lông! Hãy mở Thực Đơn cho ăn Cỏ Mèo hoặc Chải Lông nhé!');
+            }
+
+            if (game.pettingTimer > 0) game.pettingTimer = Math.max(0, game.pettingTimer - dt);
+
+            if (game.jumpY > 0 || game.jumpVel !== 0) {
+                game.jumpVel -= 9.8 * dt;
+                game.jumpY += game.jumpVel * dt;
+                if (game.jumpY <= 0) { game.jumpY = 0; game.jumpVel = 0; }
+            }
+
+            // 3. Cập nhật Mini-game 30s Bắt Chuột / Đom Đóm
+            if (minigame.active) {
+                minigame.timeLeft -= dt;
+                document.getElementById('minigame-timer').textContent = `${Math.ceil(Math.max(0, minigame.timeLeft))}s`;
+                document.getElementById('minigame-score').textContent = `Đã bắt: ${minigame.score}`;
+
+                for (let i = huntTargets.length - 1; i >= 0; i--) {
+                    const t = huntTargets[i];
+                    t.turnTimer -= dt;
+                    if (t.turnTimer <= 0) {
+                        t.turnTimer = 0.6 + Math.random() * 1.1;
+                        t.angle += (Math.random() - 0.5) * 2.2;
+                    }
+                    t.group.position.x += Math.sin(t.angle) * t.speed * dt;
+                    t.group.position.z += Math.cos(t.angle) * t.speed * dt;
+                    if (minigame.isNightFirefly) {
+                        t.group.position.y = 0.45 + Math.sin(elapsed * 5 + i) * 0.18;
+                    }
+                    if (Math.abs(t.group.position.x) > 3.0) { t.angle = -t.angle; t.group.position.x = THREE.MathUtils.clamp(t.group.position.x, -3, 3); }
+                    if (Math.abs(t.group.position.z) > 2.9) { t.angle = Math.PI - t.angle; t.group.position.z = THREE.MathUtils.clamp(t.group.position.z, -2.9, 2.9); }
+                    t.group.rotation.y = t.angle;
+
+                    // Kiểm tra mèo vồ trúng mục tiêu!
+                    if (Math.hypot(t.group.position.x - game.pos.x, t.group.position.z - game.pos.z) < 0.58) {
+                        minigame.score += 1;
+                        game.jumpVel = 2.4;
+                        soundFX.playCoin();
+                        spawnFloatingSprite('star', t.group.position.clone().add(new THREE.Vector3(0, 0.3, 0)));
+                        scene.remove(t.group);
+                        huntTargets.splice(i, 1);
+                        spawnHuntTarget();
+                    }
+                }
+
+                if (minigame.timeLeft <= 0) {
+                    stopMouseHuntMinigame(true);
+                }
+            }
+
+            // 4. Máy trạng thái AI chính của chú mèo
+            game.currentSpeed = 0;
+            let bodyRoll = 0, headEatBob = 0, isSleepingCurled = false;
+            let targetElevY = 0;
+
+            if (roombaState.riding && game.furniture.roomba) {
+                game.state = 'RIDE_ROOMBA';
+                game.pos.set(roombaState.pos.x, 0, roombaState.pos.z);
+                game.angle = roombaState.angle;
+                targetElevY = 0.14;
+            } else if (game.state === 'IDLE') {
+                game.stateTimer -= dt;
+                if (game.stateTimer <= 0 && game.pettingTimer <= 0) {
+                    const roll = Math.random();
+                    if (game.furniture.catTree && roll < 0.25) {
+                        game.state = 'CLIMB_TREE';
+                        game.subPhase = 0;
+                        game.stateTimer = 5.0;
+                    } else if (game.furniture.aquarium && roll < 0.48) {
+                        game.state = 'WATCH_FISH';
+                        game.subPhase = 0;
+                        game.stateTimer = 5.0;
+                    } else {
+                        game.state = 'WANDER';
+                        const ang = Math.random() * Math.PI * 2, r = 0.6 + Math.random() * 1.6;
+                        game.targetPos.set(Math.cos(ang) * r, 0, Math.sin(ang) * r + 0.2);
+                    }
+                }
+            } else if (game.state === 'WANDER') {
+                const mv = moveEntityTowards(game.pos, game.angle, game.targetPos.x, game.targetPos.z, 1.55 * speedFactor, dt, 0.2);
+                game.angle = mv.angle; game.currentSpeed = mv.speed;
+                if (mv.arrived) { game.state = 'IDLE'; game.stateTimer = 3.5 + Math.random() * 3.5; }
+            } else if (game.state === 'CLIMB_TREE') {
+                if (game.subPhase === 0) {
+                    const mv = moveEntityTowards(game.pos, game.angle, SCRATCH_POS.x + 0.3, SCRATCH_POS.z + 0.3, 2.5 * speedFactor, dt, 0.25);
+                    game.angle = mv.angle; game.currentSpeed = mv.speed;
+                    if (mv.arrived) {
+                        game.subPhase = 1;
+                        game.pos.set(SCRATCH_POS.x, 0, SCRATCH_POS.z - 0.05);
+                        game.jumpVel = 3.2;
+                        soundFX.playMeow('happy');
+                        showSpeech('Nhảy lên đỉnh Cat Tree ngắm cảnh nè! 🏰✨', 2.2);
+                    }
+                } else {
+                    targetElevY = 2.42;
+                    game.angle = Math.atan2(-game.pos.x, -game.pos.z);
+                    game.stateTimer -= dt;
+                    if (game.stateTimer <= 0) {
+                        game.weightKg = Math.max(1.8, game.weightKg - 0.04);
+                        game.state = 'IDLE';
+                        game.stateTimer = 3.5;
+                    }
+                }
+            } else if (game.state === 'WATCH_FISH') {
+                if (game.subPhase === 0) {
+                    const mv = moveEntityTowards(game.pos, game.angle, AQUARIUM_POS.x, AQUARIUM_POS.z + 0.85, 2.2 * speedFactor, dt, 0.2);
+                    game.angle = mv.angle; game.currentSpeed = mv.speed;
+                    if (mv.arrived) {
+                        game.subPhase = 1;
+                        game.angle = Math.PI;
+                        showSpeech('Cá bơi tung tăng thích mắt quá~ 🐠👀', 2.2);
+                    }
+                } else {
+                    game.stateTimer -= dt;
+                    game.stats.happy = Math.min(100, game.stats.happy + dt * 2.5);
+                    if (game.stateTimer <= 0) { game.state = 'IDLE'; game.stateTimer = 3.5; }
+                }
+            } else if (game.state === 'USE_LITTER') {
+                if (game.subPhase === 0) {
+                    const mv = moveEntityTowards(game.pos, game.angle, LITTER_POS.x, LITTER_POS.z, 2.4 * speedFactor, dt, 0.22);
+                    game.angle = mv.angle; game.currentSpeed = mv.speed;
+                    if (mv.arrived) {
+                        game.subPhase = 1;
+                        soundFX.playSandScratch();
+                    }
+                } else {
+                    targetElevY = 0.24;
+                    game.stateTimer -= dt;
+                    if (Math.random() < 0.08) soundFX.playSandScratch();
+                    if (game.stateTimer <= 0) {
+                        game.litterClumps = Math.min(3, game.litterClumps + 1);
+                        syncLitterVisuals();
+                        showToast('💩 Mèo vừa đi vệ sinh! Hãy cầm xẻng dọn Khay Cát trước khi bốc mùi nhé!');
+                        game.state = 'IDLE';
+                        game.stateTimer = 3.0;
+                        saveGameState();
+                    }
+                }
+            } else if (game.state === 'LASER') {
+                laserGroup.position.copy(laserTarget);
+                const mv = moveEntityTowards(game.pos, game.angle, laserTarget.x, laserTarget.z, 4.3 * speedFactor, dt, 0.28);
+                game.angle = mv.angle; game.currentSpeed = mv.speed;
+                if (mv.arrived && game.jumpY <= 0.01 && Math.random() < 0.09) {
+                    game.jumpVel = 2.6;
+                    game.weightKg = Math.max(1.8, game.weightKg - 0.02);
+                    soundFX.playMeow('short');
+                    addAffection(3, 0.35);
+                }
+            } else if (game.state === 'MINI_HUNT') {
+                const mv = moveEntityTowards(game.pos, game.angle, game.targetPos.x, game.targetPos.z, 4.6 * speedFactor, dt, 0.2);
+                game.angle = mv.angle; game.currentSpeed = mv.speed;
+            } else if (game.state === 'CHASE_YARN') {
+                const mv = moveEntityTowards(game.pos, game.angle, yarnState.pos.x, yarnState.pos.z, 4.1 * speedFactor, dt, 0.5);
+                game.angle = mv.angle; game.currentSpeed = mv.speed;
+                if (mv.arrived && yarnState.bouncesLeft > 0) {
+                    yarnState.bouncesLeft--;
+                    const kAng = game.angle + (Math.random() - 0.5);
+                    yarnState.vel.set(Math.sin(kAng) * 4.5, 2.2, Math.cos(kAng) * 4.5);
+                    game.jumpVel = 2.4;
+                    game.weightKg = Math.max(1.8, game.weightKg - 0.03);
+                    soundFX.playMeow('short');
+                    addAffection(5, 0.45);
+                } else if (mv.arrived && Math.hypot(yarnState.vel.x, yarnState.vel.z) < 0.4) {
+                    game.state = 'IDLE'; game.stateTimer = 3.0;
+                }
+            } else if (game.state === 'EATING') {
+                if (game.subPhase === 0) {
+                    const mv = moveEntityTowards(game.pos, game.angle, BOWL_EAT_POS.x, BOWL_EAT_POS.z, 2.8 * speedFactor, dt, 0.18);
+                    game.angle = mv.angle; game.currentSpeed = mv.speed;
+                    if (mv.arrived) {
+                        game.subPhase = 1;
+                        game.angle = Math.atan2(BOWL_POS.x - 0.34 - game.pos.x, BOWL_POS.z - game.pos.z);
+                    }
+                } else {
+                    game.stateTimer -= dt;
+                    game.eatChewTimer -= dt;
+                    headEatBob = 0.45 + Math.sin(elapsed * 15) * 0.16;
+                    if (game.eatChewTimer <= 0) { game.eatChewTimer = 0.36; soundFX.playNomNom(); }
+                    if (game.stateTimer <= 0) {
+                        const item = FOOD_MENU[game.pendingFoodKey] || FOOD_MENU.kibble;
+                        bowlFoodGroup.scale.setScalar(0.35);
+                        game.stats.hunger = Math.min(100, game.stats.hunger + item.hunger);
+                        game.stats.happy = Math.min(100, game.stats.happy + item.happy);
+                        game.weightKg = THREE.MathUtils.clamp(game.weightKg + item.weightDelta, 1.6, 6.2);
+                        game.digestion = Math.min(100, game.digestion + 48);
+                        game.hairballRisk = Math.max(0, game.hairballRisk + item.hairballDelta);
+                        if (item.curesHairball && game.hasHairball) {
+                            game.hasHairball = false;
+                            showToast('🌱 Cỏ Mèo đã giúp tiêu sạch búi lông trong bụng!');
+                        }
+                        checkWeightMilestones();
+                        addAffection(item.exp, 0.4);
+                        saveGameState();
+                        game.state = 'IDLE'; game.stateTimer = 3.0;
+                    }
+                }
+            } else if (game.state === 'BATHING') {
+                game.stateTimer -= dt;
+                if (game.subPhase === 0) {
+                    game.bubbleSpawnTimer -= dt;
+                    if (game.bubbleSpawnTimer <= 0) { game.bubbleSpawnTimer = 0.14; spawnSoapBubble(game.pos); }
+                    if (game.stateTimer <= 0) { game.subPhase = 1; game.stateTimer = 0.8; soundFX.playBell(); }
+                } else {
+                    bodyRoll = Math.sin(elapsed * 45) * 0.38;
+                    if (game.stateTimer <= 0) {
+                        game.stats.hygiene = 100;
+                        addAffection(12, 0.5);
+                        game.state = 'IDLE'; game.stateTimer = 3.0;
+                    }
+                }
+            } else if (game.state === 'TRICK') {
+                game.stateTimer -= dt;
+                if (game.activeTrick === 'backflip') {
+                    game.flipAngle = Math.min(Math.PI * 2, game.flipAngle + dt * Math.PI * 2.1);
+                }
+                if (game.stateTimer <= 0) {
+                    game.flipAngle = 0;
+                    game.activeTrick = null;
+                    game.state = 'IDLE';
+                    game.stateTimer = 2.5;
+                }
+            } else if (game.state === 'SLEEPING') {
+                const bedTargetX = game.buddy.adopted ? BED_POS.x - 0.24 : BED_POS.x;
+                if (game.subPhase === 0) {
+                    const mv = moveEntityTowards(game.pos, game.angle, bedTargetX, BED_POS.z, 2.2 * speedFactor, dt, 0.2);
+                    game.angle = mv.angle; game.currentSpeed = mv.speed;
+                    if (mv.arrived) { game.subPhase = 1; game.angle = 0.65; }
+                } else {
+                    isSleepingCurled = true;
+                    game.zzzTimer -= dt;
+                    if (game.zzzTimer <= 0) {
+                        game.zzzTimer = 1.5;
+                        spawnFloatingSprite('zzz', new THREE.Vector3(game.pos.x, 0.95, game.pos.z));
+                    }
+                }
+            }
+
+            // 5. Áp dụng biến dạng vóc dáng Chonk (cân nặng) & Pose Kỹ năng 3D
+            game.elevY = THREE.MathUtils.lerp(game.elevY, targetElevY, Math.min(1, dt * 8));
+            catRig.root.position.set(game.pos.x, (isSleepingCurled ? 0.18 : game.elevY) + game.jumpY, game.pos.z);
+            catRig.root.rotation.y = game.angle;
+
+            const breath = Math.sin(elapsed * 3.2) * 0.02;
+            const fatWidth = 0.92 + chonkRatio * 0.42;
+            const fatHeight = 0.86 + chonkRatio * 0.26;
+            catRig.torso.scale.set(fatWidth + breath, fatHeight + breath, 1.32);
+
+            const walkBounce = game.currentSpeed > 0.1 ? Math.abs(Math.sin(game.walkCycle * 2)) * 0.045 : 0;
+            catRig.bodyPivot.position.y = (isSleepingCurled ? 0.34 : 0.48) + walkBounce;
+            catRig.bodyPivot.rotation.z = bodyRoll;
+
+            // Pose Kỹ năng: Ngồi ngoan, Bắt tay, Đứng 2 chân xin ăn, Lộn nhào 3D
+            if (game.state === 'TRICK') {
+                if (game.activeTrick === 'backflip') {
+                    catRig.bodyPivot.rotation.x = -game.flipAngle;
+                } else if (game.activeTrick === 'beg') {
+                    catRig.bodyPivot.rotation.x = -1.05;
+                    catRig.bodyPivot.position.y = 0.72;
+                    catRig.legs[0].pivot.rotation.x = -0.6 + Math.sin(elapsed * 10) * 0.25;
+                    catRig.legs[1].pivot.rotation.x = -0.6 - Math.sin(elapsed * 10) * 0.25;
+                    catRig.legs[2].pivot.rotation.x = 1.05;
+                    catRig.legs[3].pivot.rotation.x = 1.05;
+                } else if (game.activeTrick === 'paw' || game.activeTrick === 'sit') {
+                    catRig.bodyPivot.rotation.x = -0.45;
+                    catRig.legs[2].pivot.rotation.x = 0.95;
+                    catRig.legs[3].pivot.rotation.x = 0.95;
+                    catRig.legs[0].pivot.rotation.x = 0.42;
+                    catRig.legs[1].pivot.rotation.x = game.activeTrick === 'paw' ? -0.95 + Math.sin(elapsed * 9) * 0.22 : 0.42;
+                }
+            } else {
+                catRig.bodyPivot.rotation.x = game.jumpY > 0.02 ? -game.jumpVel * 0.08 : 0;
+                if (isSleepingCurled) {
+                    catRig.legs.forEach((l, i) => { l.pivot.rotation.x = i < 2 ? -1.15 : 1.15; });
+                } else if (game.currentSpeed > 0.08) {
+                    game.walkCycle += dt * (4.5 + game.currentSpeed * 2.8);
+                    const amp = Math.min(0.68, 0.25 + game.currentSpeed * 0.11);
+                    [0, Math.PI, Math.PI, 0].forEach((ph, i) => {
+                        catRig.legs[i].pivot.rotation.x = Math.sin(game.walkCycle + ph) * amp;
+                    });
+                } else {
+                    catRig.legs.forEach(l => { l.pivot.rotation.x = THREE.MathUtils.lerp(l.pivot.rotation.x, 0, dt * 10); });
+                }
+            }
+
+            // Vẫy đuôi & Biểu cảm mắt miệng
+            catRig.tailSegments.forEach((seg, idx) => {
+                seg.pivot.rotation.z = isSleepingCurled ? 0.32 : Math.sin(elapsed * 3.8 - idx * 0.55) * 0.22;
+            });
+
+            if (isSleepingCurled) {
+                catRig.headPivot.rotation.set(0.28, -0.45, 0.18);
+            } else if (game.state === 'EATING' && game.subPhase === 1) {
+                catRig.headPivot.rotation.set(headEatBob, 0, 0);
+            } else {
+                const focus = isLaserMode ? laserTarget : lookCursor3D;
+                const local = focus.clone().sub(catRig.root.position).applyAxisAngle(new THREE.Vector3(0, 1, 0), -game.angle);
+                const yaw = THREE.MathUtils.clamp(Math.atan2(local.x, Math.max(0.4, local.z)), -0.6, 0.6);
+                const pitch = THREE.MathUtils.clamp(-(local.y - 0.82) * 0.28, -0.35, 0.35);
+                catRig.headPivot.rotation.y = THREE.MathUtils.lerp(catRig.headPivot.rotation.y, yaw, dt * 6);
+                catRig.headPivot.rotation.x = THREE.MathUtils.lerp(catRig.headPivot.rotation.x, pitch, dt * 6);
+            }
+
+            const happyEyes = isSleepingCurled || game.pettingTimer > 0 || (game.state === 'EATING' && game.subPhase === 1);
+            catRig.eyeLOpen.visible = catRig.eyeROpen.visible = !happyEyes;
+            catRig.eyeLHappy.visible = catRig.eyeRHappy.visible = happyEyes;
+            catRig.mouthOpen.visible = soundFX.mouthEnergy > 0.04;
+            if (catRig.mouthOpen.visible) catRig.mouthOpen.scale.y = 0.2 + soundFX.mouthEnergy * 0.95;
+
+            // 6. AI của Bé Mèo Bạn Thứ 2 (Rượt đuổi nhau, Liếm lông thả tim, Ngủ cuộn chung ổ!)
+            if (game.buddy.adopted && buddyRig) {
+                updateBuddyCatAI(dt, elapsed, isSleepingCurled);
+            }
+        }
+
+        function updateBuddyCatAI(dt, elapsed, mainSleeping) {
+            let buddyCurled = false;
+            if (mainSleeping || game.state === 'SLEEPING') {
+                // Nằm cuộn tròn sát cạnh mèo chính trên chiếc đệm hồng
+                const mv = moveEntityTowards(buddyAI.pos, buddyAI.angle, BED_POS.x + 0.32, BED_POS.z + 0.12, 2.2, dt, 0.18);
+                buddyAI.angle = mv.angle; buddyAI.speed = mv.speed;
+                if (mv.arrived) {
+                    buddyCurled = true;
+                    buddyAI.angle = -0.55;
+                }
+            } else {
+                buddyAI.timer -= dt;
+                const distToMain = Math.hypot(game.pos.x - buddyAI.pos.x, game.pos.z - buddyAI.pos.z);
+
+                if (buddyAI.timer <= 0) {
+                    buddyAI.timer = 4.0 + Math.random() * 3.5;
+                    buddyAI.mode = Math.random() < 0.45 ? 'GROOM' : 'PLAY';
+                    if (buddyAI.mode === 'PLAY') {
+                        const a = Math.random() * Math.PI * 2;
+                        buddyAI.targetPos.set(Math.cos(a) * 1.6, 0, Math.sin(a) * 1.5);
+                    }
+                }
+
+                if (buddyAI.mode === 'GROOM' && game.elevY < 0.2) {
+                    // Lại gần mèo chính liếm lông làm lành thả tim hồng
+                    const mv = moveEntityTowards(buddyAI.pos, buddyAI.angle, game.pos.x + 0.58, game.pos.z + 0.2, 2.1, dt, 0.25);
+                    buddyAI.angle = mv.angle; buddyAI.speed = mv.speed;
+                    if (mv.arrived) {
+                        buddyAI.angle = Math.atan2(game.pos.x - buddyAI.pos.x, game.pos.z - buddyAI.pos.z);
+                        buddyRig.headPivot.rotation.x = Math.sin(elapsed * 9) * 0.22;
+                        if (Math.random() < 0.03) {
+                            spawnFloatingSprite('heart', new THREE.Vector3((game.pos.x + buddyAI.pos.x) * 0.5, 1.05, (game.pos.z + buddyAI.pos.z) * 0.5));
+                            game.stats.happy = Math.min(100, game.stats.happy + 1);
+                        }
+                    }
+                } else {
+                    // Chạy lon ton rượt đuổi nhau quanh thảm
+                    const tx = distToMain > 1.8 ? game.pos.x : buddyAI.targetPos.x;
+                    const tz = distToMain > 1.8 ? game.pos.z : buddyAI.targetPos.z;
+                    const mv = moveEntityTowards(buddyAI.pos, buddyAI.angle, tx, tz, 2.5, dt, 0.35);
+                    buddyAI.angle = mv.angle; buddyAI.speed = mv.speed;
+                }
+            }
+
+            buddyRig.root.position.set(buddyAI.pos.x, buddyCurled ? 0.18 : 0, buddyAI.pos.z);
+            buddyRig.root.rotation.y = buddyAI.angle;
+            buddyRig.eyeLOpen.visible = buddyRig.eyeROpen.visible = !buddyCurled;
+            buddyRig.eyeLHappy.visible = buddyRig.eyeRHappy.visible = buddyCurled;
+
+            if (buddyCurled) {
+                buddyRig.legs.forEach((l, i) => { l.pivot.rotation.x = i < 2 ? -1.15 : 1.15; });
+            } else if (buddyAI.speed > 0.08) {
+                buddyAI.walkCycle += dt * (4.8 + buddyAI.speed * 2.8);
+                [0, Math.PI, Math.PI, 0].forEach((ph, i) => {
+                    buddyRig.legs[i].pivot.rotation.x = Math.sin(buddyAI.walkCycle + ph) * 0.45;
+                });
+            } else {
+                buddyRig.legs.forEach(l => { l.pivot.rotation.x *= 0.85; });
+            }
+            buddyRig.tailSegments.forEach((seg, idx) => {
+                seg.pivot.rotation.z = Math.sin(elapsed * 4.2 - idx * 0.5) * 0.22;
+            });
+        }
+
+        function updateYarnPhysics(dt) {
+            yarnState.vel.y -= 9.5 * dt;
+            yarnState.pos.addScaledVector(yarnState.vel, dt);
+            if (yarnState.pos.y <= yarnState.radius) {
+                yarnState.pos.y = yarnState.radius;
+                yarnState.vel.y = Math.abs(yarnState.vel.y) > 0.6 ? -yarnState.vel.y * 0.58 : 0;
+                yarnState.vel.x *= Math.pow(0.28, dt);
+                yarnState.vel.z *= Math.pow(0.28, dt);
+            }
+            if (Math.abs(yarnState.pos.x) > 3.2) { yarnState.pos.x = Math.sign(yarnState.pos.x) * 3.2; yarnState.vel.x *= -0.7; }
+            if (Math.abs(yarnState.pos.z) > 3.2) { yarnState.pos.z = Math.sign(yarnState.pos.z) * 3.2; yarnState.vel.z *= -0.7; }
+            yarnBallGroup.position.copy(yarnState.pos);
+        }
+
+        /* =========================================================================
+           9. TƯƠNG TÁC CHUỘT / CẢM ỨNG & CẬP NHẬT GIAO DIỆN HUD
+        ========================================================================= */
+        function setupInteractionEvents() {
+            const dom = renderer.domElement;
+            window.addEventListener('pointerdown', () => soundFX.unlock(), { passive: true });
+
+            dom.addEventListener('pointerdown', e => {
+                pointerNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+                pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                camOrbit.lastX = e.clientX;
+                camOrbit.lastY = e.clientY;
+
+                raycaster.setFromCamera(pointerNDC, camera);
+
+                // 1. Nhặt Xu Cá Vàng 3D trên sàn
+                for (let i = coinDrops.length - 1; i >= 0; i--) {
+                    if (raycaster.intersectObject(coinDrops[i].group, true).length > 0) {
+                        collectCoinDrop(i);
+                        return;
+                    }
+                }
+
+                // 2. Điều khiển mèo phóng tới vồ trong Mini-game 30s
+                if (minigame.active && e.button !== 2) {
+                    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                    const pt = new THREE.Vector3();
+                    if (raycaster.ray.intersectPlane(plane, pt)) {
+                        game.targetPos.set(THREE.MathUtils.clamp(pt.x, -3.1, 3.1), 0, THREE.MathUtils.clamp(pt.z, -3.0, 3.1));
+                        game.state = 'MINI_HUNT';
+                        return;
+                    }
+                }
+
+                // 3. Đèn Laser
+                if (isLaserMode && e.button !== 2) {
+                    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                    const pt = new THREE.Vector3();
+                    if (raycaster.ray.intersectPlane(plane, pt)) {
+                        laserTarget.set(THREE.MathUtils.clamp(pt.x, -3.2, 3.2), 0.02, THREE.MathUtils.clamp(pt.z, -3.1, 3.2));
+                        return;
+                    }
+                }
+
+                // 4. Chạm vuốt ve Mèo chính
+                const catHits = raycaster.intersectObjects(catRig.hitMeshes, false);
+                if (catHits.length > 0) {
+                    camOrbit.isPettingDrag = true;
+                    game.pettingTimer = 0.85;
+                    soundFX.playPurr();
+                    spawnFloatingSprite('heart', catHits[0].point.clone().add(new THREE.Vector3(0, 0.25, 0)));
+                    game.stats.happy = Math.min(100, game.stats.happy + 2);
+                    addAffection(3, 0.22);
+                    showSpeech('Gừ gừ~ Sướng quá sen ơi! 💖', 1.4);
+                    return;
+                }
+
+                // 5. Chạm các đồ vật tương tác trong phòng
+                const hits = raycaster.intersectObjects(scene.children, true);
+                for (const h of hits) {
+                    const nm = h.object.name;
+                    if (nm === 'interactive_litter') { scoopLitterBox(); return; }
+                    if (nm === 'interactive_yarn') { throwYarnBall(); return; }
+                    if (nm === 'interactive_bed') { toggleSleepCat(); return; }
+                    if (nm === 'interactive_window') { toggleDayNight(); return; }
+                    if (nm === 'interactive_cattree') {
+                        wakeUpIfSleeping(false); roombaState.riding = false;
+                        game.state = 'CLIMB_TREE'; game.subPhase = 0; game.stateTimer = 5.5;
+                        return;
+                    }
+                    if (nm === 'interactive_aquarium') {
+                        wakeUpIfSleeping(false); roombaState.riding = false;
+                        game.state = 'WATCH_FISH'; game.subPhase = 0; game.stateTimer = 5.5;
+                        return;
+                    }
+                    if (nm === 'interactive_roomba') {
+                        wakeUpIfSleeping(false);
+                        roombaState.riding = !roombaState.riding;
+                        if (!roombaState.riding && game.state === 'RIDE_ROOMBA') game.state = 'IDLE';
+                        soundFX.playMeow('happy');
+                        showSpeech(roombaState.riding ? 'Lên xe Robot tuần tra thôi! 🤖👑' : 'Xuống xe đi bộ chút~ 🐾', 2.2);
+                        return;
+                    }
+                }
+
+                camOrbit.isDragging = true;
+            });
+
+            window.addEventListener('pointermove', e => {
+                pointerNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+                pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(pointerNDC, camera);
+
+                const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                const pt = new THREE.Vector3();
+                if (raycaster.ray.intersectPlane(plane, pt)) {
+                    lookCursor3D.set(pt.x, 0.85, pt.z);
+                    if (isLaserMode) laserTarget.set(THREE.MathUtils.clamp(pt.x, -3.2, 3.2), 0.02, THREE.MathUtils.clamp(pt.z, -3.1, 3.2));
+                }
+
+                if (camOrbit.isDragging) {
+                    const dx = e.clientX - camOrbit.lastX, dy = e.clientY - camOrbit.lastY;
+                    camOrbit.lastX = e.clientX; camOrbit.lastY = e.clientY;
+                    camOrbit.targetTheta -= dx * 0.0075;
+                    camOrbit.targetPhi = THREE.MathUtils.clamp(camOrbit.targetPhi - dy * 0.0065, 0.42, 1.38);
+                }
+            });
+
+            window.addEventListener('pointerup', () => {
+                camOrbit.isDragging = false;
+                camOrbit.isPettingDrag = false;
+            });
+
+            dom.addEventListener('wheel', e => {
+                e.preventDefault();
+                camOrbit.targetRadius = THREE.MathUtils.clamp(camOrbit.targetRadius + e.deltaY * 0.004, 3.8, 10.5);
+            }, { passive: false });
+        }
+
+        function updateCameraAndSpeechUI(dt) {
+            camOrbit.theta = THREE.MathUtils.lerp(camOrbit.theta, camOrbit.targetTheta, Math.min(1, dt * 10));
+            camOrbit.phi = THREE.MathUtils.lerp(camOrbit.phi, camOrbit.targetPhi, Math.min(1, dt * 10));
+            camOrbit.radius = THREE.MathUtils.lerp(camOrbit.radius, camOrbit.targetRadius, Math.min(1, dt * 10));
+
+            camOrbit.lookAt.x = THREE.MathUtils.lerp(camOrbit.lookAt.x, game.pos.x * 0.35, dt * 4);
+            camOrbit.lookAt.z = THREE.MathUtils.lerp(camOrbit.lookAt.z, game.pos.z * 0.35, dt * 4);
+
+            camera.position.set(
+                camOrbit.lookAt.x + camOrbit.radius * Math.sin(camOrbit.phi) * Math.sin(camOrbit.theta),
+                camOrbit.lookAt.y + camOrbit.radius * Math.cos(camOrbit.phi),
+                camOrbit.lookAt.z + camOrbit.radius * Math.sin(camOrbit.phi) * Math.cos(camOrbit.theta)
+            );
+            camera.lookAt(camOrbit.lookAt);
+
+            backWallGroup.visible = camera.position.z > -3.6;
+            leftWallGroup.visible = camera.position.x > -3.6;
+
+            const speechEl = document.getElementById('cat-speech');
+            if (speechTimer > 0) {
+                speechTimer -= dt;
+                const headWorld = new THREE.Vector3();
+                catRig.headPivot.getWorldPosition(headWorld);
+                headWorld.y += 0.56;
+                headWorld.project(camera);
+                speechEl.style.left = `${(headWorld.x * 0.5 + 0.5) * window.innerWidth}px`;
+                speechEl.style.top = `${(-headWorld.y * 0.5 + 0.5) * window.innerHeight}px`;
+                if (speechTimer <= 0) speechEl.classList.add('opacity-0', 'scale-90');
+            }
+        }
+
+        function showSpeech(text, duration = 2.0) {
+            const el = document.getElementById('cat-speech');
+            el.textContent = text;
+            el.classList.remove('opacity-0', 'scale-90');
+            speechTimer = duration;
+        }
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const el = document.getElementById('toast-msg');
+            el.textContent = msg;
+            el.classList.remove('opacity-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.add('opacity-0'), 2600);
+        }
+
+        function closeAllPanels() {
+            ['panel-food', 'panel-care', 'panel-tricks', 'panel-shop'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+        }
+
+        function togglePanel(id) {
+            const el = document.getElementById(id);
+            const wasHidden = el.classList.contains('hidden');
+            closeAllPanels();
+            if (wasHidden) el.classList.remove('hidden');
+        }
+
+        function updateHUD() {
+            document.getElementById('cat-name-display').textContent = game.catName;
+            document.getElementById('level-badge').textContent = `Cấp ${game.level} • ${getGrowthTitle()}`;
+            document.getElementById('coin-display').textContent = Math.floor(game.coins);
+            document.getElementById('weight-badge').textContent =
+                `⚖️ ${game.weightKg.toFixed(1)} kg${game.weightKg > 4.2 ? ' (Mập!)' : ''}`;
+
+            const expPct = Math.min(100, Math.round((game.exp / game.expNext) * 100));
+            document.getElementById('exp-bar').style.width = `${expPct}%`;
+            document.getElementById('exp-text').textContent = `${Math.floor(game.exp)}/${game.expNext}`;
+
+            const setBar = (bId, vId, val) => {
+                const p = Math.round(THREE.MathUtils.clamp(val, 0, 100));
+                document.getElementById(vId).textContent = `${p}%`;
+                document.getElementById(bId).style.width = `${p}%`;
+            };
+            setBar('bar-hunger', 'val-hunger', game.stats.hunger);
+            setBar('bar-happy', 'val-happy', game.stats.happy);
+            setBar('bar-energy', 'val-energy', game.stats.energy);
+            setBar('bar-hygiene', 'val-hygiene', game.stats.hygiene);
+
+            // Cảnh báo khay cát bẩn & búi lông
+            const litterAlert = document.getElementById('pill-litter-alert');
+            const hairAlert = document.getElementById('pill-hairball-alert');
+            const careDot = document.getElementById('care-badge-dot');
+
+            litterAlert.classList.toggle('hidden', game.litterClumps <= 0);
+            litterAlert.classList.toggle('inline-flex', game.litterClumps > 0);
+            hairAlert.classList.toggle('hidden', !game.hasHairball);
+            hairAlert.classList.toggle('inline-flex', game.hasHairball);
+
+            const hasCareIssue = game.litterClumps > 0 || game.hasHairball;
+            careDot.classList.toggle('hidden', !hasCareIssue);
+            careDot.classList.toggle('flex', hasCareIssue);
+
+            document.getElementById('litter-status-sub').textContent =
+                game.litterClumps > 0 ? `Có ${game.litterClumps} bãi cần dọn!` : 'Đang sạch thơm';
+
+            // Cập nhật trạng thái nút Cửa Hàng & Kỹ Năng
+            document.getElementById('req-paw').textContent = game.level >= 2 ? 'Đã mở • +5 Xu' : 'Cần Cấp 2 (Mèo Choai)';
+            document.getElementById('req-beg').textContent = game.level >= 3 ? 'Đã mở • +8 Xu' : 'Cần Cấp 3';
+            document.getElementById('req-backflip').textContent = game.level >= 4 ? 'Đã mở • +12 Xu' : 'Cần Cấp 4';
+
+            const setFurBtn = (id, owned, cost) => {
+                const b = document.getElementById(id);
+                b.textContent = owned ? '✅ Đã trang bị trong phòng' : `🪙 Mua (${cost} Xu)`;
+                b.className = owned
+                    ? 'w-full py-1.5 rounded-xl bg-emerald-100 text-emerald-800 font-black text-xs cursor-default'
+                    : 'game-btn w-full py-1.5 rounded-xl bg-amber-400 text-amber-950 font-black text-xs';
+            };
+            setFurBtn('buy-cattree', game.furniture.catTree, 95);
+            setFurBtn('buy-aquarium', game.furniture.aquarium, 110);
+            setFurBtn('buy-roomba', game.furniture.roomba, 140);
+
+            ['bow', 'glasses', 'crown'].forEach(acc => {
+                const el = document.getElementById(`price-acc-${acc}`);
+                if (el && game.unlockedAcc.includes(acc)) el.textContent = '(Đã mua)';
+            });
+
+            const adoptBtn = document.getElementById('btn-adopt-buddy');
+            adoptBtn.textContent = game.buddy.adopted ? '🎨 Đổi Màu Lông Mèo Bạn (Miễn phí)' : '🪙 Nhận Nuôi (160 Xu)';
+
+            const moodEl = document.getElementById('cat-mood-text');
+            if (game.hasHairball) moodEl.textContent = '🌿 Đang nghẹn búi lông (cần Cỏ Mèo!)';
+            else if (game.litterClumps >= 2) moodEl.textContent = '💩 Khay cát bốc mùi quá sen ơi!';
+            else if (roombaState.riding) moodEl.textContent = '🤖 Đang cưỡi Robot hút bụi cực ngầu!';
+            else if (game.state === 'CLIMB_TREE') moodEl.textContent = '🏰 Đang ngự trên đỉnh Cat Tree';
+            else if (game.state === 'WATCH_FISH') moodEl.textContent = '🐠 Đang say sưa rình bể cá';
+            else if (game.weightKg > 4.2) moodEl.textContent = '🐱 Bụng mỡ tròn quay, cần tập thể dục!';
+            else if (game.buddy.adopted) moodEl.textContent = '🐱💕🐱 Đang vui đùa cùng Mèo Bạn';
+            else moodEl.textContent = '✨ Đang vẫy đuôi vui vẻ';
+        }
+
+        function bindUIControls() {
+            document.getElementById('dock-food').addEventListener('click', () => togglePanel('panel-food'));
+            document.getElementById('dock-care').addEventListener('click', () => togglePanel('panel-care'));
+            document.getElementById('dock-tricks').addEventListener('click', () => togglePanel('panel-tricks'));
+            document.getElementById('dock-shop').addEventListener('click', () => togglePanel('panel-shop'));
+
+            document.querySelectorAll('[data-close-panel]').forEach(btn => {
+                btn.addEventListener('click', closeAllPanels);
+            });
+
+            // Các món ăn
+            document.querySelectorAll('.food-item-btn').forEach(btn => {
+                btn.addEventListener('click', () => feedCatWithItem(btn.dataset.food));
+            });
+
+            // Vệ sinh & cảnh báo nhanh
+            document.getElementById('btn-scoop-litter').addEventListener('click', scoopLitterBox);
+            document.getElementById('pill-litter-alert').addEventListener('click', scoopLitterBox);
+            document.getElementById('btn-brush-fur').addEventListener('click', brushCatFur);
+            document.getElementById('pill-hairball-alert').addEventListener('click', () => togglePanel('panel-food'));
+            document.getElementById('btn-bath-soap').addEventListener('click', triggerBathCat);
+
+            // Đồ chơi & Mini-game & Đi ngủ
+            document.getElementById('act-laser').addEventListener('click', () => toggleLaserMode());
+            document.getElementById('act-yarn').addEventListener('click', throwYarnBall);
+            document.getElementById('act-minigame').addEventListener('click', startMouseHuntMinigame);
+            document.getElementById('btn-stop-minigame').addEventListener('click', () => stopMouseHuntMinigame(false));
+            document.getElementById('act-sleep').addEventListener('click', toggleSleepCat);
+
+            // Kỹ năng huấn luyện
+            document.querySelectorAll('.trick-btn').forEach(btn => {
+                btn.addEventListener('click', () => performTrick(btn.dataset.trick));
+            });
+
+            // Tabs trong Cửa Hàng
+            document.querySelectorAll('.shop-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.shopTab;
+                    document.querySelectorAll('.shop-tab-btn').forEach(b => {
+                        const active = b.dataset.shopTab === tab;
+                        b.className = active
+                            ? 'shop-tab-btn px-3 py-1 rounded-full text-xs font-black bg-amber-500 text-white'
+                            : 'shop-tab-btn px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900';
+                    });
+                    ['furniture', 'wardrobe', 'buddy'].forEach(t => {
+                        document.getElementById(`shop-tab-${t}`).classList.toggle('hidden', t !== tab);
+                    });
+                });
+            });
+
+            // Mua Nội Thất 3D
+            const buyFurniture = (key, cost, msg) => {
+                if (game.furniture[key]) return;
+                if (game.coins < cost) {
+                    showToast(`🪙 Cần ${cost} Xu Cá Vàng để sắm món nội thất này!`);
+                    return;
+                }
+                game.coins -= cost;
+                game.furniture[key] = true;
+                syncFurnitureVisibility();
+                soundFX.playChime();
+                showToast(msg);
+                saveGameState();
+                updateHUD();
+            };
+
+            document.getElementById('buy-cattree').addEventListener('click', () =>
+                buyFurniture('catTree', 95, '🏰 Đã lắp đặt Cat Tree 3 Tầng! Bấm vào tháp để mèo trèo lên đỉnh!'));
+            document.getElementById('buy-aquarium').addEventListener('click', () =>
+                buyFurniture('aquarium', 110, '🐠 Đã đặt Bể Cá Cảnh Phát Sáng! Mèo sẽ rất thích ra ngồi rình!'));
+            document.getElementById('buy-roomba').addEventListener('click', () =>
+                buyFurniture('roomba', 140, '🤖 Robot Hút Bụi đã chạy! Bấm vào Robot để cho mèo ngồi cưỡi!'));
+
+            // Đổi Màu Lông & Mua Phụ Kiện
+            document.querySelectorAll('.coat-btn').forEach(btn => {
+                btn.addEventListener('click', () => applyCatCoat(btn.dataset.coat, true));
+            });
+
+            document.querySelectorAll('.acc-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const acc = btn.dataset.acc;
+                    const cost = Number(btn.dataset.cost || 0);
+                    if (acc !== 'none' && !game.unlockedAcc.includes(acc)) {
+                        if (game.coins < cost) {
+                            showToast(`🪙 Cần ${cost} Xu Cá Vàng để mở khóa phụ kiện này!`);
+                            return;
+                        }
+                        game.coins -= cost;
+                        game.unlockedAcc.push(acc);
+                        soundFX.playChime();
+                        showToast('🎀 Đã mở khóa phụ kiện mới!');
+                    }
+                    applyCatAccessory(acc, true);
+                    updateHUD();
+                });
+            });
+
+            // Nhận Nuôi Mèo Bạn Thứ 2
+            document.getElementById('btn-adopt-buddy').addEventListener('click', () => {
+                const chosenCoat = document.getElementById('buddy-coat-select').value;
+                if (!game.buddy.adopted) {
+                    if (game.coins < 160) {
+                        showToast('🪙 Cần 160 Xu Cá Vàng để đón bé Mèo Bạn thứ 2 về nhà!');
+                        return;
+                    }
+                    game.coins -= 160;
+                    game.buddy.adopted = true;
+                    game.buddy.coat = chosenCoat;
+                    spawnBuddyCat3D(true);
+                } else {
+                    game.buddy.coat = chosenCoat;
+                    spawnBuddyCat3D(false);
+                    showToast('🐱 Đã cập nhật màu lông cho bé Mèo Bạn!');
+                }
+                saveGameState();
+                updateHUD();
+            });
+
+            // Chụp Polaroid, Ngày/Đêm, Âm thanh, Camera, Hồ sơ
+            document.getElementById('btn-polaroid').addEventListener('click', capturePolaroidSnapshot);
+            document.getElementById('polaroid-close').addEventListener('click', () => {
+                document.getElementById('polaroid-modal').classList.add('hidden');
+                document.getElementById('polaroid-modal').classList.remove('flex');
+            });
+
+            document.getElementById('btn-daynight').addEventListener('click', toggleDayNight);
+            document.getElementById('btn-sound').addEventListener('click', () => {
+                const on = soundFX.toggle();
+                document.getElementById('btn-sound').textContent = on ? '🔊' : '🔇';
+            });
+            document.getElementById('btn-reset-cam').addEventListener('click', () => {
+                camOrbit.targetTheta = 0.42; camOrbit.targetPhi = 1.08; camOrbit.targetRadius = 6.6;
+            });
+
+            const renameModal = document.getElementById('rename-modal');
+            const renameInput = document.getElementById('rename-input');
+            document.getElementById('btn-rename').addEventListener('click', () => {
+                renameInput.value = game.catName;
+                renameModal.classList.remove('hidden'); renameModal.classList.add('flex');
+            });
+            document.getElementById('rename-cancel').addEventListener('click', () => {
+                renameModal.classList.add('hidden'); renameModal.classList.remove('flex');
+            });
+            document.getElementById('rename-save').addEventListener('click', () => {
+                const v = renameInput.value.trim();
+                if (v) { game.catName = v; saveGameState(); updateHUD(); }
+                renameModal.classList.add('hidden'); renameModal.classList.remove('flex');
+            });
+            document.getElementById('btn-reset-save').addEventListener('click', () => {
+                localStorage.removeItem(SAVE_KEY);
+                window.location.reload();
+            });
+        }
+
+        function onWindowResize() {
+            if (!camera || !renderer) return;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        /* =========================================================================
+           10. VÒNG LẶP CHÍNH + TỰ ĐỘNG LƯU ĐỊNH KỲ MỖI 5 GIÂY
+        ========================================================================= */
+        let lastFrameTime = performance.now();
+        let hudAccum = 0;
+        let autoSaveAccum = 0;
+
+        function animateLoop(now) {
+            requestAnimationFrame(animateLoop);
+            const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+            lastFrameTime = now;
+            const elapsed = now * 0.001;
+
+            updateYarnPhysics(dt);
+            updateMainCatAndRoom(dt, elapsed);
+            updateParticlesAndCoins(dt, elapsed);
+            updateCameraAndSpeechUI(dt);
+
+            hudAccum += dt;
+            if (hudAccum >= 0.3) {
+                hudAccum = 0;
+                updateHUD();
+            }
+
+            autoSaveAccum += dt;
+            if (autoSaveAccum >= 5.0) {
+                autoSaveAccum = 0;
+                saveGameState();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function () {
+            loadGameState();
+            initThreeScene();
+            bindUIControls();
+            updateHUD();
+            showSpeech(`Meow~ Mừng sen quay lại với ${game.catName}! 💕`, 3.2);
+            lastFrameTime = performance.now();
+            animateLoop(lastFrameTime);
+        };
+    </script>
+</body>
+</html>

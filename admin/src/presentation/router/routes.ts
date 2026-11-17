@@ -5,6 +5,7 @@ export const ADMIN_ROUTES = {
   TEMPLATE_DETAIL: (id = ':id') => `/templates/${id}`,
   TEMPLATE_EDIT: (id = ':id') => `/templates/${id}/edit`,
   ROUTES_MANAGER: '/routes',
+  ENTERTAINMENT: '/entertainment',
   SETTINGS: '/settings',
 } as const;
 
@@ -56,6 +57,12 @@ export const ADMIN_ROUTE_MANIFEST: AdminRouteMeta[] = [
     path: '/routes',
     name: 'Routes & Live Endpoints',
     description: 'Quản lý định tuyến Web Admin & kiểm tra trạng thái HTTP của Template URLs',
+    method: 'GET',
+  },
+  {
+    path: '/entertainment',
+    name: 'Entertainment Zone · 3D Relax Hub',
+    description: 'Kệ giải trí tương tác 3D (Zen Koi Pond 3D & Meow 3D) tích hợp trực tiếp trong Admin',
     method: 'GET',
   },
   {

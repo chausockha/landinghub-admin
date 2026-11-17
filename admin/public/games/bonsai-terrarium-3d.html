@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bonsai Terrarium 3D - Góc Cây Cảnh & Nhạc Lo-fi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
+            background: #1a1625;
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            z-index: 1;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cozy-glass {
+            background: rgba(252, 249, 243, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 255, 255, 0.92);
+            box-shadow: 0 8px 28px rgba(20, 16, 32, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        .cozy-btn {
+            transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 0 rgba(45, 35, 25, 0.12), 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+
+        .cozy-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .cozy-btn:active {
+            transform: translateY(2px) scale(0.96);
+            box-shadow: 0 1px 0 rgba(45, 35, 25, 0.12);
+        }
+
+        .cozy-btn.active-state {
+            border-color: #d97706 !important;
+            background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.28), 0 4px 0 rgba(180, 83, 9, 0.2);
+        }
+
+        @keyframes eqBar {
+            0%, 100% { height: 4px; }
+            50% { height: 14px; }
+        }
+        .eq-bar {
+            width: 3px;
+            border-radius: 99px;
+            background: #d97706;
+            animation: eqBar 0.9s ease-in-out infinite;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-stone-900">
+
+    <!-- Khung vẽ 3D Three.js -->
+    <div id="canvas-container"></div>
+
+    <!-- Giao diện HUD nổi -->
+    <div id="ui-layer" class="fixed inset-0 pointer-events-none z-10 flex flex-col justify-between p-2.5 sm:p-4">
+
+        <!-- THANH TRÊN: Thông tin Bonsai + Trình phát Lo-fi Chill -->
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-2.5">
+            <!-- Khối Trái: Hồ sơ Bonsai & Chỉ số chăm sóc -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pointer-events-auto max-w-full">
+                <div class="cozy-glass rounded-3xl px-3.5 py-2.5 flex items-center gap-3 shrink-0">
+                    <div id="species-badge-icon" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-2xl shadow-inner border-2 border-white shrink-0">
+                        🪴
+                    </div>
+                    <div class="min-w-[148px]">
+                        <div class="flex items-center gap-1.5">
+                            <span id="tree-title" class="font-black text-base sm:text-lg text-stone-900 tracking-tight">Bonsai Anh Đào</span>
+                            <span id="tree-age-badge" class="ml-1 px-2 py-0.5 text-[11px] font-black rounded-full bg-emerald-600 text-white shadow-sm">
+                                Năm 1
+                            </span>
+                        </div>
+                        <div class="mt-1 flex items-center gap-1.5">
+                            <span class="text-xs">🌱</span>
+                            <div class="w-full h-2 bg-emerald-100 rounded-full overflow-hidden border border-emerald-200">
+                                <div id="exp-bar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all duration-300" style="width: 30%;"></div>
+                            </div>
+                            <span id="exp-text" class="text-[10px] font-bold text-emerald-700 shrink-0">30/100</span>
+                        </div>
+                        <div id="status-line" class="text-[11px] font-bold text-stone-600 mt-0.5 truncate">
+                            ✨ Tán cây cân đối • Không gian yên tĩnh
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 Thanh chỉ số: Độ ẩm, Ánh sáng ấm, Dáng thế -->
+                <div class="cozy-glass rounded-3xl px-3.5 py-2 hidden sm:grid grid-cols-3 gap-x-3.5 gap-y-1 min-w-[290px]">
+                    <div>
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-stone-800">
+                            <span>💧 Độ ẩm</span>
+                            <span id="val-water">86%</span>
+                        </div>
+                        <div class="h-2 bg-sky-100 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-water" class="h-full bg-gradient-to-r from-sky-400 to-cyan-500 rounded-full transition-all duration-300" style="width: 86%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-stone-800">
+                            <span>💡 Quang hợp</span>
+                            <span id="val-warmth">90%</span>
+                        </div>
+                        <div class="h-2 bg-amber-100 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-warmth" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-300" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-stone-800">
+                            <span>✂️ Dáng thế</span>
+                            <span id="val-shape">92%</span>
+                        </div>
+                        <div class="h-2 bg-pink-100 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-shape" class="h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full transition-all duration-300" style="width: 92%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khối Phải: Radio Nhạc Lo-fi + Thời gian + Đặt lại góc nhìn -->
+            <div class="flex items-center justify-between sm:justify-end gap-2 pointer-events-auto">
+                <!-- Trình phát Lo-fi Chillhop -->
+                <button id="btn-lofi" class="cozy-btn cozy-glass rounded-full px-3.5 py-1.5 flex items-center gap-2 shadow-sm">
+                    <span id="lofi-icon" class="text-base">🎵</span>
+                    <span id="lofi-label" class="font-black text-xs sm:text-sm text-amber-900">Bật Lo-fi Chill</span>
+                    <span id="lofi-eq" class="hidden items-end gap-0.5 h-3.5 ml-0.5">
+                        <span class="eq-bar" style="animation-delay: 0s;"></span>
+                        <span class="eq-bar" style="animation-delay: 0.25s;"></span>
+                        <span class="eq-bar" style="animation-delay: 0.5s;"></span>
+                    </span>
+                </button>
+
+                <div class="flex items-center gap-1.5">
+                    <button id="btn-sky" title="Đổi khung cảnh cửa sổ: Đêm Lo-fi / Nắng Sớm / Chiều Tà" class="cozy-btn cozy-glass w-10 h-10 rounded-full flex items-center justify-center text-lg">
+                        🌙
+                    </button>
+                    <button id="btn-mute" title="Bật / Tắt toàn bộ âm thanh" class="cozy-btn cozy-glass w-10 h-10 rounded-full flex items-center justify-center text-lg">
+                        🔊
+                    </button>
+                    <button id="btn-reset-cam" title="Đưa góc nhìn về chính diện bàn làm việc" class="cozy-btn cozy-glass w-10 h-10 rounded-full flex items-center justify-center text-base">
+                        🎥
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gợi ý nhẹ ở giữa trên -->
+        <div class="flex justify-center pointer-events-none my-auto items-start pt-1">
+            <div id="hint-banner" class="cozy-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-stone-700 shadow-sm text-center">
+                🎧 Bấm "Bật Lo-fi Chill" & "Mưa Cửa Sổ" để vừa làm việc vừa treo máy ngắm cây • 🔄 Kéo chuột để xoay 360°
+            </div>
+        </div>
+
+        <!-- THANH DƯỚI: Chọn giống Bonsai + Dock Chăm sóc -->
+        <div class="flex flex-col items-center gap-2.5 w-full">
+
+            <!-- Khay đổi phong cách lá Bonsai -->
+            <div id="style-drawer" class="hidden pointer-events-auto cozy-glass rounded-3xl p-3 sm:p-4 w-full max-w-lg transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-black text-sm sm:text-base text-stone-900">
+                        🌿 Chọn Dòng Cây Bonsai Yêu Thích
+                    </h3>
+                    <button id="btn-close-style" class="w-7 h-7 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-black text-xs flex items-center justify-center">
+                        ✕
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button data-species="sakura" class="species-btn cozy-btn rounded-2xl p-2.5 bg-pink-50 border-2 border-pink-400 flex flex-col items-center gap-1">
+                        <span class="text-xl">🌸</span>
+                        <span class="text-xs font-extrabold text-stone-900">Anh Đào Sakura</span>
+                        <span class="text-[10px] font-bold text-pink-600">Hoa hồng rơi nhẹ</span>
+                    </button>
+                    <button data-species="pine" class="species-btn cozy-btn rounded-2xl p-2.5 bg-white/85 border-2 border-transparent flex flex-col items-center gap-1">
+                        <span class="text-xl">🌲</span>
+                        <span class="text-xs font-extrabold text-stone-900">Tùng La Hán</span>
+                        <span class="text-[10px] font-bold text-emerald-700">Xanh ngọc cổ thụ</span>
+                    </button>
+                    <button data-species="maple" class="species-btn cozy-btn rounded-2xl p-2.5 bg-white/85 border-2 border-transparent flex flex-col items-center gap-1">
+                        <span class="text-xl">🍁</span>
+                        <span class="text-xs font-extrabold text-stone-900">Phong Đỏ Kyoto</span>
+                        <span class="text-[10px] font-bold text-orange-600">Lá thu rực ấm</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dock Nút Tương Tác Chính -->
+            <div class="pointer-events-auto w-full max-w-3xl cozy-glass rounded-3xl p-2 sm:p-2.5">
+                <div class="flex items-center justify-start sm:justify-center gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar px-0.5 py-0.5">
+                    <button id="act-water" class="cozy-btn shrink-0 bg-gradient-to-b from-sky-50 to-cyan-100 border-2 border-sky-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[78px] sm:min-w-[92px]">
+                        <span class="text-xl sm:text-2xl leading-none">💧</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-sky-950 mt-1">Tưới Phun Sương</span>
+                    </button>
+
+                    <button id="act-prune" class="cozy-btn shrink-0 bg-gradient-to-b from-rose-50 to-pink-100 border-2 border-pink-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[78px] sm:min-w-[92px]">
+                        <span class="text-xl sm:text-2xl leading-none">✂️</span>
+                        <span id="prune-label" class="text-[11px] sm:text-xs font-extrabold text-rose-950 mt-1">Tỉa Cành</span>
+                    </button>
+
+                    <button id="act-lamp" class="cozy-btn active-state shrink-0 bg-gradient-to-b from-amber-50 to-yellow-100 border-2 border-amber-300 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[78px] sm:min-w-[92px]">
+                        <span class="text-xl sm:text-2xl leading-none">💡</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-amber-950 mt-1">Đèn Sưởi</span>
+                    </button>
+
+                    <button id="act-rain" class="cozy-btn active-state shrink-0 bg-gradient-to-b from-indigo-50 to-slate-200 border-2 border-indigo-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[78px] sm:min-w-[92px]">
+                        <span class="text-xl sm:text-2xl leading-none">🌧️</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-indigo-950 mt-1">Mưa Cửa Sổ</span>
+                    </button>
+
+                    <button id="act-dome" class="cozy-btn active-state shrink-0 bg-gradient-to-b from-teal-50 to-emerald-100 border-2 border-teal-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[78px] sm:min-w-[92px]">
+                        <span class="text-xl sm:text-2xl leading-none">🫙</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-teal-950 mt-1">Vòm Kính</span>
+                    </button>
+
+                    <button id="act-species" class="cozy-btn shrink-0 bg-gradient-to-b from-orange-50 to-amber-100 border-2 border-orange-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[78px] sm:min-w-[92px]">
+                        <span class="text-xl sm:text-2xl leading-none">🌸</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-orange-950 mt-1">Đổi Giống Cây</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông báo nhỏ (Toast) -->
+    <div id="toast-msg" class="fixed top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none opacity-0 transition-all duration-300 bg-stone-900/90 text-amber-50 px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold shadow-lg">
+        Thông báo
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. BỘ TỔNG HỢP NHẠC LO-FI CHILLHOP & TIẾNG MƯA CỬA SỔ (WEB AUDIO API)
+           Hợp âm Rhodes ấm áp (Fmaj9 - Em7 - Dm9 - Cmaj9), tiếng đĩa than & mưa rơi
+        ========================================================================= */
+        class LofiSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+                this.lofiPlaying = false;
+                this.rainEnabled = true;
+                this.masterGain = null;
+                this.rainGain = null;
+                this.vinylGain = null;
+                this.loopTimer = null;
+                this.stepIndex = 0;
+
+                // Vòng hợp âm Jazz Lo-fi kinh điển cực kỳ êm tai (70 BPM)
+                this.chords = [
+                    [174.61, 220.00, 261.63, 329.63, 392.00], // Fmaj9
+                    [164.81, 196.00, 246.94, 293.66, 392.00], // Em7
+                    [146.83, 220.00, 261.63, 329.63, 349.23], // Dm9
+                    [130.81, 196.00, 246.94, 293.66, 329.63], // Cmaj9
+                ];
+                this.melodyNotes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+            }
+
+            unlock() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return;
+                    this.ctx = new AudioCtx();
+                    this.masterGain = this.ctx.createGain();
+                    this.masterGain.gain.value = 0.85;
+                    this.masterGain.connect(this.ctx.destination);
+                    this.initRainAndVinyl();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            initRainAndVinyl() {
+                if (!this.ctx) return;
+                const dur = 4;
+                const len = this.ctx.sampleRate * dur;
+                const rainBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const data = rainBuf.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0;
+                for (let i = 0; i < len; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.997 * b0 + white * 0.099;
+                    b1 = 0.963 * b1 + white * 0.296;
+                    b2 = 0.570 * b2 + white * 1.052;
+                    data[i] = (b0 + b1 + b2 + white * 0.18) * 0.045;
+                }
+
+                const rainSrc = this.ctx.createBufferSource();
+                rainSrc.buffer = rainBuf;
+                rainSrc.loop = true;
+
+                // Tiếng mưa lộp bộp ngoài khung kính cửa sổ (ấm, trầm dịu)
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 920;
+                filter.Q.value = 0.75;
+
+                this.rainGain = this.ctx.createGain();
+                this.rainGain.gain.value = this.rainEnabled ? 0.22 : 0.0;
+
+                rainSrc.connect(filter);
+                filter.connect(this.rainGain);
+                this.rainGain.connect(this.masterGain);
+                rainSrc.start();
+
+                // Tiếng lạo xạo đĩa than Vinyl rất khẽ cho nhạc Lo-fi
+                const vinylBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const vData = vinylBuf.getChannelData(0);
+                for (let i = 0; i < len; i++) {
+                    vData[i] = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.16 : (Math.random() * 2 - 1) * 0.006;
+                }
+                const vinylSrc = this.ctx.createBufferSource();
+                vinylSrc.buffer = vinylBuf;
+                vinylSrc.loop = true;
+
+                const vFilter = this.ctx.createBiquadFilter();
+                vFilter.type = 'highpass';
+                vFilter.frequency.value = 1800;
+
+                this.vinylGain = this.ctx.createGain();
+                this.vinylGain.gain.value = 0.0;
+
+                vinylSrc.connect(vFilter);
+                vFilter.connect(this.vinylGain);
+                this.vinylGain.connect(this.masterGain);
+                vinylSrc.start();
+            }
+
+            setRain(enabled) {
+                this.rainEnabled = enabled;
+                this.unlock();
+                if (this.rainGain && this.ctx) {
+                    this.rainGain.gain.setTargetAtTime(enabled && !this.muted ? 0.22 : 0.0, this.ctx.currentTime, 0.35);
+                }
+            }
+
+            toggleLofi() {
+                this.unlock();
+                this.lofiPlaying = !this.lofiPlaying;
+                if (this.vinylGain && this.ctx) {
+                    this.vinylGain.gain.setTargetAtTime(this.lofiPlaying ? 0.18 : 0.0, this.ctx.currentTime, 0.3);
+                }
+
+                if (this.lofiPlaying) {
+                    this.stepIndex = 0;
+                    this.playLofiBarStep();
+                    // 70 BPM -> mỗi phách 8th note ~ 428ms
+                    this.loopTimer = setInterval(() => this.playLofiBarStep(), 428);
+                } else if (this.loopTimer) {
+                    clearInterval(this.loopTimer);
+                    this.loopTimer = null;
+                }
+                return this.lofiPlaying;
+            }
+
+            playLofiBarStep() {
+                if (!this.ctx || !this.lofiPlaying || this.muted) return;
+                const stepInBar = this.stepIndex % 8;
+                const chordIdx = Math.floor(this.stepIndex / 8) % this.chords.length;
+                const now = this.ctx.currentTime;
+
+                // Đánh hợp âm Rhodes ấm ở đầu ô nhịp (step 0)
+                if (stepInBar === 0) {
+                    this.playWarmRhodesChord(this.chords[chordIdx], now, 3.3);
+                }
+
+                // Nhịp trống Lo-fi mềm mại: Kick trầm ở 0 & 5, Rim/Brush nhẹ ở 2 & 6
+                if (stepInBar === 0 || stepInBar === 5) {
+                    this.playSoftKick(now, stepInBar === 0 ? 0.16 : 0.11);
+                }
+                if (stepInBar === 2 || stepInBar === 6) {
+                    this.playSoftSnareBrush(now);
+                }
+
+                // Điểm xuyết nốt giai điệu chuông Rhodes ngẫu nhiên dịu dàng
+                if ((stepInBar === 3 || stepInBar === 7) && Math.random() < 0.55) {
+                    const note = this.melodyNotes[Math.floor(Math.random() * this.melodyNotes.length)];
+                    this.playBellNote(note, now + 0.02);
+                }
+
+                this.stepIndex++;
+            }
+
+            playWarmRhodesChord(freqs, time, duration) {
+                const lp = this.ctx.createBiquadFilter();
+                lp.type = 'lowpass';
+                lp.frequency.setValueAtTime(980, time);
+                lp.frequency.exponentialRampToValueAtTime(420, time + duration);
+                lp.connect(this.masterGain);
+
+                // Hiệu ứng băng từ băng cassette (Tape Wow nhẹ)
+                const wow = this.ctx.createOscillator();
+                const wowGain = this.ctx.createGain();
+                wow.frequency.value = 1.8;
+                wowGain.gain.value = 1.4;
+                wow.connect(wowGain);
+                wow.start(time);
+                wow.stop(time + duration + 0.05);
+
+                freqs.forEach((f, idx) => {
+                    const t0 = time + idx * 0.028; // Rải hợp âm nhẹ (strum)
+                    const osc = this.ctx.createOscillator();
+                    osc.type = idx === 0 ? 'sine' : 'triangle';
+                    osc.frequency.setValueAtTime(f, t0);
+                    wowGain.connect(osc.frequency);
+
+                    const env = this.ctx.createGain();
+                    const peak = idx === 0 ? 0.085 : 0.052;
+                    env.gain.setValueAtTime(0.0001, t0);
+                    env.gain.linearRampToValueAtTime(peak, t0 + 0.045);
+                    env.gain.exponentialRampToValueAtTime(0.0008, t0 + duration);
+
+                    osc.connect(env);
+                    env.connect(lp);
+                    osc.start(t0);
+                    osc.stop(t0 + duration + 0.05);
+                });
+            }
+
+            playBellNote(freq, time) {
+                const osc = this.ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, time);
+
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.0001, time);
+                env.gain.linearRampToValueAtTime(0.045, time + 0.015);
+                env.gain.exponentialRampToValueAtTime(0.0001, time + 1.25);
+
+                osc.connect(env);
+                env.connect(this.masterGain);
+                osc.start(time);
+                osc.stop(time + 1.3);
+            }
+
+            playSoftKick(time, amp) {
+                const osc = this.ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(115, time);
+                osc.frequency.exponentialRampToValueAtTime(42, time + 0.14);
+
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.0001, time);
+                env.gain.linearRampToValueAtTime(amp, time + 0.01);
+                env.gain.exponentialRampToValueAtTime(0.0001, time + 0.22);
+
+                osc.connect(env);
+                env.connect(this.masterGain);
+                osc.start(time);
+                osc.stop(time + 0.24);
+            }
+
+            playSoftSnareBrush(time) {
+                const len = Math.floor(this.ctx.sampleRate * 0.11);
+                const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < len; i++) {
+                    d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.35));
+                }
+                const src = this.ctx.createBufferSource();
+                src.buffer = buf;
+
+                const bp = this.ctx.createBiquadFilter();
+                bp.type = 'bandpass';
+                bp.frequency.value = 1450;
+
+                const env = this.ctx.createGain();
+                env.gain.value = 0.055;
+
+                src.connect(bp);
+                bp.connect(env);
+                env.connect(this.masterGain);
+                src.start(time);
+            }
+
+            playMistSpray() {
+                this.unlock();
+                if (!this.ctx || this.muted) return;
+                const now = this.ctx.currentTime;
+                const len = Math.floor(this.ctx.sampleRate * 0.38);
+                const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < len; i++) {
+                    d[i] = (Math.random() * 2 - 1) * Math.sin((i / len) * Math.PI);
+                }
+                const src = this.ctx.createBufferSource();
+                src.buffer = buf;
+
+                const hp = this.ctx.createBiquadFilter();
+                hp.type = 'bandpass';
+                hp.frequency.value = 3200;
+
+                const g = this.ctx.createGain();
+                g.gain.value = 0.12;
+
+                src.connect(hp);
+                hp.connect(g);
+                g.connect(this.masterGain);
+                src.start(now);
+            }
+
+            playSnip() {
+                this.unlock();
+                if (!this.ctx || this.muted) return;
+                const now = this.ctx.currentTime;
+                [2400, 3550].forEach((f, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, now + idx * 0.025);
+                    osc.frequency.exponentialRampToValueAtTime(900, now + idx * 0.025 + 0.055);
+                    const g = this.ctx.createGain();
+                    g.gain.setValueAtTime(0.11, now + idx * 0.025);
+                    g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.025 + 0.065);
+                    osc.connect(g);
+                    g.connect(this.masterGain);
+                    osc.start(now + idx * 0.025);
+                    osc.stop(now + idx * 0.025 + 0.07);
+                });
+            }
+
+            toggleMute() {
+                this.unlock();
+                this.muted = !this.muted;
+                if (this.masterGain && this.ctx) {
+                    this.masterGain.gain.setTargetAtTime(this.muted ? 0.0 : 0.85, this.ctx.currentTime, 0.08);
+                }
+                return !this.muted;
+            }
+        }
+
+        const audioEngine = new LofiSoundEngine();
+
+        /* =========================================================================
+           2. KHỞI TẠO KHÔNG GIAN 3D: BÀN GỖ, CỬA SỔ MƯA RƠI, TERRARIUM & BONSAI
+        ========================================================================= */
+        const SPECIES_PALETTES = {
+            sakura: {
+                title: 'Bonsai Anh Đào',
+                icon: '🌸',
+                leafColors: [0xf9a8d4, 0xf472b6, 0xfbcfe8, 0xfda4af],
+                petalColor: 0xfbcfe8,
+            },
+            pine: {
+                title: 'Tùng La Hán',
+                icon: '🌲',
+                leafColors: [0x15803d, 0x166534, 0x22c55e, 0x0f766e],
+                petalColor: 0x86efac,
+            },
+            maple: {
+                title: 'Phong Đỏ Kyoto',
+                icon: '🍁',
+                leafColors: [0xea580c, 0xdc2626, 0xf97316, 0xf59e0b],
+                petalColor: 0xfb923c,
+            },
+        };
+
+        const state = {
+            species: 'sakura',
+            lampOn: true,
+            rainOn: true,
+            domeOn: true,
+            skyMode: 0, // 0: Đêm Lo-fi, 1: Nắng Sớm, 2: Hoàng Hôn
+            water: 86,
+            warmth: 90,
+            shape: 92,
+            exp: 30,
+            year: 1,
+        };
+
+        let scene, camera, renderer;
+        let ambientLight, windowDirLight, growSpotLight, lanternLight;
+        let lampConeMesh, lampBulbMat, glassDomeGroup, windowGlassMat;
+        let bonsaiRoot, foliageMeshes = [], sproutList = [];
+        let windowRainStreaks = [], mistParticles = [], fallingPetals = [];
+
+        const camOrbit = {
+            theta: 0.22,
+            phi: 1.18,
+            radius: 6.4,
+            targetTheta: 0.22,
+            targetPhi: 1.18,
+            targetRadius: 6.4,
+            dragging: false,
+            lastX: 0,
+            lastY: 0,
+        };
+
+        function initScene() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x161324);
+            scene.fog = new THREE.FogExp2(0x161324, 0.035);
+
+            camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 60);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            container.appendChild(renderer.domElement);
+
+            // Ánh sáng phòng ấm cúng
+            ambientLight = new THREE.AmbientLight(0xc4b5fd, 0.52);
+            scene.add(ambientLight);
+
+            windowDirLight = new THREE.DirectionalLight(0x93c5fd, 0.55);
+            windowDirLight.position.set(-3, 5, -5);
+            scene.add(windowDirLight);
+
+            // Đèn sưởi quang hợp chiếu ấm từ đỉnh xuống chậu Bonsai
+            growSpotLight = new THREE.SpotLight(0xfbbf24, 1.65, 11, Math.PI / 4.2, 0.55, 1.2);
+            growSpotLight.position.set(1.15, 3.55, 0.4);
+            growSpotLight.target.position.set(0, 0.6, 0);
+            growSpotLight.castShadow = true;
+            scene.add(growSpotLight);
+            scene.add(growSpotLight.target);
+
+            buildDeskAndWindow();
+            buildTerrariumPotAndMoss();
+            buildBonsaiTree();
+            buildBrassGrowLamp();
+            buildGlassDome();
+            initFallingPetals();
+
+            updateHUD();
+        }
+
+        function buildDeskAndWindow() {
+            // Mặt bàn gỗ sồi ấm áp
+            const deskGeo = new THREE.BoxGeometry(14, 0.35, 7.5);
+            const deskMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.78 });
+            const desk = new THREE.Mesh(deskGeo, deskMat);
+            desk.position.set(0, -0.82, 0.4);
+            desk.receiveShadow = true;
+            scene.add(desk);
+
+            // Khung cửa sổ lớn phía sau bàn làm việc
+            const wallGroup = new THREE.Group();
+            windowGlassMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+            const paneGeo = new THREE.PlaneGeometry(11.5, 6.8);
+            const pane = new THREE.Mesh(paneGeo, windowGlassMat);
+            pane.position.set(0, 2.2, -3.5);
+            wallGroup.add(pane);
+
+            // Chấn song gỗ khung cửa sổ Nhật Bản
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0x291d18, roughness: 0.85 });
+            const barH = new THREE.Mesh(new THREE.BoxGeometry(11.8, 0.14, 0.16), frameMat);
+            barH.position.set(0, 2.2, -3.42);
+            wallGroup.add(barH);
+
+            [-2.6, 0, 2.6].forEach(xPos => {
+                const barV = new THREE.Mesh(new THREE.BoxGeometry(0.14, 6.8, 0.16), frameMat);
+                barV.position.set(xPos, 2.2, -3.42);
+                wallGroup.add(barV);
+            });
+
+            const sill = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.22, 0.45), frameMat);
+            sill.position.set(0, -0.55, -3.32);
+            wallGroup.add(sill);
+
+            scene.add(wallGroup);
+
+            // Các vệt hạt mưa lăn dài ngoài ô kính cửa sổ
+            const dropGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.36, 5);
+            const dropMat = new THREE.MeshBasicMaterial({
+                color: 0xbae6fd,
+                transparent: true,
+                opacity: 0.52,
+            });
+            for (let i = 0; i < 65; i++) {
+                const m = new THREE.Mesh(dropGeo, dropMat);
+                m.position.set(
+                    (Math.random() - 0.5) * 10.6,
+                    -0.3 + Math.random() * 5.4,
+                    -3.46
+                );
+                m.rotation.z = 0.08;
+                scene.add(m);
+                windowRainStreaks.push({
+                    mesh: m,
+                    speed: 2.8 + Math.random() * 2.4,
+                });
+            }
+        }
+
+        function buildTerrariumPotAndMoss() {
+            const baseGroup = new THREE.Group();
+
+            // Khay gốm Nhật Tokoname tròn thanh lịch
+            const potGeo = new THREE.CylinderGeometry(1.75, 1.48, 0.46, 36);
+            const potMat = new THREE.MeshStandardMaterial({
+                color: 0x2d3748,
+                roughness: 0.42,
+                metalness: 0.12,
+            });
+            const pot = new THREE.Mesh(potGeo, potMat);
+            pot.position.y = -0.42;
+            pot.castShadow = true;
+            pot.receiveShadow = true;
+            baseGroup.add(pot);
+
+            // Viền miệng chậu gốm
+            const rimGeo = new THREE.TorusGeometry(1.74, 0.065, 12, 42);
+            rimGeo.rotateX(Math.PI / 2);
+            const rim = new THREE.Mesh(rimGeo, potMat);
+            rim.position.y = -0.19;
+            baseGroup.add(rim);
+
+            // Đồi rêu nhung xanh mướt bên trong chậu
+            const mossMat = new THREE.MeshStandardMaterial({ color: 0x3f7d3a, roughness: 0.92 });
+            const moundMain = new THREE.Mesh(new THREE.SphereGeometry(1.66, 28, 18), mossMat);
+            moundMain.scale.set(1, 0.24, 1);
+            moundMain.position.y = -0.22;
+            moundMain.receiveShadow = true;
+            baseGroup.add(moundMain);
+
+            const moundSub = new THREE.Mesh(new THREE.SphereGeometry(0.75, 18, 14), mossMat);
+            moundSub.scale.set(1.1, 0.35, 0.9);
+            moundSub.position.set(-0.55, -0.06, 0.35);
+            baseGroup.add(moundSub);
+
+            // Đá cảnh Suiseki nhỏ & sỏi trắng lối mòn
+            const rockMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.85 });
+            [
+                [-0.85, 0.05, -0.35, 0.28],
+                [0.88, 0.02, 0.48, 0.22],
+                [0.42, 0.0, 0.82, 0.15],
+            ].forEach(([x, y, z, s]) => {
+                const r = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), rockMat);
+                r.position.set(x, y, z);
+                r.scale.set(1.1, 0.75, 0.9);
+                r.castShadow = true;
+                baseGroup.add(r);
+            });
+
+            // Đèn đá Nhật Toro tí hon phát sáng ấm áp trên thảm rêu
+            const toroGroup = new THREE.Group();
+            const stoneMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.85 });
+            const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.09, 0.22, 6), stoneMat);
+            ped.position.y = 0.1;
+            const box = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+            box.position.y = 0.26;
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(0.19, 0.12, 4), stoneMat);
+            roof.position.y = 0.38;
+            roof.rotation.y = Math.PI / 4;
+            toroGroup.add(ped, box, roof);
+            toroGroup.position.set(0.78, -0.02, -0.35);
+            baseGroup.add(toroGroup);
+
+            lanternLight = new THREE.PointLight(0xfb923c, 0.65, 2.6);
+            lanternLight.position.set(0.78, 0.32, -0.35);
+            scene.add(lanternLight);
+
+            // Hai cây nấm đỏ tí hon bên gốc cây
+            const stemMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7 });
+            const capMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5 });
+            [
+                [-0.38, 0.04, 0.72, 1.0],
+                [-0.22, 0.02, 0.82, 0.72],
+            ].forEach(([x, y, z, sc]) => {
+                const mg = new THREE.Group();
+                const st = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.032, 0.12, 8), stemMat);
+                st.position.y = 0.06;
+                const cp = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), capMat);
+                cp.position.y = 0.11;
+                mg.add(st, cp);
+                mg.scale.setScalar(sc);
+                mg.position.set(x, y, z);
+                baseGroup.add(mg);
+            });
+
+            scene.add(baseGroup);
+        }
+
+        function buildBonsaiTree() {
+            bonsaiRoot = new THREE.Group();
+            const barkMat = new THREE.MeshStandardMaterial({
+                color: 0x5c4033,
+                roughness: 0.9,
+            });
+
+            // Thân chính uốn lượn nghệ thuật (dáng Moyogi) bằng TubeGeometry
+            const trunkCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-0.08, -0.1, 0.05),
+                new THREE.Vector3(-0.32, 0.42, -0.08),
+                new THREE.Vector3(0.18, 0.95, 0.08),
+                new THREE.Vector3(-0.05, 1.48, -0.02),
+            ]);
+            const trunkGeo = new THREE.TubeGeometry(trunkCurve, 24, 0.14, 10, false);
+            // Thu nhỏ dần bán kính thân từ gốc lên ngọn
+            const pos = trunkGeo.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+                const vy = pos.getY(i);
+                const t = Math.max(0, Math.min(1, (vy + 0.1) / 1.6));
+                const taper = 1 - t * 0.52;
+                pos.setX(i, pos.getX(i) * (0.95 + 0.05 * taper));
+            }
+            trunkGeo.computeVertexNormals();
+            const trunkMesh = new THREE.Mesh(trunkGeo, barkMat);
+            trunkMesh.castShadow = true;
+            bonsaiRoot.add(trunkMesh);
+
+            // Các nhánh cành vươn ra nâng đỡ tán mây
+            const branchDefs = [
+                [new THREE.Vector3(-0.26, 0.52, -0.05), new THREE.Vector3(-0.88, 0.78, 0.18)],
+                [new THREE.Vector3(0.08, 0.88, 0.05), new THREE.Vector3(0.82, 1.12, -0.12)],
+                [new THREE.Vector3(0.05, 1.15, 0.02), new THREE.Vector3(-0.56, 1.38, -0.35)],
+                [new THREE.Vector3(-0.04, 1.42, -0.02), new THREE.Vector3(0.05, 1.68, 0.04)],
+            ];
+
+            branchDefs.forEach(([p0, p1]) => {
+                const mid = p0.clone().lerp(p1, 0.5);
+                mid.y += 0.08;
+                const curve = new THREE.CatmullRomCurve3([p0, mid, p1]);
+                const bGeo = new THREE.TubeGeometry(curve, 12, 0.055, 8, false);
+                const bMesh = new THREE.Mesh(bGeo, barkMat);
+                bMesh.castShadow = true;
+                bonsaiRoot.add(bMesh);
+            });
+
+            // 4 Tán mây Bonsai (Cloud Pads) bồng bềnh
+            const padCenters = [
+                { x: -0.92, y: 0.84, z: 0.18, r: 0.46 },
+                { x: 0.86, y: 1.16, z: -0.12, r: 0.44 },
+                { x: -0.56, y: 1.42, z: -0.36, r: 0.40 },
+                { x: 0.02, y: 1.74, z: 0.02, r: 0.52 },
+            ];
+
+            const palette = SPECIES_PALETTES[state.species].leafColors;
+            foliageMeshes = [];
+
+            padCenters.forEach((pad, pIdx) => {
+                const padGroup = new THREE.Group();
+                padGroup.position.set(pad.x, pad.y, pad.z);
+
+                for (let i = 0; i < 9; i++) {
+                    const col = palette[(pIdx + i) % palette.length];
+                    const mat = new THREE.MeshStandardMaterial({
+                        color: col,
+                        roughness: 0.72,
+                    });
+                    const sph = new THREE.Mesh(
+                        new THREE.DodecahedronGeometry(pad.r * (0.48 + (i % 3) * 0.12), 1),
+                        mat
+                    );
+                    const ang = (i / 9) * Math.PI * 2;
+                    const dist = i === 0 ? 0 : pad.r * 0.52;
+                    sph.position.set(
+                        Math.cos(ang) * dist,
+                        (i === 0 ? 0.08 : -0.02) + (Math.random() - 0.5) * 0.06,
+                        Math.sin(ang) * dist
+                    );
+                    sph.scale.set(1.18, 0.62, 1.12);
+                    sph.castShadow = true;
+                    padGroup.add(sph);
+                    foliageMeshes.push({ mesh: sph, colorIndex: (pIdx + i) % palette.length });
+                }
+
+                bonsaiRoot.add(padGroup);
+            });
+
+            scene.add(bonsaiRoot);
+
+            // Tạo sẵn 2 chồi non vượt tán để người chơi trải nghiệm cắt tỉa ngay
+            spawnOvergrownSprout();
+            spawnOvergrownSprout();
+        }
+
+        function spawnOvergrownSprout() {
+            if (sproutList.length >= 5) return;
+            const anchors = [
+                new THREE.Vector3(-0.95, 1.08, 0.2),
+                new THREE.Vector3(0.92, 1.38, -0.1),
+                new THREE.Vector3(0.05, 2.02, 0.05),
+                new THREE.Vector3(-0.62, 1.62, -0.35),
+                new THREE.Vector3(0.38, 1.88, 0.22),
+            ];
+            const base = anchors[Math.floor(Math.random() * anchors.length)];
+
+            const group = new THREE.Group();
+            const stemMat = new THREE.MeshStandardMaterial({ color: 0x65a30d });
+            const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.022, 0.34, 6), stemMat);
+            stem.position.y = 0.16;
+            group.add(stem);
+
+            const palette = SPECIES_PALETTES[state.species].leafColors;
+            const leafMat = new THREE.MeshStandardMaterial({
+                color: palette[0],
+                emissive: 0x222222,
+            });
+            const tipLeaf = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 0), leafMat);
+            tipLeaf.scale.set(1.2, 0.6, 0.8);
+            tipLeaf.position.set(0.05, 0.32, 0);
+            group.add(tipLeaf);
+
+            group.position.copy(base);
+            group.rotation.set((Math.random() - 0.5) * 0.5, Math.random() * Math.PI, (Math.random() - 0.5) * 0.6);
+            bonsaiRoot.add(group);
+            sproutList.push({ group, leafMesh: tipLeaf });
+
+            state.shape = Math.max(60, state.shape - 5);
+            updateHUD();
+        }
+
+        function buildBrassGrowLamp() {
+            const lampGroup = new THREE.Group();
+            const brassMat = new THREE.MeshStandardMaterial({
+                color: 0xd97706,
+                metalness: 0.68,
+                roughness: 0.28,
+            });
+
+            // Chân đế đèn đồng đặt cạnh chậu cây
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 0.09, 24), brassMat);
+            base.position.set(2.25, -0.6, -0.2);
+            lampGroup.add(base);
+
+            // Thân đèn uốn cong vươn lên trên đỉnh Bonsai
+            const neckCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(2.25, -0.56, -0.2),
+                new THREE.Vector3(2.32, 1.85, -0.2),
+                new THREE.Vector3(1.85, 3.45, 0.1),
+                new THREE.Vector3(1.15, 3.52, 0.35),
+            ]);
+            const neck = new THREE.Mesh(new THREE.TubeGeometry(neckCurve, 28, 0.045, 10, false), brassMat);
+            lampGroup.add(neck);
+
+            // Chao đèn hình chuông
+            const shade = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.42, 24, 1, true), brassMat);
+            shade.material.side = THREE.DoubleSide;
+            shade.position.set(1.15, 3.42, 0.35);
+            shade.rotation.z = 0.32;
+            lampGroup.add(shade);
+
+            lampBulbMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+            const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), lampBulbMat);
+            bulb.position.set(1.10, 3.32, 0.35);
+            lampGroup.add(bulb);
+
+            // Chùm tia sáng ấm áp mờ ảo (Volumetric Cone giả lập)
+            const coneGeo = new THREE.ConeGeometry(1.95, 3.6, 28, 1, true);
+            const coneMat = new THREE.MeshBasicMaterial({
+                color: 0xfde68a,
+                transparent: true,
+                opacity: 0.085,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+            });
+            lampConeMesh = new THREE.Mesh(coneGeo, coneMat);
+            lampConeMesh.position.set(0.55, 1.65, 0.18);
+            lampConeMesh.rotation.z = 0.32;
+            lampGroup.add(lampConeMesh);
+
+            scene.add(lampGroup);
+        }
+
+        function buildGlassDome() {
+            glassDomeGroup = new THREE.Group();
+            const glassMat = new THREE.MeshPhongMaterial({
+                color: 0xe0f2fe,
+                specular: 0xffffff,
+                shininess: 140,
+                transparent: true,
+                opacity: 0.15,
+                depthWrite: false,
+            });
+
+            // Thân chuông kính Terrarium bao quanh chậu cây
+            const cyl = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.78, 1.65, 36, 1, true), glassMat);
+            cyl.position.y = 0.62;
+            glassDomeGroup.add(cyl);
+
+            const domeTop = new THREE.Mesh(
+                new THREE.SphereGeometry(1.78, 36, 20, 0, Math.PI * 2, 0, Math.PI / 2),
+                glassMat
+            );
+            domeTop.position.y = 1.44;
+            glassDomeGroup.add(domeTop);
+
+            // Núm cầm bằng đồng trên đỉnh vòm kính
+            const knob = new THREE.Mesh(
+                new THREE.SphereGeometry(0.11, 14, 14),
+                new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.7, roughness: 0.25 })
+            );
+            knob.position.y = 3.26;
+            glassDomeGroup.add(knob);
+
+            scene.add(glassDomeGroup);
+        }
+
+        function initFallingPetals() {
+            const geo = new THREE.CircleGeometry(0.045, 6);
+            for (let i = 0; i < 22; i++) {
+                const mat = new THREE.MeshBasicMaterial({
+                    color: SPECIES_PALETTES[state.species].petalColor,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.85,
+                });
+                const m = new THREE.Mesh(geo, mat);
+                resetPetal(m);
+                scene.add(m);
+                fallingPetals.push({
+                    mesh: m,
+                    swayPhase: Math.random() * Math.PI * 2,
+                    speed: 0.28 + Math.random() * 0.24,
+                });
+            }
+        }
+
+        function resetPetal(mesh) {
+            mesh.position.set(
+                (Math.random() - 0.5) * 1.9,
+                1.1 + Math.random() * 1.1,
+                (Math.random() - 0.5) * 1.9
+            );
+        }
+
+        /* =========================================================================
+           3. HÀNH ĐỘNG CHĂM SÓC: TƯỚI NƯỚC, TỈA CÀNH, ĐỔI GIỐNG CÂY & BẦU TRỜI
+        ========================================================================= */
+        function waterBonsai() {
+            audioEngine.playMistSpray();
+            state.water = Math.min(100, state.water + 14);
+            addExp(8);
+
+            // Phun 28 hạt sương long lanh từ trên xuống tán cây
+            const mistGeo = new THREE.SphereGeometry(0.032, 6, 6);
+            const mistMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.9 });
+            for (let i = 0; i < 28; i++) {
+                const m = new THREE.Mesh(mistGeo, mistMat.clone());
+                m.position.set(
+                    (Math.random() - 0.5) * 1.7,
+                    2.15 + Math.random() * 0.45,
+                    (Math.random() - 0.5) * 1.7
+                );
+                scene.add(m);
+                mistParticles.push({
+                    mesh: m,
+                    vy: -1.4 - Math.random() * 0.9,
+                    age: 0,
+                });
+            }
+            showToast('💧 Đã tưới sương mát lành cho tán lá & thảm rêu!');
+            updateHUD();
+        }
+
+        function pruneBonsai() {
+            audioEngine.playSnip();
+            if (sproutList.length > 0) {
+                const removed = sproutList.pop();
+                const pos = removed.group.position.clone();
+                bonsaiRoot.remove(removed.group);
+
+                // Hiệu ứng lá rụng nhẹ khi bấm tỉa
+                const leafGeo = new THREE.CircleGeometry(0.055, 5);
+                const col = SPECIES_PALETTES[state.species].petalColor;
+                for (let i = 0; i < 8; i++) {
+                    const lm = new THREE.Mesh(
+                        leafGeo,
+                        new THREE.MeshBasicMaterial({ color: col, side: THREE.DoubleSide, transparent: true, opacity: 1 })
+                    );
+                    lm.position.copy(pos);
+                    scene.add(lm);
+                    mistParticles.push({
+                        mesh: lm,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: -0.7 - Math.random() * 0.5,
+                        vz: (Math.random() - 0.5) * 0.8,
+                        age: 0,
+                    });
+                }
+                state.shape = Math.min(100, state.shape + 8);
+                addExp(10);
+                showToast(
+                    sproutList.length > 0
+                        ? `✂️ Đã tỉa gọn 1 nhánh vượt (còn ${sproutList.length} chồi non)`
+                        : '✨ Tuyệt đẹp! Tán Bonsai đã gọn gàng chuẩn nghệ thuật!'
+                );
+            } else {
+                state.shape = 100;
+                addExp(4);
+                showToast('✂️ Tán lá hiện đã rất cân đối và thanh thoát!');
+            }
+            updateHUD();
+        }
+
+        function setSpecies(sp) {
+            state.species = sp;
+            const info = SPECIES_PALETTES[sp];
+            foliageMeshes.forEach(item => {
+                item.mesh.material.color.setHex(info.leafColors[item.colorIndex % info.leafColors.length]);
+            });
+            sproutList.forEach(s => {
+                s.leafMesh.material.color.setHex(info.leafColors[0]);
+            });
+            fallingPetals.forEach(p => {
+                p.mesh.material.color.setHex(info.petalColor);
+            });
+
+            document.querySelectorAll('.species-btn').forEach(btn => {
+                const active = btn.getAttribute('data-species') === sp;
+                btn.classList.toggle('border-pink-400', active);
+                btn.classList.toggle('bg-pink-50', active);
+                btn.classList.toggle('border-transparent', !active);
+            });
+
+            updateHUD();
+            showToast(`${info.icon} Đã chuyển sang dòng cây ${info.title}`);
+        }
+
+        function addExp(val) {
+            state.exp += val;
+            if (state.exp >= 100) {
+                state.exp -= 100;
+                state.year += 1;
+                showToast(`🪴 Chúc mừng! Cây Bonsai bước sang Năm tuổi thứ ${state.year}!`);
+            }
+        }
+
+        /* =========================================================================
+           4. GẮN SỰ KIỆN GIAO DIỆN & XOAY CAMERA 360°
+        ========================================================================= */
+        function bindUI() {
+            const canvas = renderer.domElement;
+
+            canvas.addEventListener('pointerdown', e => {
+                audioEngine.unlock();
+                camOrbit.dragging = true;
+                camOrbit.lastX = e.clientX;
+                camOrbit.lastY = e.clientY;
+            });
+
+            window.addEventListener('pointermove', e => {
+                if (!camOrbit.dragging) return;
+                const dx = e.clientX - camOrbit.lastX;
+                const dy = e.clientY - camOrbit.lastY;
+                camOrbit.lastX = e.clientX;
+                camOrbit.lastY = e.clientY;
+                camOrbit.targetTheta -= dx * 0.006;
+                camOrbit.targetPhi = Math.max(0.55, Math.min(1.42, camOrbit.targetPhi - dy * 0.005));
+            });
+
+            window.addEventListener('pointerup', () => {
+                camOrbit.dragging = false;
+            });
+
+            canvas.addEventListener(
+                'wheel',
+                e => {
+                    e.preventDefault();
+                    camOrbit.targetRadius = Math.max(4.2, Math.min(9.2, camOrbit.targetRadius + e.deltaY * 0.004));
+                },
+                { passive: false }
+            );
+
+            // Bật / Tắt Nhạc Lo-fi Chillhop
+            const btnLofi = document.getElementById('btn-lofi');
+            const lofiLabel = document.getElementById('lofi-label');
+            const lofiEq = document.getElementById('lofi-eq');
+            btnLofi.addEventListener('click', () => {
+                const playing = audioEngine.toggleLofi();
+                btnLofi.classList.toggle('active-state', playing);
+                lofiLabel.textContent = playing ? 'Đang phát Lo-fi' : 'Bật Lo-fi Chill';
+                lofiEq.classList.toggle('hidden', !playing);
+                lofiEq.classList.toggle('inline-flex', playing);
+                showToast(
+                    playing
+                        ? '🎧 Đang phát hợp âm Lo-fi Chillhop ấm áp...'
+                        : '⏸️ Đã tạm dừng nhạc nền Lo-fi'
+                );
+            });
+
+            // Tưới Nước & Tỉa Cành
+            document.getElementById('act-water').addEventListener('click', waterBonsai);
+            document.getElementById('act-prune').addEventListener('click', pruneBonsai);
+
+            // Bật / Tắt Đèn Sưởi Quang Hợp
+            const btnLamp = document.getElementById('act-lamp');
+            btnLamp.addEventListener('click', () => {
+                audioEngine.unlock();
+                state.lampOn = !state.lampOn;
+                growSpotLight.intensity = state.lampOn ? 1.65 : 0.0;
+                lampConeMesh.visible = state.lampOn;
+                lampBulbMat.color.setHex(state.lampOn ? 0xfef08a : 0x64748b);
+                btnLamp.classList.toggle('active-state', state.lampOn);
+                showToast(state.lampOn ? '💡 Đã bật đèn sưởi ấm quang hợp' : '🌑 Đã tắt đèn sưởi bàn');
+                updateHUD();
+            });
+
+            // Bật / Tắt Mưa Rơi Ngoài Cửa Sổ
+            const btnRain = document.getElementById('act-rain');
+            btnRain.addEventListener('click', () => {
+                state.rainOn = !state.rainOn;
+                audioEngine.setRain(state.rainOn);
+                btnRain.classList.toggle('active-state', state.rainOn);
+                windowRainStreaks.forEach(r => {
+                    r.mesh.visible = state.rainOn;
+                });
+                showToast(
+                    state.rainOn
+                        ? '🌧️ Tiếng mưa rơi rả rích bên ngoài khung cửa sổ...'
+                        : '🌤️ Cơn mưa ngoài cửa sổ đã tạnh'
+                );
+                updateHUD();
+            });
+
+            // Bật / Tắt Vòm Kính Terrarium
+            const btnDome = document.getElementById('act-dome');
+            btnDome.addEventListener('click', () => {
+                audioEngine.unlock();
+                state.domeOn = !state.domeOn;
+                glassDomeGroup.visible = state.domeOn;
+                btnDome.classList.toggle('active-state', state.domeOn);
+                showToast(
+                    state.domeOn
+                        ? '🫙 Đã đậy vòm kính Terrarium giữ ẩm cho rêu'
+                        : '🌬️ Đã mở vòm kính để cây đón gió thoáng đãng'
+                );
+            });
+
+            // Đổi giống cây Bonsai
+            const drawer = document.getElementById('style-drawer');
+            document.getElementById('act-species').addEventListener('click', () => {
+                drawer.classList.toggle('hidden');
+            });
+            document.getElementById('btn-close-style').addEventListener('click', () => {
+                drawer.classList.add('hidden');
+            });
+            document.querySelectorAll('.species-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setSpecies(btn.getAttribute('data-species'));
+                });
+            });
+
+            // Đổi khung cảnh cửa sổ (Đêm Lo-fi / Nắng Sớm / Chiều Tà)
+            const btnSky = document.getElementById('btn-sky');
+            btnSky.addEventListener('click', () => {
+                state.skyMode = (state.skyMode + 1) % 3;
+                if (state.skyMode === 0) {
+                    btnSky.textContent = '🌙';
+                    scene.background.setHex(0x161324);
+                    scene.fog.color.setHex(0x161324);
+                    windowGlassMat.color.setHex(0x1e293b);
+                    ambientLight.color.setHex(0xc4b5fd);
+                    ambientLight.intensity = 0.52;
+                    windowDirLight.intensity = 0.55;
+                    showToast('🌙 Đêm Lo-fi ấm cúng bên bàn làm việc');
+                } else if (state.skyMode === 1) {
+                    btnSky.textContent = '☀️';
+                    scene.background.setHex(0xdbeafe);
+                    scene.fog.color.setHex(0xdbeafe);
+                    windowGlassMat.color.setHex(0x93c5fd);
+                    ambientLight.color.setHex(0xffffff);
+                    ambientLight.intensity = 0.92;
+                    windowDirLight.intensity = 0.95;
+                    showToast('☀️ Nắng sớm ban mai chiếu qua khung cửa');
+                } else {
+                    btnSky.textContent = '🌅';
+                    scene.background.setHex(0x2e1a2b);
+                    scene.fog.color.setHex(0x2e1a2b);
+                    windowGlassMat.color.setHex(0x7c2d12);
+                    ambientLight.color.setHex(0xfed7aa);
+                    ambientLight.intensity = 0.68;
+                    windowDirLight.intensity = 0.75;
+                    showToast('🌅 Chiều hoàng hôn tím ấm áp');
+                }
+            });
+
+            // Tắt / Mở âm thanh tổng
+            const btnMute = document.getElementById('btn-mute');
+            btnMute.addEventListener('click', () => {
+                const soundOn = audioEngine.toggleMute();
+                btnMute.textContent = soundOn ? '🔊' : '🔇';
+                showToast(soundOn ? '🔊 Đã bật âm thanh' : '🔇 Đã tắt tiếng');
+            });
+
+            // Đặt lại góc nhìn chính diện
+            document.getElementById('btn-reset-cam').addEventListener('click', () => {
+                camOrbit.targetTheta = 0.22;
+                camOrbit.targetPhi = 1.18;
+                camOrbit.targetRadius = 6.4;
+                showToast('🎥 Đã đưa góc nhìn về chính diện chậu Bonsai');
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        let toastTimeout = null;
+        function showToast(text) {
+            const el = document.getElementById('toast-msg');
+            el.textContent = text;
+            el.style.opacity = '1';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                el.style.opacity = '0';
+            }, 2400);
+        }
+
+        function updateHUD() {
+            const sp = SPECIES_PALETTES[state.species];
+            document.getElementById('tree-title').textContent = sp.title;
+            document.getElementById('species-badge-icon').textContent = sp.icon;
+            document.getElementById('tree-age-badge').textContent = `Năm ${state.year}`;
+            document.getElementById('exp-bar').style.width = `${state.exp}%`;
+            document.getElementById('exp-text').textContent = `${Math.floor(state.exp)}/100`;
+
+            const w = Math.round(state.water);
+            const l = Math.round(state.warmth);
+            const s = Math.round(state.shape);
+            document.getElementById('val-water').textContent = `${w}%`;
+            document.getElementById('bar-water').style.width = `${w}%`;
+            document.getElementById('val-warmth').textContent = `${l}%`;
+            document.getElementById('bar-warmth').style.width = `${l}%`;
+            document.getElementById('val-shape').textContent = `${s}%`;
+            document.getElementById('bar-shape').style.width = `${s}%`;
+
+            document.getElementById('prune-label').textContent =
+                sproutList.length > 0 ? `Tỉa Cành (${sproutList.length})` : 'Tỉa Cành';
+
+            const rainTxt = state.rainOn ? '🌧️ Mưa ngoài hiên' : '🍃 Trời tạnh ráo';
+            const sproutTxt =
+                sproutList.length > 0
+                    ? `• Có ${sproutList.length} nhánh non cần tỉa`
+                    : '• Tán mây chuẩn đẹp';
+            document.getElementById('status-line').textContent = `${rainTxt} ${sproutTxt}`;
+        }
+
+        /* =========================================================================
+           5. VÒNG LẶP ANIMATION THỜI GIAN THỰC (TREO MÁY THƯ GIÃN MƯỢT MÀ)
+        ========================================================================= */
+        let lastFrame = performance.now();
+        let sproutTimer = 18;
+        let hudAccum = 0;
+
+        function animate(now) {
+            requestAnimationFrame(animate);
+            const dt = Math.min(0.05, (now - lastFrame) / 1000);
+            lastFrame = now;
+            const elapsed = now * 0.001;
+
+            // Nhịp thở khẽ đung đưa của tán lá Bonsai
+            if (bonsaiRoot) {
+                bonsaiRoot.rotation.z = Math.sin(elapsed * 0.9) * 0.012;
+            }
+
+            // Mưa lăn trên kính cửa sổ phía sau
+            if (state.rainOn) {
+                windowRainStreaks.forEach(r => {
+                    r.mesh.position.y -= r.speed * dt;
+                    r.mesh.position.x -= r.speed * 0.08 * dt;
+                    if (r.mesh.position.y < -0.45) {
+                        r.mesh.position.y = 5.2;
+                        r.mesh.position.x = (Math.random() - 0.5) * 10.6;
+                    }
+                });
+            }
+
+            // Cánh hoa / lá nhỏ bay lất phất quanh tán Bonsai
+            fallingPetals.forEach(p => {
+                p.mesh.position.y -= p.speed * dt;
+                p.mesh.position.x += Math.sin(elapsed * 1.8 + p.swayPhase) * 0.18 * dt;
+                p.mesh.rotation.x += dt * 1.4;
+                p.mesh.rotation.y += dt * 1.1;
+                if (p.mesh.position.y < -0.15) {
+                    resetPetal(p.mesh);
+                }
+            });
+
+            // Hạt sương tưới nước & lá cắt tỉa
+            for (let i = mistParticles.length - 1; i >= 0; i--) {
+                const mp = mistParticles[i];
+                mp.age += dt;
+                if (mp.age > 0.95 || mp.mesh.position.y < -0.2) {
+                    scene.remove(mp.mesh);
+                    mistParticles.splice(i, 1);
+                } else {
+                    if (mp.vx) mp.mesh.position.x += mp.vx * dt;
+                    if (mp.vz) mp.mesh.position.z += mp.vz * dt;
+                    mp.mesh.position.y += mp.vy * dt;
+                    mp.mesh.material.opacity = Math.max(0, 1 - mp.age / 0.95);
+                }
+            }
+
+            // Thay đổi chậm các chỉ số chăm sóc để treo máy lâu vẫn sống động
+            state.water = Math.max(30, state.water - (state.domeOn ? 0.12 : 0.28) * dt);
+            state.warmth = state.lampOn
+                ? Math.min(100, state.warmth + 0.6 * dt)
+                : Math.max(45, state.warmth - 0.35 * dt);
+
+            sproutTimer -= dt;
+            if (sproutTimer <= 0) {
+                sproutTimer = 22 + Math.random() * 14;
+                spawnOvergrownSprout();
+            }
+
+            // Camera Orbit mượt mà
+            camOrbit.theta += (camOrbit.targetTheta - camOrbit.theta) * Math.min(1, dt * 6);
+            camOrbit.phi += (camOrbit.targetPhi - camOrbit.phi) * Math.min(1, dt * 6);
+            camOrbit.radius += (camOrbit.targetRadius - camOrbit.radius) * Math.min(1, dt * 6);
+
+            const sinPhi = Math.sin(camOrbit.phi);
+            camera.position.set(
+                camOrbit.radius * sinPhi * Math.sin(camOrbit.theta),
+                camOrbit.radius * Math.cos(camOrbit.phi) + 0.65,
+                camOrbit.radius * sinPhi * Math.cos(camOrbit.theta)
+            );
+            camera.lookAt(0, 0.72, 0);
+
+            hudAccum += dt;
+            if (hudAccum >= 0.4) {
+                hudAccum = 0;
+                updateHUD();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function () {
+            initScene();
+            bindUI();
+            lastFrame = performance.now();
+            animate(lastFrame);
+        };
+    </script>
+</body>
+</html>

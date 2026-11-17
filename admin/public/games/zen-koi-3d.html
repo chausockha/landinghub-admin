@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zen Koi Pond 3D - Hồ Cá Koi Thư Giãn</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
+            background: #0c2227;
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .zen-glass {
+            background: rgba(244, 252, 250, 0.84);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 255, 255, 0.92);
+            box-shadow: 0 8px 28px rgba(8, 45, 52, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        .zen-btn {
+            transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 0 rgba(15, 60, 65, 0.12), 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+
+        .zen-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .zen-btn:active {
+            transform: translateY(2px) scale(0.96);
+            box-shadow: 0 1px 0 rgba(15, 60, 65, 0.12);
+        }
+
+        .zen-btn.active-tool {
+            border-color: #0d9488 !important;
+            background: linear-gradient(135deg, #ccfbf1, #99f6e4) !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.32), 0 4px 0 rgba(13, 148, 136, 0.22);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-teal-950">
+
+    <!-- Khung 3D WebGL -->
+    <div id="canvas-container"></div>
+
+    <!-- Giao diện HUD nổi -->
+    <div id="ui-layer" class="fixed inset-0 pointer-events-none z-10 flex flex-col justify-between p-2.5 sm:p-4">
+
+        <!-- THANH TRÊN: Hồ sơ Hồ Thiền + Điều khiển môi trường -->
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-2.5">
+            <!-- Khối Trái: Trạng thái Hồ Cá Koi -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pointer-events-auto max-w-full">
+                <div class="zen-glass rounded-3xl px-3.5 py-2.5 flex items-center gap-3 shrink-0">
+                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-600 flex items-center justify-center text-2xl shadow-inner border-2 border-white shrink-0">
+                        🎏
+                    </div>
+                    <div class="min-w-[145px]">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-black text-base sm:text-lg text-teal-950 tracking-tight">Hồ Thiền Koi</span>
+                            <span id="zen-level-badge" class="ml-1 px-2 py-0.5 text-[11px] font-black rounded-full bg-teal-600 text-white shadow-sm">
+                                Cấp 1
+                            </span>
+                        </div>
+                        <div class="mt-1 flex items-center gap-1.5">
+                            <span class="text-xs">🪷</span>
+                            <div class="w-full h-2 bg-teal-100 rounded-full overflow-hidden border border-teal-200">
+                                <div id="zen-exp-bar" class="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full transition-all duration-300" style="width: 25%;"></div>
+                            </div>
+                            <span id="zen-exp-text" class="text-[10px] font-bold text-teal-700 shrink-0">25/100</span>
+                        </div>
+                        <div id="pond-status-text" class="text-[11px] font-bold text-teal-800/85 mt-0.5 truncate">
+                            🌊 Mặt hồ tĩnh lặng • 9 Cá Koi đang bơi
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chỉ số Sinh khí & Độ trong -->
+                <div class="zen-glass rounded-3xl px-3.5 py-2 hidden sm:grid grid-cols-2 gap-x-4 gap-y-1 min-w-[230px]">
+                    <div>
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-teal-900">
+                            <span>✨ Tĩnh tâm</span>
+                            <span id="val-harmony">94%</span>
+                        </div>
+                        <div class="h-2 bg-teal-100 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-harmony" class="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all duration-300" style="width: 94%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center text-[11px] font-extrabold text-teal-900">
+                            <span>🌾 Độ no đàn cá</span>
+                            <span id="val-fullness">82%</span>
+                        </div>
+                        <div class="h-2 bg-amber-100 rounded-full overflow-hidden p-0.5 mt-0.5">
+                            <div id="bar-fullness" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-300" style="width: 82%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khối Phải: Ngọc Sen + Thời gian + Âm thanh + Góc nhìn -->
+            <div class="flex items-center justify-between sm:justify-end gap-2 pointer-events-auto">
+                <div class="zen-glass rounded-full px-3.5 py-1.5 flex items-center gap-1.5 shadow-sm">
+                    <span class="text-base">🪷</span>
+                    <span id="pearl-display" class="font-black text-sm sm:text-base text-teal-800">120</span>
+                    <span class="text-[11px] font-extrabold text-teal-700/80 hidden sm:inline">Ngọc Sen</span>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <button id="btn-ambience" title="Đổi thời gian: Nắng Sớm / Hoàng Hôn / Đêm Hoa Đăng" class="zen-btn zen-glass w-10 h-10 rounded-full flex items-center justify-center text-lg">
+                        ☀️
+                    </button>
+                    <button id="btn-sound" title="Bật / Tắt tiếng suối chảy & chuông gió" class="zen-btn zen-glass w-10 h-10 rounded-full flex items-center justify-center text-lg">
+                        🔊
+                    </button>
+                    <button id="btn-cam-view" title="Đổi góc nhìn: Nghiêng 3D / Nhìn thẳng từ trên cao" class="zen-btn zen-glass w-10 h-10 rounded-full flex items-center justify-center text-base">
+                        🎥
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gợi ý tương tác giữa trên -->
+        <div class="flex justify-center pointer-events-none my-auto items-start pt-1">
+            <div id="hint-banner" class="zen-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-900/90 shadow-sm transition-all duration-500 text-center">
+                🌾 Chạm mặt nước để rải thức ăn gọi đàn cá Koi • 🔄 Giữ chuột phải (hoặc kéo rìa) để xoay góc nhìn 3D
+            </div>
+        </div>
+
+        <!-- THANH DƯỚI: Khay thả thêm Cá Koi + Dock công cụ chính -->
+        <div class="flex flex-col items-center gap-2.5 w-full">
+
+            <!-- Ngăn kéo chọn giống Cá Koi để thả thêm -->
+            <div id="koi-drawer" class="hidden pointer-events-auto zen-glass rounded-3xl p-3 sm:p-4 w-full max-w-xl transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-black text-sm sm:text-base text-teal-950 flex items-center gap-1.5">
+                        🎏 Thả Thêm Cá Koi Quý Vào Hồ (<span id="koi-count-drawer">9</span>/16)
+                    </h3>
+                    <button id="btn-close-drawer" class="w-7 h-7 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-black text-xs flex items-center justify-center">
+                        ✕
+                    </button>
+                </div>
+                <p class="text-[11px] font-bold text-teal-700 mb-2.5">Chọn giống cá Koi Nhật Bản bạn muốn thả thêm xuống hồ (miễn phí thư giãn):</p>
+                <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+                    <button data-breed="kohaku" class="breed-btn zen-btn rounded-2xl p-2 bg-white/85 hover:bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-1">
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-white via-red-500 to-orange-500 border border-white shadow"></span>
+                        <span class="text-[10px] sm:text-xs font-extrabold text-teal-950 text-center leading-tight">Kohaku<br><span class="text-[9px] text-rose-600">Đỏ Trắng</span></span>
+                    </button>
+                    <button data-breed="ogon" class="breed-btn zen-btn rounded-2xl p-2 bg-white/85 hover:bg-amber-50 border-2 border-amber-300 flex flex-col items-center gap-1">
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 border border-white shadow"></span>
+                        <span class="text-[10px] sm:text-xs font-extrabold text-teal-950 text-center leading-tight">Yamabuki<br><span class="text-[9px] text-amber-600">Hoàng Kim</span></span>
+                    </button>
+                    <button data-breed="sanke" class="breed-btn zen-btn rounded-2xl p-2 bg-white/85 hover:bg-slate-50 border-2 border-slate-300 flex flex-col items-center gap-1">
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-tr from-zinc-900 via-red-500 to-white border border-white shadow"></span>
+                        <span class="text-[10px] sm:text-xs font-extrabold text-teal-950 text-center leading-tight">Taisho<br><span class="text-[9px] text-slate-600">Tam Thể</span></span>
+                    </button>
+                    <button data-breed="shusui" class="breed-btn zen-btn rounded-2xl p-2 bg-white/85 hover:bg-sky-50 border-2 border-sky-200 flex flex-col items-center gap-1">
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-sky-300 via-cyan-600 to-orange-400 border border-white shadow"></span>
+                        <span class="text-[10px] sm:text-xs font-extrabold text-teal-950 text-center leading-tight">Shusui<br><span class="text-[9px] text-sky-700">Xanh Ngọc</span></span>
+                    </button>
+                    <button data-breed="platinum" class="breed-btn zen-btn rounded-2xl p-2 bg-white/85 hover:bg-teal-50 border-2 border-teal-200 flex flex-col items-center gap-1">
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-white via-slate-100 to-cyan-200 border border-slate-200 shadow"></span>
+                        <span class="text-[10px] sm:text-xs font-extrabold text-teal-950 text-center leading-tight">Purachina<br><span class="text-[9px] text-teal-600">Bạch Kim</span></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Thanh Dock Tương Tác Chính -->
+            <div class="pointer-events-auto w-full max-w-3xl zen-glass rounded-3xl p-2 sm:p-2.5">
+                <div class="flex items-center justify-start sm:justify-center gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar px-0.5 py-0.5">
+                    <button id="tool-feed" class="zen-btn active-tool shrink-0 bg-gradient-to-b from-amber-50 to-orange-100 border-2 border-amber-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span class="text-xl sm:text-2xl leading-none">🌾</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-amber-950 mt-1">Rải Mồi</span>
+                    </button>
+
+                    <button id="tool-ripple" class="zen-btn shrink-0 bg-gradient-to-b from-cyan-50 to-teal-100 border-2 border-teal-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span class="text-xl sm:text-2xl leading-none">💧</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-teal-950 mt-1">Chạm Nước</span>
+                    </button>
+
+                    <button id="act-scatter" class="zen-btn shrink-0 bg-gradient-to-b from-orange-50 to-amber-100 border-2 border-orange-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span class="text-xl sm:text-2xl leading-none">✨</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-orange-950 mt-1">Tung Cám</span>
+                    </button>
+
+                    <button id="act-chime" class="zen-btn shrink-0 bg-gradient-to-b from-sky-50 to-indigo-100 border-2 border-indigo-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span class="text-xl sm:text-2xl leading-none">🎐</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-indigo-950 mt-1">Chuông Gió</span>
+                    </button>
+
+                    <button id="act-lantern" class="zen-btn shrink-0 bg-gradient-to-b from-rose-50 to-amber-100 border-2 border-rose-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span class="text-xl sm:text-2xl leading-none">🏮</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-rose-950 mt-1">Hoa Đăng</span>
+                    </button>
+
+                    <button id="act-rain" class="zen-btn shrink-0 bg-gradient-to-b from-slate-50 to-sky-100 border-2 border-sky-200 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span id="icon-rain" class="text-xl sm:text-2xl leading-none">🌧️</span>
+                        <span id="label-rain" class="text-[11px] sm:text-xs font-extrabold text-sky-950 mt-1">Mưa Thiền</span>
+                    </button>
+
+                    <button id="act-add-koi" class="zen-btn shrink-0 bg-gradient-to-b from-emerald-50 to-teal-100 border-2 border-emerald-300 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[76px] sm:min-w-[90px]">
+                        <span class="text-xl sm:text-2xl leading-none">🐟</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-emerald-950 mt-1">Thêm Koi</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông báo Toast -->
+    <div id="toast-msg" class="fixed top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none opacity-0 transition-all duration-300 bg-teal-950/90 text-white px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold shadow-lg">
+        Thông báo
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. HỆ THỐNG ÂM THANH THIỀN ĐỊNH WEB AUDIO API
+           (Tiếng suối tre chảy róc rách, Chuông gió Furin Ngũ Cung Nhật Bản, Giọt nước)
+        ========================================================================= */
+        class ZenSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+                this.streamRunning = false;
+                this.masterGain = null;
+                this.streamGain = null;
+                this.rainGain = null;
+                // Thang âm Ngũ Cung Nhật Bản (Hirajoshi / Yo Pentatonic) cực kỳ êm dịu
+                this.pentatonic = [587.33, 659.25, 783.99, 880.00, 987.77, 1174.66, 1318.51, 1567.98];
+            }
+
+            unlock() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) {
+                        this.ctx = new AudioCtx();
+                        this.masterGain = this.ctx.createGain();
+                        this.masterGain.gain.value = 0.85;
+                        this.masterGain.connect(this.ctx.destination);
+                        this.initStreamAmbience();
+                    }
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            initStreamAmbience() {
+                if (!this.ctx || this.streamRunning) return;
+                this.streamRunning = true;
+
+                // Tạo buffer nhiễu hồng mềm mại cho tiếng suối tre và mưa xuân
+                const seconds = 4;
+                const bufferSize = this.ctx.sampleRate * seconds;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99765 * b0 + white * 0.0990460;
+                    b1 = 0.96300 * b1 + white * 0.2965164;
+                    b2 = 0.57000 * b2 + white * 1.0526913;
+                    data[i] = (b0 + b1 + b2 + white * 0.1848) * 0.05;
+                }
+
+                // Luồng 1: Tiếng nước chảy suối tre Kakehi
+                const streamSrc = this.ctx.createBufferSource();
+                streamSrc.buffer = buffer;
+                streamSrc.loop = true;
+
+                const streamBand = this.ctx.createBiquadFilter();
+                streamBand.type = 'bandpass';
+                streamBand.frequency.value = 620;
+                streamBand.Q.value = 1.4;
+
+                // LFO điều chế tần số nhẹ tạo cảm giác dòng nước gợn lăn tăn
+                const lfo = this.ctx.createOscillator();
+                const lfoGain = this.ctx.createGain();
+                lfo.frequency.value = 0.28;
+                lfoGain.gain.value = 180;
+                lfo.connect(lfoGain);
+                lfoGain.connect(streamBand.frequency);
+
+                this.streamGain = this.ctx.createGain();
+                this.streamGain.gain.value = 0.18;
+
+                streamSrc.connect(streamBand);
+                streamBand.connect(this.streamGain);
+                this.streamGain.connect(this.masterGain);
+
+                streamSrc.start();
+                lfo.start();
+
+                // Luồng 2: Tiếng mưa xuân thiền định (mặc định = 0, bật khi gọi mưa)
+                const rainSrc = this.ctx.createBufferSource();
+                rainSrc.buffer = buffer;
+                rainSrc.loop = true;
+
+                const rainFilter = this.ctx.createBiquadFilter();
+                rainFilter.type = 'highpass';
+                rainFilter.frequency.value = 1350;
+
+                this.rainGain = this.ctx.createGain();
+                this.rainGain.gain.value = 0.0;
+
+                rainSrc.connect(rainFilter);
+                rainFilter.connect(this.rainGain);
+                this.rainGain.connect(this.masterGain);
+                rainSrc.start();
+            }
+
+            setRainSound(active) {
+                this.unlock();
+                if (!this.ctx || !this.rainGain) return;
+                const now = this.ctx.currentTime;
+                this.rainGain.gain.cancelScheduledValues(now);
+                this.rainGain.gain.setTargetAtTime(active && this.enabled ? 0.14 : 0.0, now, 0.45);
+            }
+
+            toggle() {
+                this.unlock();
+                this.enabled = !this.enabled;
+                if (this.masterGain && this.ctx) {
+                    this.masterGain.gain.setTargetAtTime(this.enabled ? 0.85 : 0.0, this.ctx.currentTime, 0.08);
+                }
+                return this.enabled;
+            }
+
+            // Tiếng giọt nước thanh khiết khi chạm hồ hoặc thả mồi
+            playWaterDrop(intensity = 1.0) {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                osc.type = 'sine';
+                const startF = (380 + Math.random() * 260) * (0.9 + intensity * 0.15);
+                osc.frequency.setValueAtTime(startF, now);
+                osc.frequency.exponentialRampToValueAtTime(startF * 2.35, now + 0.095);
+
+                const env = this.ctx.createGain();
+                const peak = Math.min(0.16, 0.09 * intensity);
+                env.gain.setValueAtTime(0.0001, now);
+                env.gain.linearRampToValueAtTime(peak, now + 0.012);
+                env.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+                osc.connect(env);
+                env.connect(this.masterGain);
+                osc.start(now);
+                osc.stop(now + 0.13);
+            }
+
+            // Tiếng cá Koi đớp mồi "Bloop~" ấm áp
+            playKoiGulp() {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                osc.type = 'triangle';
+                const f0 = 220 + Math.random() * 90;
+                osc.frequency.setValueAtTime(f0, now);
+                osc.frequency.exponentialRampToValueAtTime(f0 * 1.85, now + 0.075);
+
+                const env = this.ctx.createGain();
+                env.gain.setValueAtTime(0.0001, now);
+                env.gain.linearRampToValueAtTime(0.11, now + 0.015);
+                env.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+                osc.connect(env);
+                env.connect(this.masterGain);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+
+            // Tiếng Chuông Gió Furin Nhật Bản (hợp âm ngũ cung ngân dài trong trẻo)
+            playWindChime(noteCount = 3) {
+                this.unlock();
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+
+                for (let i = 0; i < noteCount; i++) {
+                    const delay = i * (0.14 + Math.random() * 0.12);
+                    const t0 = now + delay;
+                    const freq = this.pentatonic[Math.floor(Math.random() * this.pentatonic.length)];
+
+                    // Âm cơ bản + họa âm thuỷ tinh (2.76x) tạo chất chuông gió Furin thủy tinh Edo
+                    [1, 2.756].forEach((mult, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq * mult, t0);
+
+                        const env = this.ctx.createGain();
+                        const amp = idx === 0 ? 0.11 : 0.032;
+                        const decay = idx === 0 ? 1.85 : 0.75;
+                        env.gain.setValueAtTime(0.0001, t0);
+                        env.gain.linearRampToValueAtTime(amp, t0 + 0.008);
+                        env.gain.exponentialRampToValueAtTime(0.0001, t0 + decay);
+
+                        osc.connect(env);
+                        env.connect(this.masterGain);
+                        osc.start(t0);
+                        osc.stop(t0 + decay + 0.05);
+                    });
+                }
+            }
+        }
+
+        const zenAudio = new ZenSoundEngine();
+
+        /* =========================================================================
+           2. PROCEDURAL TEXTURES (ĐÁY HỒ CAUSTICS, HOA VĂN 5 GIỐNG CÁ KOI, ĐÁ RÊU)
+        ========================================================================= */
+        function createPondBedTexture() {
+            const c = document.createElement('canvas');
+            c.width = 512;
+            c.height = 512;
+            const ctx = c.getContext('2d');
+
+            const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 260);
+            grad.addColorStop(0, '#134e4a');
+            grad.addColorStop(0.55, '#0f3d3e');
+            grad.addColorStop(1, '#082529');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Vẽ sỏi cuội nhỏ dưới đáy hồ trong vắt
+            const pebbleColors = ['#1e5b56', '#28665f', '#174645', '#2f6f68', '#3c786c'];
+            for (let i = 0; i < 240; i++) {
+                const px = Math.random() * 512;
+                const py = Math.random() * 512;
+                const rx = 4 + Math.random() * 9;
+                const ry = 3 + Math.random() * 7;
+                ctx.fillStyle = pebbleColors[i % pebbleColors.length];
+                ctx.globalAlpha = 0.45;
+                ctx.beginPath();
+                ctx.ellipse(px, py, rx, ry, Math.random() * Math.PI, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            return new THREE.CanvasTexture(c);
+        }
+
+        const koiTextureCache = {};
+        function getKoiSkinTexture(breed) {
+            if (koiTextureCache[breed]) return koiTextureCache[breed];
+
+            const c = document.createElement('canvas');
+            c.width = 256;
+            c.height = 128;
+            const ctx = c.getContext('2d');
+
+            if (breed === 'kohaku') {
+                ctx.fillStyle = '#fff9f2';
+                ctx.fillRect(0, 0, 256, 128);
+                ctx.fillStyle = '#ea3815';
+                [
+                    [62, 64, 44, 38],
+                    [138, 58, 38, 34],
+                    [198, 66, 28, 26],
+                ].forEach(([x, y, rx, ry]) => {
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, rx, ry, 0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (breed === 'ogon') {
+                const g = ctx.createLinearGradient(0, 0, 256, 128);
+                g.addColorStop(0, '#fde047');
+                g.addColorStop(0.5, '#f59e0b');
+                g.addColorStop(1, '#fbbf24');
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, 256, 128);
+                // Ánh vảy kim loại
+                ctx.fillStyle = 'rgba(255,255,255,0.28)';
+                for (let x = 20; x < 236; x += 18) {
+                    ctx.beginPath();
+                    ctx.arc(x, 64, 14, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (breed === 'sanke') {
+                ctx.fillStyle = '#fffaf5';
+                ctx.fillRect(0, 0, 256, 128);
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.ellipse(75, 64, 42, 36, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(172, 60, 32, 30, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#18181b';
+                [
+                    [112, 46, 20, 16],
+                    [148, 82, 22, 17],
+                    [208, 64, 16, 15],
+                ].forEach(([x, y, rx, ry]) => {
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, rx, ry, -0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (breed === 'shusui') {
+                const g = ctx.createLinearGradient(0, 0, 0, 128);
+                g.addColorStop(0, '#fb7185');
+                g.addColorStop(0.25, '#bae6fd');
+                g.addColorStop(0.5, '#0284c7');
+                g.addColorStop(0.75, '#bae6fd');
+                g.addColorStop(1, '#fb7185');
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, 256, 128);
+                // Hàng vảy lưng xanh đậm đặc trưng của Shusui
+                ctx.fillStyle = '#0c4a6e';
+                for (let x = 30; x < 225; x += 22) {
+                    ctx.beginPath();
+                    ctx.ellipse(x, 64, 8, 12, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else {
+                // Platinum Purachina
+                const g = ctx.createLinearGradient(0, 0, 256, 128);
+                g.addColorStop(0, '#ffffff');
+                g.addColorStop(0.5, '#e2e8f0');
+                g.addColorStop(1, '#cffafe');
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, 256, 128);
+            }
+
+            const tex = new THREE.CanvasTexture(c);
+            koiTextureCache[breed] = tex;
+            return tex;
+        }
+
+        /* =========================================================================
+           3. DỰNG HỒ CÁ KOI 3D, MẶT NƯỚC GỢN SÓNG VERTEX, LÁ SEN, SUỐI TRE & HOA ĐĂNG
+        ========================================================================= */
+        const POND_RADIUS = 5.4;
+        const WATER_Y = 0.0;
+        const BED_Y = -1.05;
+
+        let scene, camera, renderer;
+        let ambientLight, sunLight, moonPointLight;
+        let waterMesh, waterGeo, waterBasePos;
+        let bambooStreamParticles = [];
+
+        // Trạng thái điều khiển & game
+        const gameState = {
+            tool: 'feed', // 'feed' | 'ripple'
+            timeMode: 0,  // 0: Nắng sớm, 1: Hoàng hôn, 2: Đêm hoa đăng
+            isRaining: false,
+            pearls: 120,
+            level: 1,
+            exp: 25,
+            harmony: 94,
+            fullness: 82,
+        };
+
+        const camOrbit = {
+            theta: 0.35,
+            phi: 0.68,
+            radius: 9.2,
+            targetTheta: 0.35,
+            targetPhi: 0.68,
+            targetRadius: 9.2,
+            topDown: false,
+            isDragging: false,
+            lastX: 0,
+            lastY: 0,
+        };
+
+        const koiList = [];
+        const foodList = [];
+        const rippleRings = [];
+        const waveImpulses = []; // Sóng 3D truyền trên lưới mặt nước
+        const lilyPads = [];
+        const lanterns = [];
+        const fireflies = [];
+        const sparkles = [];
+
+        /* --- Lớp Cá Koi 3D phân đốt chuyển động S-wave mềm mại --- */
+        class KoiFish3D {
+            constructor(breed, startPos) {
+                this.breed = breed;
+                this.scale = 0.78 + Math.random() * 0.36;
+                this.root = new THREE.Group();
+                this.pos = startPos
+                    ? startPos.clone()
+                    : new THREE.Vector3(
+                          (Math.random() - 0.5) * 5.2,
+                          -0.32 - Math.random() * 0.28,
+                          (Math.random() - 0.5) * 5.2
+                      );
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = 0.85 + Math.random() * 0.45;
+                this.baseSpeed = this.speed;
+                this.turnVel = 0;
+                this.swimPhase = Math.random() * Math.PI * 2;
+                this.wanderTimer = 0;
+                this.desiredAngle = this.angle;
+                this.pitch = 0;
+
+                const skinTex = getKoiSkinTexture(breed);
+                const bodyMat = new THREE.MeshStandardMaterial({
+                    map: skinTex,
+                    roughness: 0.25,
+                    metalness: breed === 'ogon' || breed === 'platinum' ? 0.35 : 0.08,
+                });
+
+                const finColor =
+                    breed === 'ogon' ? 0xfde68a : breed === 'shusui' ? 0xe0f2fe : 0xfff1f2;
+                const finMat = new THREE.MeshStandardMaterial({
+                    color: finColor,
+                    transparent: true,
+                    opacity: 0.78,
+                    roughness: 0.35,
+                    side: THREE.DoubleSide,
+                });
+
+                // Khâu khớp xương sống 7 đốt từ đầu tới đuôi để uốn lượn tự nhiên
+                this.segments = [];
+                const radii = [0.20, 0.25, 0.23, 0.18, 0.13, 0.09, 0.055];
+                const lengths = [0.22, 0.24, 0.22, 0.20, 0.18, 0.16, 0.14];
+
+                let parentNode = this.root;
+                for (let i = 0; i < radii.length; i++) {
+                    const pivot = new THREE.Group();
+                    if (i > 0) {
+                        pivot.position.z = -lengths[i - 1] * 0.86;
+                    }
+                    const segGeo = new THREE.SphereGeometry(radii[i], 14, 12);
+                    segGeo.scale(0.88, 0.78, 1.38);
+                    const segMesh = new THREE.Mesh(segGeo, bodyMat);
+                    pivot.add(segMesh);
+
+                    // Thêm mắt, râu cá Koi ở đốt đầu (i === 0)
+                    if (i === 0) {
+                        const eyeGeo = new THREE.SphereGeometry(0.036, 8, 8);
+                        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+                        const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+                        const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+                        eyeL.position.set(0.14, 0.05, 0.12);
+                        eyeR.position.set(-0.14, 0.05, 0.12);
+                        pivot.add(eyeL, eyeR);
+
+                        // Đôi râu cá chép Koi nhỏ xinh ở khóe miệng
+                        const barbelGeo = new THREE.ConeGeometry(0.014, 0.11, 5);
+                        const barbelL = new THREE.Mesh(barbelGeo, finMat);
+                        const barbelR = new THREE.Mesh(barbelGeo, finMat);
+                        barbelL.position.set(0.09, -0.04, 0.24);
+                        barbelL.rotation.set(0.5, 0, -0.6);
+                        barbelR.position.set(-0.09, -0.04, 0.24);
+                        barbelR.rotation.set(0.5, 0, 0.6);
+                        pivot.add(barbelL, barbelR);
+                    }
+
+                    // Vây ngực hai bên ở đốt thứ 2 (i === 1)
+                    if (i === 1) {
+                        const pecGeo = new THREE.CircleGeometry(0.22, 10, 0, Math.PI * 0.72);
+                        this.finL = new THREE.Mesh(pecGeo, finMat);
+                        this.finR = new THREE.Mesh(pecGeo, finMat);
+                        this.finL.position.set(0.18, -0.06, 0.02);
+                        this.finL.rotation.set(Math.PI / 2, 0.15, -0.55);
+                        this.finR.position.set(-0.18, -0.06, 0.02);
+                        this.finR.rotation.set(Math.PI / 2, -0.15, Math.PI + 0.55);
+                        pivot.add(this.finL, this.finR);
+
+                        // Vây lưng mềm mại
+                        const dorsalGeo = new THREE.PlaneGeometry(0.06, 0.36);
+                        const dorsal = new THREE.Mesh(dorsalGeo, finMat);
+                        dorsal.position.set(0, 0.19, -0.08);
+                        dorsal.rotation.x = Math.PI / 2.2;
+                        dorsal.rotation.y = Math.PI / 2;
+                        pivot.add(dorsal);
+                    }
+
+                    // Vây đuôi quạt thướt tha ở đốt cuối
+                    if (i === radii.length - 1) {
+                        const tailShape = new THREE.Shape();
+                        tailShape.moveTo(0, 0);
+                        tailShape.quadraticCurveTo(0.16, 0.22, 0.08, 0.42);
+                        tailShape.quadraticCurveTo(0, 0.30, -0.08, 0.42);
+                        tailShape.quadraticCurveTo(-0.16, 0.22, 0, 0);
+                        const tailGeo = new THREE.ShapeGeometry(tailShape);
+                        this.tailFin = new THREE.Mesh(tailGeo, finMat);
+                        this.tailFin.rotation.x = -Math.PI / 2;
+                        this.tailFin.rotation.z = Math.PI;
+                        this.tailFin.scale.set(1.25, 1.15, 1);
+                        this.tailFin.position.set(0, 0.01, -0.06);
+                        pivot.add(this.tailFin);
+                    }
+
+                    parentNode.add(pivot);
+                    this.segments.push(pivot);
+                    parentNode = pivot;
+                }
+
+                this.root.scale.setScalar(this.scale);
+                this.root.position.copy(this.pos);
+                scene.add(this.root);
+
+                // Bóng mềm dưới đáy hồ tạo chiều sâu nước trong vắt
+                const shadowGeo = new THREE.CircleGeometry(0.32 * this.scale, 12);
+                shadowGeo.scale(0.65, 1.8, 1);
+                shadowGeo.rotateX(-Math.PI / 2);
+                const shadowMat = new THREE.MeshBasicMaterial({
+                    color: 0x031518,
+                    transparent: true,
+                    opacity: 0.32,
+                    depthWrite: false,
+                });
+                this.shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+                this.shadowMesh.position.set(this.pos.x, BED_Y + 0.03, this.pos.z);
+                scene.add(this.shadowMesh);
+            }
+
+            update(dt, elapsed) {
+                // 1. Tìm hạt thức ăn gần nhất nếu có
+                let targetPellet = null;
+                let bestDist = 999;
+                for (let i = 0; i < foodList.length; i++) {
+                    const f = foodList[i];
+                    const dx = f.mesh.position.x - this.pos.x;
+                    const dz = f.mesh.position.z - this.pos.z;
+                    const d = Math.hypot(dx, dz);
+                    if (d < bestDist) {
+                        bestDist = d;
+                        targetPellet = f;
+                    }
+                }
+
+                if (targetPellet && bestDist < 5.5) {
+                    this.desiredAngle = Math.atan2(
+                        targetPellet.mesh.position.x - this.pos.x,
+                        targetPellet.mesh.position.z - this.pos.z
+                    );
+                    const targetSpd = this.baseSpeed * 2.15;
+                    this.speed += (targetSpd - this.speed) * Math.min(1, dt * 4);
+                    // Trồi nhẹ lên gần mặt nước để đớp mồi
+                    const targetY = -0.14;
+                    this.pos.y += (targetY - this.pos.y) * Math.min(1, dt * 3.2);
+                    this.pitch += (-0.18 - this.pitch) * Math.min(1, dt * 4);
+
+                    if (bestDist < 0.34) {
+                        consumeFoodPellet(targetPellet, this.pos);
+                    }
+                } else {
+                    // Bơi dạo thư thái tự nhiên trong hồ
+                    this.wanderTimer -= dt;
+                    if (this.wanderTimer <= 0) {
+                        this.wanderTimer = 1.4 + Math.random() * 2.4;
+                        this.desiredAngle += (Math.random() - 0.5) * 1.6;
+                    }
+                    this.speed += (this.baseSpeed - this.speed) * Math.min(1, dt * 2.2);
+                    const cruiseY = -0.34 - (this.scale - 0.78) * 0.35;
+                    this.pos.y += (cruiseY - this.pos.y) * Math.min(1, dt * 1.8);
+                    this.pitch += (0 - this.pitch) * Math.min(1, dt * 3);
+                }
+
+                // Giữ cá luôn bơi gọn bên trong lòng hồ đá tròn
+                const distFromCenter = Math.hypot(this.pos.x, this.pos.z);
+                if (distFromCenter > POND_RADIUS - 0.95) {
+                    const angleToCenter = Math.atan2(-this.pos.x, -this.pos.z);
+                    let diff = angleToCenter - this.angle;
+                    diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+                    this.desiredAngle = this.angle + diff * 0.85;
+                }
+
+                // Né nhẹ các lá sen lớn để nhìn tự nhiên hơn
+                for (let i = 0; i < lilyPads.length; i++) {
+                    const pad = lilyPads[i];
+                    const dx = this.pos.x - pad.group.position.x;
+                    const dz = this.pos.z - pad.group.position.z;
+                    const d = Math.hypot(dx, dz);
+                    if (d < pad.radius + 0.25 && this.pos.y > -0.22) {
+                        pad.bobVel -= 0.35 * dt;
+                    }
+                }
+
+                // Xoay góc bơi mượt mà
+                let angleDiff = this.desiredAngle - this.angle;
+                angleDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+                const maxTurn = (targetPellet ? 3.4 : 1.85) * dt;
+                const turnStep = Math.max(-maxTurn, Math.min(maxTurn, angleDiff * 2.5 * dt));
+                this.angle += turnStep;
+                const turnBend = Math.max(-0.35, Math.min(0.35, angleDiff * 0.22));
+
+                // Di chuyển tiến về phía trước
+                this.pos.x += Math.sin(this.angle) * this.speed * dt;
+                this.pos.z += Math.cos(this.angle) * this.speed * dt;
+
+                this.root.position.copy(this.pos);
+                this.root.rotation.set(this.pitch, this.angle, 0);
+
+                // Sóng uốn lượn xương sống S-curve theo tốc độ bơi
+                this.swimPhase += dt * (4.2 + this.speed * 4.0);
+                for (let i = 0; i < this.segments.length; i++) {
+                    const seg = this.segments[i];
+                    if (i === 0) {
+                        seg.rotation.y = Math.sin(this.swimPhase) * 0.06 + turnBend * 0.3;
+                    } else {
+                        const amp = 0.065 + i * 0.042;
+                        seg.rotation.y =
+                            Math.sin(this.swimPhase - i * 0.72) * amp - turnBend * 0.38;
+                    }
+                }
+
+                // Vỗ nhẹ đôi vây ngực
+                if (this.finL && this.finR) {
+                    const flap = Math.sin(elapsed * 4.5 + this.swimPhase * 0.4) * 0.18;
+                    this.finL.rotation.y = 0.15 + flap;
+                    this.finR.rotation.y = -0.15 - flap;
+                }
+
+                // Cập nhật bóng dưới đáy hồ
+                this.shadowMesh.position.set(this.pos.x + 0.15, BED_Y + 0.03, this.pos.z + 0.15);
+                this.shadowMesh.rotation.z = -this.angle;
+            }
+        }
+
+        /* --- Khởi tạo toàn bộ khung cảnh Hồ Cá Koi 3D --- */
+        function initPondScene() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b292e);
+            scene.fog = new THREE.FogExp2(0x0b292e, 0.032);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 80);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            container.appendChild(renderer.domElement);
+
+            // Hệ thống ánh sáng tự nhiên
+            ambientLight = new THREE.AmbientLight(0xdbeafe, 0.82);
+            scene.add(ambientLight);
+
+            sunLight = new THREE.DirectionalLight(0xfffbeb, 1.15);
+            sunLight.position.set(6, 11, 5);
+            scene.add(sunLight);
+
+            moonPointLight = new THREE.PointLight(0xfbbf24, 0.0, 14);
+            moonPointLight.position.set(0, 2.5, 0);
+            scene.add(moonPointLight);
+
+            // 1. Đáy hồ sỏi cuội xanh ngọc lục bảo
+            const bedGeo = new THREE.CylinderGeometry(POND_RADIUS + 0.4, POND_RADIUS, 0.3, 48);
+            const bedMat = new THREE.MeshStandardMaterial({
+                map: createPondBedTexture(),
+                roughness: 0.9,
+            });
+            const bedMesh = new THREE.Mesh(bedGeo, bedMat);
+            bedMesh.position.y = BED_Y - 0.15;
+            scene.add(bedMesh);
+
+            // Đá cuội trang trí dưới lòng hồ
+            const subStoneGeo = new THREE.DodecahedronGeometry(0.32, 1);
+            const subStoneMat = new THREE.MeshStandardMaterial({ color: 0x335c57, roughness: 0.85 });
+            for (let i = 0; i < 16; i++) {
+                const st = new THREE.Mesh(subStoneGeo, subStoneMat);
+                const r = 1.2 + Math.random() * (POND_RADIUS - 1.9);
+                const a = (i / 16) * Math.PI * 2 + Math.random() * 0.3;
+                st.position.set(Math.cos(a) * r, BED_Y + 0.06, Math.sin(a) * r);
+                st.scale.set(0.8 + Math.random() * 0.9, 0.38, 0.7 + Math.random() * 0.8);
+                st.rotation.y = Math.random() * Math.PI;
+                scene.add(st);
+            }
+
+            // 2. Viền đá cuội & rêu phong quanh bờ hồ Nhật Bản
+            const borderGroup = new THREE.Group();
+            const rockColors = [0x64748b, 0x475569, 0x57534e, 0x4d6b53];
+            const rockCount = 38;
+            for (let i = 0; i < rockCount; i++) {
+                const ang = (i / rockCount) * Math.PI * 2;
+                const rad = POND_RADIUS + 0.12 + (Math.random() - 0.5) * 0.26;
+                const rSize = 0.52 + Math.random() * 0.36;
+                const rockGeo = new THREE.DodecahedronGeometry(rSize, 1);
+                const rockMat = new THREE.MeshStandardMaterial({
+                    color: rockColors[i % rockColors.length],
+                    roughness: 0.88,
+                });
+                const rock = new THREE.Mesh(rockGeo, rockMat);
+                rock.position.set(Math.cos(ang) * rad, -0.18 + Math.random() * 0.22, Math.sin(ang) * rad);
+                rock.scale.set(1.15, 0.72 + Math.random() * 0.3, 1.05);
+                rock.rotation.set(Math.random() * 0.4, Math.random() * Math.PI, Math.random() * 0.4);
+                borderGroup.add(rock);
+            }
+
+            // Thềm gỗ Thiền bao ngoài hồ
+            const deckGeo = new THREE.RingGeometry(POND_RADIUS + 0.35, POND_RADIUS + 8.5, 48);
+            deckGeo.rotateX(-Math.PI / 2);
+            const deckMat = new THREE.MeshStandardMaterial({ color: 0x1e292b, roughness: 0.95 });
+            const deckMesh = new THREE.Mesh(deckGeo, deckMat);
+            deckMesh.position.y = -0.32;
+            scene.add(deckMesh);
+            scene.add(borderGroup);
+
+            // 3. Ống tre dẫn nước suối Kakehi góc Bắc hồ
+            buildBambooFountain();
+
+            // 4. Mặt nước 3D trong suốt có lưới đỉnh gợn sóng thật
+            waterGeo = new THREE.CircleGeometry(POND_RADIUS + 0.25, 56);
+            waterGeo.rotateX(-Math.PI / 2);
+            // Chia lưới chi tiết hơn bằng PlaneGeometry cắt tròn hoặc dùng lưới Plane phủ khít lòng hồ
+            waterGeo = new THREE.PlaneGeometry(POND_RADIUS * 2.1, POND_RADIUS * 2.1, 52, 52);
+            waterGeo.rotateX(-Math.PI / 2);
+            waterBasePos = Float32Array.from(waterGeo.attributes.position.array);
+
+            const waterMat = new THREE.MeshPhongMaterial({
+                color: 0x14b8a6,
+                emissive: 0x042f2e,
+                specular: 0xe0f2fe,
+                shininess: 110,
+                transparent: true,
+                opacity: 0.46,
+            });
+            waterMesh = new THREE.Mesh(waterGeo, waterMat);
+            waterMesh.position.y = WATER_Y;
+            scene.add(waterMesh);
+
+            // 5. Lá Sen & Hoa Sen Hồng/Trắng nổi tự nhiên
+            const padConfigs = [
+                { x: -2.4, z: -1.8, r: 0.68, flower: 'pink' },
+                { x: -1.7, z: -2.5, r: 0.48, flower: null },
+                { x: 2.6, z: 1.7, r: 0.72, flower: 'white' },
+                { x: 2.0, z: 2.5, r: 0.50, flower: null },
+                { x: -2.6, z: 2.1, r: 0.58, flower: 'pink' },
+                { x: 2.5, z: -2.0, r: 0.54, flower: null },
+            ];
+            padConfigs.forEach(cfg => createLilyPad(cfg.x, cfg.z, cfg.r, cfg.flower));
+
+            // 6. Thả sẵn 9 chú cá Koi đủ 5 sắc màu Nhật Bản
+            const initialBreeds = [
+                'kohaku', 'ogon', 'sanke', 'shusui', 'platinum',
+                'kohaku', 'ogon', 'sanke', 'kohaku'
+            ];
+            initialBreeds.forEach(b => koiList.push(new KoiFish3D(b)));
+
+            // Thả sẵn 2 đèn hoa đăng ấm áp trên mặt hồ
+            spawnFloatingLantern(-0.8, -2.6, false);
+            spawnFloatingLantern(2.9, -0.5, false);
+
+            // Đom đóm lung linh cho chế độ Hoàng hôn & Ban đêm
+            initFireflies();
+
+            updateHUD();
+        }
+
+        function buildBambooFountain() {
+            const group = new THREE.Group();
+            const bambooMat = new THREE.MeshStandardMaterial({ color: 0x65a30d, roughness: 0.55 });
+            const darkBamboo = new THREE.MeshStandardMaterial({ color: 0x3f6212, roughness: 0.65 });
+
+            // Hai trụ tre đỡ
+            const postGeo = new THREE.CylinderGeometry(0.09, 0.1, 1.35, 10);
+            const postL = new THREE.Mesh(postGeo, darkBamboo);
+            const postR = new THREE.Mesh(postGeo, darkBamboo);
+            postL.position.set(-0.32, 0.45, -POND_RADIUS - 0.1);
+            postR.position.set(0.32, 0.45, -POND_RADIUS - 0.1);
+            group.add(postL, postR);
+
+            // Ống tre nghiêng rót nước xuống hồ
+            const spoutGeo = new THREE.CylinderGeometry(0.11, 0.11, 1.55, 12);
+            const spout = new THREE.Mesh(spoutGeo, bambooMat);
+            spout.position.set(0, 0.72, -POND_RADIUS + 0.35);
+            spout.rotation.x = Math.PI / 2.45;
+            group.add(spout);
+
+            scene.add(group);
+
+            // Hạt dòng nước suối chảy liên tục từ vòi tre xuống mặt hồ
+            const dropGeo = new THREE.SphereGeometry(0.055, 6, 6);
+            const dropMat = new THREE.MeshBasicMaterial({
+                color: 0xe0f2fe,
+                transparent: true,
+                opacity: 0.78,
+            });
+            for (let i = 0; i < 14; i++) {
+                const m = new THREE.Mesh(dropGeo, dropMat);
+                scene.add(m);
+                bambooStreamParticles.push({
+                    mesh: m,
+                    t: i / 14,
+                });
+            }
+        }
+
+        function createLilyPad(x, z, radius, flowerColor) {
+            const group = new THREE.Group();
+            // Lá sen khuyết chữ V
+            const padGeo = new THREE.CircleGeometry(radius, 24, 0.18, Math.PI * 2 - 0.36);
+            padGeo.rotateX(-Math.PI / 2);
+            const padMat = new THREE.MeshStandardMaterial({
+                color: 0x15803d,
+                roughness: 0.65,
+                side: THREE.DoubleSide,
+            });
+            const padMesh = new THREE.Mesh(padGeo, padMat);
+            padMesh.rotation.y = Math.random() * Math.PI * 2;
+            group.add(padMesh);
+
+            if (flowerColor) {
+                const flowerGroup = new THREE.Group();
+                const petalColor = flowerColor === 'pink' ? 0xf472b6 : 0xfff1f2;
+                const petalMat = new THREE.MeshStandardMaterial({
+                    color: petalColor,
+                    roughness: 0.4,
+                });
+                const petalGeo = new THREE.ConeGeometry(0.09, 0.26, 6);
+                for (let l = 0; l < 2; l++) {
+                    const count = l === 0 ? 8 : 6;
+                    for (let i = 0; i < count; i++) {
+                        const p = new THREE.Mesh(petalGeo, petalMat);
+                        const a = (i / count) * Math.PI * 2 + l * 0.4;
+                        const tilt = l === 0 ? 0.85 : 0.42;
+                        p.position.set(Math.cos(a) * 0.08, 0.08 + l * 0.03, Math.sin(a) * 0.08);
+                        p.rotation.y = -a;
+                        p.rotation.z = -tilt;
+                        flowerGroup.add(p);
+                    }
+                }
+                const centerGeo = new THREE.SphereGeometry(0.065, 8, 8);
+                const centerMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+                const center = new THREE.Mesh(centerGeo, centerMat);
+                center.position.y = 0.09;
+                flowerGroup.add(center);
+                group.add(flowerGroup);
+            }
+
+            group.position.set(x, WATER_Y + 0.025, z);
+            scene.add(group);
+            lilyPads.push({
+                group,
+                radius,
+                baseY: WATER_Y + 0.025,
+                bobPhase: Math.random() * Math.PI * 2,
+                bobVel: 0,
+                bobOffset: 0,
+            });
+        }
+
+        function spawnFloatingLantern(x, z, notify = true) {
+            if (lanterns.length >= 7) {
+                const oldest = lanterns.shift();
+                scene.remove(oldest.group);
+            }
+
+            const group = new THREE.Group();
+            // Đế gỗ nổi
+            const baseGeo = new THREE.BoxGeometry(0.36, 0.05, 0.36);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            group.add(base);
+
+            // Lồng giấy Washi phát sáng ấm áp
+            const shadeGeo = new THREE.CylinderGeometry(0.13, 0.15, 0.32, 8);
+            const shadeMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+            const shade = new THREE.Mesh(shadeGeo, shadeMat);
+            shade.position.y = 0.18;
+            group.add(shade);
+
+            // Ánh sáng tỏa ra trên mặt nước
+            const glow = new THREE.PointLight(0xfb923c, 0.85, 3.8);
+            glow.position.y = 0.28;
+            group.add(glow);
+
+            group.position.set(x, WATER_Y + 0.03, z);
+            scene.add(group);
+
+            lanterns.push({
+                group,
+                glow,
+                vx: (Math.random() - 0.5) * 0.14,
+                vz: (Math.random() - 0.5) * 0.14,
+                phase: Math.random() * Math.PI * 2,
+            });
+
+            spawnWaterRipple(x, z, 0.9);
+            if (notify) {
+                zenAudio.playWindChime(2);
+                addZenExp(6);
+                showToast('🏮 Đã thả đèn Hoa Đăng cầu bình an trên mặt hồ');
+            }
+        }
+
+        function initFireflies() {
+            const geo = new THREE.SphereGeometry(0.035, 6, 6);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+            for (let i = 0; i < 24; i++) {
+                const m = new THREE.Mesh(geo, mat);
+                m.visible = false;
+                scene.add(m);
+                fireflies.push({
+                    mesh: m,
+                    angle: Math.random() * Math.PI * 2,
+                    radius: 1.0 + Math.random() * 4.2,
+                    height: 0.35 + Math.random() * 1.6,
+                    speed: 0.25 + Math.random() * 0.35,
+                    phase: Math.random() * Math.PI * 2,
+                });
+            }
+        }
+
+        /* =========================================================================
+           4. HIỆU ỨNG GỢN SÓNG NƯỚC 3D, RẢI THỨC ĂN & VÒNG SÓNG LAN TỎA
+        ========================================================================= */
+        function spawnWaterRipple(x, z, strength = 1.0) {
+            if (Math.hypot(x, z) > POND_RADIUS) return;
+
+            // Thêm xung sóng cơ học làm biến dạng mặt nước 3D
+            if (waveImpulses.length > 14) waveImpulses.shift();
+            waveImpulses.push({
+                x,
+                z,
+                age: 0,
+                amp: 0.085 * strength,
+            });
+
+            // Thêm vòng gợn sóng trắng mảnh lan rộng trên mặt hồ
+            const ringGeo = new THREE.RingGeometry(0.08, 0.13, 32);
+            ringGeo.rotateX(-Math.PI / 2);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: 0xe0f2fe,
+                transparent: true,
+                opacity: 0.58 * Math.min(1.2, strength),
+                side: THREE.DoubleSide,
+                depthWrite: false,
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.set(x, WATER_Y + 0.015, z);
+            scene.add(ring);
+            rippleRings.push({
+                mesh: ring,
+                mat: ringMat,
+                age: 0,
+                maxAge: 1.65,
+                speed: 1.35 + strength * 0.35,
+            });
+        }
+
+        function dropFoodPellet(x, z) {
+            if (Math.hypot(x, z) > POND_RADIUS - 0.55) return;
+            if (foodList.length >= 28) return;
+
+            const pelletGeo = new THREE.SphereGeometry(0.075, 8, 8);
+            const pelletMat = new THREE.MeshStandardMaterial({
+                color: 0xf59e0b,
+                emissive: 0x78350f,
+                roughness: 0.4,
+            });
+            const mesh = new THREE.Mesh(pelletGeo, pelletMat);
+            mesh.position.set(x, WATER_Y + 0.02, z);
+            scene.add(mesh);
+
+            foodList.push({
+                mesh,
+                phase: Math.random() * Math.PI * 2,
+                age: 0,
+            });
+
+            spawnWaterRipple(x, z, 0.75);
+            zenAudio.playWaterDrop(0.85);
+        }
+
+        function consumeFoodPellet(pellet, fishPos) {
+            const idx = foodList.indexOf(pellet);
+            if (idx === -1) return;
+            scene.remove(pellet.mesh);
+            foodList.splice(idx, 1);
+
+            spawnWaterRipple(pellet.mesh.position.x, pellet.mesh.position.z, 1.05);
+            zenAudio.playKoiGulp();
+
+            // Hạt lấp lánh vàng ngọc bay lên khi cá ăn
+            const spGeo = new THREE.SphereGeometry(0.045, 6, 6);
+            const spMat = new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 1 });
+            for (let i = 0; i < 4; i++) {
+                const sp = new THREE.Mesh(spGeo, spMat.clone());
+                sp.position.set(fishPos.x, WATER_Y + 0.08, fishPos.z);
+                scene.add(sp);
+                sparkles.push({
+                    mesh: sp,
+                    vx: (Math.random() - 0.5) * 0.9,
+                    vy: 0.9 + Math.random() * 0.7,
+                    vz: (Math.random() - 0.5) * 0.9,
+                    age: 0,
+                });
+            }
+
+            gameState.pearls += 2;
+            gameState.fullness = Math.min(100, gameState.fullness + 2.5);
+            gameState.harmony = Math.min(100, gameState.harmony + 0.8);
+            addZenExp(4);
+        }
+
+        function addZenExp(amount) {
+            gameState.exp += amount;
+            if (gameState.exp >= 100) {
+                gameState.exp -= 100;
+                gameState.level += 1;
+                gameState.pearls += 25;
+                zenAudio.playWindChime(4);
+                showToast(`🪷 Hồ Thiền đạt Cấp ${gameState.level}! +25 Ngọc Sen`);
+            }
+        }
+
+        /* =========================================================================
+           5. CẬP NHẬT MẶT NƯỚC 3D, SUỐI TRE, MƯA XUÂN & CAMERA
+        ========================================================================= */
+        let splashAccum = 0;
+        let rainAccum = 0;
+
+        function updateEnvironment(dt, elapsed) {
+            // 1. Biến dạng đỉnh lưới mặt nước 3D theo sóng chạm + gợn tự nhiên
+            const posAttr = waterGeo.attributes.position;
+            const arr = posAttr.array;
+
+            for (let i = waveImpulses.length - 1; i >= 0; i--) {
+                waveImpulses[i].age += dt;
+                if (waveImpulses[i].age > 2.4) {
+                    waveImpulses.splice(i, 1);
+                }
+            }
+
+            for (let i = 0; i < arr.length; i += 3) {
+                const vx = waterBasePos[i];
+                const vz = waterBasePos[i + 2];
+                // Gợn nước lăn tăn nhẹ nhàng nền
+                let h =
+                    Math.sin(vx * 1.4 + elapsed * 1.9) * 0.018 +
+                    Math.cos(vz * 1.6 - elapsed * 1.5) * 0.016;
+
+                for (let w = 0; w < waveImpulses.length; w++) {
+                    const imp = waveImpulses[w];
+                    const d = Math.hypot(vx - imp.x, vz - imp.z);
+                    const waveRadius = imp.age * 2.6;
+                    const band = Math.abs(d - waveRadius);
+                    if (band < 0.75) {
+                        const decay = Math.max(0, 1 - imp.age / 2.4);
+                        h +=
+                            Math.cos(((d - waveRadius) / 0.75) * Math.PI * 0.5) *
+                            Math.sin((d - waveRadius) * 9.0) *
+                            imp.amp *
+                            decay;
+                    }
+                }
+                arr[i + 1] = h;
+            }
+            posAttr.needsUpdate = true;
+            waterGeo.computeVertexNormals();
+
+            // 2. Vòng gợn sóng lan tỏa
+            for (let i = rippleRings.length - 1; i >= 0; i--) {
+                const r = rippleRings[i];
+                r.age += dt;
+                if (r.age >= r.maxAge) {
+                    scene.remove(r.mesh);
+                    r.mesh.geometry.dispose();
+                    r.mat.dispose();
+                    rippleRings.splice(i, 1);
+                } else {
+                    const progress = r.age / r.maxAge;
+                    const s = 1 + r.age * r.speed * 5.2;
+                    r.mesh.scale.set(s, 1, s);
+                    r.mat.opacity = (1 - progress) * 0.5;
+                }
+            }
+
+            // 3. Dòng nước từ ống tre Kakehi đổ xuống mặt hồ
+            const streamTargetZ = -POND_RADIUS + 1.05;
+            bambooStreamParticles.forEach(p => {
+                p.t += dt * 1.55;
+                if (p.t > 1) p.t -= 1;
+                const y = 0.56 * (1 - p.t * p.t);
+                const z = (-POND_RADIUS + 0.75) + p.t * 0.32;
+                p.mesh.position.set((Math.random() - 0.5) * 0.03, y, z);
+            });
+            splashAccum += dt;
+            if (splashAccum > 0.55) {
+                splashAccum = 0;
+                spawnWaterRipple(0, streamTargetZ, 0.42);
+            }
+
+            // 4. Mưa xuân thiền định tạo gợn sóng lất phất khắp mặt hồ
+            if (gameState.isRaining) {
+                rainAccum += dt;
+                if (rainAccum > 0.09) {
+                    rainAccum = 0;
+                    const a = Math.random() * Math.PI * 2;
+                    const rad = Math.sqrt(Math.random()) * (POND_RADIUS - 0.4);
+                    spawnWaterRipple(Math.cos(a) * rad, Math.sin(a) * rad, 0.35);
+                }
+            }
+
+            // 5. Lá sen đung đưa nhẹ theo sóng nước
+            lilyPads.forEach(pad => {
+                pad.bobVel += -pad.bobOffset * 10 * dt;
+                pad.bobVel *= 0.92;
+                pad.bobOffset += pad.bobVel * dt;
+                pad.group.position.y =
+                    pad.baseY + Math.sin(elapsed * 1.6 + pad.bobPhase) * 0.012 + pad.bobOffset;
+                pad.group.rotation.z = Math.sin(elapsed * 1.1 + pad.bobPhase) * 0.025;
+            });
+
+            // 6. Hoa đăng trôi dạt êm đềm trên mặt hồ
+            lanterns.forEach(lan => {
+                lan.group.position.x += lan.vx * dt;
+                lan.group.position.z += lan.vz * dt;
+                lan.group.position.y = WATER_Y + 0.03 + Math.sin(elapsed * 2 + lan.phase) * 0.015;
+                lan.group.rotation.y += 0.18 * dt;
+                const d = Math.hypot(lan.group.position.x, lan.group.position.z);
+                if (d > POND_RADIUS - 1.1) {
+                    lan.vx = -lan.group.position.x * 0.06;
+                    lan.vz = -lan.group.position.z * 0.06;
+                }
+            });
+
+            // 7. Hạt thức ăn nổi nhấp nhô trên mặt nước
+            foodList.forEach(f => {
+                f.age += dt;
+                f.mesh.position.y = WATER_Y + 0.015 + Math.sin(elapsed * 4 + f.phase) * 0.018;
+            });
+
+            // 8. Hạt lấp lánh & Đom đóm ban đêm
+            for (let i = sparkles.length - 1; i >= 0; i--) {
+                const sp = sparkles[i];
+                sp.age += dt;
+                if (sp.age > 0.75) {
+                    scene.remove(sp.mesh);
+                    sparkles.splice(i, 1);
+                } else {
+                    sp.mesh.position.x += sp.vx * dt;
+                    sp.mesh.position.y += sp.vy * dt;
+                    sp.mesh.position.z += sp.vz * dt;
+                    sp.mesh.material.opacity = 1 - sp.age / 0.75;
+                }
+            }
+
+            const showFireflies = gameState.timeMode >= 1;
+            fireflies.forEach(ff => {
+                ff.mesh.visible = showFireflies;
+                if (showFireflies) {
+                    ff.angle += ff.speed * dt * 0.35;
+                    ff.mesh.position.set(
+                        Math.cos(ff.angle) * ff.radius,
+                        ff.height + Math.sin(elapsed * 2 + ff.phase) * 0.22,
+                        Math.sin(ff.angle) * ff.radius
+                    );
+                }
+            });
+
+            // Giảm nhẹ độ no của đàn cá theo thời gian để người chơi rải mồi chăm sóc
+            gameState.fullness = Math.max(25, gameState.fullness - dt * 0.35);
+
+            // 9. Camera Orbit mượt mà
+            camOrbit.theta += (camOrbit.targetTheta - camOrbit.theta) * Math.min(1, dt * 6);
+            camOrbit.phi += (camOrbit.targetPhi - camOrbit.phi) * Math.min(1, dt * 6);
+            camOrbit.radius += (camOrbit.targetRadius - camOrbit.radius) * Math.min(1, dt * 6);
+
+            const sinPhi = Math.sin(camOrbit.phi);
+            camera.position.set(
+                camOrbit.radius * sinPhi * Math.sin(camOrbit.theta),
+                camOrbit.radius * Math.cos(camOrbit.phi),
+                camOrbit.radius * sinPhi * Math.cos(camOrbit.theta)
+            );
+            camera.lookAt(0, -0.15, 0);
+        }
+
+        /* =========================================================================
+           6. TƯƠNG TÁC CHUỘT / CẢM ỨNG & NÚT ĐIỀU KHIỂN GIAO DIỆN
+        ========================================================================= */
+        const raycaster = new THREE.Raycaster();
+        const pointerNDC = new THREE.Vector2();
+        const waterPlaneMath = new THREE.Plane(new THREE.Vector3(0, 1, 0), -WATER_Y);
+        const hitPoint = new THREE.Vector3();
+        let isPointerDown = false;
+        let lastRippleMove = 0;
+
+        function getWaterIntersection(clientX, clientY) {
+            pointerNDC.x = (clientX / window.innerWidth) * 2 - 1;
+            pointerNDC.y = -(clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(pointerNDC, camera);
+            return raycaster.ray.intersectPlane(waterPlaneMath, hitPoint);
+        }
+
+        function bindEvents() {
+            const canvasEl = renderer.domElement;
+
+            canvasEl.addEventListener('contextmenu', e => e.preventDefault());
+
+            canvasEl.addEventListener('pointerdown', e => {
+                zenAudio.unlock();
+                const hit = getWaterIntersection(e.clientX, e.clientY);
+                const outsidePond = !hit || Math.hypot(hit.x, hit.z) > POND_RADIUS - 0.25;
+
+                // Nút chuột phải hoặc chạm ngoài rìa đá -> Xoay góc nhìn 3D
+                if (e.button === 2 || outsidePond) {
+                    camOrbit.isDragging = true;
+                    camOrbit.lastX = e.clientX;
+                    camOrbit.lastY = e.clientY;
+                    return;
+                }
+
+                isPointerDown = true;
+                if (gameState.tool === 'feed') {
+                    dropFoodPellet(hit.x, hit.z);
+                } else {
+                    spawnWaterRipple(hit.x, hit.z, 1.15);
+                    zenAudio.playWaterDrop(1.0);
+                }
+            });
+
+            window.addEventListener('pointermove', e => {
+                if (camOrbit.isDragging) {
+                    const dx = e.clientX - camOrbit.lastX;
+                    const dy = e.clientY - camOrbit.lastY;
+                    camOrbit.lastX = e.clientX;
+                    camOrbit.lastY = e.clientY;
+                    camOrbit.targetTheta -= dx * 0.006;
+                    camOrbit.targetPhi = Math.max(0.18, Math.min(1.18, camOrbit.targetPhi - dy * 0.005));
+                    return;
+                }
+
+                if (!isPointerDown) return;
+                const now = performance.now();
+                if (now - lastRippleMove < 95) return;
+                lastRippleMove = now;
+
+                const hit = getWaterIntersection(e.clientX, e.clientY);
+                if (hit && Math.hypot(hit.x, hit.z) <= POND_RADIUS - 0.35) {
+                    if (gameState.tool === 'feed') {
+                        dropFoodPellet(hit.x + (Math.random() - 0.5) * 0.25, hit.z + (Math.random() - 0.5) * 0.25);
+                    } else {
+                        spawnWaterRipple(hit.x, hit.z, 0.75);
+                        zenAudio.playWaterDrop(0.65);
+                    }
+                }
+            });
+
+            window.addEventListener('pointerup', () => {
+                isPointerDown = false;
+                camOrbit.isDragging = false;
+            });
+
+            canvasEl.addEventListener(
+                'wheel',
+                e => {
+                    e.preventDefault();
+                    camOrbit.targetRadius = Math.max(5.5, Math.min(13.5, camOrbit.targetRadius + e.deltaY * 0.005));
+                },
+                { passive: false }
+            );
+
+            // Chuyển công cụ Rải Mồi / Chạm Nước
+            const btnFeed = document.getElementById('tool-feed');
+            const btnRipple = document.getElementById('tool-ripple');
+            btnFeed.addEventListener('click', () => {
+                zenAudio.unlock();
+                gameState.tool = 'feed';
+                btnFeed.classList.add('active-tool');
+                btnRipple.classList.remove('active-tool');
+                showToast('🌾 Chế độ Rải Mồi: Chạm mặt hồ để thả cám gọi đàn cá Koi');
+            });
+
+            btnRipple.addEventListener('click', () => {
+                zenAudio.unlock();
+                gameState.tool = 'ripple';
+                btnRipple.classList.add('active-tool');
+                btnFeed.classList.remove('active-tool');
+                showToast('💧 Chế độ Chạm Nước: Lướt tay trên mặt hồ tạo sóng 3D thư giãn');
+            });
+
+            // Nút Tung Cám (Rải nhanh 7 hạt thức ăn ra giữa hồ)
+            document.getElementById('act-scatter').addEventListener('click', () => {
+                zenAudio.unlock();
+                for (let i = 0; i < 7; i++) {
+                    setTimeout(() => {
+                        const a = Math.random() * Math.PI * 2;
+                        const r = 0.4 + Math.random() * 2.4;
+                        dropFoodPellet(Math.cos(a) * r, Math.sin(a) * r);
+                    }, i * 55);
+                }
+                showToast('✨ Đã tung một nắm thức ăn gọi cả đàn cá Koi tụ hội!');
+            });
+
+            // Nút Chuông Gió Furin
+            document.getElementById('act-chime').addEventListener('click', () => {
+                zenAudio.playWindChime(4);
+                lilyPads.forEach(p => {
+                    p.bobVel += (Math.random() - 0.5) * 0.25;
+                });
+                gameState.harmony = Math.min(100, gameState.harmony + 3);
+                addZenExp(5);
+                showToast('🎐 Tiếng chuông gió ngũ cung ngân vang thanh tịnh...');
+            });
+
+            // Nút Thả Đèn Hoa Đăng
+            document.getElementById('act-lantern').addEventListener('click', () => {
+                zenAudio.unlock();
+                const a = Math.random() * Math.PI * 2;
+                const r = 0.8 + Math.random() * 2.6;
+                spawnFloatingLantern(Math.cos(a) * r, Math.sin(a) * r, true);
+            });
+
+            // Nút Mưa Thiền
+            const btnRain = document.getElementById('act-rain');
+            btnRain.addEventListener('click', () => {
+                gameState.isRaining = !gameState.isRaining;
+                zenAudio.setRainSound(gameState.isRaining);
+                btnRain.classList.toggle('active-tool', gameState.isRaining);
+                showToast(
+                    gameState.isRaining
+                        ? '🌧️ Cơn mưa xuân lất phất gõ nhịp trên mặt hồ...'
+                        : '🌤️ Trời đã tạnh mưa, mặt hồ phẳng lặng như gương'
+                );
+                updateHUD();
+            });
+
+            // Khay Thêm Cá Koi
+            const drawer = document.getElementById('koi-drawer');
+            document.getElementById('act-add-koi').addEventListener('click', () => {
+                zenAudio.unlock();
+                drawer.classList.toggle('hidden');
+            });
+            document.getElementById('btn-close-drawer').addEventListener('click', () => {
+                drawer.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.breed-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    zenAudio.unlock();
+                    if (koiList.length >= 16) {
+                        showToast('🎏 Hồ đã đầy 16 chú cá Koi khỏe mạnh rồi!');
+                        return;
+                    }
+                    const breed = btn.getAttribute('data-breed');
+                    const spawnPos = new THREE.Vector3(
+                        (Math.random() - 0.5) * 2.5,
+                        -0.3,
+                        (Math.random() - 0.5) * 2.5
+                    );
+                    koiList.push(new KoiFish3D(breed, spawnPos));
+                    spawnWaterRipple(spawnPos.x, spawnPos.z, 1.3);
+                    zenAudio.playWaterDrop(1.1);
+                    zenAudio.playWindChime(2);
+                    updateHUD();
+                    showToast(`🐟 Đã thả thêm 1 chú cá Koi (${koiList.length}/16) vào hồ!`);
+                });
+            });
+
+            // Đổi Thời Gian: Nắng Sớm -> Hoàng Hôn -> Đêm Hoa Đăng
+            const btnAmbience = document.getElementById('btn-ambience');
+            btnAmbience.addEventListener('click', () => {
+                zenAudio.unlock();
+                gameState.timeMode = (gameState.timeMode + 1) % 3;
+                if (gameState.timeMode === 0) {
+                    btnAmbience.textContent = '☀️';
+                    scene.background.setHex(0x0b292e);
+                    scene.fog.color.setHex(0x0b292e);
+                    ambientLight.color.setHex(0xdbeafe);
+                    ambientLight.intensity = 0.82;
+                    sunLight.color.setHex(0xfffbeb);
+                    sunLight.intensity = 1.15;
+                    moonPointLight.intensity = 0;
+                    waterMesh.material.color.setHex(0x14b8a6);
+                    showToast('☀️ Bình minh thanh khiết bên hồ cá Koi');
+                } else if (gameState.timeMode === 1) {
+                    btnAmbience.textContent = '🌅';
+                    scene.background.setHex(0x231829);
+                    scene.fog.color.setHex(0x231829);
+                    ambientLight.color.setHex(0xfed7aa);
+                    ambientLight.intensity = 0.68;
+                    sunLight.color.setHex(0xfb923c);
+                    sunLight.intensity = 1.05;
+                    moonPointLight.intensity = 0.35;
+                    waterMesh.material.color.setHex(0x0d9488);
+                    showToast('🌅 Nắng chiều hoàng hôn nhuộm vàng mặt nước');
+                } else {
+                    btnAmbience.textContent = '🌙';
+                    scene.background.setHex(0x06101c);
+                    scene.fog.color.setHex(0x06101c);
+                    ambientLight.color.setHex(0x93c5fd);
+                    ambientLight.intensity = 0.42;
+                    sunLight.color.setHex(0x60a5fa);
+                    sunLight.intensity = 0.48;
+                    moonPointLight.intensity = 0.85;
+                    waterMesh.material.color.setHex(0x0f766e);
+                    showToast('🌙 Đêm trăng tĩnh mịch cùng đom đóm & đèn Hoa Đăng');
+                }
+            });
+
+            // Nút Bật/Tắt Âm Thanh
+            const btnSound = document.getElementById('btn-sound');
+            btnSound.addEventListener('click', () => {
+                const isOn = zenAudio.toggle();
+                btnSound.textContent = isOn ? '🔊' : '🔇';
+                showToast(isOn ? '🔊 Đã bật tiếng nước chảy & chuông gió' : '🔇 Đã tắt âm thanh');
+            });
+
+            // Nút Góc Nhìn 3D / Nhìn thẳng từ đỉnh hồ
+            document.getElementById('btn-cam-view').addEventListener('click', () => {
+                camOrbit.topDown = !camOrbit.topDown;
+                if (camOrbit.topDown) {
+                    camOrbit.targetPhi = 0.16;
+                    camOrbit.targetRadius = 10.2;
+                    showToast('🎥 Góc nhìn Thiền từ đỉnh hồ xuống thẳng mặt nước');
+                } else {
+                    camOrbit.targetTheta = 0.35;
+                    camOrbit.targetPhi = 0.68;
+                    camOrbit.targetRadius = 9.2;
+                    showToast('🎥 Góc nhìn nghiêng 3D toàn cảnh hồ đá');
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const el = document.getElementById('toast-msg');
+            el.textContent = msg;
+            el.style.opacity = '1';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                el.style.opacity = '0';
+            }, 2400);
+        }
+
+        function updateHUD() {
+            document.getElementById('pearl-display').textContent = Math.floor(gameState.pearls);
+            document.getElementById('zen-level-badge').textContent = `Cấp ${gameState.level}`;
+            document.getElementById('zen-exp-bar').style.width = `${gameState.exp}%`;
+            document.getElementById('zen-exp-text').textContent = `${Math.floor(gameState.exp)}/100`;
+
+            const h = Math.round(gameState.harmony);
+            const f = Math.round(gameState.fullness);
+            document.getElementById('val-harmony').textContent = `${h}%`;
+            document.getElementById('bar-harmony').style.width = `${h}%`;
+            document.getElementById('val-fullness').textContent = `${f}%`;
+            document.getElementById('bar-fullness').style.width = `${f}%`;
+
+            const weatherLabel = gameState.isRaining ? '🌧️ Mưa xuân êm dịu' : '🌊 Mặt hồ tĩnh lặng';
+            document.getElementById('pond-status-text').textContent =
+                `${weatherLabel} • ${koiList.length} Cá Koi đang bơi`;
+            document.getElementById('koi-count-drawer').textContent = koiList.length;
+        }
+
+        /* =========================================================================
+           7. VÒNG LẶP CHÍNH (60FPS) + CHUÔNG GIÓ TỰ NHIÊN THEO LÀN GIÓ
+        ========================================================================= */
+        let lastTime = performance.now();
+        let hudTick = 0;
+        let breezeChimeTimer = 9;
+
+        function animate(now) {
+            requestAnimationFrame(animate);
+            const dt = Math.min(0.05, (now - lastTime) / 1000);
+            lastTime = now;
+            const elapsed = now * 0.001;
+
+            for (let i = 0; i < koiList.length; i++) {
+                koiList[i].update(dt, elapsed);
+            }
+
+            updateEnvironment(dt, elapsed);
+
+            // Làn gió tự nhiên thỉnh thoảng làm ngân nhẹ chuông gió nếu người chơi đã mở khóa âm thanh
+            if (zenAudio.ctx && zenAudio.enabled) {
+                breezeChimeTimer -= dt;
+                if (breezeChimeTimer <= 0) {
+                    breezeChimeTimer = 11 + Math.random() * 10;
+                    zenAudio.playWindChime(2);
+                }
+            }
+
+            hudTick += dt;
+            if (hudTick >= 0.3) {
+                hudTick = 0;
+                updateHUD();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function () {
+            initPondScene();
+            bindEvents();
+            lastTime = performance.now();
+            animate(lastTime);
+        };
+    </script>
+</body>
+</html>

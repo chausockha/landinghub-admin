@@ -9,11 +9,12 @@ import {
   PanelLeftOpen,
   Menu,
   Type,
+  Gamepad2,
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useThemeTokens } from '../../theme/ThemeProvider.tsx';
 import { useSidebar } from './SidebarContext.tsx';
 
@@ -24,6 +25,7 @@ interface HeaderProps {
 
 export function Header({ title, subtitle }: HeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     presets,
     presetId,
@@ -163,6 +165,18 @@ export function Header({ title, subtitle }: HeaderProps) {
             <Search className="h-[18px] w-[18px]" />
           </button>
         )}
+
+        {/* Quick Entertainment Shortcut (Meow 3D) */}
+        <button
+          type="button"
+          onClick={() => navigate('/entertainment')}
+          className={`btn-ghost btn-icon ${
+            location.pathname === '/entertainment' ? 'border-brand/50 text-brand bg-brand/10' : ''
+          }`}
+          title="Góc Giải Trí — Meow 3D Nuôi Mèo Cưng"
+        >
+          <Gamepad2 className="h-[18px] w-[18px]" />
+        </button>
 
         {/* Light / Dark Surface Toggle */}
         <button

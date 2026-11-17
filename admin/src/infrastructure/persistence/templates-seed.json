@@ -1,6 +1,38 @@
 {
   "templates": [
     {
+      "id": "tpl-042",
+      "name": "INVENTO — Clean SaaS Inventory, Cash Flow & Alerts",
+      "description": "SaaS Inventory Dashboard giao diện sáng tinh tế chuẩn hiện đại: Sidebar trắng tối giản kèm khối hồ sơ Admin, 4 thẻ KPI tồn kho bo tròn, biểu đồ cột kẻ ngang Cash Flow (nổi bật cột Tím–Cam kèm tooltip Income/Expense trực tiếp), vòng Donut Inventory Alerts (73% / 19% / 8% gạch chéo) và bảng Product Inventory sắp xếp/lọc/chỉnh sửa trực tiếp.",
+      "category": "saas",
+      "uiStyle": "modern",
+      "layout": "sidebar",
+      "tags": ["invento", "saas-inventory", "cash-flow", "stock-alerts", "warehouse"],
+      "previewUrl": "/templates/admin-dashboard/invento-saas/index.html",
+      "thumbnailUrl": "/thumbnails/tpl-042.svg",
+      "status": "published",
+      "isPremium": true,
+      "version": "4.9.0",
+      "createdAt": "2026-11-17T11:06:00Z",
+      "updatedAt": "2026-11-17T11:11:00Z"
+    },
+    {
+      "id": "tpl-041",
+      "name": "STOCKPULSE — Inventory, Warehouse & Alerts OS",
+      "description": "Inventory Dashboard thiết kế theo công thức Dark Premium + Glassmorphism + Bento Grid + Monospace Typography: dải Marquee cảnh báo RFID trực tiếp, 4 thẻ KPI nghiêng 3D Tilt, biểu đồ Stock Levels & ngưỡng an toàn ROP, sơ đồ nhiệt kệ kho 20 Bin tương tác (Zone A/B/Cold C), bàn xử lý Stockout 1-chạm phát lệnh Auto-PO và ma trận SKU.",
+      "category": "logistics",
+      "uiStyle": "bento",
+      "layout": "bento-grid",
+      "tags": ["inventory", "stock-levels", "warehouse-heatmap", "alerts", "bento-grid"],
+      "previewUrl": "/templates/admin-dashboard/stockpulse-inventory/index.html",
+      "thumbnailUrl": "/thumbnails/tpl-041.svg",
+      "status": "published",
+      "isPremium": true,
+      "version": "4.8.0",
+      "createdAt": "2026-11-17T10:56:00Z",
+      "updatedAt": "2026-11-17T11:00:00Z"
+    },
+    {
       "id": "tpl-040",
       "name": "MORVIN — Enterprise Admin, Ecommerce & Calendar",
       "description": "Multi-Module Admin Dashboard chuẩn Morvin phối Royal Indigo (#525CE5) & Emerald (#23C58F) với thẻ nổi chồng lên dải Banner đa giác: Quick Summary cột chồng 12 tháng, Orders/Users, Revenue Wave, Earning Goal, bản đồ Sales by State, kèm lịch Calendar kéo–thả sự kiện trực tiếp, Chat và Ecommerce.",

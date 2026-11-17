@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" fill="none">
+  <defs>
+    <radialGradient id="pondBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="55%" stop-color="#0F766E"/>
+      <stop offset="100%" stop-color="#06282C"/>
+    </radialGradient>
+    <radialGradient id="lanternGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.9"/>
+      <stop offset="55%" stop-color="#FB923C" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FB923C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldKoi" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Emerald Pond Water -->
+  <rect width="800" height="450" fill="url(#pondBg)"/>
+
+  <!-- Subtle Caustics & Pebbles -->
+  <circle cx="170" cy="110" r="24" fill="#115E59" opacity="0.45"/>
+  <circle cx="650" cy="340" r="32" fill="#115E59" opacity="0.4"/>
+  <circle cx="480" cy="95" r="18" fill="#134E4A" opacity="0.45"/>
+  <circle cx="290" cy="370" r="26" fill="#134E4A" opacity="0.4"/>
+
+  <!-- Concentric 3D Water Ripples -->
+  <g stroke="#CCFBF1" fill="none">
+    <circle cx="400" cy="230" r="46" stroke-width="2.2" opacity="0.55"/>
+    <circle cx="400" cy="230" r="92" stroke-width="1.6" opacity="0.35"/>
+    <circle cx="400" cy="230" r="145" stroke-width="1.2" opacity="0.18"/>
+    <circle cx="235" cy="155" r="34" stroke-width="1.6" opacity="0.32"/>
+    <circle cx="575" cy="295" r="42" stroke-width="1.6" opacity="0.28"/>
+  </g>
+
+  <!-- Food Pellets Floating at Center -->
+  <circle cx="392" cy="224" r="5.5" fill="#FBBF24"/>
+  <circle cx="412" cy="236" r="5" fill="#F59E0B"/>
+  <circle cx="398" cy="244" r="4.5" fill="#FDE047"/>
+
+  <!-- Kohaku Koi (Red & White) Swimming Toward Center -->
+  <g transform="translate(295, 255) rotate(-26)">
+    <ellipse cx="-8" cy="14" rx="58" ry="20" fill="#041E21" opacity="0.32"/>
+    <!-- Pectoral Fins -->
+    <ellipse cx="18" cy="-24" rx="18" ry="10" transform="rotate(-28 18 -24)" fill="#FFF1F2" opacity="0.82"/>
+    <ellipse cx="18" cy="24" rx="18" ry="10" transform="rotate(28 18 24)" fill="#FFF1F2" opacity="0.82"/>
+    <!-- Tail Fin -->
+    <path d="M-52 0 Q-86 -26 -96 -14 Q-78 0 -96 14 Q-86 26 -52 0 Z" fill="#FFF1F2" opacity="0.88"/>
+    <!-- Body -->
+    <path d="M58 0 C58 -20 15 -24 -56 0 C15 24 58 20 58 0 Z" fill="#FFFDF9"/>
+    <!-- Red Kohaku Markings -->
+    <ellipse cx="22" cy="-2" rx="22" ry="13" fill="#EF4444"/>
+    <ellipse cx="-18" cy="3" rx="16" ry="10" fill="#DC2626"/>
+    <!-- Eyes -->
+    <circle cx="44" cy="-9" r="3" fill="#0F172A"/>
+    <circle cx="44" cy="9" r="3" fill="#0F172A"/>
+  </g>
+
+  <!-- Yamabuki Ogon (Golden Koi) Swimming Toward Center -->
+  <g transform="translate(508, 192) rotate(152)">
+    <ellipse cx="-8" cy="14" rx="54" ry="18" fill="#041E21" opacity="0.32"/>
+    <ellipse cx="16" cy="-22" rx="16" ry="9" transform="rotate(-28 16 -22)" fill="#FEF08A" opacity="0.82"/>
+    <ellipse cx="16" cy="22" rx="16" ry="9" transform="rotate(28 16 22)" fill="#FEF08A" opacity="0.82"/>
+    <path d="M-48 0 Q-80 -24 -90 -12 Q-74 0 -90 12 Q-80 24 -48 0 Z" fill="#FDE047" opacity="0.88"/>
+    <path d="M54 0 C54 -18 14 -22 -52 0 C14 22 54 18 54 0 Z" fill="url(#goldKoi)"/>
+    <circle cx="40" cy="-8" r="2.8" fill="#0F172A"/>
+    <circle cx="40" cy="8" r="2.8" fill="#0F172A"/>
+  </g>
+
+  <!-- Shusui Blue-Jade Koi -->
+  <g transform="translate(455, 338) rotate(-112) scale(0.84)">
+    <path d="M-48 0 Q-80 -22 -88 -11 Q-72 0 -88 11 Q-80 22 -48 0 Z" fill="#E0F2FE" opacity="0.85"/>
+    <path d="M54 0 C54 -18 14 -22 -52 0 C14 22 54 18 54 0 Z" fill="#38BDF8"/>
+    <ellipse cx="8" cy="0" rx="32" ry="7" fill="#0369A1"/>
+    <circle cx="40" cy="-8" r="2.8" fill="#0F172A"/>
+    <circle cx="40" cy="8" r="2.8" fill="#0F172A"/>
+  </g>
+
+  <!-- Lily Pads & Pink Lotus -->
+  <g transform="translate(148, 320)">
+    <path d="M0 0 L54 -18 A58 58 0 1 1 42 -38 Z" fill="#15803D"/>
+    <path d="M0 0 L38 -12" stroke="#22C55E" stroke-width="2" opacity="0.5"/>
+    <!-- Pink Lotus Petals -->
+    <g transform="translate(-6, -4)">
+      <ellipse cx="0" cy="-16" rx="8" ry="18" fill="#F472B6"/>
+      <ellipse cx="0" cy="16" rx="8" ry="18" fill="#F472B6"/>
+      <ellipse cx="-16" cy="0" rx="18" ry="8" fill="#F9A8D4"/>
+      <ellipse cx="16" cy="0" rx="18" ry="8" fill="#F9A8D4"/>
+      <ellipse cx="-11" cy="-11" rx="8" ry="16" transform="rotate(-45 -11 -11)" fill="#EC4899"/>
+      <ellipse cx="11" cy="-11" rx="8" ry="16" transform="rotate(45 11 -11)" fill="#EC4899"/>
+      <ellipse cx="-11" cy="11" rx="8" ry="16" transform="rotate(45 -11 11)" fill="#EC4899"/>
+      <ellipse cx="11" cy="11" rx="8" ry="16" transform="rotate(-45 11 11)" fill="#EC4899"/>
+      <circle cx="0" cy="0" r="8" fill="#FACC15"/>
+    </g>
+  </g>
+
+  <g transform="translate(665, 118) scale(0.82)">
+    <path d="M0 0 L52 22 A56 56 0 1 1 56 -6 Z" fill="#166534"/>
+  </g>
+
+  <!-- Warm Floating Lantern -->
+  <g transform="translate(625, 295)">
+    <circle cx="0" cy="0" r="64" fill="url(#lanternGlow)"/>
+    <rect x="-20" y="-20" width="40" height="40" rx="8" fill="#78350F"/>
+    <rect x="-13" y="-13" width="26" height="26" rx="6" fill="#FEF08A"/>
+    <circle cx="0" cy="0" r="6" fill="#FFFFFF"/>
+  </g>
+</svg>

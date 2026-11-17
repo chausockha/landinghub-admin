@@ -19,6 +19,7 @@ import {
   Zap,
   Palette,
   Type,
+  Gamepad2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardStats } from '../hooks/useDashboardStats.ts';
@@ -403,6 +404,10 @@ export function DashboardPage() {
                 <button onClick={() => navigate('/templates')} className="btn-ghost btn-md">
                   <Eye className="h-[18px] w-[18px]" />
                   Duyệt Kho Giao Diện
+                </button>
+                <button onClick={() => navigate('/entertainment')} className="btn-ghost btn-md">
+                  <Gamepad2 className="h-[18px] w-[18px] text-brand" />
+                  Góc Giải Trí 3D
                 </button>
               </div>
 
@@ -1062,6 +1067,201 @@ export function DashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            ROW 6: RELAX & ENTERTAINMENT HUB (4 MINI GAMES)
+        ══════════════════════════════════════════════════════════════════ */}
+        <div className="glass rounded-3xl p-6 lg:p-7 space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-display text-lg font-bold text-ink">
+                  Góc Giải Trí 3D · Không Gian Xả Stress
+                </h3>
+                <span className="chip-brand">4 Mini Games · WebGL + WebAudio</span>
+              </div>
+              <p className="text-sm text-ink-muted mt-1">
+                Đầy đủ từ hành động sinh tồn InstancedMesh tốc độ cao đến góc Lo-fi cây Bonsai, hồ cá Koi và nuôi mèo 3D
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/entertainment')}
+              className="btn-ghost btn-sm"
+            >
+              <Gamepad2 className="h-4 w-4 text-brand" />
+              Mở Kệ Giải Trí (4)
+              <ArrowUpRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            {/* Card 0: Poly Survivor 3D */}
+            <div className="glass-subcard p-5 flex flex-col justify-between gap-4 hover:border-brand/40 transition-all">
+              <div className="flex items-start gap-3.5">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-brand/15 border border-brand/25 text-2xl">
+                  ⚔️
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-display text-base font-bold text-ink">
+                      Poly Survivor 3D
+                    </h4>
+                    <span className="badge-published">Mới</span>
+                  </div>
+                  <p className="text-sm text-ink-secondary leading-relaxed">
+                    Sinh tồn giữa biển quái vật Low-Poly bằng Đạn đa tia, Vòng lửa &amp; Sấm sét với hiệu năng InstancedMesh 60 FPS.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-line">
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.open('/games/poly-survivor-3d.html', '_blank', 'noopener,noreferrer')
+                  }
+                  className="preview-open-btn"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Tab riêng
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/entertainment?game=poly-survivor')}
+                  className="btn-primary btn-sm"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Chơi ngay
+                </button>
+              </div>
+            </div>
+
+            {/* Card 1: Bonsai Terrarium 3D */}
+            <div className="glass-subcard p-5 flex flex-col justify-between gap-4 hover:border-brand/40 transition-all">
+              <div className="flex items-start gap-3.5">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-brand/15 border border-brand/25 text-2xl">
+                  🪴
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-display text-base font-bold text-ink">
+                      Bonsai Terrarium 3D
+                    </h4>
+                    <span className="badge-published">Mới</span>
+                  </div>
+                  <p className="text-sm text-ink-secondary leading-relaxed">
+                    Tưới sương, tỉa cành, bật đèn sưởi ấm và ngắm mưa rơi ngoài cửa sổ kèm nhạc Lo-fi Chillhop êm dịu.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-line">
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.open('/games/bonsai-terrarium-3d.html', '_blank', 'noopener,noreferrer')
+                  }
+                  className="preview-open-btn"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Tab riêng
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/entertainment?game=bonsai-3d')}
+                  className="btn-primary btn-sm"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Chơi ngay
+                </button>
+              </div>
+            </div>
+
+            {/* Card 2: Zen Koi Pond 3D */}
+            <div className="glass-subcard p-5 flex flex-col justify-between gap-4 hover:border-brand/40 transition-all">
+              <div className="flex items-start gap-3.5">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-brand/15 border border-brand/25 text-2xl">
+                  🎏
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-display text-base font-bold text-ink">
+                      Zen Koi Pond 3D
+                    </h4>
+                    <span className="chip">Thiền</span>
+                  </div>
+                  <p className="text-sm text-ink-secondary leading-relaxed">
+                    Chạm mặt nước tạo sóng 3D, rải cám gọi đàn cá Koi 5 sắc màu tụ lại kèm tiếng suối tre &amp; chuông gió.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-line">
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.open('/games/zen-koi-3d.html', '_blank', 'noopener,noreferrer')
+                  }
+                  className="preview-open-btn"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Tab riêng
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/entertainment?game=zen-koi')}
+                  className="btn-primary btn-sm"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Chơi ngay
+                </button>
+              </div>
+            </div>
+
+            {/* Card 3: Meow 3D */}
+            <div className="glass-subcard p-5 flex flex-col justify-between gap-4 hover:border-brand/40 transition-all">
+              <div className="flex items-start gap-3.5">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-brand/15 border border-brand/25 text-2xl">
+                  🐱
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-display text-base font-bold text-ink">
+                      Meow 3D — Mèo Cưng
+                    </h4>
+                    <span className="chip">Virtual Pet</span>
+                  </div>
+                  <p className="text-sm text-ink-secondary leading-relaxed">
+                    Vuốt ve mèo 3D nghe tiếng gừ gừ, chiếu đèn Laser, tung bóng len vật lý và diện phụ kiện đáng yêu.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-line">
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.open('/games/meow-3d.html', '_blank', 'noopener,noreferrer')
+                  }
+                  className="preview-open-btn"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Tab riêng
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/entertainment?game=meow-3d')}
+                  className="btn-primary btn-sm"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Chơi ngay
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

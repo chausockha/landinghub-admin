@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" fill="none">
+  <defs>
+    <linearGradient id="nightRoom" x1="0" y1="0" x2="800" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E1B4B"/>
+      <stop offset="55%" stop-color="#1E162B"/>
+      <stop offset="100%" stop-color="#110E1B"/>
+    </linearGradient>
+    <linearGradient id="lampCone" x1="485" y1="75" x2="400" y2="395" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.45"/>
+      <stop offset="65%" stop-color="#FBBF24" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="domeGlass" x1="250" y1="90" x2="550" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E0F2FE" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#BAE6FD" stop-opacity="0.16"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Midnight Cozy Study Background -->
+  <rect width="800" height="450" fill="url(#nightRoom)"/>
+
+  <!-- Rainy Window Backdrop -->
+  <g opacity="0.72">
+    <rect x="85" y="34" width="630" height="290" rx="12" fill="#0F172A" stroke="#312E81" stroke-width="5"/>
+    <line x1="295" y1="34" x2="295" y2="324" stroke="#1E1B4B" stroke-width="6"/>
+    <line x1="505" y1="34" x2="505" y2="324" stroke="#1E1B4B" stroke-width="6"/>
+    <line x1="85" y1="178" x2="715" y2="178" stroke="#1E1B4B" stroke-width="6"/>
+
+    <!-- Rain Streaks Outside Window -->
+    <g stroke="#7DD3FC" stroke-width="2" stroke-linecap="round" opacity="0.5">
+      <line x1="145" y1="65" x2="136" y2="96"/>
+      <line x1="215" y1="115" x2="206" y2="146"/>
+      <line x1="178" y1="215" x2="169" y2="248"/>
+      <line x1="352" y1="58" x2="343" y2="88"/>
+      <line x1="612" y1="84" x2="603" y2="118"/>
+      <line x1="658" y1="212" x2="649" y2="246"/>
+      <line x1="564" y1="238" x2="555" y2="270"/>
+    </g>
+  </g>
+
+  <!-- Warm Oak Desk -->
+  <rect x="0" y="352" width="800" height="98" fill="#452719"/>
+  <rect x="0" y="352" width="800" height="8" fill="#683B24"/>
+
+  <!-- Warm Grow Lamp Volumetric Light Cone -->
+  <polygon points="488,88 228,376 568,376" fill="url(#lampCone)"/>
+
+  <!-- Brass Gooseneck Grow Lamp -->
+  <path d="M608 366 L608 175 Q608 62 502 82" stroke="#D97706" stroke-width="9" stroke-linecap="round" fill="none"/>
+  <ellipse cx="608" cy="368" rx="40" ry="10" fill="#B45309"/>
+  <path d="M468 96 L516 66 L526 102 Z" fill="#F59E0B"/>
+  <circle cx="492" cy="92" r="10" fill="#FEF9C3"/>
+
+  <!-- Ceramic Bonsai Pot & Moss Hill -->
+  <g transform="translate(392, 342)">
+    <!-- Shadow -->
+    <ellipse cx="0" cy="34" rx="146" ry="20" fill="#09070F" opacity="0.55"/>
+    <!-- Moss Mound -->
+    <ellipse cx="0" cy="-6" rx="122" ry="28" fill="#15803D"/>
+    <ellipse cx="-24" cy="-12" rx="74" ry="20" fill="#22C55E" opacity="0.65"/>
+
+    <!-- Miniature Stone Lantern (Toro) -->
+    <g transform="translate(68, -22)">
+      <circle cx="0" cy="-8" r="22" fill="#FB923C" opacity="0.35"/>
+      <rect x="-5" y="-4" width="10" height="14" fill="#94A3B8"/>
+      <rect x="-8" y="-16" width="16" height="12" rx="2" fill="#FEF08A"/>
+      <polygon points="-14,-16 14,-16 0,-26" fill="#64748B"/>
+    </g>
+
+    <!-- Gnarled Bonsai Trunk & Branches -->
+    <path d="M-8 -8 C-38 -52 24 -96 -6 -144" stroke="#5C4033" stroke-width="20" stroke-linecap="round" fill="none"/>
+    <path d="M-18 -58 L-78 -86" stroke="#5C4033" stroke-width="10" stroke-linecap="round"/>
+    <path d="M6 -92 L72 -114" stroke="#5C4033" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- Sakura Cloud Foliage Pads -->
+    <g>
+      <ellipse cx="-82" cy="-92" rx="46" ry="22" fill="#F472B6"/>
+      <ellipse cx="-76" cy="-98" rx="34" ry="15" fill="#FBCFE8"/>
+
+      <ellipse cx="74" cy="-120" rx="44" ry="21" fill="#EC4899"/>
+      <ellipse cx="70" cy="-126" rx="32" ry="14" fill="#F9A8D4"/>
+
+      <ellipse cx="-6" cy="-156" rx="58" ry="26" fill="#F472B6"/>
+      <ellipse cx="-10" cy="-164" rx="42" ry="18" fill="#FCE7F3"/>
+    </g>
+
+    <!-- Falling Blossoms -->
+    <circle cx="-42" cy="-42" r="3.5" fill="#FBCFE8"/>
+    <circle cx="34" cy="-64" r="3.5" fill="#F9A8D4"/>
+    <circle cx="-64" cy="-32" r="3" fill="#FCE7F3"/>
+
+    <!-- Pot Body -->
+    <polygon points="-130,-4 130,-4 112,32 -112,32" fill="#334155"/>
+    <rect x="-135" y="-9" width="270" height="9" rx="4.5" fill="#475569"/>
+  </g>
+
+  <!-- Terrarium Glass Dome Overlay -->
+  <path d="M258 338 L258 212 A134 134 0 0 1 526 212 L526 338 Z" fill="url(#domeGlass)" stroke="#BAE6FD" stroke-opacity="0.45" stroke-width="2.5"/>
+  <circle cx="392" cy="72" r="8" fill="#D97706"/>
+</svg>

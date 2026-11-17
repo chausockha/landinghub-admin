@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <radialGradient id="spGlow41" cx="0.2" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#080C14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="spBar41" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Premium Obsidian Canvas -->
+  <rect width="800" height="450" fill="#080C14"/>
+  <rect width="800" height="450" fill="url(#spGlow41)"/>
+
+  <!-- Topbar (Badge-safe top-left) -->
+  <rect x="0" y="0" width="800" height="44" fill="#0C121E"/>
+  <line x1="0" y1="44" x2="800" y2="44" stroke="#1E293B"/>
+  <rect x="520" y="11" width="124" height="22" rx="6" fill="#111827" stroke="#334155"/>
+  <text x="582" y="25" text-anchor="middle" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="8" font-weight="600">All Warehouses (4)</text>
+  <rect x="654" y="11" width="118" height="22" rx="6" fill="#10B981"/>
+  <text x="713" y="25" text-anchor="middle" fill="#052E16" font-family="Inter, sans-serif" font-size="8" font-weight="800">+ Receive Stock</text>
+
+  <!-- Row 1: 4 Oversized KPI Bento Cards (y >= 106 so 100% clear of top-left card badges) -->
+  <rect x="24" y="106" width="180" height="74" rx="12" fill="#0F1624" stroke="#26334D"/>
+  <text x="38" y="124" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">TOTAL STOCK UNITS</text>
+  <text x="38" y="150" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="18" font-weight="800">148,920</text>
+  <rect x="38" y="164" width="152" height="4" rx="2" fill="#1E293B"/>
+  <rect x="38" y="164" width="124" height="4" rx="2" fill="url(#spBar41)"/>
+
+  <rect x="214" y="106" width="180" height="74" rx="12" fill="#0F1624" stroke="#26334D"/>
+  <text x="228" y="124" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">WAREHOUSE CAPACITY</text>
+  <text x="228" y="150" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="18" font-weight="800">84.6%</text>
+  <text x="298" y="149" fill="#38BDF8" font-family="monospace" font-size="8" font-weight="700">16.9k Pallets</text>
+  <rect x="228" y="164" width="34" height="4" rx="2" fill="#10B981"/>
+  <rect x="267" y="164" width="34" height="4" rx="2" fill="#10B981"/>
+  <rect x="306" y="164" width="34" height="4" rx="2" fill="#06B6D4"/>
+  <rect x="345" y="164" width="34" height="4" rx="2" fill="#F59E0B"/>
+
+  <rect x="404" y="106" width="180" height="74" rx="12" fill="#0F1624" stroke="#9F1239"/>
+  <text x="418" y="124" fill="#FDA4AF" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">ACTIVE STOCK ALERTS</text>
+  <text x="418" y="150" fill="#FB7185" font-family="Inter, sans-serif" font-size="18" font-weight="800">5 Alerts</text>
+  <rect x="506" y="136" width="64" height="16" rx="8" fill="#881337"/>
+  <text x="538" y="147" text-anchor="middle" fill="#FECDD3" font-family="monospace" font-size="7.5" font-weight="700">2 Stockouts</text>
+  <text x="418" y="168" fill="#10B981" font-family="monospace" font-size="7.5" font-weight="700">Auto-PO Engine: ARMED →</text>
+
+  <rect x="594" y="106" width="182" height="74" rx="12" fill="#0F1624" stroke="#26334D"/>
+  <text x="608" y="124" fill="#94A3B8" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">FILL RATE &amp; VELOCITY</text>
+  <text x="608" y="150" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="18" font-weight="800">99.18%</text>
+  <text x="688" y="149" fill="#FBBF24" font-family="monospace" font-size="8" font-weight="700">8.4x / yr</text>
+  <rect x="608" y="164" width="154" height="4" rx="2" fill="#10B981"/>
+
+  <!-- Row 2 Asymmetric Bento: Stock Levels Chart + Warehouse Bin Heatmap + Live Alerts -->
+  <!-- Pillar 1: Stock Levels & ROP Line -->
+  <rect x="24" y="192" width="314" height="238" rx="14" fill="#0F1624" stroke="#26334D"/>
+  <text x="40" y="214" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Stock Levels &amp; Replenishment</text>
+  <rect x="284" y="201" width="38" height="16" rx="5" fill="#10B981"/>
+  <text x="303" y="212" text-anchor="middle" fill="#052E16" font-family="monospace" font-size="8" font-weight="700">30D</text>
+
+  <!-- Bars + Dashed ROP Line -->
+  <g transform="translate(46, 240)">
+    <rect x="0"   y="46" width="12" height="94" rx="3" fill="#10B981"/><rect x="14"  y="96" width="10" height="44" rx="3" fill="#06B6D4"/>
+    <rect x="36"  y="32" width="12" height="108" rx="3" fill="#10B981"/><rect x="50"  y="82" width="10" height="58" rx="3" fill="#06B6D4"/>
+    <rect x="72"  y="40" width="12" height="100" rx="3" fill="#10B981"/><rect x="86"  y="102" width="10" height="38" rx="3" fill="#06B6D4"/>
+    <rect x="108" y="22" width="12" height="118" rx="3" fill="#10B981"/><rect x="122" y="76" width="10" height="64" rx="3" fill="#06B6D4"/>
+    <rect x="144" y="28" width="12" height="112" rx="3" fill="#10B981"/><rect x="158" y="90" width="10" height="50" rx="3" fill="#06B6D4"/>
+    <rect x="180" y="18" width="12" height="122" rx="3" fill="#10B981"/><rect x="194" y="70" width="10" height="70" rx="3" fill="#06B6D4"/>
+    <rect x="216" y="14" width="12" height="126" rx="3" fill="#10B981"/><rect x="230" y="78" width="10" height="62" rx="3" fill="#06B6D4"/>
+    <rect x="252" y="10" width="12" height="130" rx="3" fill="#10B981"/><rect x="266" y="74" width="10" height="66" rx="3" fill="#06B6D4"/>
+    <!-- ROP Safety Line -->
+    <line x1="-4" y1="64" x2="278" y2="64" stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="5 4"/>
+    <rect x="206" y="49" width="70" height="13" rx="3" fill="#F59E0B"/>
+    <text x="241" y="58.5" text-anchor="middle" fill="#090D16" font-family="monospace" font-size="7.5" font-weight="700">ROP 95k MIN</text>
+  </g>
+
+  <!-- Pillar 2: Warehouse Rack Heatmap (5x4 Grid) -->
+  <rect x="348" y="192" width="236" height="238" rx="14" fill="#0F1624" stroke="#26334D"/>
+  <text x="364" y="214" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Warehouse Rack Map</text>
+  <g transform="translate(364, 230)">
+    <!-- Row 1 -->
+    <rect x="0"   y="0" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="18" y="17" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-01</text>
+    <rect x="42"  y="0" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="60" y="17" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-02</text>
+    <rect x="84"  y="0" width="36" height="28" rx="5" fill="#78350F" stroke="#F59E0B"/><text x="102" y="17" text-anchor="middle" fill="#FCD34D" font-family="monospace" font-size="8" font-weight="700">A-03</text>
+    <rect x="126" y="0" width="36" height="28" rx="5" fill="#881337" stroke="#FB7185"/><text x="144" y="17" text-anchor="middle" fill="#FECDD3" font-family="monospace" font-size="8" font-weight="700">A-04</text>
+    <rect x="168" y="0" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="186" y="17" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-05</text>
+    <!-- Row 2 -->
+    <rect x="0"   y="34" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="18" y="51" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-06</text>
+    <rect x="42"  y="34" width="36" height="28" rx="5" fill="#881337" stroke="#FB7185"/><text x="60" y="51" text-anchor="middle" fill="#FECDD3" font-family="monospace" font-size="8" font-weight="700">A-07</text>
+    <rect x="84"  y="34" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="102" y="51" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-08</text>
+    <rect x="126" y="34" width="36" height="28" rx="5" fill="#78350F" stroke="#F59E0B"/><text x="144" y="51" text-anchor="middle" fill="#FCD34D" font-family="monospace" font-size="8" font-weight="700">A-09</text>
+    <rect x="168" y="34" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="186" y="51" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-10</text>
+    <!-- Row 3 -->
+    <rect x="0"   y="68" width="36" height="28" rx="5" fill="#881337" stroke="#FB7185"/><text x="18" y="85" text-anchor="middle" fill="#FECDD3" font-family="monospace" font-size="8" font-weight="700">A-11</text>
+    <rect x="42"  y="68" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="60" y="85" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-12</text>
+    <rect x="84"  y="68" width="36" height="28" rx="5" fill="#1E293B" stroke="#475569"/><text x="102" y="85" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="8" font-weight="700">OPEN</text>
+    <rect x="126" y="68" width="36" height="28" rx="5" fill="#064E3B" stroke="#10B981"/><text x="144" y="85" text-anchor="middle" fill="#6EE7B7" font-family="monospace" font-size="8" font-weight="700">A-14</text>
+    <rect x="168" y="68" width="36" height="28" rx="5" fill="#78350F" stroke="#F59E0B"/><text x="186" y="85" text-anchor="middle" fill="#FCD34D" font-family="monospace" font-size="8" font-weight="700">A-15</text>
+  </g>
+  <!-- Bin Inspector Box -->
+  <rect x="364" y="344" width="204" height="72" rx="10" fill="#090D16" stroke="#334155"/>
+  <text x="376" y="362" fill="#F8FAFC" font-family="monospace" font-size="8.5" font-weight="700">BIN A-04 · SKU-NV904</text>
+  <text x="376" y="378" fill="#FB7185" font-family="monospace" font-size="8" font-weight="700">⚠ STOCKOUT (0 / 120 ROP)</text>
+  <text x="376" y="398" fill="#94A3B8" font-family="Inter, sans-serif" font-size="8">Lithium Pack 48V · 21°C</text>
+
+  <!-- Pillar 3: Stock Alerts Desk -->
+  <rect x="594" y="192" width="182" height="238" rx="14" fill="#0F1624" stroke="#26334D"/>
+  <text x="610" y="214" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">Stock Alerts</text>
+
+  <rect x="608" y="228" width="154" height="58" rx="9" fill="#090D16" stroke="#881337"/>
+  <rect x="616" y="236" width="52" height="13" rx="3" fill="#881337"/>
+  <text x="642" y="245.5" text-anchor="middle" fill="#FECDD3" font-family="monospace" font-size="7" font-weight="700">STOCKOUT</text>
+  <rect x="704" y="235" width="50" height="15" rx="4" fill="#10B981"/>
+  <text x="729" y="245" text-anchor="middle" fill="#052E16" font-family="monospace" font-size="7" font-weight="800">+250 PO</text>
+  <text x="616" y="264" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="8" font-weight="700">SKU-NV904 Lithium 48V</text>
+  <text x="616" y="276" fill="#94A3B8" font-family="monospace" font-size="7">0 / 120 ROP · WH-01</text>
+
+  <rect x="608" y="294" width="154" height="58" rx="9" fill="#090D16" stroke="#78350F"/>
+  <rect x="616" y="302" width="48" height="13" rx="3" fill="#78350F"/>
+  <text x="640" y="311.5" text-anchor="middle" fill="#FDE68A" font-family="monospace" font-size="7" font-weight="700">LOW ROP</text>
+  <rect x="704" y="301" width="50" height="15" rx="4" fill="#10B981"/>
+  <text x="729" y="311" text-anchor="middle" fill="#052E16" font-family="monospace" font-size="7" font-weight="800">+160 PO</text>
+  <text x="616" y="330" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="8" font-weight="700">SKU-MC210 Sensor X4</text>
+  <text x="616" y="342" fill="#94A3B8" font-family="monospace" font-size="7">18 / 80 ROP · WH-02</text>
+
+  <rect x="608" y="360" width="154" height="56" rx="9" fill="#090D16" stroke="#155E75"/>
+  <rect x="616" y="368" width="48" height="13" rx="3" fill="#155E75"/>
+  <text x="640" y="377.5" text-anchor="middle" fill="#A5F3FC" font-family="monospace" font-size="7" font-weight="700">FEFO 5D</text>
+  <text x="616" y="396" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="8" font-weight="700">SKU-BIO42 Cryo Lot</text>
+  <text x="616" y="408" fill="#38BDF8" font-family="monospace" font-size="7">-18.4°C · Zone C-03</text>
+</svg>

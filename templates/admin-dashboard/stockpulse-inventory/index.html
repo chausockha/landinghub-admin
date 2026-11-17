@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STOCKPULSE — Smart Inventory, Warehouse Zones &amp; Real-Time Alerts OS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            pulse: {
+              emerald: '#10B981',
+              amber: '#F59E0B',
+              rose: '#F43F5E',
+              cyan: '#06B6D4',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* UI Combo (combo_ui.md): Dark Premium + Glassmorphism + Bento Grid + Monospace Typography + Marquee + 3D Tilt + Glow */
+    html {
+      font-size: 15px;
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #F3F5F9;
+      color: #0F172A;
+      background-image:
+        radial-gradient(ellipse 60% 45% at 12% 0%, rgba(16, 185, 129, 0.08), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 88% 8%, rgba(6, 182, 212, 0.08), transparent 65%);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    html.dark body {
+      background-color: #080C14;
+      color: #F1F5F9;
+      background-image:
+        radial-gradient(ellipse 62% 48% at 14% -5%, rgba(16, 185, 129, 0.13), transparent 68%),
+        radial-gradient(ellipse 52% 42% at 88% 6%, rgba(245, 158, 11, 0.09), transparent 65%),
+        radial-gradient(ellipse 50% 50% at 50% 100%, rgba(6, 182, 212, 0.07), transparent 70%);
+    }
+
+    /* Subtle Grain / Noise Overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.025;
+      background-image: radial-gradient(#ffffff 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+
+    .bento-glass {
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(203, 213, 225, 0.75);
+      border-radius: 20px;
+      box-shadow: 0 12px 32px -14px rgba(15, 23, 42, 0.08);
+      transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, background 0.3s ease;
+    }
+    .bento-glass:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    html.dark .bento-glass {
+      background: rgba(15, 22, 36, 0.76);
+      border-color: rgba(51, 65, 85, 0.62);
+      box-shadow: 0 18px 42px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    html.dark .bento-glass:hover {
+      border-color: rgba(16, 185, 129, 0.42);
+      box-shadow: 0 20px 46px -14px rgba(0, 0, 0, 0.78), 0 0 24px -8px rgba(16, 185, 129, 0.16);
+    }
+
+    .sticky-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(203, 213, 225, 0.7);
+    }
+    html.dark .sticky-topbar {
+      background: rgba(8, 12, 20, 0.82);
+      border-bottom-color: rgba(30, 41, 59, 0.85);
+    }
+
+    /* Continuous Live Telemetry Marquee */
+    @keyframes marqueeSlide {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marqueeSlide 34s linear infinite;
+    }
+    .marquee-track:hover {
+      animation-play-state: paused;
+    }
+
+    /* Glow Badges */
+    .glow-rose {
+      box-shadow: 0 0 16px rgba(244, 63, 94, 0.35);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Warehouse Rack Cells */
+    .bin-cell {
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .bin-cell:hover {
+      transform: translateY(-2px) scale(1.04);
+      z-index: 10;
+    }
+    .bin-cell.selected-bin {
+      outline: 2px solid #F8FAFC;
+      outline-offset: 1px;
+      transform: scale(1.05);
+    }
+    html:not(.dark) .bin-cell.selected-bin {
+      outline-color: #0F172A;
+    }
+
+    .tilt-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-500/25 selection:text-emerald-400">
+
+  <!-- ==================== LIVE TELEMETRY MARQUEE BAR ==================== -->
+  <div class="relative z-40 bg-[#05080F] text-slate-300 border-b border-slate-800/90 overflow-hidden py-1.5 text-[11px] font-mono">
+    <div class="marquee-track items-center gap-8 px-4">
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></i><strong class="text-rose-400">ALERT [WH-01]:</strong> SKU-NV904 Lithium Pack 48V hit 0 units (Safety ROP: 120)</span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-emerald-400"></i><strong class="text-emerald-400">INBOUND DOCK #04:</strong> Container MSKU-884120 (+1,400 units scanned via RFID)</span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-amber-400"></i><strong class="text-amber-400">LOW ROP [WH-02]:</strong> SKU-MC210 Industrial Sensor X4 at 18/80 units</span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-cyan-400"></i><strong class="text-cyan-400">COLD CHAIN ZONE-C:</strong> -18.4°C Stable · Humidity 41% · 100% SLA</span>
+      <span class="text-slate-600">•</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-rose-500"></i><strong class="text-rose-400">ALERT [WH-01]:</strong> SKU-NV904 Lithium Pack 48V hit 0 units (Safety ROP: 120)</span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-emerald-400"></i><strong class="text-emerald-400">INBOUND DOCK #04:</strong> Container MSKU-884120 (+1,400 units scanned via RFID)</span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-amber-400"></i><strong class="text-amber-400">LOW ROP [WH-02]:</strong> SKU-MC210 Industrial Sensor X4 at 18/80 units</span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-2"><i class="w-2 h-2 rounded-full bg-cyan-400"></i><strong class="text-cyan-400">COLD CHAIN ZONE-C:</strong> -18.4°C Stable · Humidity 41% · 100% SLA</span>
+    </div>
+  </div>
+
+  <!-- ==================== STICKY GLASS NAVIGATION ==================== -->
+  <header class="sticky-topbar px-5 lg:px-8 py-3">
+    <div class="max-w-[1540px] mx-auto flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand + Module Switcher -->
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-cyan-600 flex items-center justify-center text-slate-950 shadow-md glow-emerald">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+              <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white">STOCKPULSE</span>
+              <span class="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">WMS 5.2</span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-none mt-0.5">Stock Levels · Warehouse Floor · Alert Triage</p>
+          </div>
+        </div>
+
+        <!-- Navigation Pills -->
+        <nav class="hidden xl:flex items-center gap-1 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900/90 border border-slate-300/60 dark:border-slate-800" id="topModuleTabs">
+          <button data-mod="all" class="mod-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 shadow-xs cursor-pointer transition">Overview Bento</button>
+          <button data-mod="stock" class="mod-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer transition">Stock Levels</button>
+          <button data-mod="warehouse" class="mod-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer transition">Warehouse Floor</button>
+          <button data-mod="alerts" class="mod-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer transition flex items-center gap-1.5">
+            <span>Alerts Desk</span>
+            <span id="navAlertCount" class="font-mono text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-bold">5</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Right Controls: Warehouse Filter + SKU Search + Receive Stock + Theme -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <select id="warehouseSelect" class="h-9 px-3 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
+          <option value="ALL">🌐 All Warehouses (4 Hubs)</option>
+          <option value="WH-01">🇻🇳 WH-01 · Saigon MegaHub</option>
+          <option value="WH-02">🇻🇳 WH-02 · Hanoi North DC</option>
+          <option value="WH-03">🇸🇬 WH-03 · Singapore Jurong</option>
+          <option value="WH-04">🇳🇱 WH-04 · Rotterdam EuroPort</option>
+        </select>
+
+        <div class="relative hidden sm:block">
+          <input id="skuSearchInput" type="text" placeholder="Scan SKU, item or bin..." class="w-48 lg:w-56 h-9 pl-8 pr-3 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500"/>
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </div>
+
+        <button id="openReceiveModalBtn" class="h-9 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer transition">
+          <span>+ Receive / Restock</span>
+        </button>
+
+        <button id="themeSwitchBtn" title="Toggle Dark Premium / Swiss Daylight" class="w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-amber-400 hover:border-emerald-500 cursor-pointer transition">
+          <svg id="sunSvg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg id="moonSvg" class="w-4 h-4 hidden text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN BENTO GRID WORKSPACE ==================== -->
+  <main class="relative z-10 max-w-[1540px] mx-auto px-5 lg:px-8 py-6 space-y-5">
+
+    <!-- ROW 1: 4 OVERSIZED TYPOGRAPHY KPI BENTO CARDS (WITH 3D TILT) -->
+    <section id="sec-kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <!-- KPI 1: Total Units In Stock -->
+      <div class="bento-glass tilt-card p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Stock Units</span>
+          <span class="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">+6.4% MoM</span>
+        </div>
+        <div class="my-3">
+          <p id="kpiTotalUnits" class="font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular">148,920</p>
+          <p id="kpiValuation" class="font-mono text-xs text-slate-500 dark:text-slate-400 mt-1">Asset Value: <strong class="text-slate-800 dark:text-slate-200">$4,824,500</strong></p>
+        </div>
+        <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400" style="width: 82%"></div>
+        </div>
+      </div>
+
+      <!-- KPI 2: Warehouse Capacity -->
+      <div class="bento-glass tilt-card p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Warehouse Utilization</span>
+          <span id="kpiHubBadge" class="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">4 Active Hubs</span>
+        </div>
+        <div class="my-3">
+          <p id="kpiUtilization" class="font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular">84.6%</p>
+          <p id="kpiPallets" class="font-mono text-xs text-slate-500 dark:text-slate-400 mt-1">16,920 / 20,000 Pallet Slots</p>
+        </div>
+        <div class="grid grid-cols-4 gap-1.5">
+          <div class="h-1.5 rounded-full bg-emerald-500"></div>
+          <div class="h-1.5 rounded-full bg-emerald-500"></div>
+          <div class="h-1.5 rounded-full bg-cyan-400"></div>
+          <div class="h-1.5 rounded-full bg-amber-400/70"></div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Critical & Low Stock Alerts -->
+      <div class="bento-glass tilt-card p-5 flex flex-col justify-between border-rose-500/35">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Stock Alerts</span>
+          <span class="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 glow-rose">Action Needed</span>
+        </div>
+        <div class="my-3">
+          <p id="kpiAlertsCount" class="font-display text-3xl font-bold tracking-tight text-rose-600 dark:text-rose-400 tabular">5 Alerts</p>
+          <p id="kpiAlertsSub" class="font-mono text-xs text-slate-500 dark:text-slate-400 mt-1">2 Stockouts · 2 Below ROP · 1 Cold</p>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+          <span>Auto-PO Engine: <strong class="text-emerald-500">ARMED</strong></span>
+          <button id="autoResolveAllBtn" class="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline cursor-pointer">Reorder All →</button>
+        </div>
+      </div>
+
+      <!-- KPI 4: Turnover & Dispatch SLA -->
+      <div class="bento-glass tilt-card p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Fill Rate &amp; Velocity</span>
+          <span class="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">8.4x / yr</span>
+        </div>
+        <div class="my-3">
+          <p id="kpiFillRate" class="font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular">99.18%</p>
+          <p class="font-mono text-xs text-slate-500 dark:text-slate-400 mt-1">Avg Pick-to-Dock: <strong class="text-emerald-500">14m 20s</strong></p>
+        </div>
+        <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-emerald-500" style="width: 99%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROW 2: ASYMMETRIC BENTO GRID — STOCK LEVELS (5) + WAREHOUSE MAP (4) + ALERTS FEED (3) -->
+    <section id="sec-bento-main" class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+      <!-- PILLAR 1: STOCK LEVELS VELOCITY & ROP THRESHOLD (5 COLS) -->
+      <div id="card-stock-chart" class="bento-glass p-5 xl:col-span-5 flex flex-col justify-between">
+        <div>
+          <div class="flex flex-wrap items-start justify-between gap-2 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-display text-base font-bold text-slate-900 dark:text-white">Stock Levels &amp; Replenishment Flow</h2>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">On-hand stock vs. outbound dispatch &amp; safety reorder point (ROP)</p>
+            </div>
+
+            <div class="flex items-center gap-1 p-1 rounded-lg bg-slate-200/70 dark:bg-slate-900 border border-slate-300/50 dark:border-slate-800 text-[11px] font-mono">
+              <button data-range="7d" class="vel-range px-2 py-1 rounded text-slate-500 dark:text-slate-400 cursor-pointer">7D</button>
+              <button data-range="30d" class="vel-range px-2 py-1 rounded bg-emerald-500 text-slate-950 font-bold cursor-pointer">30D</button>
+              <button data-range="90d" class="vel-range px-2 py-1 rounded text-slate-500 dark:text-slate-400 cursor-pointer">90D</button>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="flex flex-wrap items-center gap-4 text-[11.5px] mb-2 text-slate-600 dark:text-slate-300">
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-xs bg-emerald-500 inline-block"></i>In-Stock Level</span>
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-xs bg-cyan-400 inline-block"></i>Inbound PO</span>
+            <span class="flex items-center gap-1.5"><i class="w-3 h-0.5 bg-amber-400 inline-block"></i>Safety ROP Line</span>
+          </div>
+
+          <!-- Interactive SVG Bar + Threshold Line Chart -->
+          <div class="relative pt-1">
+            <svg id="stockVelocitySvg" viewBox="0 0 540 230" class="w-full h-auto select-none overflow-visible"></svg>
+            <div id="velTooltip" class="hidden pointer-events-none absolute top-2 left-8 bento-glass px-3 py-2 text-[11.5px] shadow-xl z-30"></div>
+          </div>
+        </div>
+
+        <!-- Category Stock Breakdown Mini Strip -->
+        <div class="grid grid-cols-3 gap-2.5 pt-3 mt-2 border-t border-slate-200/70 dark:border-slate-800/80 font-mono text-[11px]">
+          <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+            <span class="text-slate-400 block">Electronics</span>
+            <strong class="text-slate-900 dark:text-white text-xs">62,400 u</strong>
+            <span class="text-emerald-500 block text-[10px]">94% Optimal</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+            <span class="text-slate-400 block">Power Cells</span>
+            <strong class="text-slate-900 dark:text-white text-xs">38,120 u</strong>
+            <span class="text-rose-400 block text-[10px]">2 Critical</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+            <span class="text-slate-400 block">Cold Chain</span>
+            <strong class="text-slate-900 dark:text-white text-xs">48,400 u</strong>
+            <span class="text-cyan-400 block text-[10px]">-18.4°C OK</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PILLAR 2: INTERACTIVE WAREHOUSE RACK & BIN FLOORMAP (4 COLS) -->
+      <div id="card-warehouse-map" class="bento-glass p-5 xl:col-span-4 flex flex-col justify-between">
+        <div>
+          <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+            <div>
+              <h2 class="font-display text-base font-bold text-slate-900 dark:text-white">Warehouse Rack Heatmap</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Click any rack bay to inspect bin SKU &amp; pallet load</p>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-mono" id="zoneTabs">
+              <button data-zone="A" class="zone-btn px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-bold cursor-pointer">Zone A</button>
+              <button data-zone="B" class="zone-btn px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">Zone B</button>
+              <button data-zone="C" class="zone-btn px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">Cold C</button>
+            </div>
+          </div>
+
+          <!-- Color Status Legend -->
+          <div class="flex items-center justify-between text-[10.5px] font-mono text-slate-500 dark:text-slate-400 mb-3 px-0.5">
+            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-emerald-500/80 inline-block"></i>Optimal</span>
+            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-amber-500/85 inline-block"></i>High &gt;85%</span>
+            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-rose-500 inline-block"></i>Low/Stockout</span>
+            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-slate-600 inline-block"></i>Open</span>
+          </div>
+
+          <!-- 5x5 Interactive Rack Matrix -->
+          <div id="warehouseBinGrid" class="grid grid-cols-5 gap-2"></div>
+        </div>
+
+        <!-- Live Selected Bin Inspector -->
+        <div id="binInspector" class="mt-4 p-3.5 rounded-xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 font-mono text-xs">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- PILLAR 3: REAL-TIME ALERTS & 1-CLICK AUTO-PO DESK (3 COLS) -->
+      <div id="card-alerts-desk" class="bento-glass p-5 xl:col-span-3 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div>
+              <h2 class="font-display text-base font-bold text-slate-900 dark:text-white">Stock Alerts</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">1-click PO reorder &amp; FEFO triage</p>
+            </div>
+            <select id="alertSeverityFilter" class="h-7 px-2 rounded-lg text-[11px] font-mono bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer">
+              <option value="all">All Alerts</option>
+              <option value="critical">Stockout</option>
+              <option value="warning">Low ROP</option>
+              <option value="cold">Cold/FEFO</option>
+            </select>
+          </div>
+
+          <div id="alertsListContainer" class="space-y-2.5 max-h-[310px] overflow-y-auto pr-0.5"></div>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+          <span>Webhook: <strong class="text-emerald-500">ERP Synced</strong></span>
+          <span id="poCounterLabel">0 POs Sent</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ROW 3: LIVE SKU STOCK LEVELS MATRIX TABLE -->
+    <section id="sec-sku-table" class="bento-glass p-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="font-display text-base font-bold text-slate-900 dark:text-white">Live SKU Stock Levels &amp; Safety Thresholds</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Real-time bin tracking, safety ROP gauges, and instant cycle-count adjustments</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900 border border-slate-300/60 dark:border-slate-800 text-xs" id="skuStatusPills">
+            <button data-st="all" class="sku-st-btn px-3 py-1 rounded-lg font-semibold bg-emerald-500 text-slate-950 cursor-pointer">All SKUs</button>
+            <button data-st="Critical" class="sku-st-btn px-3 py-1 rounded-lg font-medium text-slate-600 dark:text-slate-300 cursor-pointer">Stockout / Critical</button>
+            <button data-st="Low Stock" class="sku-st-btn px-3 py-1 rounded-lg font-medium text-slate-600 dark:text-slate-300 cursor-pointer">Low ROP</button>
+            <button data-st="Optimal" class="sku-st-btn px-3 py-1 rounded-lg font-medium text-slate-600 dark:text-slate-300 cursor-pointer">Optimal</button>
+          </div>
+
+          <button id="exportCsvBtn" class="h-8 px-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-mono font-semibold text-slate-700 dark:text-slate-200 hover:border-emerald-500 cursor-pointer transition">
+            ↓ Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[880px]">
+          <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-mono uppercase tracking-wider text-slate-400">
+              <th class="pb-3 pr-4">SKU Code</th>
+              <th class="pb-3 pr-4">Item Description</th>
+              <th class="pb-3 pr-4">Warehouse · Bin</th>
+              <th class="pb-3 pr-4 w-56">Stock Level vs. Safety ROP</th>
+              <th class="pb-3 pr-4 text-right">Unit Cost</th>
+              <th class="pb-3 pr-4">Health Status</th>
+              <th class="pb-3 text-right">Quick Action</th>
+            </tr>
+          </thead>
+          <tbody id="skuTableBody" class="divide-y divide-slate-200/60 dark:divide-slate-800/70 text-xs"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== RECEIVE / RESTOCK MODAL ==================== -->
+  <div id="receiveModal" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bento-glass max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold">INBOUND ASN / PO</span>
+          <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white mt-1">Receive &amp; Restock Inventory</h3>
+        </div>
+        <button id="closeReceiveModal" class="w-8 h-8 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-600 dark:text-slate-300">Select Target SKU</label>
+          <select id="restockSkuSelect" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-xs"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-600 dark:text-slate-300">Inbound Quantity (+)</label>
+            <input id="restockQtyInput" type="number" min="10" value="250" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono"/>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-600 dark:text-slate-300">Dock / Carrier</label>
+            <input type="text" value="Dock #02 · DHL Supply" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="cancelReceiveBtn" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold cursor-pointer">Cancel</button>
+        <button id="confirmReceiveBtn" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold cursor-pointer">Confirm Putaway</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== WAREHOUSE & SKU DATA ====================
+    const HUB_METRICS = {
+      'ALL':   { units: '148,920', val: '$4,824,500', util: '84.6%', pallets: '16,920 / 20,000 Pallet Slots', badge: '4 Active Hubs', fill: '99.18%' },
+      'WH-01': { units: '54,210',  val: '$1,940,000', util: '89.2%', pallets: '6,244 / 7,000 Pallet Slots',   badge: 'Saigon MegaHub', fill: '99.42%' },
+      'WH-02': { units: '36,480',  val: '$1,120,400', util: '78.5%', pallets: '3,925 / 5,000 Pallet Slots',   badge: 'Hanoi North DC', fill: '98.90%' },
+      'WH-03': { units: '31,890',  val: '$1,042,100', util: '86.0%', pallets: '3,440 / 4,000 Pallet Slots',   badge: 'Singapore Jurong', fill: '99.55%' },
+      'WH-04': { units: '26,340',  val: '$722,000',   util: '82.8%', pallets: '3,311 / 4,000 Pallet Slots',   badge: 'Rotterdam Euro', fill: '98.85%' },
+    };
+
+    const VELOCITY_SERIES = {
+      '30d': {
+        labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10'],
+        stock:   [118, 132, 125, 141, 136, 122, 145, 139, 144, 149],
+        inbound: [42,  58,  35,  64,  48,  39,  70,  52,  60,  66],
+        rop: 95,
+      },
+      '7d': {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        stock:   [140, 138, 144, 142, 147, 146, 149],
+        inbound: [28,  22,  39,  31,  44,  18,  36],
+        rop: 100,
+      },
+      '90d': {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+        stock:   [98, 108, 115, 112, 126, 134, 129, 141, 149],
+        inbound: [50, 62,  55,  48,  72,  68,  58,  74,  79],
+        rop: 92,
+      },
+    };
+
+    const ZONE_BINS = {
+      A: [
+        { code: 'A-01', pct: 78, sku: 'SKU-ch810', name: 'USB-C PD GaN Dock', units: 640, temp: '22°C' },
+        { code: 'A-02', pct: 65, sku: 'SKU-kb402', name: 'Mechanical Keycap Kit', units: 420, temp: '22°C' },
+        { code: 'A-03', pct: 92, sku: 'SKU-pk102', name: 'Corrugated Box XL', units: 1840, temp: '23°C' },
+        { code: 'A-04', pct: 0,  sku: 'SKU-NV904', name: 'Lithium Pack 48V', units: 0, temp: '21°C' },
+        { code: 'A-05', pct: 74, sku: 'SKU-rt550', name: 'Wi-Fi 7 Mesh Router', units: 310, temp: '22°C' },
+        { code: 'A-06', pct: 81, sku: 'SKU-mn320', name: '4K OLED Panel 27"', units: 195, temp: '22°C' },
+        { code: 'A-07', pct: 12, sku: 'SKU-MC210', name: 'Industrial Sensor X4', units: 18, temp: '22°C' },
+        { code: 'A-08', pct: 58, sku: 'SKU-cb119', name: 'Braided Thunder Cable', units: 950, temp: '22°C' },
+        { code: 'A-09', pct: 88, sku: 'SKU-pw700', name: 'Smart Inverter 3kW', units: 142, temp: '23°C' },
+        { code: 'A-10', pct: 69, sku: 'SKU-dr410', name: 'Autonomous LiDAR Gimbal', units: 88, temp: '21°C' },
+        { code: 'A-11', pct: 15, sku: 'SKU-CH309', name: ' GaN Fast Charger 140W', units: 24, temp: '22°C' },
+        { code: 'A-12', pct: 76, sku: 'SKU-ss901', name: 'NVMe Gen5 Heatsink 2TB', units: 510, temp: '21°C' },
+        { code: 'A-13', pct: 0,  sku: 'OPEN-BAY',  name: 'Empty Staging Slot', units: 0, temp: '22°C', open: true },
+        { code: 'A-14', pct: 83, sku: 'SKU-cm204', name: 'PTZ Security Dome 8MP', units: 265, temp: '22°C' },
+        { code: 'A-15', pct: 94, sku: 'SKU-pl880', name: ' Shrink Wrap Roll 500m', units: 1120, temp: '23°C' },
+        { code: 'A-16', pct: 67, sku: 'SKU-rf310', name: 'UHF RFID Handheld Gun', units: 74, temp: '22°C' },
+        { code: 'A-17', pct: 71, sku: 'SKU-lb205', name: 'Thermal Label 4x6 Roll', units: 2400, temp: '22°C' },
+        { code: 'A-18', pct: 9,  sku: 'SKU-BT772', name: 'Backup BMS Controller', units: 9, temp: '21°C' },
+        { code: 'A-19', pct: 62, sku: 'SKU-gt440', name: 'IoT Edge LoRa Gateway', units: 165, temp: '22°C' },
+        { code: 'A-20', pct: 79, sku: 'SKU-sv120', name: 'Servo Actuator 24V', units: 330, temp: '22°C' },
+      ],
+      B: Array.from({ length: 20 }, (_, i) => ({
+        code: `B-${String(i + 1).padStart(2, '0')}`,
+        pct: [72, 88, 64, 91, 53, 14, 82, 77, 69, 95, 60, 74, 84, 11, 68, 79, 86, 55, 73, 90][i],
+        sku: `SKU-BLK${200 + i}`,
+        name: `Bulk Pallet Module #${i + 1}`,
+        units: (i + 3) * 85,
+        temp: '23.5°C',
+      })),
+      C: Array.from({ length: 20 }, (_, i) => ({
+        code: `C-${String(i + 1).padStart(2, '0')}`,
+        pct: [68, 74, 16, 82, 79, 64, 88, 71, 59, 83, 91, 62, 77, 12, 85, 70, 66, 78, 81, 69][i],
+        sku: `SKU-BIO${40 + i}`,
+        name: `Cryo Cold-Chain Lot #${80 + i}`,
+        units: (i + 2) * 32,
+        temp: '-18.4°C',
+      })),
+    };
+
+    const ALERTS = [
+      { id: 'al-1', type: 'critical', badge: 'STOCKOUT', title: 'SKU-NV904 · Lithium Pack 48V', detail: '0 / 120 ROP · WH-01 Bin A-04', reorderQty: 250, sku: 'SKU-NV904', resolved: false },
+      { id: 'al-2', type: 'critical', badge: 'CRITICAL', title: 'SKU-BT772 · Backup BMS Unit', detail: '9 / 60 ROP · WH-01 Bin A-18', reorderQty: 120, sku: 'SKU-BT772', resolved: false },
+      { id: 'al-3', type: 'warning',  badge: 'LOW ROP',  title: 'SKU-MC210 · Industrial Sensor X4', detail: '18 / 80 ROP · WH-02 Bin A-07', reorderQty: 160, sku: 'SKU-MC210', resolved: false },
+      { id: 'al-4', type: 'warning',  badge: 'LOW ROP',  title: 'SKU-CH309 · GaN Charger 140W', detail: '24 / 90 ROP · WH-03 Bin A-11', reorderQty: 200, sku: 'SKU-CH309', resolved: false },
+      { id: 'al-5', type: 'cold',     badge: 'FEFO 5D',  title: 'SKU-BIO42 · Cryo Reagent Lot #82', detail: '42 Vials · -18.4°C Zone C-03', reorderQty: 100, sku: 'SKU-BIO42', resolved: false },
+    ];
+
+    const SKUS = [
+      { sku: 'SKU-NV904', name: 'Lithium Iron Pack 48V 100Ah', hub: 'WH-01', bin: 'A-04', onHand: 0,    rop: 120, max: 400, cost: '$310.00' },
+      { sku: 'SKU-BT772', name: 'Smart BMS Controller Pro',    hub: 'WH-01', bin: 'A-18', onHand: 9,    rop: 60,  max: 240, cost: '$84.50' },
+      { sku: 'SKU-MC210', name: 'Industrial LiDAR Sensor X4',  hub: 'WH-02', bin: 'A-07', onHand: 18,   rop: 80,  max: 300, cost: '$145.00' },
+      { sku: 'SKU-CH309', name: 'GaN Fast Charger 140W Enterprise', hub: 'WH-03', bin: 'A-11', onHand: 24, rop: 90, max: 350, cost: '$49.00' },
+      { sku: 'SKU-BIO42', name: 'Cryo Biologics Reagent Kit',  hub: 'WH-03', bin: 'C-03', onHand: 164,  rop: 80,  max: 250, cost: '$215.00' },
+      { sku: 'SKU-SS901', name: 'NVMe Gen5 Heatsink SSD 2TB',  hub: 'WH-02', bin: 'A-12', onHand: 510,  rop: 150, max: 600, cost: '$168.00' },
+      { sku: 'SKU-PK102', name: 'Heavy-Duty Export Crate XL',  hub: 'WH-04', bin: 'A-03', onHand: 1840, rop: 500, max: 2000, cost: '$6.40' },
+    ];
+
+    let activeHub = 'ALL';
+    let activeVelRange = '30d';
+    let activeZone = 'A';
+    let selectedBinIdx = 3; // Default highlights A-04 Stockout bin!
+    let activeSkuStatus = 'all';
+    let poSentCount = 0;
+
+    function getSkuStatus(item) {
+      if (item.onHand <= 10) return 'Critical';
+      if (item.onHand < item.rop) return 'Low Stock';
+      return 'Optimal';
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    function renderHubKPIs() {
+      const m = HUB_METRICS[activeHub];
+      document.getElementById('kpiTotalUnits').textContent = m.units;
+      document.getElementById('kpiValuation').innerHTML = `Asset Value: <strong class="text-slate-800 dark:text-slate-200">${m.val}</strong>`;
+      document.getElementById('kpiUtilization').textContent = m.util;
+      document.getElementById('kpiPallets').textContent = m.pallets;
+      document.getElementById('kpiHubBadge').textContent = m.badge;
+      document.getElementById('kpiFillRate').textContent = m.fill;
+
+      const unresolved = ALERTS.filter(a => !a.resolved).length;
+      document.getElementById('kpiAlertsCount').textContent = `${unresolved} Alerts`;
+      document.getElementById('navAlertCount').textContent = unresolved;
+    }
+
+    function renderVelocityChart() {
+      const svg = document.getElementById('stockVelocitySvg');
+      const tip = document.getElementById('velTooltip');
+      const d = VELOCITY_SERIES[activeVelRange];
+      const isDark = document.documentElement.classList.contains('dark');
+
+      const W = 540, H = 230, padL = 38, padR = 14, padT = 16, padB = 28;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+      const maxV = 170;
+
+      const gridColor = isDark ? 'rgba(51,65,85,0.45)' : 'rgba(203,213,225,0.7)';
+      const txtColor = isDark ? '#94A3B8' : '#64748B';
+
+      let html = '';
+      [0, 50, 100, 150].forEach(val => {
+        const y = padT + plotH - (val / maxV) * plotH;
+        html += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="${gridColor}" stroke-width="1"/>`;
+        html += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" fill="${txtColor}" font-family="JetBrains Mono" font-size="10">${val}k</text>`;
+      });
+
+      const step = plotW / d.labels.length;
+      const barW = Math.min(16, step * 0.32);
+
+      d.labels.forEach((lbl, idx) => {
+        const cx = padL + step * idx + step / 2;
+        const stVal = d.stock[idx];
+        const inVal = d.inbound[idx];
+        const stH = (stVal / maxV) * plotH;
+        const inH = (inVal / maxV) * plotH;
+        const stY = padT + plotH - stH;
+        const inY = padT + plotH - inH;
+
+        html += `<g class="vel-col cursor-pointer" data-lbl="${lbl}" data-st="${stVal}" data-in="${inVal}">`;
+        html += `<rect x="${cx - barW - 1.5}" y="${stY}" width="${barW}" height="${stH}" rx="4" fill="#10B981"/>`;
+        html += `<rect x="${cx + 1.5}" y="${inY}" width="${barW}" height="${inH}" rx="4" fill="#06B6D4" opacity="0.85"/>`;
+        html += `<text x="${cx}" y="${H - 7}" text-anchor="middle" fill="${txtColor}" font-family="JetBrains Mono" font-size="10">${lbl}</text>`;
+        html += `</g>`;
+      });
+
+      // Safety ROP Dashed Line
+      const ropY = padT + plotH - (d.rop / maxV) * plotH;
+      html += `<line x1="${padL}" y1="${ropY}" x2="${W - padR}" y2="${ropY}" stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+      html += `<rect x="${W - 108}" y="${ropY - 17}" width="92" height="15" rx="4" fill="#F59E0B"/>`;
+      html += `<text x="${W - 62}" y="${ropY - 6.5}" text-anchor="middle" fill="#090D16" font-family="JetBrains Mono" font-size="9" font-weight="700">ROP ${d.rop}k MIN</text>`;
+
+      svg.innerHTML = html;
+
+      svg.querySelectorAll('.vel-col').forEach(g => {
+        g.addEventListener('mouseenter', () => {
+          tip.innerHTML = `
+            <p class="font-mono font-bold text-slate-900 dark:text-white">${g.getAttribute('data-lbl')} Telemetry</p>
+            <p class="text-emerald-500 font-mono mt-0.5">In-Stock: ${g.getAttribute('data-st')},400 u</p>
+            <p class="text-cyan-400 font-mono">Inbound PO: +${g.getAttribute('data-in')},200 u</p>
+          `;
+          tip.classList.remove('hidden');
+        });
+        g.addEventListener('mouseleave', () => tip.classList.add('hidden'));
+      });
+    }
+
+    function renderWarehouseMap() {
+      const bins = ZONE_BINS[activeZone];
+      const grid = document.getElementById('warehouseBinGrid');
+
+      grid.innerHTML = bins
+        .map((b, idx) => {
+          let cls = 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border-emerald-500/35';
+          if (b.open) {
+            cls = 'bg-slate-200/70 dark:bg-slate-800/70 text-slate-400 border-slate-300 dark:border-slate-700';
+          } else if (b.pct <= 18) {
+            cls = 'bg-rose-500/25 text-rose-600 dark:text-rose-300 border-rose-500/60 glow-rose';
+          } else if (b.pct >= 85) {
+            cls = 'bg-amber-500/25 text-amber-700 dark:text-amber-300 border-amber-500/50';
+          }
+          const sel = idx === selectedBinIdx ? 'selected-bin' : '';
+          return `
+            <div data-bin-idx="${idx}" class="bin-cell ${cls} ${sel}">
+              <div>${b.code}</div>
+              <div class="text-[9.5px] opacity-80 mt-0.5">${b.open ? 'OPEN' : b.pct + '%'}</div>
+            </div>`;
+        })
+        .join('');
+
+      const cur = bins[selectedBinIdx] || bins[0];
+      const statusBadge = cur.open
+        ? '<span class="text-slate-400">READY FOR PUTAWAY</span>'
+        : cur.pct <= 18
+        ? '<span class="text-rose-400 font-bold">⚠ CRITICAL LOW STOCK</span>'
+        : cur.pct >= 85
+        ? '<span class="text-amber-400 font-bold">HIGH DENSITY &gt;85%</span>'
+        : '<span class="text-emerald-400 font-bold">● OPTIMAL LOAD</span>';
+
+      document.getElementById('binInspector').innerHTML = `
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-bold text-slate-900 dark:text-white">BIN ${cur.code} · ${cur.sku.toUpperCase()}</span>
+          ${statusBadge}
+        </div>
+        <p class="text-slate-600 dark:text-slate-300 truncate">${cur.name}</p>
+        <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+          <span>Qty: <strong class="text-slate-900 dark:text-white">${cur.units} units</strong></span>
+          <span>Env: <strong class="text-cyan-500">${cur.temp}</strong></span>
+          <span>Fill: <strong>${cur.pct}%</strong></span>
+        </div>
+      `;
+
+      grid.querySelectorAll('[data-bin-idx]').forEach(el => {
+        el.addEventListener('click', () => {
+          selectedBinIdx = Number(el.getAttribute('data-bin-idx'));
+          renderWarehouseMap();
+        });
+      });
+    }
+
+    function renderAlerts() {
+      const sev = document.getElementById('alertSeverityFilter').value;
+      const box = document.getElementById('alertsListContainer');
+      const list = ALERTS.filter(a => sev === 'all' || a.type === sev);
+
+      box.innerHTML = list
+        .map(a => {
+          const badgeStyle =
+            a.type === 'critical'
+              ? 'bg-rose-500/20 text-rose-500 border-rose-500/40'
+              : a.type === 'warning'
+              ? 'bg-amber-500/20 text-amber-500 border-amber-500/40'
+              : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40';
+
+          return `
+            <div class="p-3 rounded-xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded border ${badgeStyle}">${a.badge}</span>
+                ${
+                  a.resolved
+                    ? `<span class="font-mono text-[10.5px] font-bold text-emerald-500">✓ PO Dispatched</span>`
+                    : `<button data-resolve-id="${a.id}" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-[10.5px] font-bold cursor-pointer transition">Reorder +${a.reorderQty}</button>`
+                }
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-slate-900 dark:text-white truncate">${a.title}</p>
+                <p class="font-mono text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">${a.detail}</p>
+              </div>
+            </div>`;
+        })
+        .join('');
+
+      box.querySelectorAll('[data-resolve-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-resolve-id');
+          const alertObj = ALERTS.find(x => x.id === id);
+          if (alertObj && !alertObj.resolved) {
+            alertObj.resolved = true;
+            poSentCount++;
+            document.getElementById('poCounterLabel').textContent = `${poSentCount} POs Sent`;
+            const skuItem = SKUS.find(s => s.sku === alertObj.sku);
+            if (skuItem) skuItem.onHand += alertObj.reorderQty;
+            if (alertObj.sku === 'SKU-NV904') {
+              ZONE_BINS.A[3].units = alertObj.reorderQty;
+              ZONE_BINS.A[3].pct = 62;
+            }
+            renderHubKPIs();
+            renderWarehouseMap();
+            renderAlerts();
+            renderSkuTable();
+          }
+        });
+      });
+    }
+
+    function renderSkuTable() {
+      const q = document.getElementById('skuSearchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('skuTableBody');
+
+      const filtered = SKUS.filter(item => {
+        const st = getSkuStatus(item);
+        const matchHub = activeHub === 'ALL' || item.hub === activeHub;
+        const matchSt = activeSkuStatus === 'all' || st === activeSkuStatus;
+        const matchQ =
+          !q ||
+          item.sku.toLowerCase().includes(q) ||
+          item.name.toLowerCase().includes(q) ||
+          item.bin.toLowerCase().includes(q);
+        return matchHub && matchSt && matchQ;
+      });
+
+      tbody.innerHTML = filtered
+        .map(item => {
+          const st = getSkuStatus(item);
+          const pct = Math.min(100, Math.round((item.onHand / item.max) * 100));
+          const barColor = st === 'Critical' ? 'bg-rose-500' : st === 'Low Stock' ? 'bg-amber-400' : 'bg-emerald-500';
+          const pillCls =
+            st === 'Critical'
+              ? 'bg-rose-500/15 text-rose-500 border-rose-500/30'
+              : st === 'Low Stock'
+              ? 'bg-amber-500/15 text-amber-500 border-amber-500/30'
+              : 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30';
+
+          return `
+            <tr class="hover:bg-slate-100/70 dark:hover:bg-slate-800/40 transition">
+              <td class="py-3.5 pr-4 font-mono font-bold text-emerald-600 dark:text-emerald-400">${item.sku}</td>
+              <td class="py-3.5 pr-4 font-semibold text-slate-900 dark:text-white">${item.name}</td>
+              <td class="py-3.5 pr-4 font-mono text-slate-500 dark:text-slate-400">${item.hub} · <strong class="text-slate-800 dark:text-slate-200">${item.bin}</strong></td>
+              <td class="py-3.5 pr-4">
+                <div class="flex justify-between font-mono text-[11px] mb-1">
+                  <strong class="text-slate-900 dark:text-white tabular">${item.onHand} u</strong>
+                  <span class="text-slate-400">ROP: ${item.rop}</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                  <div class="h-full rounded-full ${barColor} transition-all duration-300" style="width:${Math.max(4, pct)}%"></div>
+                </div>
+              </td>
+              <td class="py-3.5 pr-4 text-right font-mono tabular text-slate-700 dark:text-slate-300">${item.cost}</td>
+              <td class="py-3.5 pr-4"><span class="font-mono text-[10.5px] font-bold px-2.5 py-0.5 rounded-full border ${pillCls}">${st}</span></td>
+              <td class="py-3.5 text-right">
+                <button data-plus-sku="${item.sku}" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 font-mono text-[11px] font-semibold cursor-pointer transition">+50 Restock</button>
+              </td>
+            </tr>`;
+        })
+        .join('');
+
+      tbody.querySelectorAll('[data-plus-sku]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const code = btn.getAttribute('data-plus-sku');
+          const target = SKUS.find(s => s.sku === code);
+          if (target) {
+            target.onHand += 50;
+            renderSkuTable();
+          }
+        });
+      });
+    }
+
+    function populateModalSkus() {
+      document.getElementById('restockSkuSelect').innerHTML = SKUS.map(
+        s => `<option value="${s.sku}">${s.sku} — ${s.name} (${s.onHand} u)</option>`
+      ).join('');
+    }
+
+    // ==================== 3D TILT MICRO-INTERACTION (combo_ui.md) ====================
+    document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `perspective(700px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg) translateY(-2px)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) translateY(0)';
+      });
+    });
+
+    // ==================== CONTROLS & EVENTS ====================
+    document.getElementById('warehouseSelect').addEventListener('change', e => {
+      activeHub = e.target.value;
+      renderHubKPIs();
+      renderSkuTable();
+    });
+
+    document.getElementById('skuSearchInput').addEventListener('input', renderSkuTable);
+    document.getElementById('alertSeverityFilter').addEventListener('change', renderAlerts);
+
+    document.querySelectorAll('.vel-range').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeVelRange = btn.getAttribute('data-range');
+        document.querySelectorAll('.vel-range').forEach(b => {
+          b.className =
+            b === btn
+              ? 'vel-range px-2 py-1 rounded bg-emerald-500 text-slate-950 font-bold cursor-pointer'
+              : 'vel-range px-2 py-1 rounded text-slate-500 dark:text-slate-400 cursor-pointer';
+        });
+        renderVelocityChart();
+      });
+    });
+
+    document.querySelectorAll('.zone-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeZone = btn.getAttribute('data-zone');
+        selectedBinIdx = 0;
+        document.querySelectorAll('.zone-btn').forEach(b => {
+          b.className =
+            b === btn
+              ? 'zone-btn px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-bold cursor-pointer'
+              : 'zone-btn px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer';
+        });
+        renderWarehouseMap();
+      });
+    });
+
+    document.querySelectorAll('.sku-st-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeSkuStatus = btn.getAttribute('data-st');
+        document.querySelectorAll('.sku-st-btn').forEach(b => {
+          b.className =
+            b === btn
+              ? 'sku-st-btn px-3 py-1 rounded-lg font-semibold bg-emerald-500 text-slate-950 cursor-pointer'
+              : 'sku-st-btn px-3 py-1 rounded-lg font-medium text-slate-600 dark:text-slate-300 cursor-pointer';
+        });
+        renderSkuTable();
+      });
+    });
+
+    // Top module focus filter
+    document.querySelectorAll('.mod-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mod = btn.getAttribute('data-mod');
+        document.querySelectorAll('.mod-tab').forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('bg-emerald-500', active);
+          b.classList.toggle('text-slate-950', active);
+          b.classList.toggle('font-semibold', active);
+        });
+        if (mod === 'stock') document.getElementById('sec-sku-table').scrollIntoView({ behavior: 'smooth' });
+        if (mod === 'warehouse') document.getElementById('card-warehouse-map').scrollIntoView({ behavior: 'smooth' });
+        if (mod === 'alerts') document.getElementById('card-alerts-desk').scrollIntoView({ behavior: 'smooth' });
+        if (mod === 'all') window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    // Auto-resolve all alerts
+    document.getElementById('autoResolveAllBtn').addEventListener('click', () => {
+      ALERTS.forEach(a => {
+        if (!a.resolved) {
+          a.resolved = true;
+          poSentCount++;
+          const s = SKUS.find(x => x.sku === a.sku);
+          if (s) s.onHand += a.reorderQty;
+        }
+      });
+      ZONE_BINS.A[3].units = 250;
+      ZONE_BINS.A[3].pct = 62;
+      document.getElementById('poCounterLabel').textContent = `${poSentCount} POs Sent`;
+      renderHubKPIs();
+      renderWarehouseMap();
+      renderAlerts();
+      renderSkuTable();
+    });
+
+    // Export CSV
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      const csv = ['SKU,Name,Warehouse,Bin,OnHand,ROP,UnitCost']
+        .concat(SKUS.map(s => `${s.sku},"${s.name}",${s.hub},${s.bin},${s.onHand},${s.rop},${s.cost}`))
+        .join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'stockpulse-inventory.csv';
+      a.click();
+    });
+
+    // Receive Modal
+    const recModal = document.getElementById('receiveModal');
+    document.getElementById('openReceiveModalBtn').addEventListener('click', () => {
+      populateModalSkus();
+      recModal.classList.remove('hidden');
+    });
+    document.getElementById('closeReceiveModal').addEventListener('click', () => recModal.classList.add('hidden'));
+    document.getElementById('cancelReceiveBtn').addEventListener('click', () => recModal.classList.add('hidden'));
+    document.getElementById('confirmReceiveBtn').addEventListener('click', () => {
+      const code = document.getElementById('restockSkuSelect').value;
+      const qty = Math.max(1, Number(document.getElementById('restockQtyInput').value) || 100);
+      const item = SKUS.find(s => s.sku === code);
+      if (item) item.onHand += qty;
+      recModal.classList.add('hidden');
+      renderSkuTable();
+    });
+
+    // Dark / Swiss Light Mode Switch
+    document.getElementById('themeSwitchBtn').addEventListener('click', () => {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      document.getElementById('sunSvg').classList.toggle('hidden', !isDark);
+      document.getElementById('moonSvg').classList.toggle('hidden', isDark);
+      renderVelocityChart();
+    });
+
+    // Init
+    renderHubKPIs();
+    renderVelocityChart();
+    renderWarehouseMap();
+    renderAlerts();
+    renderSkuTable();
+  </script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import { TemplateListPage } from './presentation/pages/TemplateListPage.tsx';
 import { TemplateDetailPage } from './presentation/pages/TemplateDetailPage.tsx';
 import { TemplateFormPage } from './presentation/pages/TemplateFormPage.tsx';
 import { RoutesPage } from './presentation/pages/RoutesPage.tsx';
+import { EntertainmentPage } from './presentation/pages/EntertainmentPage.tsx';
 import { SettingsPage } from './presentation/pages/SettingsPage.tsx';
 import { NotFoundPage } from './presentation/pages/NotFoundPage.tsx';
 
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/templates/:id" element={<TemplateDetailPage />} />
             <Route path="/templates/:id/edit" element={<TemplateFormPage mode="edit" />} />
             <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/entertainment" element={<EntertainmentPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>

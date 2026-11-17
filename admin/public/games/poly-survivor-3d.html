@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Poly Survivor 3D - Tử Chiến Sinh Tồn</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Nunito + JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
+            background: #0b101b;
+            color: #f8fafc;
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            z-index: 1;
+        }
+
+        .hud-glass {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .upgrade-card {
+            transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+        .upgrade-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #38bdf8;
+            box-shadow: 0 16px 36px rgba(14, 165, 233, 0.28);
+        }
+        .upgrade-card:active {
+            transform: scale(0.98);
+        }
+
+        .font-mono-tech {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Khung vẽ WebGL 3D -->
+    <div id="canvas-container"></div>
+
+    <!-- LỚP GIAO DIỆN HUD CHÍNH -->
+    <div id="hud-layer" class="fixed inset-0 pointer-events-none z-10 flex flex-col justify-between p-3 sm:p-4">
+
+        <!-- Hàng trên: Thanh EXP + Đồng hồ & Hạ gục + Bảng Telemetry Kỹ Thuật -->
+        <div class="space-y-2">
+            <!-- Thanh Kinh Nghiệm toàn chiều ngang -->
+            <div class="w-full h-3.5 rounded-full bg-slate-900/90 border border-slate-700/80 p-0.5 overflow-hidden shadow-md">
+                <div id="xp-bar" class="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 transition-all duration-150" style="width: 0%;"></div>
+            </div>
+
+            <div class="flex items-start justify-between gap-2">
+                <!-- Trái: Máu, Cấp độ & Vũ khí hiện tại -->
+                <div class="hud-glass rounded-2xl px-3.5 py-2.5 space-y-1.5 pointer-events-auto min-w-[190px] sm:min-w-[235px]">
+                    <div class="flex items-center justify-between gap-2">
+                        <span id="lv-text" class="px-2 py-0.5 rounded-md bg-sky-500/20 border border-sky-400/40 text-sky-300 text-xs font-black">
+                            CẤP 1
+                        </span>
+                        <span id="hp-text" class="text-xs font-extrabold text-rose-300 font-mono-tech">100 / 100 HP</span>
+                    </div>
+                    <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                        <div id="hp-bar" class="h-full bg-gradient-to-r from-rose-500 to-red-400 transition-all duration-150" style="width: 100%;"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-300 pt-0.5">
+                        <span>💀 Hạ: <strong id="kill-count" class="text-amber-300 font-mono-tech">0</strong></span>
+                        <span id="weapon-badges" class="text-xs">🔫1 🔥1</span>
+                    </div>
+                </div>
+
+                <!-- Giữa: Đồng hồ sinh tồn & Cảnh báo Boss -->
+                <div class="flex flex-col items-center gap-1.5">
+                    <div class="hud-glass rounded-2xl px-4 py-1.5 text-center">
+                        <div id="timer-text" class="font-mono-tech text-lg sm:text-2xl font-bold tracking-wider text-white">00:00</div>
+                        <div id="wave-label" class="text-[10px] font-extrabold uppercase tracking-widest text-sky-400">Đợt 1 • Khởi Đầu</div>
+                    </div>
+
+                    <!-- Thanh máu Đại Boss (hiện mỗi 2 phút khi Boss xuất hiện) -->
+                    <div id="boss-bar-wrap" class="hidden hud-glass rounded-xl px-3 py-1.5 w-52 sm:w-72 border-rose-500/60">
+                        <div class="flex justify-between text-[10px] font-black text-rose-300 uppercase mb-1">
+                            <span>👹 ĐẠI BOSS HỦY DIỆT</span>
+                            <span id="boss-hp-text">100%</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden">
+                            <div id="boss-hp-bar" class="h-full bg-gradient-to-r from-red-600 via-rose-500 to-amber-400" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phải: Telemetry Kỹ Thuật (FPS, Quái, Đạn, Draw Calls) + Nút Âm thanh -->
+                <div class="flex flex-col items-end gap-1.5 pointer-events-auto">
+                    <div class="hud-glass rounded-2xl px-3 py-2 font-mono-tech text-[11px] leading-relaxed text-slate-200 min-w-[138px]">
+                        <div class="flex justify-between gap-3">
+                            <span class="text-slate-400">FPS:</span>
+                            <span id="stat-fps" class="text-emerald-400 font-bold">60</span>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <span class="text-slate-400">Quái:</span>
+                            <span id="stat-enemies" class="text-rose-400 font-bold">0</span>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <span class="text-slate-400">Đạn:</span>
+                            <span id="stat-bullets" class="text-cyan-300 font-bold">0</span>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <span class="text-slate-400">DrawCalls:</span>
+                            <span id="stat-draws" class="text-amber-300 font-bold">0</span>
+                        </div>
+                    </div>
+
+                    <button id="btn-sound" title="Bật / Tắt âm thanh" class="hud-glass w-9 h-9 rounded-xl flex items-center justify-center text-sm hover:border-sky-400/50 cursor-pointer">
+                        🔊
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hàng dưới: Hướng dẫn điều khiển / Vùng Joystick ảo trên điện thoại -->
+        <div class="flex items-end justify-between">
+            <div id="joystick-zone" class="relative w-28 h-28 rounded-full border-2 border-slate-400/25 bg-slate-900/35 backdrop-blur-sm flex items-center justify-center sm:opacity-60">
+                <div id="joystick-knob" class="w-11 h-11 rounded-full bg-sky-400/70 border-2 border-white/80 shadow-lg transition-transform duration-75"></div>
+            </div>
+
+            <div class="hidden sm:block hud-glass rounded-xl px-3.5 py-1.5 text-[11px] font-bold text-slate-300">
+                ⌨️ Di chuyển: <span class="text-sky-300">WASD / Phím Mũi Tên</span> • Vũ khí tự động khai hỏa • Chạm kéo trên Mobile
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LÊN CẤP: CHỌN 1 TRONG 3 THẺ NÂNG CẤP -->
+    <div id="levelup-modal" class="fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+        <div class="max-w-2xl w-full space-y-4">
+            <div class="text-center space-y-1">
+                <span class="inline-block px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-black uppercase tracking-wider">
+                    ⚡ Thăng Cấp Kỹ Năng ⚡
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">Chọn 1 Nâng Cấp Chiến Đấu</h2>
+                <p class="text-xs sm:text-sm text-slate-300">Bấm chọn thẻ hoặc nhấn phím <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 font-mono-tech">1</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 font-mono-tech">2</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 font-mono-tech">3</kbd></p>
+            </div>
+
+            <div id="upgrade-cards-container" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH KẾT THÚC (GAME OVER) -->
+    <div id="gameover-modal" class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
+        <div class="hud-glass rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-5 border-rose-500/40">
+            <div class="space-y-1">
+                <div class="text-4xl mb-1">💀</div>
+                <h2 class="text-2xl sm:text-3xl font-black text-rose-400">THẤT THỦ CHIẾN TRƯỜNG</h2>
+                <p class="text-xs sm:text-sm text-slate-300">Bạn đã chiến đấu ngoan cường trước biển quái vật!</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2.5 bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800">
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400">Thời gian</div>
+                    <div id="end-time" class="font-mono-tech text-base sm:text-lg font-bold text-sky-300 mt-0.5">00:00</div>
+                </div>
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400">Quái đã hạ</div>
+                    <div id="end-kills" class="font-mono-tech text-base sm:text-lg font-bold text-amber-300 mt-0.5">0</div>
+                </div>
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400">Cấp đạt được</div>
+                    <div id="end-level" class="font-mono-tech text-base sm:text-lg font-bold text-emerald-300 mt-0.5">1</div>
+                </div>
+            </div>
+
+            <button id="btn-restart" class="w-full py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-lg shadow-sky-500/25 cursor-pointer transition-transform active:scale-95">
+                🔄 CHƠI LẠI NGAY
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. HỆ THỐNG ÂM THANH TỐI GIẢN (WEB AUDIO API - KHÔNG CẤP PHÁT RÁC)
+        ========================================================================= */
+        const sfx = {
+            ctx: null,
+            enabled: true,
+            lastShoot: 0,
+            lastHit: 0,
+            lastGem: 0,
+            unlock() {
+                if (!this.ctx) {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (Ctx) this.ctx = new Ctx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            },
+            shoot() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                if (now - this.lastShoot < 0.06) return;
+                this.lastShoot = now;
+                const o = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                o.type = 'triangle';
+                o.frequency.setValueAtTime(520, now);
+                o.frequency.exponentialRampToValueAtTime(170, now + 0.065);
+                g.gain.setValueAtTime(0.05, now);
+                g.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+                o.connect(g); g.connect(this.ctx.destination);
+                o.start(now); o.stop(now + 0.075);
+            },
+            thunder() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const o = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                o.type = 'sawtooth';
+                o.frequency.setValueAtTime(280, now);
+                o.frequency.exponentialRampToValueAtTime(48, now + 0.18);
+                g.gain.setValueAtTime(0.09, now);
+                g.gain.exponentialRampToValueAtTime(0.0001, now + 0.19);
+                o.connect(g); g.connect(this.ctx.destination);
+                o.start(now); o.stop(now + 0.2);
+            },
+            gem() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                if (now - this.lastGem < 0.035) return;
+                this.lastGem = now;
+                const o = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(780 + Math.random() * 240, now);
+                o.frequency.exponentialRampToValueAtTime(1320, now + 0.06);
+                g.gain.setValueAtTime(0.045, now);
+                g.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+                o.connect(g); g.connect(this.ctx.destination);
+                o.start(now); o.stop(now + 0.075);
+            },
+            levelUp() {
+                if (!this.enabled || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+                    const o = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(f, now + i * 0.065);
+                    g.gain.setValueAtTime(0.09, now + i * 0.065);
+                    g.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.065 + 0.24);
+                    o.connect(g); g.connect(this.ctx.destination);
+                    o.start(now + i * 0.065); o.stop(now + i * 0.065 + 0.25);
+                });
+            }
+        };
+
+        /* =========================================================================
+           2. HẰNG SỐ KỸ THUẬT, OBJECT POOLS CỐ ĐỊNH & BIẾN TẠM DÙNG CHUNG (ZERO GC)
+        ========================================================================= */
+        const FIXED_DT = 1 / 60;
+        const ARENA_HALF = 95;          // Mặt phẳng chiến trường rộng 190 x 190 đơn vị
+        const NEAR_AI_DIST_SQ = 26 * 26; // Chỉ chạy AI đẩy tách nặng cho quái trong bán kính 26m
+
+        // Kích thước Pool cố định cho từng hệ thống InstancedMesh
+        const MAX_ENEMIES_PER_TYPE = [650, 450, 260, 200, 8]; // Thường, Nhanh, Trâu, Tinh Anh, Boss (Tổng 1.568 slot!)
+        const ENEMY_TYPES = 5;
+        let TOTAL_ENEMY_SLOTS = 0;
+        const TYPE_OFFSET = new Int32Array(ENEMY_TYPES);
+        for (let t = 0; t < ENEMY_TYPES; t++) {
+            TYPE_OFFSET[t] = TOTAL_ENEMY_SLOTS;
+            TOTAL_ENEMY_SLOTS += MAX_ENEMIES_PER_TYPE[t];
+        }
+
+        const MAX_BULLETS = 500;
+        const MAX_GEMS = 1200;
+        const MAX_PARTICLES = 900;
+        const MAX_ORBITALS = 12;
+        const MAX_SHADOWS = TOTAL_ENEMY_SLOTS + 1; // Toàn bộ quái + 1 bóng nhân vật chính trong đúng 1 Draw Call!
+        const MAX_LIGHTNING_BOLTS = 6;
+
+        // Cấu hình thông số 5 chủng loại quái (0: Thường, 1: Nhanh, 2: Trâu, 3: Tinh Anh, 4: Đại Boss)
+        const ENEMY_DEFS = [
+            { color: 0xef4444, radius: 0.52, scaleY: 1.15, speed: 3.1, hp: 22, dmg: 10, xp: 1 },
+            { color: 0xf59e0b, radius: 0.44, scaleY: 1.10, speed: 5.4, hp: 14, dmg: 8,  xp: 1 },
+            { color: 0x8b5cf6, radius: 0.78, scaleY: 1.35, speed: 2.1, hp: 75, dmg: 18, xp: 3 },
+            { color: 0x10b981, radius: 0.62, scaleY: 1.25, speed: 4.1, hp: 48, dmg: 14, xp: 2 },
+            { color: 0xe11d48, radius: 1.75, scaleY: 2.20, speed: 2.8, hp: 1600, dmg: 32, xp: 40 }
+        ];
+
+        // TypedArray dữ liệu phẳng cho toàn bộ Quái (Object Pooling 100%)
+        const eActive = new Uint8Array(TOTAL_ENEMY_SLOTS);
+        const eType = new Uint8Array(TOTAL_ENEMY_SLOTS);
+        const eLocalIdx = new Int32Array(TOTAL_ENEMY_SLOTS);
+        const eX = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eZ = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eHp = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eMaxHp = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eFlash = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eWasFlashing = new Uint8Array(TOTAL_ENEMY_SLOTS);
+        const eKnockX = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eKnockZ = new Float32Array(TOTAL_ENEMY_SLOTS);
+        const eNextInCell = new Int32Array(TOTAL_ENEMY_SLOTS);
+
+        // Free-list Stack riêng cho từng loại quái để O(1) spawn/kill
+        const freeEnemyStacks = [];
+        const freeEnemyTops = new Int32Array(ENEMY_TYPES);
+        for (let t = 0; t < ENEMY_TYPES; t++) {
+            const cap = MAX_ENEMIES_PER_TYPE[t];
+            const stack = new Int32Array(cap);
+            for (let i = 0; i < cap; i++) {
+                const globalId = TYPE_OFFSET[t] + i;
+                eType[globalId] = t;
+                eLocalIdx[globalId] = i;
+                stack[i] = globalId;
+            }
+            freeEnemyStacks.push(stack);
+            freeEnemyTops[t] = cap;
+        }
+
+        // Spatial Grid 2D trên mặt phẳng XZ (100 x 100 ô, mỗi ô 2.0m -> phủ trọn 200m x 200m)
+        const GRID_COLS = 100;
+        const GRID_CELL = 2.0;
+        const GRID_HALF_WORLD = (GRID_COLS * GRID_CELL) * 0.5;
+        const GRID_TOTAL_CELLS = GRID_COLS * GRID_COLS;
+        const gridHeads = new Int32Array(GRID_TOTAL_CELLS);
+
+        // Object Pool cho Đạn Tự Động
+        const bActive = new Uint8Array(MAX_BULLETS);
+        const bX = new Float32Array(MAX_BULLETS);
+        const bZ = new Float32Array(MAX_BULLETS);
+        const bVX = new Float32Array(MAX_BULLETS);
+        const bVZ = new Float32Array(MAX_BULLETS);
+        const bLife = new Float32Array(MAX_BULLETS);
+        const bDmg = new Float32Array(MAX_BULLETS);
+        const bFreeStack = new Int32Array(MAX_BULLETS);
+        let bFreeTop = MAX_BULLETS;
+
+        // Object Pool cho Ngọc Kinh Nghiệm
+        const gActive = new Uint8Array(MAX_GEMS);
+        const gX = new Float32Array(MAX_GEMS);
+        const gZ = new Float32Array(MAX_GEMS);
+        const gVal = new Float32Array(MAX_GEMS);
+        const gMagnet = new Uint8Array(MAX_GEMS);
+        const gFreeStack = new Int32Array(MAX_GEMS);
+        let gFreeTop = MAX_GEMS;
+
+        // Object Pool cho Hạt Nổ Khi Quái Chết
+        const pActive = new Uint8Array(MAX_PARTICLES);
+        const pX = new Float32Array(MAX_PARTICLES);
+        const pY = new Float32Array(MAX_PARTICLES);
+        const pZ = new Float32Array(MAX_PARTICLES);
+        const pVX = new Float32Array(MAX_PARTICLES);
+        const pVY = new Float32Array(MAX_PARTICLES);
+        const pVZ = new Float32Array(MAX_PARTICLES);
+        const pLife = new Float32Array(MAX_PARTICLES);
+        const pMaxLife = new Float32Array(MAX_PARTICLES);
+        const pFreeStack = new Int32Array(MAX_PARTICLES);
+        let pFreeTop = MAX_PARTICLES;
+
+        // BIẾN TẠM DÙNG CHUNG TOÀN CỤC (Tuyệt đối không new Vector3/Matrix4 trong vòng lặp!)
+        const _mat4 = new THREE.Matrix4();
+        const _hiddenMat4 = new THREE.Matrix4().makeScale(0, 0, 0);
+        _hiddenMat4.setPosition(0, -999, 0);
+        const _pos = new THREE.Vector3();
+        const _quat = new THREE.Quaternion();
+        const _scale = new THREE.Vector3();
+        const _euler = new THREE.Euler();
+        const _color = new THREE.Color();
+        const _whiteColor = new THREE.Color(0xffffff);
+        const _baseColors = ENEMY_DEFS.map(d => new THREE.Color(d.color));
+
+        /* =========================================================================
+           3. KHỞI TẠO THREE.JS, INSTANCED MESHES, BÓNG MỜ GIẢ & TIA SÉT ZIGZAG
+        ========================================================================= */
+        let scene, camera, renderer;
+        let playerGroup, playerBodyMat, groundGrid;
+        const enemyMeshes = [];
+        let shadowInstMesh, bulletInstMesh, gemInstMesh, particleInstMesh, orbitalInstMesh;
+        const lightningLines = []; // Pool 6 đường zigzag sấm sét cố định
+
+        function createFloorGridTexture() {
+            const c = document.createElement('canvas');
+            c.width = 256; c.height = 256;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#111827';
+            ctx.fillRect(0, 0, 256, 256);
+
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.11)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, 256, 256);
+
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 64; i < 256; i += 64) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(256, i); ctx.stroke();
+            }
+
+            const tex = new THREE.CanvasTexture(c);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(50, 50);
+            return tex;
+        }
+
+        function initThreeEngine() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b101b);
+            scene.fog = new THREE.Fog(0x0b101b, 28, 56);
+
+            camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.5, 90);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Ánh sáng đúng chuẩn: 1 Đèn môi trường + 1 Đèn hướng
+            const ambient = new THREE.AmbientLight(0x94a3b8, 0.75);
+            scene.add(ambient);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
+            dirLight.position.set(14, 28, 16);
+            scene.add(dirLight);
+
+            // Mặt phẳng nền rộng có lưới mờ rõ vị trí di chuyển
+            const floorGeo = new THREE.PlaneGeometry(ARENA_HALF * 2.4, ARENA_HALF * 2.4);
+            floorGeo.rotateX(-Math.PI / 2);
+            const floorMat = new THREE.MeshLambertMaterial({ map: createFloorGridTexture() });
+            groundGrid = new THREE.Mesh(floorGeo, floorMat);
+            scene.add(groundGrid);
+
+            // Nhân vật chính Low-Poly (Hình trụ + Hình nón pháp sư + Vòng định vị sáng)
+            playerGroup = new THREE.Group();
+            playerBodyMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.25 });
+            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.44, 0.95, 10), playerBodyMat);
+            torso.position.y = 0.55;
+            const head = new THREE.Mesh(
+                new THREE.SphereGeometry(0.28, 10, 8),
+                new THREE.MeshLambertMaterial({ color: 0xfef3c7 })
+            );
+            head.position.y = 1.22;
+            const hat = new THREE.Mesh(
+                new THREE.ConeGeometry(0.46, 0.62, 8),
+                new THREE.MeshLambertMaterial({ color: 0x2563eb })
+            );
+            hat.position.y = 1.62;
+            const auraRing = new THREE.Mesh(
+                new THREE.RingGeometry(0.55, 0.66, 24),
+                new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.65 })
+            );
+            auraRing.rotation.x = -Math.PI / 2;
+            auraRing.position.y = 0.03;
+            playerGroup.add(torso, head, hat, auraRing);
+            scene.add(playerGroup);
+
+            // 1. InstancedMesh cho Bóng mờ giả hình tròn dưới chân (1 Draw Call duy nhất!)
+            const shadowGeo = new THREE.CircleGeometry(0.55, 12);
+            shadowGeo.rotateX(-Math.PI / 2);
+            const shadowMat = new THREE.MeshBasicMaterial({
+                color: 0x020617,
+                transparent: true,
+                opacity: 0.48,
+                depthWrite: false
+            });
+            shadowInstMesh = new THREE.InstancedMesh(shadowGeo, shadowMat, MAX_SHADOWS);
+            shadowInstMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            shadowInstMesh.frustumCulled = false;
+            scene.add(shadowInstMesh);
+
+            // 2. 5 InstancedMesh cho 4 loại quái + Đại Boss (hỗ trợ instanceColor để nháy trắng khi trúng đòn!)
+            const enemyGeos = [
+                new THREE.CylinderGeometry(0.42, 0.48, 1.0, 8), // Loại 0: Quái Thường (Hình trụ đỏ)
+                new THREE.ConeGeometry(0.44, 1.05, 7),          // Loại 1: Quái Nhanh (Hình nón cam)
+                new THREE.DodecahedronGeometry(0.62, 0),        // Loại 2: Quái Trâu (Khối đa diện tím)
+                new THREE.OctahedronGeometry(0.54, 0),          // Loại 3: Tinh Anh (Khối bát diện ngọc)
+                new THREE.IcosahedronGeometry(0.85, 0)          // Loại 4: Đại Boss (Khối 20 mặt khổng lồ)
+            ];
+
+            for (let t = 0; t < ENEMY_TYPES; t++) {
+                const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+                const cap = MAX_ENEMIES_PER_TYPE[t];
+                const im = new THREE.InstancedMesh(enemyGeos[t], mat, cap);
+                im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+                im.frustumCulled = false;
+                for (let i = 0; i < cap; i++) {
+                    im.setMatrixAt(i, _hiddenMat4);
+                    im.setColorAt(i, _baseColors[t]);
+                }
+                im.instanceMatrix.needsUpdate = true;
+                if (im.instanceColor) im.instanceColor.needsUpdate = true;
+                scene.add(im);
+                enemyMeshes.push(im);
+            }
+
+            // 3. InstancedMesh cho Đạn Tự Động
+            const bulletGeo = new THREE.SphereGeometry(0.18, 8, 6);
+            bulletGeo.scale(1, 1, 1.8);
+            const bulletMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+            bulletInstMesh = new THREE.InstancedMesh(bulletGeo, bulletMat, MAX_BULLETS);
+            bulletInstMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            bulletInstMesh.frustumCulled = false;
+            scene.add(bulletInstMesh);
+
+            // 4. InstancedMesh cho Ngọc Kinh Nghiệm
+            const gemGeo = new THREE.OctahedronGeometry(0.24, 0);
+            const gemMat = new THREE.MeshLambertMaterial({ color: 0x22d3ee, emissive: 0x0891b2, emissiveIntensity: 0.5 });
+            gemInstMesh = new THREE.InstancedMesh(gemGeo, gemMat, MAX_GEMS);
+            gemInstMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            gemInstMesh.frustumCulled = false;
+            scene.add(gemInstMesh);
+
+            // 5. InstancedMesh cho Vòng Lửa Hộ Thể phát sáng
+            const orbGeo = new THREE.SphereGeometry(0.36, 10, 8);
+            const orbMat = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+            orbitalInstMesh = new THREE.InstancedMesh(orbGeo, orbMat, MAX_ORBITALS);
+            orbitalInstMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            orbitalInstMesh.frustumCulled = false;
+            scene.add(orbitalInstMesh);
+
+            // 6. InstancedMesh cho Hạt Nổ Khi Quái Chết
+            const partGeo = new THREE.BoxGeometry(0.18, 0.18, 0.18);
+            const partMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            particleInstMesh = new THREE.InstancedMesh(partGeo, partMat, MAX_PARTICLES);
+            particleInstMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            particleInstMesh.frustumCulled = false;
+            for (let i = 0; i < MAX_PARTICLES; i++) {
+                particleInstMesh.setMatrixAt(i, _hiddenMat4);
+                particleInstMesh.setColorAt(i, _whiteColor);
+            }
+            scene.add(particleInstMesh);
+
+            // 7. Pool 6 Tia Sét Zigzag cố định (cập nhật đỉnh trực tiếp, không tạo mới)
+            const boltMat = new THREE.LineBasicMaterial({ color: 0xfef08a, linewidth: 2 });
+            for (let i = 0; i < MAX_LIGHTNING_BOLTS; i++) {
+                const positions = new Float32Array(7 * 3); // 7 khúc gãy zigzag
+                const bGeo = new THREE.BufferGeometry();
+                bGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const line = new THREE.Line(bGeo, boltMat);
+                line.visible = false;
+                line.frustumCulled = false;
+                scene.add(line);
+                lightningLines.push({ line, positions, timer: 0 });
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            });
+        }
+
+        /* =========================================================================
+           4. TRẠNG THÁI NGƯỜI CHƠI, VŨ KHÍ, THẺ NÂNG CẤP & ĐIỀU KHIỂN
+        ========================================================================= */
+        const player = {
+            x: 0, z: 0, angle: 0,
+            hp: 100, maxHp: 100,
+            speed: 7.2,
+            pickupRadius: 3.8,
+            invulnTimer: 0,
+            shakeTimer: 0,
+
+            level: 1,
+            xp: 0,
+            xpNext: 10,
+            kills: 0,
+            elapsedTime: 0,
+            nextBossTime: 120, // Boss mỗi 2 phút (120 giây)
+            activeBossId: -1,
+
+            // Vũ khí 1: Đạn bắn tự động
+            bulletCount: 1,
+            bulletDmg: 18,
+            fireCooldown: 0.48,
+            fireTimer: 0,
+
+            // Vũ khí 2: Vòng lửa quay quanh người
+            orbitalCount: 2,
+            orbitalRadius: 2.65,
+            orbitalSpeed: 3.1,
+            orbitalAngle: 0,
+            orbitalDmg: 16,
+
+            // Vũ khí 3: Sấm sét đánh ngẫu nhiên
+            lightningCount: 1,
+            lightningDmg: 55,
+            lightningCooldown: 2.4,
+            lightningTimer: 1.2
+        };
+
+        const UPGRADE_POOL = [
+            {
+                id: 'multishot', icon: '🔫', title: 'Thêm Tia Đạn Ma Thuật',
+                desc: 'Bắn thêm +1 tia đạn tỏa hình quạt về phía quái gần nhất.',
+                apply: () => { player.bulletCount = Math.min(9, player.bulletCount + 1); }
+            },
+            {
+                id: 'dmg', icon: '💥', title: 'Cường Hóa Hỏa Lực',
+                desc: 'Tăng +25% sát thương cho toàn bộ Đạn, Vòng Lửa và Sấm Sét.',
+                apply: () => {
+                    player.bulletDmg = Math.round(player.bulletDmg * 1.25);
+                    player.orbitalDmg = Math.round(player.orbitalDmg * 1.25);
+                    player.lightningDmg = Math.round(player.lightningDmg * 1.25);
+                }
+            },
+            {
+                id: 'firerate', icon: '⚡', title: 'Nòng Bắn Liên Thanh',
+                desc: 'Tăng +20% tốc độ bắn đạn tự động.',
+                apply: () => { player.fireCooldown = Math.max(0.11, player.fireCooldown * 0.82); }
+            },
+            {
+                id: 'fire_orb', icon: '🔥', title: 'Vòng Lửa Hộ Thể',
+                desc: 'Thêm +1 cầu lửa xoay quanh người và tăng tốc độ xoay.',
+                apply: () => {
+                    player.orbitalCount = Math.min(MAX_ORBITALS, player.orbitalCount + 1);
+                    player.orbitalSpeed += 0.35;
+                }
+            },
+            {
+                id: 'lightning', icon: '🌩️', title: 'Lôi Phạt Thiên Giáng',
+                desc: 'Tăng +1 tia sấm sét đánh ngẫu nhiên & giảm thời gian hồi chiêu.',
+                apply: () => {
+                    player.lightningCount = Math.min(MAX_LIGHTNING_BOLTS, player.lightningCount + 1);
+                    player.lightningCooldown = Math.max(0.75, player.lightningCooldown * 0.86);
+                }
+            },
+            {
+                id: 'maxhp', icon: '❤️', title: 'Trái Tim Chiến Binh',
+                desc: 'Tăng +30 Máu tối đa và hồi phục ngay 40 HP.',
+                apply: () => {
+                    player.maxHp += 30;
+                    player.hp = Math.min(player.maxHp, player.hp + 40);
+                }
+            },
+            {
+                id: 'movespeed', icon: '👟', title: 'Giày Gió Thần Tốc',
+                desc: 'Tăng +14% tốc độ chạy né đàn quái đông.',
+                apply: () => { player.speed = Math.min(13.5, player.speed * 1.14); }
+            },
+            {
+                id: 'magnet', icon: '🧲', title: 'Từ Trường Hút Ngọc',
+                desc: 'Tăng +35% bán kính tự động hút ngọc kinh nghiệm.',
+                apply: () => { player.pickupRadius = Math.min(14, player.pickupRadius * 1.35); }
+            }
+        ];
+
+        let gameState = 'PLAYING'; // PLAYING | PAUSED_LEVELUP | GAMEOVER
+        let activeEnemyCount = 0;
+        let activeBulletCount = 0;
+        let spawnAccumulator = 0;
+        let orbitalHitTick = 0;
+
+        // Input Bàn phím + Joystick ảo trên điện thoại
+        const keys = {};
+        const joyInput = { active: false, id: -1, startX: 0, startY: 0, dx: 0, dy: 0 };
+
+        function setupControls() {
+            window.addEventListener('keydown', e => {
+                sfx.unlock();
+                keys[e.code] = true;
+                if (gameState === 'PAUSED_LEVELUP') {
+                    if (e.key === '1') chooseUpgradeIndex(0);
+                    else if (e.key === '2') chooseUpgradeIndex(1);
+                    else if (e.key === '3') chooseUpgradeIndex(2);
+                }
+            });
+            window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+            const knob = document.getElementById('joystick-knob');
+            window.addEventListener('pointerdown', e => {
+                sfx.unlock();
+                if (gameState !== 'PLAYING') return;
+                if (e.target.closest('button')) return;
+                joyInput.active = true;
+                joyInput.id = e.pointerId;
+                joyInput.startX = e.clientX;
+                joyInput.startY = e.clientY;
+                joyInput.dx = 0; joyInput.dy = 0;
+            });
+
+            window.addEventListener('pointermove', e => {
+                if (!joyInput.active || e.pointerId !== joyInput.id) return;
+                const rx = e.clientX - joyInput.startX;
+                const ry = e.clientY - joyInput.startY;
+                const maxR = 42;
+                const len = Math.hypot(rx, ry);
+                if (len > 4) {
+                    const clamped = Math.min(maxR, len);
+                    joyInput.dx = (rx / len) * (clamped / maxR);
+                    joyInput.dy = (ry / len) * (clamped / maxR);
+                    knob.style.transform = `translate(${(rx / len) * clamped * 0.65}px, ${(ry / len) * clamped * 0.65}px)`;
+                } else {
+                    joyInput.dx = 0; joyInput.dy = 0;
+                    knob.style.transform = 'translate(0px, 0px)';
+                }
+            });
+
+            const endJoy = e => {
+                if (e.pointerId === joyInput.id) {
+                    joyInput.active = false;
+                    joyInput.dx = 0; joyInput.dy = 0;
+                    knob.style.transform = 'translate(0px, 0px)';
+                }
+            };
+            window.addEventListener('pointerup', endJoy);
+            window.addEventListener('pointercancel', endJoy);
+
+            document.getElementById('btn-sound').addEventListener('click', () => {
+                sfx.unlock();
+                sfx.enabled = !sfx.enabled;
+                document.getElementById('btn-sound').textContent = sfx.enabled ? '🔊' : '🔇';
+            });
+
+            document.getElementById('btn-restart').addEventListener('click', resetNewGame);
+        }
+
+        /* =========================================================================
+           5. QUẢN LÝ OBJECT POOLING & SPATIAL HASH GRID 2D (O(1) / O(N))
+        ========================================================================= */
+        function resetPoolsAndState() {
+            eActive.fill(0);
+            eFlash.fill(0);
+            eWasFlashing.fill(0);
+            for (let t = 0; t < ENEMY_TYPES; t++) {
+                const cap = MAX_ENEMIES_PER_TYPE[t];
+                for (let i = 0; i < cap; i++) {
+                    freeEnemyStacks[t][i] = TYPE_OFFSET[t] + i;
+                    enemyMeshes[t].setMatrixAt(i, _hiddenMat4);
+                    enemyMeshes[t].setColorAt(i, _baseColors[t]);
+                }
+                freeEnemyTops[t] = cap;
+                enemyMeshes[t].instanceMatrix.needsUpdate = true;
+                if (enemyMeshes[t].instanceColor) enemyMeshes[t].instanceColor.needsUpdate = true;
+            }
+
+            bActive.fill(0);
+            bFreeTop = MAX_BULLETS;
+            for (let i = 0; i < MAX_BULLETS; i++) {
+                bFreeStack[i] = i;
+                bulletInstMesh.setMatrixAt(i, _hiddenMat4);
+            }
+            bulletInstMesh.instanceMatrix.needsUpdate = true;
+
+            gActive.fill(0);
+            gFreeTop = MAX_GEMS;
+            for (let i = 0; i < MAX_GEMS; i++) {
+                gFreeStack[i] = i;
+                gemInstMesh.setMatrixAt(i, _hiddenMat4);
+            }
+            gemInstMesh.instanceMatrix.needsUpdate = true;
+
+            pActive.fill(0);
+            pFreeTop = MAX_PARTICLES;
+            for (let i = 0; i < MAX_PARTICLES; i++) {
+                pFreeStack[i] = i;
+                particleInstMesh.setMatrixAt(i, _hiddenMat4);
+            }
+            particleInstMesh.instanceMatrix.needsUpdate = true;
+
+            for (let i = 0; i < MAX_SHADOWS; i++) {
+                shadowInstMesh.setMatrixAt(i, _hiddenMat4);
+            }
+            shadowInstMesh.instanceMatrix.needsUpdate = true;
+
+            for (let i = 0; i < MAX_ORBITALS; i++) {
+                orbitalInstMesh.setMatrixAt(i, _hiddenMat4);
+            }
+            orbitalInstMesh.instanceMatrix.needsUpdate = true;
+
+            activeEnemyCount = 0;
+            activeBulletCount = 0;
+        }
+
+        function spawnEnemy(typeId, x, z, hpScale) {
+            const top = freeEnemyTops[typeId];
+            if (top <= 0) return -1;
+            const newTop = top - 1;
+            freeEnemyTops[typeId] = newTop;
+            const id = freeEnemyStacks[typeId][newTop];
+
+            const def = ENEMY_DEFS[typeId];
+            eActive[id] = 1;
+            eX[id] = x;
+            eZ[id] = z;
+            eMaxHp[id] = def.hp * hpScale;
+            eHp[id] = eMaxHp[id];
+            eFlash[id] = 0;
+            eKnockX[id] = 0;
+            eKnockZ[id] = 0;
+            if (eWasFlashing[id]) {
+                enemyMeshes[typeId].setColorAt(eLocalIdx[id], _baseColors[typeId]);
+                if (enemyMeshes[typeId].instanceColor) enemyMeshes[typeId].instanceColor.needsUpdate = true;
+                eWasFlashing[id] = 0;
+            }
+            activeEnemyCount++;
+            return id;
+        }
+
+        function killEnemy(id) {
+            if (!eActive[id]) return;
+            eActive[id] = 0;
+            activeEnemyCount--;
+
+            const t = eType[id];
+            const local = eLocalIdx[id];
+            enemyMeshes[t].setMatrixAt(local, _hiddenMat4);
+            shadowInstMesh.setMatrixAt(id, _hiddenMat4);
+
+            freeEnemyStacks[t][freeEnemyTops[t]] = id;
+            freeEnemyTops[t]++;
+
+            if (id === player.activeBossId) {
+                player.activeBossId = -1;
+                document.getElementById('boss-bar-wrap').classList.add('hidden');
+            }
+
+            player.kills++;
+            const def = ENEMY_DEFS[t];
+            // Rơi ngọc kinh nghiệm (Boss rơi chùm 16 viên ngọc lớn!)
+            if (t === 4) {
+                for (let k = 0; k < 16; k++) {
+                    const a = (k / 16) * Math.PI * 2;
+                    spawnGem(eX[id] + Math.cos(a) * 1.4, eZ[id] + Math.sin(a) * 1.4, 5);
+                }
+            } else {
+                spawnGem(eX[id], eZ[id], def.xp);
+            }
+
+            // Nổ hạt màu cùng màu quái
+            const burstCount = t === 4 ? 26 : 6;
+            for (let k = 0; k < burstCount; k++) {
+                spawnDeathParticle(eX[id], 0.55, eZ[id], _baseColors[t]);
+            }
+        }
+
+        function damageEnemy(id, amount, pushDirX, pushDirZ, pushForce) {
+            eHp[id] -= amount;
+            eFlash[id] = 0.09;
+            const t = eType[id];
+            const resist = t === 4 ? 0.12 : t === 2 ? 0.45 : 1.0;
+            eKnockX[id] = pushDirX * pushForce * resist;
+            eKnockZ[id] = pushDirZ * pushForce * resist;
+
+            if (eHp[id] <= 0) {
+                killEnemy(id);
+            }
+        }
+
+        function spawnBullet(x, z, vx, vz, dmg) {
+            if (bFreeTop <= 0) return;
+            const id = bFreeStack[--bFreeTop];
+            bActive[id] = 1;
+            bX[id] = x; bZ[id] = z;
+            bVX[id] = vx; bVZ[id] = vz;
+            bLife[id] = 1.45;
+            bDmg[id] = dmg;
+            activeBulletCount++;
+        }
+
+        function releaseBullet(id) {
+            if (!bActive[id]) return;
+            bActive[id] = 0;
+            activeBulletCount--;
+            bulletInstMesh.setMatrixAt(id, _hiddenMat4);
+            bFreeStack[bFreeTop++] = id;
+        }
+
+        function spawnGem(x, z, val) {
+            if (gFreeTop <= 0) return;
+            const id = gFreeStack[--gFreeTop];
+            gActive[id] = 1;
+            gX[id] = x; gZ[id] = z;
+            gVal[id] = val;
+            gMagnet[id] = 0;
+        }
+
+        function releaseGem(id) {
+            if (!gActive[id]) return;
+            gActive[id] = 0;
+            gemInstMesh.setMatrixAt(id, _hiddenMat4);
+            gFreeStack[gFreeTop++] = id;
+        }
+
+        function spawnDeathParticle(x, y, z, colorObj) {
+            if (pFreeTop <= 0) return;
+            const id = pFreeStack[--pFreeTop];
+            pActive[id] = 1;
+            pX[id] = x; pY[id] = y; pZ[id] = z;
+            const a = Math.random() * Math.PI * 2;
+            const spd = 2.2 + Math.random() * 4.5;
+            pVX[id] = Math.cos(a) * spd;
+            pVY[id] = 2.5 + Math.random() * 3.8;
+            pVZ[id] = Math.sin(a) * spd;
+            pLife[id] = 0;
+            pMaxLife[id] = 0.35 + Math.random() * 0.22;
+            particleInstMesh.setColorAt(id, colorObj);
+            if (particleInstMesh.instanceColor) particleInstMesh.instanceColor.needsUpdate = true;
+        }
+
+        /* --- Băm Spatial Grid 2D trên mặt phẳng XZ --- */
+        function worldToCell(coord) {
+            const c = ((coord + GRID_HALF_WORLD) / GRID_CELL) | 0;
+            return c < 0 ? 0 : c >= GRID_COLS ? GRID_COLS - 1 : c;
+        }
+
+        function rebuildSpatialGrid() {
+            gridHeads.fill(-1);
+            for (let i = 0; i < TOTAL_ENEMY_SLOTS; i++) {
+                if (!eActive[i]) continue;
+                const cx = worldToCell(eX[i]);
+                const cz = worldToCell(eZ[i]);
+                const cellIdx = cz * GRID_COLS + cx;
+                eNextInCell[i] = gridHeads[cellIdx];
+                gridHeads[cellIdx] = i;
+            }
+        }
+
+        function findNearestEnemy(originX, originZ, maxRange) {
+            const maxSq = maxRange * maxRange;
+            let bestId = -1;
+            let bestSq = maxSq;
+
+            const cellRad = Math.ceil(maxRange / GRID_CELL);
+            const cx0 = worldToCell(originX);
+            const cz0 = worldToCell(originZ);
+            const minX = Math.max(0, cx0 - cellRad), maxX = Math.min(GRID_COLS - 1, cx0 + cellRad);
+            const minZ = Math.max(0, cz0 - cellRad), maxZ = Math.min(GRID_COLS - 1, cz0 + cellRad);
+
+            for (let cz = minZ; cz <= maxZ; cz++) {
+                const rowOffset = cz * GRID_COLS;
+                for (let cx = minX; cx <= maxX; cx++) {
+                    let eid = gridHeads[rowOffset + cx];
+                    while (eid !== -1) {
+                        const dx = eX[eid] - originX;
+                        const dz = eZ[eid] - originZ;
+                        const dSq = dx * dx + dz * dz;
+                        if (dSq < bestSq) {
+                            bestSq = dSq;
+                            bestId = eid;
+                        }
+                        eid = eNextInCell[eid];
+                    }
+                }
+            }
+            return bestId;
+        }
+
+        /* =========================================================================
+           6. FIXED TIMESTEP LOGIC (60 Hz) - DI CHUYỂN, VŨ KHÍ, VA CHẠM, LÊN CẤP
+        ========================================================================= */
+        function triggerLightningBolt(slotIdx, targetX, targetZ) {
+            const bolt = lightningLines[slotIdx];
+            if (!bolt) return;
+            const arr = bolt.positions;
+            const startX = targetX + (Math.random() - 0.5) * 1.6;
+            const startZ = targetZ + (Math.random() - 0.5) * 1.6;
+            const startY = 11.5;
+
+            for (let s = 0; s < 7; s++) {
+                const t = s / 6;
+                const jitter = (s === 0 || s === 6) ? 0 : (Math.random() - 0.5) * 0.95;
+                const jitterZ = (s === 0 || s === 6) ? 0 : (Math.random() - 0.5) * 0.95;
+                arr[s * 3] = startX + (targetX - startX) * t + jitter;
+                arr[s * 3 + 1] = startY * (1 - t) + 0.15;
+                arr[s * 3 + 2] = startZ + (targetZ - startZ) * t + jitterZ;
+            }
+            bolt.line.geometry.attributes.position.needsUpdate = true;
+            bolt.line.visible = true;
+            bolt.timer = 0.14;
+        }
+
+        function fixedUpdate(dt) {
+            player.elapsedTime += dt;
+
+            // 1. Điều khiển nhân vật WASD / Phím mũi tên / Joystick cảm ứng
+            let moveX = joyInput.dx;
+            let moveZ = joyInput.dy;
+            if (keys['KeyW'] || keys['ArrowUp']) moveZ -= 1;
+            if (keys['KeyS'] || keys['ArrowDown']) moveZ += 1;
+            if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
+            if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+
+            const moveLen = Math.hypot(moveX, moveZ);
+            if (moveLen > 0.01) {
+                const nx = moveX / Math.max(1, moveLen);
+                const nz = moveZ / Math.max(1, moveLen);
+                player.x = THREE.MathUtils.clamp(player.x + nx * player.speed * dt, -ARENA_HALF, ARENA_HALF);
+                player.z = THREE.MathUtils.clamp(player.z + nz * player.speed * dt, -ARENA_HALF, ARENA_HALF);
+                player.angle = Math.atan2(nx, nz);
+            }
+
+            if (player.invulnTimer > 0) player.invulnTimer -= dt;
+            if (player.shakeTimer > 0) player.shakeTimer -= dt;
+
+            // 2. Sinh quái tràn vào từ mọi hướng đông dần theo thời gian + Boss mỗi 2 phút
+            const minutes = player.elapsedTime / 60;
+            const spawnRate = 3.8 + minutes * 9.5 + Math.min(28, player.level * 1.3); // Tăng mạnh theo phút!
+            const hpScale = 1 + minutes * 0.65;
+
+            spawnAccumulator += spawnRate * dt;
+            while (spawnAccumulator >= 1) {
+                spawnAccumulator -= 1;
+                const ang = Math.random() * Math.PI * 2;
+                const spawnDist = 24 + Math.random() * 6;
+                const sx = THREE.MathUtils.clamp(player.x + Math.cos(ang) * spawnDist, -ARENA_HALF, ARENA_HALF);
+                const sz = THREE.MathUtils.clamp(player.z + Math.sin(ang) * spawnDist, -ARENA_HALF, ARENA_HALF);
+
+                // Tỷ lệ xuất hiện 4 loại quái đa dạng dần theo phút
+                const r = Math.random();
+                let typeId = 0;
+                if (minutes > 1.2 && r > 0.88) typeId = 3;      // Tinh anh xanh ngọc
+                else if (minutes > 0.6 && r > 0.72) typeId = 2; // Quái trâu tím
+                else if (minutes > 0.25 && r > 0.48) typeId = 1;// Quái nhanh cam
+
+                spawnEnemy(typeId, sx, sz, hpScale);
+            }
+
+            // Triệu hồi Đại Boss đúng mỗi 2 phút (120s, 240s, 360s...)
+            if (player.elapsedTime >= player.nextBossTime) {
+                player.nextBossTime += 120;
+                const bAng = Math.random() * Math.PI * 2;
+                const bossId = spawnEnemy(
+                    4,
+                    THREE.MathUtils.clamp(player.x + Math.cos(bAng) * 22, -ARENA_HALF, ARENA_HALF),
+                    THREE.MathUtils.clamp(player.z + Math.sin(bAng) * 22, -ARENA_HALF, ARENA_HALF),
+                    1 + (minutes - 2) * 0.6
+                );
+                if (bossId !== -1) {
+                    player.activeBossId = bossId;
+                    player.shakeTimer = 0.45;
+                    sfx.thunder();
+                    document.getElementById('boss-bar-wrap').classList.remove('hidden');
+                }
+            }
+
+            // 3. Xây Spatial Grid cho khung logic hiện tại
+            rebuildSpatialGrid();
+
+            // 4. Vũ khí 1: Đạn bắn tự động vào quái gần nhất
+            player.fireTimer -= dt;
+            if (player.fireTimer <= 0) {
+                const targetId = findNearestEnemy(player.x, player.z, 20);
+                if (targetId !== -1) {
+                    player.fireTimer = player.fireCooldown;
+                    const baseAng = Math.atan2(eX[targetId] - player.x, eZ[targetId] - player.z);
+                    const count = player.bulletCount;
+                    const spread = 0.14;
+                    const bulletSpeed = 21.0;
+
+                    for (let i = 0; i < count; i++) {
+                        const a = baseAng + (i - (count - 1) * 0.5) * spread;
+                        spawnBullet(player.x, player.z, Math.sin(a) * bulletSpeed, Math.cos(a) * bulletSpeed, player.bulletDmg);
+                    }
+                    sfx.shoot();
+                } else {
+                    player.fireTimer = 0.08;
+                }
+            }
+
+            // 5. Vũ khí 2: Vòng lửa quay quanh người (kiểm tra va chạm qua Spatial Grid)
+            player.orbitalAngle += player.orbitalSpeed * dt;
+            orbitalHitTick += dt;
+            if (orbitalHitTick >= 0.12) {
+                orbitalHitTick = 0;
+                for (let k = 0; k < player.orbitalCount; k++) {
+                    const oa = player.orbitalAngle + (k / player.orbitalCount) * Math.PI * 2;
+                    const ox = player.x + Math.sin(oa) * player.orbitalRadius;
+                    const oz = player.z + Math.cos(oa) * player.orbitalRadius;
+                    const oCellX = worldToCell(ox), oCellZ = worldToCell(oz);
+
+                    for (let dz = -1; dz <= 1; dz++) {
+                        const cz = oCellZ + dz;
+                        if (cz < 0 || cz >= GRID_COLS) continue;
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const cx = oCellX + dx;
+                            if (cx < 0 || cx >= GRID_COLS) continue;
+                            let eid = gridHeads[cz * GRID_COLS + cx];
+                            while (eid !== -1) {
+                                const nextEid = eNextInCell[eid];
+                                if (eActive[eid]) {
+                                    const ex = eX[eid] - ox, ez = eZ[eid] - oz;
+                                    const hitR = ENEMY_DEFS[eType[eid]].radius + 0.45;
+                                    if (ex * ex + ez * ez <= hitR * hitR) {
+                                        const d = Math.hypot(ex, ez) || 1;
+                                        damageEnemy(eid, player.orbitalDmg * 0.55, ex / d, ez / d, 4.5);
+                                    }
+                                }
+                                eid = nextEid;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 6. Vũ khí 3: Sấm sét đánh ngẫu nhiên trong vùng lân cận
+            player.lightningTimer -= dt;
+            if (player.lightningTimer <= 0) {
+                player.lightningTimer = player.lightningCooldown;
+                let struck = false;
+                for (let s = 0; s < player.lightningCount; s++) {
+                    // Chọn ô ngẫu nhiên quanh người chơi có quái
+                    const rx = player.x + (Math.random() - 0.5) * 22;
+                    const rz = player.z + (Math.random() - 0.5) * 22;
+                    const tid = findNearestEnemy(rx, rz, 7.5);
+                    if (tid !== -1 && eActive[tid]) {
+                        const tx = eX[tid], tz = eZ[tid];
+                        triggerLightningBolt(s, tx, tz);
+                        struck = true;
+                        // Sát thương nổ điện nhỏ trong các ô cạnh mục tiêu
+                        const lcx = worldToCell(tx), lcz = worldToCell(tz);
+                        for (let dz = -1; dz <= 1; dz++) {
+                            const cz = lcz + dz;
+                            if (cz < 0 || cz >= GRID_COLS) continue;
+                            for (let dx = -1; dx <= 1; dx++) {
+                                const cx = lcx + dx;
+                                if (cx < 0 || cx >= GRID_COLS) continue;
+                                let eid = gridHeads[cz * GRID_COLS + cx];
+                                while (eid !== -1) {
+                                    const nextId = eNextInCell[eid];
+                                    if (eActive[eid]) {
+                                        const ddx = eX[eid] - tx, ddz = eZ[eid] - tz;
+                                        if (ddx * ddx + ddz * ddz < 2.2 * 2.2) {
+                                            damageEnemy(eid, player.lightningDmg, 0, 0, 1.5);
+                                        }
+                                    }
+                                    eid = nextId;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (struck) sfx.thunder();
+            }
+
+            for (let i = 0; i < MAX_LIGHTNING_BOLTS; i++) {
+                if (lightningLines[i].timer > 0) {
+                    lightningLines[i].timer -= dt;
+                    if (lightningLines[i].timer <= 0) lightningLines[i].line.visible = false;
+                }
+            }
+
+            // 7. Cập nhật Đạn & Va chạm Đạn-Quái bằng Spatial Grid (chỉ duyệt 9 ô quanh viên đạn!)
+            for (let b = 0; b < MAX_BULLETS; b++) {
+                if (!bActive[b]) continue;
+                bLife[b] -= dt;
+                if (bLife[b] <= 0) {
+                    releaseBullet(b);
+                    continue;
+                }
+                bX[b] += bVX[b] * dt;
+                bZ[b] += bVZ[b] * dt;
+
+                const bcx = worldToCell(bX[b]);
+                const bcz = worldToCell(bZ[b]);
+                let hit = false;
+
+                for (let dz = -1; dz <= 1 && !hit; dz++) {
+                    const cz = bcz + dz;
+                    if (cz < 0 || cz >= GRID_COLS) continue;
+                    for (let dx = -1; dx <= 1 && !hit; dx++) {
+                        const cx = bcx + dx;
+                        if (cx < 0 || cx >= GRID_COLS) continue;
+                        let eid = gridHeads[cz * GRID_COLS + cx];
+                        while (eid !== -1) {
+                            const nextId = eNextInCell[eid];
+                            if (eActive[eid]) {
+                                const ex = eX[eid] - bX[b];
+                                const ez = eZ[eid] - bZ[b];
+                                const r = ENEMY_DEFS[eType[eid]].radius + 0.24;
+                                if (ex * ex + ez * ez <= r * r) {
+                                    const spd = Math.hypot(bVX[b], bVZ[b]) || 1;
+                                    damageEnemy(eid, bDmg[b], bVX[b] / spd, bVZ[b] / spd, 3.8);
+                                    releaseBullet(b);
+                                    hit = true;
+                                    break;
+                                }
+                            }
+                            eid = nextId;
+                        }
+                    }
+                }
+            }
+
+            // 8. Cập nhật Quái: LOD AI (Gần: đẩy tách Spatial Grid + tấn công | Xa: di chuyển tịnh tiến nhẹ)
+            for (let i = 0; i < TOTAL_ENEMY_SLOTS; i++) {
+                if (!eActive[i]) continue;
+                const t = eType[i];
+                const def = ENEMY_DEFS[t];
+
+                if (eFlash[i] > 0) eFlash[i] -= dt;
+
+                const toPx = player.x - eX[i];
+                const toPz = player.z - eZ[i];
+                const distSq = toPx * toPx + toPz * toPz;
+
+                // Nếu quái bị bỏ lại quá xa (> 44m), dịch chuyển tái chế sang rìa trước mặt nhân vật
+                if (distSq > 44 * 44 && t !== 4) {
+                    const a = Math.random() * Math.PI * 2;
+                    eX[i] = THREE.MathUtils.clamp(player.x + Math.cos(a) * 26, -ARENA_HALF, ARENA_HALF);
+                    eZ[i] = THREE.MathUtils.clamp(player.z + Math.sin(a) * 26, -ARENA_HALF, ARENA_HALF);
+                    continue;
+                }
+
+                const dist = Math.sqrt(distSq) || 0.001;
+                let vx = (toPx / dist) * def.speed;
+                let vz = (toPz / dist) * def.speed;
+
+                // CHỈ chạy AI nặng (đẩy tách không dính nhau trên 9 ô lân cận + kiểm tra cắn người chơi) cho quái gần!
+                if (distSq < NEAR_AI_DIST_SQ) {
+                    const ecx = worldToCell(eX[i]);
+                    const ecz = worldToCell(eZ[i]);
+                    let sepX = 0, sepZ = 0;
+                    let checks = 0;
+
+                    for (let dz = -1; dz <= 1; dz++) {
+                        const cz = ecz + dz;
+                        if (cz < 0 || cz >= GRID_COLS) continue;
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const cx = ecx + dx;
+                            if (cx < 0 || cx >= GRID_COLS) continue;
+                            let other = gridHeads[cz * GRID_COLS + cx];
+                            while (other !== -1 && checks < 14) {
+                                if (other !== i && eActive[other]) {
+                                    const ox = eX[i] - eX[other];
+                                    const oz = eZ[i] - eZ[other];
+                                    const minDist = def.radius + ENEMY_DEFS[eType[other]].radius;
+                                    const oSq = ox * ox + oz * oz;
+                                    if (oSq > 0.0001 && oSq < minDist * minDist) {
+                                        const od = Math.sqrt(oSq);
+                                        const push = (minDist - od) / minDist;
+                                        sepX += (ox / od) * push * 4.2;
+                                        sepZ += (oz / od) * push * 4.2;
+                                    }
+                                    checks++;
+                                }
+                                other = eNextInCell[other];
+                            }
+                        }
+                    }
+                    vx += sepX;
+                    vz += sepZ;
+
+                    // Va chạm Quái — Nhân vật
+                    const hitPlayerDist = def.radius + 0.42;
+                    if (dist < hitPlayerDist && player.invulnTimer <= 0) {
+                        player.hp -= def.dmg;
+                        player.invulnTimer = 0.35;
+                        player.shakeTimer = 0.22;
+                        if (player.hp <= 0) {
+                            player.hp = 0;
+                            triggerGameOver();
+                            return;
+                        }
+                    }
+                }
+
+                // Cộng xung lực đẩy lùi khi trúng đạn
+                vx += eKnockX[i];
+                vz += eKnockZ[i];
+                eKnockX[i] *= 0.82;
+                eKnockZ[i] *= 0.82;
+
+                eX[i] = THREE.MathUtils.clamp(eX[i] + vx * dt, -ARENA_HALF, ARENA_HALF);
+                eZ[i] = THREE.MathUtils.clamp(eZ[i] + vz * dt, -ARENA_HALF, ARENA_HALF);
+            }
+
+            // 9. Cập nhật Ngọc Kinh Nghiệm (hút về nhân vật khi vào tầm nam châm)
+            const pickupSq = player.pickupRadius * player.pickupRadius;
+            for (let g = 0; g < MAX_GEMS; g++) {
+                if (!gActive[g]) continue;
+                const dx = player.x - gX[g];
+                const dz = player.z - gZ[g];
+                const dSq = dx * dx + dz * dz;
+
+                if (dSq <= pickupSq) gMagnet[g] = 1;
+
+                if (gMagnet[g]) {
+                    const d = Math.sqrt(dSq) || 0.001;
+                    if (d < 0.55) {
+                        player.xp += gVal[g];
+                        releaseGem(g);
+                        sfx.gem();
+                        if (player.xp >= player.xpNext) {
+                            player.xp -= player.xpNext;
+                            player.level++;
+                            player.xpNext = Math.round(player.xpNext * 1.28 + 6);
+                            openLevelUpModal();
+                            return;
+                        }
+                    } else {
+                        gX[g] += (dx / d) * 15.5 * dt;
+                        gZ[g] += (dz / d) * 15.5 * dt;
+                    }
+                }
+            }
+
+            // 10. Cập nhật Hạt Nổ Khi Quái Chết
+            for (let p = 0; p < MAX_PARTICLES; p++) {
+                if (!pActive[p]) continue;
+                pLife[p] += dt;
+                if (pLife[p] >= pMaxLife[p]) {
+                    pActive[p] = 0;
+                    particleInstMesh.setMatrixAt(p, _hiddenMat4);
+                    pFreeStack[pFreeTop++] = p;
+                } else {
+                    pVY[p] -= 9.8 * dt;
+                    pX[p] += pVX[p] * dt;
+                    pY[p] = Math.max(0.08, pY[p] + pVY[p] * dt);
+                    pZ[p] += pVZ[p] * dt;
+                }
+            }
+        }
+
+        /* =========================================================================
+           7. ĐỒNG BỘ MA TRẬN INSTANCED MESH MỖI FRAME (ZERO ALLOCATION)
+        ========================================================================= */
+        function syncRenderMatrices(elapsed) {
+            // Nhân vật & hiệu ứng nháy đỏ khi vừa bị cắn
+            playerGroup.position.set(player.x, 0, player.z);
+            playerGroup.rotation.y = player.angle;
+            playerBodyMat.color.setHex(player.invulnTimer > 0.15 ? 0xf43f5e : 0x38bdf8);
+
+            // Bóng tròn của nhân vật ở slot cuối cùng của shadowInstMesh
+            _pos.set(player.x, 0.02, player.z);
+            _euler.set(0, 0, 0);
+            _quat.setFromEuler(_euler);
+            _scale.set(1.15, 1, 1.15);
+            _mat4.compose(_pos, _quat, _scale);
+            shadowInstMesh.setMatrixAt(TOTAL_ENEMY_SLOTS, _mat4);
+
+            // 1. Cập nhật ma trận & màu nháy trắng của toàn bộ Quái + Bóng chân
+            const colorDirty = [false, false, false, false, false];
+            for (let i = 0; i < TOTAL_ENEMY_SLOTS; i++) {
+                if (!eActive[i]) continue;
+                const t = eType[i];
+                const local = eLocalIdx[i];
+                const def = ENEMY_DEFS[t];
+
+                // Nhún nhảy bước đi nhẹ nhàng cho sinh động
+                const hop = Math.abs(Math.sin(elapsed * 9 + i)) * 0.14;
+                const rotY = Math.atan2(player.x - eX[i], player.z - eZ[i]);
+
+                _pos.set(eX[i], def.scaleY * 0.5 + hop, eZ[i]);
+                _euler.set(0, rotY, 0);
+                _quat.setFromEuler(_euler);
+                const s = t === 4 ? 1.85 : 1.0;
+                _scale.set(s, def.scaleY, s);
+                _mat4.compose(_pos, _quat, _scale);
+                enemyMeshes[t].setMatrixAt(local, _mat4);
+
+                // Nháy trắng khi trúng đòn
+                const flashing = eFlash[i] > 0 ? 1 : 0;
+                if (flashing !== eWasFlashing[i]) {
+                    eWasFlashing[i] = flashing;
+                    enemyMeshes[t].setColorAt(local, flashing ? _whiteColor : _baseColors[t]);
+                    colorDirty[t] = true;
+                }
+
+                // Bóng tròn giả dưới chân quái
+                _pos.set(eX[i], 0.018, eZ[i]);
+                _euler.set(0, 0, 0);
+                _quat.setFromEuler(_euler);
+                const shScale = def.radius * 1.65;
+                _scale.set(shScale, 1, shScale);
+                _mat4.compose(_pos, _quat, _scale);
+                shadowInstMesh.setMatrixAt(i, _mat4);
+            }
+
+            for (let t = 0; t < ENEMY_TYPES; t++) {
+                enemyMeshes[t].instanceMatrix.needsUpdate = true;
+                if (colorDirty[t] && enemyMeshes[t].instanceColor) {
+                    enemyMeshes[t].instanceColor.needsUpdate = true;
+                }
+            }
+            shadowInstMesh.instanceMatrix.needsUpdate = true;
+
+            // 2. Cập nhật InstancedMesh Đạn
+            for (let b = 0; b < MAX_BULLETS; b++) {
+                if (!bActive[b]) continue;
+                _pos.set(bX[b], 0.68, bZ[b]);
+                _euler.set(0, Math.atan2(bVX[b], bVZ[b]), 0);
+                _quat.setFromEuler(_euler);
+                _scale.set(1, 1, 1);
+                _mat4.compose(_pos, _quat, _scale);
+                bulletInstMesh.setMatrixAt(b, _mat4);
+            }
+            bulletInstMesh.instanceMatrix.needsUpdate = true;
+
+            // 3. Cập nhật InstancedMesh Ngọc Kinh Nghiệm xoay lấp lánh
+            _euler.set(0, elapsed * 3.2, 0);
+            _quat.setFromEuler(_euler);
+            for (let g = 0; g < MAX_GEMS; g++) {
+                if (!gActive[g]) continue;
+                _pos.set(gX[g], 0.32, gZ[g]);
+                const gs = gVal[g] >= 5 ? 1.55 : gVal[g] >= 2 ? 1.22 : 0.95;
+                _scale.set(gs, gs, gs);
+                _mat4.compose(_pos, _quat, _scale);
+                gemInstMesh.setMatrixAt(g, _mat4);
+            }
+            gemInstMesh.instanceMatrix.needsUpdate = true;
+
+            // 4. Cập nhật InstancedMesh Vòng Lửa Hộ Thể
+            _euler.set(0, 0, 0);
+            _quat.setFromEuler(_euler);
+            for (let k = 0; k < MAX_ORBITALS; k++) {
+                if (k < player.orbitalCount) {
+                    const oa = player.orbitalAngle + (k / player.orbitalCount) * Math.PI * 2;
+                    const pulse = 0.92 + Math.sin(elapsed * 14 + k) * 0.16;
+                    _pos.set(
+                        player.x + Math.sin(oa) * player.orbitalRadius,
+                        0.68,
+                        player.z + Math.cos(oa) * player.orbitalRadius
+                    );
+                    _scale.set(pulse, pulse, pulse);
+                    _mat4.compose(_pos, _quat, _scale);
+                    orbitalInstMesh.setMatrixAt(k, _mat4);
+                } else {
+                    orbitalInstMesh.setMatrixAt(k, _hiddenMat4);
+                }
+            }
+            orbitalInstMesh.instanceMatrix.needsUpdate = true;
+
+            // 5. Cập nhật InstancedMesh Hạt Nổ
+            for (let p = 0; p < MAX_PARTICLES; p++) {
+                if (!pActive[p]) continue;
+                const s = 1 - pLife[p] / pMaxLife[p];
+                _pos.set(pX[p], pY[p], pZ[p]);
+                _euler.set(elapsed * 8, elapsed * 6, 0);
+                _quat.setFromEuler(_euler);
+                _scale.set(s, s, s);
+                _mat4.compose(_pos, _quat, _scale);
+                particleInstMesh.setMatrixAt(p, _mat4);
+            }
+            particleInstMesh.instanceMatrix.needsUpdate = true;
+
+            // 6. Camera nghiêng nhìn từ trên xuống bám theo nhân vật + Rung nhẹ khi trúng đòn
+            let shakeX = 0, shakeZ = 0;
+            if (player.shakeTimer > 0) {
+                const mag = player.shakeTimer * 1.4;
+                shakeX = (Math.random() - 0.5) * mag;
+                shakeZ = (Math.random() - 0.5) * mag;
+            }
+            camera.position.set(player.x + shakeX, 17.5, player.z + 13.5 + shakeZ);
+            camera.lookAt(player.x + shakeX * 0.5, 0.4, player.z + shakeZ * 0.5);
+        }
+
+        /* =========================================================================
+           8. MODAL THẺ NÂNG CẤP, KẾT THÚC TRẬN & CẬP NHẬT HUD + TELEMETRY
+        ========================================================================= */
+        let currentChoices = [];
+
+        function openLevelUpModal() {
+            gameState = 'PAUSED_LEVELUP';
+            sfx.levelUp();
+
+            // Xáo ngẫu nhiên lấy 3 thẻ nâng cấp không trùng nhau
+            const pool = UPGRADE_POOL.slice();
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = (Math.random() * (i + 1)) | 0;
+                const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+            }
+            currentChoices = pool.slice(0, 3);
+
+            const wrap = document.getElementById('upgrade-cards-container');
+            wrap.innerHTML = '';
+            currentChoices.forEach((upg, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'upgrade-card hud-glass rounded-2xl p-4 text-left flex flex-col justify-between gap-3 cursor-pointer border-slate-600/60';
+                btn.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-3xl">${upg.icon}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono-tech text-[11px]">Phím ${idx + 1}</span>
+                        </div>
+                        <h3 class="text-base font-black text-sky-300">${upg.title}</h3>
+                        <p class="text-xs font-semibold text-slate-300 leading-relaxed">${upg.desc}</p>
+                    </div>
+                    <div class="w-full py-1.5 rounded-xl bg-sky-500/20 border border-sky-400/40 text-center text-xs font-black text-sky-200">
+                        Chọn nâng cấp →
+                    </div>
+                `;
+                btn.addEventListener('click', () => chooseUpgradeIndex(idx));
+                wrap.appendChild(btn);
+            });
+
+            const modal = document.getElementById('levelup-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function chooseUpgradeIndex(idx) {
+            if (gameState !== 'PAUSED_LEVELUP' || !currentChoices[idx]) return;
+            currentChoices[idx].apply();
+            const modal = document.getElementById('levelup-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            gameState = 'PLAYING';
+            updateGameplayHUD();
+        }
+
+        function formatMMSS(sec) {
+            const total = Math.floor(sec);
+            const m = String(Math.floor(total / 60)).padStart(2, '0');
+            const s = String(total % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function triggerGameOver() {
+            gameState = 'GAMEOVER';
+            document.getElementById('end-time').textContent = formatMMSS(player.elapsedTime);
+            document.getElementById('end-kills').textContent = player.kills;
+            document.getElementById('end-level').textContent = player.level;
+            const modal = document.getElementById('gameover-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function resetNewGame() {
+            resetPoolsAndState();
+            player.x = 0; player.z = 0; player.angle = 0;
+            player.hp = 100; player.maxHp = 100;
+            player.speed = 7.2;
+            player.pickupRadius = 3.8;
+            player.invulnTimer = 0; player.shakeTimer = 0;
+            player.level = 1; player.xp = 0; player.xpNext = 10;
+            player.kills = 0; player.elapsedTime = 0;
+            player.nextBossTime = 120;
+            player.activeBossId = -1;
+
+            player.bulletCount = 1; player.bulletDmg = 18; player.fireCooldown = 0.48; player.fireTimer = 0;
+            player.orbitalCount = 2; player.orbitalRadius = 2.65; player.orbitalSpeed = 3.1; player.orbitalDmg = 16;
+            player.lightningCount = 1; player.lightningDmg = 55; player.lightningCooldown = 2.4; player.lightningTimer = 1.0;
+
+            document.getElementById('boss-bar-wrap').classList.add('hidden');
+            document.getElementById('gameover-modal').classList.add('hidden');
+            document.getElementById('gameover-modal').classList.remove('flex');
+            document.getElementById('levelup-modal').classList.add('hidden');
+            document.getElementById('levelup-modal').classList.remove('flex');
+
+            gameState = 'PLAYING';
+            updateGameplayHUD();
+        }
+
+        function updateGameplayHUD() {
+            document.getElementById('lv-text').textContent = `CẤP ${player.level}`;
+            document.getElementById('hp-text').textContent = `${Math.ceil(player.hp)} / ${player.maxHp} HP`;
+            document.getElementById('hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
+            document.getElementById('xp-bar').style.width = `${Math.min(100, (player.xp / player.xpNext) * 100)}%`;
+            document.getElementById('kill-count').textContent = player.kills;
+            document.getElementById('timer-text').textContent = formatMMSS(player.elapsedTime);
+            document.getElementById('weapon-badges').textContent =
+                `🔫${player.bulletCount} 🔥${player.orbitalCount} ⚡${player.lightningCount}`;
+
+            const waveNum = Math.floor(player.elapsedTime / 30) + 1;
+            document.getElementById('wave-label').textContent =
+                player.activeBossId !== -1 ? '⚠️ BOSS XUẤT HIỆN!' : `Đợt ${waveNum} • Sinh Tồn`;
+
+            if (player.activeBossId !== -1 && eActive[player.activeBossId]) {
+                const bPct = Math.max(0, Math.round((eHp[player.activeBossId] / eMaxHp[player.activeBossId]) * 100));
+                document.getElementById('boss-hp-text').textContent = `${bPct}%`;
+                document.getElementById('boss-hp-bar').style.width = `${bPct}%`;
+            }
+        }
+
+        /* =========================================================================
+           9. VÒNG LẶP CHÍNH: FIXED TIMESTEP 60Hz + DELTA CLAMP + FPS & DRAW CALLS
+        ========================================================================= */
+        let prevTime = performance.now();
+        let accumulator = 0;
+        let fpsFrames = 0;
+        let fpsTimer = 0;
+        let hudTimer = 0;
+
+        function mainLoop(now) {
+            requestAnimationFrame(mainLoop);
+
+            // Delta clamp tối đa 0.1s để không bị nhảy vọt khi người chơi ẩn tab rồi mở lại
+            const rawDt = Math.min(0.1, (now - prevTime) * 0.001);
+            prevTime = now;
+
+            if (gameState === 'PLAYING') {
+                accumulator += rawDt;
+                while (accumulator >= FIXED_DT) {
+                    fixedUpdate(FIXED_DT);
+                    accumulator -= FIXED_DT;
+                    if (gameState !== 'PLAYING') {
+                        accumulator = 0;
+                        break;
+                    }
+                }
+            }
+
+            syncRenderMatrices(now * 0.001);
+            renderer.render(scene, camera);
+
+            // Cập nhật FPS, Số Quái, Số Đạn và Draw Calls (renderer.info.render.calls)
+            fpsFrames++;
+            fpsTimer += rawDt;
+            if (fpsTimer >= 0.25) {
+                const fps = Math.round(fpsFrames / fpsTimer);
+                fpsFrames = 0;
+                fpsTimer = 0;
+                document.getElementById('stat-fps').textContent = fps;
+                document.getElementById('stat-enemies').textContent = activeEnemyCount;
+                document.getElementById('stat-bullets').textContent = activeBulletCount;
+                document.getElementById('stat-draws').textContent = renderer.info.render.calls;
+            }
+
+            hudTimer += rawDt;
+            if (hudTimer >= 0.15) {
+                hudTimer = 0;
+                updateGameplayHUD();
+            }
+        }
+
+        window.onload = function () {
+            initThreeEngine();
+            setupControls();
+            resetNewGame();
+            prevTime = performance.now();
+            requestAnimationFrame(mainLoop);
+        };
+    </script>
+</body>
+</html>
