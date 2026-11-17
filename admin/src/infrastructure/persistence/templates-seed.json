@@ -1,6 +1,38 @@
 {
   "templates": [
     {
+      "id": "tpl-040",
+      "name": "MORVIN — Enterprise Admin, Ecommerce & Calendar",
+      "description": "Multi-Module Admin Dashboard chuẩn Morvin phối Royal Indigo (#525CE5) & Emerald (#23C58F) với thẻ nổi chồng lên dải Banner đa giác: Quick Summary cột chồng 12 tháng, Orders/Users, Revenue Wave, Earning Goal, bản đồ Sales by State, kèm lịch Calendar kéo–thả sự kiện trực tiếp, Chat và Ecommerce.",
+      "category": "business",
+      "uiStyle": "corporate",
+      "layout": "sidebar",
+      "tags": ["morvin", "enterprise-admin", "calendar-drag-drop", "ecommerce", "world-map"],
+      "previewUrl": "/templates/admin-dashboard/morvin-enterprise/index.html",
+      "thumbnailUrl": "/thumbnails/tpl-040.svg",
+      "status": "published",
+      "isPremium": true,
+      "version": "4.7.0",
+      "createdAt": "2026-11-17T10:25:00Z",
+      "updatedAt": "2026-11-17T10:32:00Z"
+    },
+    {
+      "id": "tpl-039",
+      "name": "28 · SOCIALLY — Social Media & Content Analytics",
+      "description": "Social Media Dashboard chuẩn SaaS hiện đại (Engagement + Followers + Content Analytics): Sidebar cam Tangerine thu gọn, 4 thẻ tài khoản đa kênh (Instagram, TikTok, Facebook, LinkedIn), đồ thị tăng trưởng Followers 4 nền tảng, phân khúc độ tuổi, ma trận nhiệt Posts Engagement 7×8 theo khung giờ, luồng hoạt động và bảng phân tích nội dung.",
+      "category": "saas",
+      "uiStyle": "modern",
+      "layout": "sidebar",
+      "tags": ["social-media", "engagement", "followers", "content-analytics", "heatmap"],
+      "previewUrl": "/templates/admin-dashboard/socially-analytics/index.html",
+      "thumbnailUrl": "/thumbnails/tpl-039.svg",
+      "status": "published",
+      "isPremium": true,
+      "version": "4.6.0",
+      "createdAt": "2026-11-17T10:10:00Z",
+      "updatedAt": "2026-11-17T10:15:00Z"
+    },
+    {
       "id": "tpl-038",
       "name": "MIDAS CAPITAL — Black & Gold Hedge Split-Desk",
       "description": "Institutional Finance & Commodities Dashboard phối Đen Carbon & Vàng Kim Hoàng Gia (Split Panel): cột trái quản lý sổ quỹ vàng XAU/Macro, khung phải phân tích đường cong Alpha phát sáng, Sharpe/VaR, lệnh khớp tổ chức và đầy đủ các tab nghiệp vụ.",

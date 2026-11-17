@@ -8,7 +8,7 @@ import type {
 } from '../../domain/template/repositories/ITemplateRepository.ts';
 import { TemplateService } from '../../domain/template/services/TemplateService.ts';
 
-export const TEMPLATES_STORAGE_KEY = 'landinghub:templates:v16';
+export const TEMPLATES_STORAGE_KEY = 'landinghub:templates:v18';
 
 export class LocalStorageTemplateRepository implements ITemplateRepository {
   private readonly STORAGE_KEY = TEMPLATES_STORAGE_KEY;

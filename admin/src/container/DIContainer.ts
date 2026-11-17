@@ -69,6 +69,8 @@ export class DIContainer {
     localStorage.removeItem('landinghub:templates:v13');
     localStorage.removeItem('landinghub:templates:v14');
     localStorage.removeItem('landinghub:templates:v15');
+    localStorage.removeItem('landinghub:templates:v16');
+    localStorage.removeItem('landinghub:templates:v17');
     localStorage.removeItem(TEMPLATES_STORAGE_KEY);
     this.templateRepo.clearCache();
   }

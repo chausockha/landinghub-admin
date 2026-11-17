@@ -9,7 +9,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-0EA5E9?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Templates](https://img.shields.io/badge/Live_Templates-38%2F38_Verified-059669?style=for-the-badge)](#danh-mục-38-templates-thực-tế)
+[![Templates](https://img.shields.io/badge/Live_Templates-40%2F40_Verified-059669?style=for-the-badge)](#danh-mục-40-templates-thực-tế)
 
 </div>
 
@@ -19,7 +19,7 @@
 
 ## 📖 Giới thiệu
 
-**LandingHub** là hệ thống Web Admin (Command Center) dùng để quản lý, phân loại đa chiều, xem trước trực tiếp (Live Preview) và giám sát trạng thái HTTP của kho **38 giao diện Landing Page & Admin Dashboard thực tế**.
+**LandingHub** là hệ thống Web Admin (Command Center) dùng để quản lý, phân loại đa chiều, xem trước trực tiếp (Live Preview) và giám sát trạng thái HTTP của kho **40 giao diện Landing Page & Admin Dashboard thực tế**.
 
 Hệ thống tuân thủ nguyên lý thiết kế **90% Trung tính + 10% Màu nhấn Token**, thang cỡ chữ chuẩn **WCAG 2.1 AA (`16px`–`18px`)** và kiến trúc **Clean Architecture / Domain-Driven Design (DDD)** giúp tách biệt hoàn toàn nghiệp vụ lõi khỏi tầng hiển thị và lưu trữ.
 
@@ -81,21 +81,21 @@ Tinh chỉnh bảng màu thương hiệu, thang chữ chuẩn WCAG 2.1 AA và qu
 
 Toàn bộ các mẫu trong thư mục `templates/` đều là trang HTML/CSS/JS hoàn chỉnh, có thể mở độc lập ngoài trình duyệt:
 
-| **AURUM CENTURION — Private Banking Dashboard** | **VELOX — Autonomous Cloud SaaS Landing Page** |
+| **MORVIN — Enterprise Admin & Calendar Suite** | **28 · SOCIALLY — Social Media & Content Analytics** |
 | :---: | :---: |
-| ![Aurum Private Bank](./docs/screenshots/07-showcase-aurum-bank.png) | ![Velox Cloud SaaS](./docs/screenshots/08-showcase-velox-saas.png) |
-| *Finance · Premium Black & 24K Gold · Bento Grid* | *SaaS · Dark Glow & Modern Typography · Full Width* |
+| ![Morvin Dashboard](./docs/screenshots/11-showcase-morvin-dashboard.png) | ![Socially Dashboard](./docs/screenshots/10-showcase-socially-dashboard.png) |
+| *Business · Royal Indigo Banner + Calendar Drag & Drop · Sidebar* | *SaaS · Engagement Heatmap + Followers + Content Analytics · Sidebar* |
 
 ---
 
-## 📊 Danh mục 38 Templates Thực tế
+## 📊 Danh mục 40 Templates Thực tế
 
 | Ngành nghề | Số lượng | Giao diện tiêu biểu |
 | :--- | :---: | :--- |
+| **Business** | `9` | *Morvin Enterprise & Calendar*, *Compreo ERP*, *Clarity BI*, *Pulse & Scope*, *Monobase UI*, *Stratum Exec*, *Haven PropTech*, *Clarity CRM*, *Oblique Studio* |
 | **Finance** | `9` | *Midas Capital*, *Aurum Centurion*, *QuantFX Pro*, *AIInves*, *Zenvest*, *Valeur Bank*, *Alpha Folio*, *Quantum Vault*, *Meridian Review* |
-| **Business** | `8` | *Compreo ERP*, *Clarity BI*, *Pulse & Scope*, *Monobase UI*, *Stratum Exec*, *Haven PropTech*, *Clarity CRM*, *Oblique Studio* |
+| **SaaS** | `6` | *Socially Analytics*, *Sullivan PM Kanban*, *CRM Pro*, *Verge Ops*, *Omnix Pro*, *Velox Cloud* |
 | **Technology** | `6` | *CryptoPulse Web3*, *Kento OS*, *Synapse Core AI*, *PulseOps Telemetry*, *Kinetic AI*, *Kairo Engineer* |
-| **SaaS** | `5` | *Sullivan PM Kanban*, *CRM Pro*, *Verge Ops*, *Omnix Pro*, *Velox Cloud* |
 | **E-commerce** | `3` | *Ecomora Sales Hub*, *CartFlow Pulse*, *Aura Acoustics Storefront* |
 | **ESG** | `3` | *Terra Horizon ESG Wall*, *Verdant OS Smart Grid*, *NetZero Carbon Platform* |
 | **Education** | `2` | *Lumina Studio AI EdTech*, *Sora Vance Design Portfolio* |

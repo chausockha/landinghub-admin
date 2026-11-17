@@ -151,7 +151,7 @@ export function SettingsPage() {
                 </div>
                 <div>
                   <h2 className="font-display text-lg font-bold text-ink">Quản lý Dữ liệu</h2>
-                  <p className="label-xs mt-0.5">LocalStorage v16 · 38 Templates Seed</p>
+                  <p className="label-xs mt-0.5">LocalStorage v18 · 40 Templates Seed</p>
                 </div>
               </div>
 
@@ -159,7 +159,7 @@ export function SettingsPage() {
                 {[
                   {
                     title: 'Reset về mặc định',
-                    desc: 'Khôi phục danh sách về 38 templates chuẩn ban đầu',
+                    desc: 'Khôi phục danh sách về 40 templates chuẩn ban đầu',
                     btnClass: 'btn-ghost btn-sm',
                     btnIcon: RefreshCw,
                     btnLabel: 'Reset',

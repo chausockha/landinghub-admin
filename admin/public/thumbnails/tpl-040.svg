@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="mvIndigo40" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#525CE5"/>
+      <stop offset="100%" stop-color="#434CD4"/>
+    </linearGradient>
+    <linearGradient id="mvWave40" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#525CE5" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#525CE5" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="800" height="450" fill="#F3F4F8"/>
+
+  <!-- Topbar -->
+  <rect x="0" y="0" width="800" height="38" fill="#FFFFFF"/>
+  <line x1="0" y1="38" x2="800" y2="38" stroke="#ECEEF4"/>
+  <circle cx="710" cy="19" r="8" fill="#CBD5E1"/>
+  <text x="724" y="22" fill="#343A40" font-family="Inter, sans-serif" font-size="8" font-weight="700">James</text>
+
+  <!-- Left Sidebar -->
+  <rect x="0" y="38" width="132" height="412" fill="#FFFFFF"/>
+  <line x1="132" y1="38" x2="132" y2="450" stroke="#ECEEF4"/>
+
+  <!-- Sidebar Indigo User Banner (Badge-safe no clutter text) -->
+  <rect x="0" y="38" width="132" height="74" fill="url(#mvIndigo40)"/>
+  <circle cx="66" cy="68" r="14" fill="#23C58F"/>
+  <circle cx="66" cy="68" r="11.5" fill="#E2E8F0"/>
+
+  <!-- Sidebar Menu -->
+  <rect x="12" y="128" width="108" height="22" rx="5" fill="#F3F4FC"/>
+  <text x="26" y="142" fill="#525CE5" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Dashboard</text>
+  <circle cx="108" cy="139" r="6" fill="#525CE5"/>
+  <text x="108" y="142" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="7" font-weight="700">3</text>
+
+  <text x="26" y="168" fill="#636E7B" font-family="Inter, sans-serif" font-size="8.5">Calendar</text>
+  <text x="26" y="192" fill="#636E7B" font-family="Inter, sans-serif" font-size="8.5">Chat</text>
+  <text x="26" y="216" fill="#636E7B" font-family="Inter, sans-serif" font-size="8.5">Ecommerce</text>
+  <text x="26" y="240" fill="#636E7B" font-family="Inter, sans-serif" font-size="8.5">Email</text>
+
+  <rect x="20" y="274" width="64" height="5" rx="2.5" fill="#D8DCE6"/>
+  <rect x="20" y="296" width="52" height="5" rx="2.5" fill="#D8DCE6"/>
+  <circle cx="108" cy="298" r="6" fill="#F15C56"/>
+  <rect x="20" y="318" width="58" height="5" rx="2.5" fill="#D8DCE6"/>
+  <rect x="20" y="340" width="50" height="5" rx="2.5" fill="#D8DCE6"/>
+
+  <!-- Indigo Geometric Hero Banner -->
+  <rect x="132" y="38" width="668" height="94" fill="url(#mvIndigo40)"/>
+  <polygon points="430,38 520,38 475,132" fill="#FFFFFF" opacity="0.06"/>
+  <polygon points="560,38 670,38 615,132" fill="#FFFFFF" opacity="0.05"/>
+  <!-- Add Widget Button on Right -->
+  <rect x="706" y="54" width="76" height="24" rx="4" fill="#23C58F"/>
+  <text x="744" y="69" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Add Widget</text>
+
+  <!-- Overlapping Card 1: Quick Summary (y=102 overlaps banner!) -->
+  <rect x="148" y="102" width="420" height="196" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="164" y="123" fill="#343A40" font-family="Inter, sans-serif" font-size="10" font-weight="700">Quick Summary</text>
+  <rect x="520" y="111" width="34" height="16" rx="3" fill="#525CE5"/>
+  <text x="537" y="122" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">Year</text>
+
+  <!-- 12 Stacked Indigo + Slate Bars -->
+  <g transform="translate(172, 142)">
+    <rect x="0"   y="36" width="7" height="40" fill="#EAEDF3"/><rect x="0"   y="76" width="7" height="56" fill="#525CE5"/>
+    <rect x="21"  y="16" width="7" height="46" fill="#EAEDF3"/><rect x="21"  y="62" width="7" height="70" fill="#525CE5"/>
+    <rect x="42"  y="28" width="7" height="34" fill="#EAEDF3"/><rect x="42"  y="62" width="7" height="70" fill="#525CE5"/>
+    <rect x="63"  y="24" width="7" height="46" fill="#EAEDF3"/><rect x="63"  y="70" width="7" height="62" fill="#525CE5"/>
+    <rect x="84"  y="16" width="7" height="46" fill="#EAEDF3"/><rect x="84"  y="62" width="7" height="70" fill="#525CE5"/>
+    <rect x="105" y="40" width="7" height="36" fill="#EAEDF3"/><rect x="105" y="76" width="7" height="56" fill="#525CE5"/>
+    <rect x="126" y="34" width="7" height="28" fill="#EAEDF3"/><rect x="126" y="62" width="7" height="70" fill="#525CE5"/>
+    <rect x="147" y="24" width="7" height="46" fill="#EAEDF3"/><rect x="147" y="70" width="7" height="62" fill="#525CE5"/>
+    <rect x="168" y="28" width="7" height="34" fill="#EAEDF3"/><rect x="168" y="62" width="7" height="70" fill="#525CE5"/>
+    <rect x="189" y="34" width="7" height="52" fill="#EAEDF3"/><rect x="189" y="86" width="7" height="46" fill="#525CE5"/>
+    <rect x="210" y="30" width="7" height="40" fill="#EAEDF3"/><rect x="210" y="70" width="7" height="62" fill="#525CE5"/>
+    <rect x="231" y="34" width="7" height="28" fill="#EAEDF3"/><rect x="231" y="62" width="7" height="70" fill="#525CE5"/>
+  </g>
+
+  <!-- Right Sub-panel inside Quick Summary -->
+  <rect x="434" y="138" width="120" height="146" rx="5" fill="#F8F9FC"/>
+  <circle cx="452" cy="162" r="9" fill="#EEF0FD"/>
+  <text x="468" y="160" fill="#343A40" font-family="Inter, sans-serif" font-size="10.5" font-weight="800">$2354</text>
+  <text x="468" y="171" fill="#525CE5" font-family="Inter, sans-serif" font-size="7">Withdraw →</text>
+
+  <circle cx="452" cy="210" r="9" fill="#EEF0FD"/>
+  <text x="468" y="208" fill="#343A40" font-family="Inter, sans-serif" font-size="10.5" font-weight="800">$1598</text>
+  <text x="468" y="219" fill="#525CE5" font-family="Inter, sans-serif" font-size="7">To Paid →</text>
+
+  <circle cx="452" cy="258" r="9" fill="#EEF0FD"/>
+  <text x="468" y="256" fill="#343A40" font-family="Inter, sans-serif" font-size="10.5" font-weight="800">1230</text>
+  <text x="468" y="267" fill="#525CE5" font-family="Inter, sans-serif" font-size="7">To Online →</text>
+
+  <!-- Right Column Top: Orders & Users -->
+  <rect x="580" y="102" width="96" height="96" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="628" y="118" text-anchor="middle" fill="#343A40" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Orders</text>
+  <circle cx="628" cy="136" r="10" fill="#DCDFFC"/>
+  <text x="628" y="162" text-anchor="middle" fill="#343A40" font-family="Inter, sans-serif" font-size="12" font-weight="800">58</text>
+  <rect x="592" y="182" width="72" height="3.5" rx="1.75" fill="#ECEEF4"/>
+  <rect x="592" y="182" width="50" height="3.5" rx="1.75" fill="#525CE5"/>
+
+  <rect x="686" y="102" width="96" height="96" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="734" y="118" text-anchor="middle" fill="#343A40" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Users</text>
+  <circle cx="734" cy="136" r="10" fill="#D3F3E8"/>
+  <text x="734" y="162" text-anchor="middle" fill="#343A40" font-family="Inter, sans-serif" font-size="12" font-weight="800">136</text>
+  <rect x="698" y="182" width="72" height="3.5" rx="1.75" fill="#ECEEF4"/>
+  <rect x="698" y="182" width="58" height="3.5" rx="1.75" fill="#23C58F"/>
+
+  <!-- Right Column Bottom: Revenue Statistics Wave -->
+  <rect x="580" y="208" width="202" height="90" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="592" y="225" fill="#343A40" font-family="Inter, sans-serif" font-size="8.5" font-weight="700">Revenue Statistics</text>
+  <text x="592" y="244" fill="#343A40" font-family="Inter, sans-serif" font-size="12" font-weight="800">$14,235</text>
+  <path d="M586,286 C606,264 624,268 642,278 C662,288 676,254 698,260 C720,266 738,282 756,272 C768,266 774,274 778,280 L778,294 L586,294 Z" fill="url(#mvWave40)"/>
+  <path d="M586,286 C606,264 624,268 642,278 C662,288 676,254 698,260 C720,266 738,282 756,272 C768,266 774,274 778,280" fill="none" stroke="#525CE5" stroke-width="1.8"/>
+
+  <!-- Bottom Row 3 Cards -->
+  <!-- Product Tracking -->
+  <rect x="148" y="310" width="202" height="128" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="162" y="328" fill="#343A40" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Product Tracking</text>
+  <circle cx="170" cy="352" r="8" fill="#CBD5E1"/>
+  <text x="184" y="351" fill="#343A40" font-family="Inter, sans-serif" font-size="8" font-weight="600">Your Manager Posted</text>
+  <text x="184" y="360" fill="#9CA3AF" font-family="Inter, sans-serif" font-size="7">James Raphael</text>
+  <circle cx="170" cy="384" r="8" fill="#EEF0FD"/>
+  <text x="184" y="383" fill="#343A40" font-family="Inter, sans-serif" font-size="8" font-weight="600">5 pending orders</text>
+  <text x="184" y="392" fill="#9CA3AF" font-family="Inter, sans-serif" font-size="7">America</text>
+  <circle cx="170" cy="416" r="8" fill="#E3F8F0"/>
+  <text x="184" y="415" fill="#343A40" font-family="Inter, sans-serif" font-size="8" font-weight="600">New Order Received</text>
+
+  <!-- Earning Goal Rings -->
+  <rect x="362" y="310" width="206" height="128" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="376" y="328" fill="#343A40" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Earning Goal</text>
+  <circle cx="418" cy="370" r="18" fill="none" stroke="#ECEEF4" stroke-width="4.5"/>
+  <circle cx="418" cy="370" r="18" fill="none" stroke="#525CE5" stroke-width="4.5" stroke-dasharray="113" stroke-dashoffset="30"/>
+  <text x="418" y="408" text-anchor="middle" fill="#343A40" font-family="Inter, sans-serif" font-size="8.5" font-weight="800">USD 13,545</text>
+
+  <circle cx="512" cy="370" r="18" fill="none" stroke="#ECEEF4" stroke-width="4.5"/>
+  <circle cx="512" cy="370" r="18" fill="none" stroke="#23C58F" stroke-width="4.5" stroke-dasharray="113" stroke-dashoffset="24"/>
+  <text x="512" y="408" text-anchor="middle" fill="#343A40" font-family="Inter, sans-serif" font-size="8.5" font-weight="800">USD 84,265</text>
+
+  <!-- Sales by State Map -->
+  <rect x="580" y="310" width="202" height="128" rx="5" fill="#FFFFFF" stroke="#E6E9F2"/>
+  <text x="594" y="328" fill="#343A40" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Sales by State</text>
+  <path d="M600,350 L635,346 L645,364 L628,382 L604,374 Z M674,348 L748,346 L756,374 L724,390 L682,380 Z" fill="#D5DAE6"/>
+  <circle cx="624" cy="364" r="4" fill="#525CE5"/>
+  <circle cx="712" cy="366" r="4" fill="#525CE5"/>
+  <text x="594" y="414" fill="#343A40" font-family="Inter, sans-serif" font-size="7.5" font-weight="700">USA 75%</text>
+  <rect x="594" y="420" width="174" height="3.5" rx="1.75" fill="#ECEEF4"/>
+  <rect x="594" y="420" width="130" height="3.5" rx="1.75" fill="#525CE5"/>
+</svg>
